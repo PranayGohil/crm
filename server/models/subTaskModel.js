@@ -1,0 +1,50 @@
+import mongoose from "mongoose";
+
+const subTaskSchema = mongoose.Schema({
+  project_id: {
+    type: String,
+  },
+  task_name: {
+    type: String,
+  },
+  description: {
+    type: String,
+  },
+  stage: {
+    type: String,
+  },
+  priority: {
+    type: String,
+  },
+  asign_to: [
+    {
+      role: {
+        type: String,
+      },
+      id: {
+        type: String,
+      },
+    },
+  ],
+  assign_date: {
+    type: Date,
+  },
+  due_date: {
+    type: Date,
+  },
+  media_files: [
+    {
+      type: String,
+    },
+  ],
+
+  path_to_files: {
+    type: String,
+  },
+  status: {
+    type: String,
+  },
+});
+
+const SubTask = mongoose.model("subtask", subTaskSchema);
+export default SubTask;
