@@ -26,7 +26,7 @@ const TeamMemberCards = () => {
           <div className="person-1-data">
             <div className="prn-img" width={"100px"} height={"100px"}>
               <img
-                src={`${process.env.REACT_APP_API_URL}/uploads/employees/${member.profile_pic || "default.png"}`}
+                src={`${member.profile_pic || "default.png"}`}
                 alt="profile"
                 className="profile-pic"
                 style={{ width: "100px", height: "100px", objectFit: "cover"}}

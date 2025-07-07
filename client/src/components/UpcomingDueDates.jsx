@@ -1,58 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const UpcomingDueDates = () => {
-  const dueTasks = [
-    {
-      task: "CAD Rendering",
-      project: "Modern Villa Design",
-      dueDate: "Today",
-      dueClass: "md-due-today",
-      userImage: "Image/user.jpg",
-      userName: "Rahul Sharma",
-      status: "In Progress",
-      statusClass: "md-status-progress"
-    },
-    {
-      task: "CAD Rendering",
-      project: "Modern Villa Design",
-      dueDate: "Today",
-      dueClass: "md-due-today",
-      userImage: "Image/user.jpg",
-      userName: "Rahul Sharma",
-      status: "Blocked",
-      statusClass: "md-status-blocked"
-    },
-    {
-      task: "CAD Rendering",
-      project: "Modern Villa Design",
-      dueDate: "Yesterday",
-      dueClass: "md-due-today",
-      userImage: "Image/user.jpg",
-      userName: "Rahul Sharma",
-      status: "Completed",
-      statusClass: "md-status-completed"
-    },
-    {
-      task: "CAD Rendering",
-      project: "Modern Villa Design",
-      dueDate: "Jun 05, 2025",
-      dueClass: "",
-      userImage: "Image/user.jpg",
-      userName: "Rahul Sharma",
-      status: "To Do",
-      statusClass: "md-status-todo"
-    },
-    {
-      task: "CAD Rendering",
-      project: "Modern Villa Design",
-      dueDate: "Jun 05, 2025",
-      dueClass: "",
-      userImage: "Image/user.jpg",
-      userName: "Rahul Sharma",
-      status: "Paused",
-      statusClass: "md-status-review"
-    }
-  ];
+  const [dueTasks, setDueTasks] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/api/statistics/upcoming-due-dates`)
+      .then((res) => setDueTasks(res.data))
+      .catch((err) => console.error(err));
+  }, []);
 
   return (
     <section className="md-overview-upcoming-due-date">
@@ -61,7 +18,6 @@ const UpcomingDueDates = () => {
           <h2>Upcoming Due Dates</h2>
           <a href="#">View All</a>
         </div>
-
         <div className="md-overview-upcoming-table">
           <table className="md-table-container">
             <thead>
@@ -76,17 +32,19 @@ const UpcomingDueDates = () => {
             <tbody>
               {dueTasks.map((task, index) => (
                 <tr key={index}>
-                  <td>{task.task}</td>
-                  <td>{task.project}</td>
-                  <td className={task.dueClass}>{task.dueDate}</td>
+                  <td>{task.task_name}</td>
+                  <td>{task.project_id}</td>
+                  <td>{new Date(task.due_date).toLocaleDateString()}</td>
                   <td>
                     <div className="md-assigned-user">
-                      <img src={task.userImage} alt={task.userName} />
-                      {task.userName}
+                      <img src="/Image/user.jpg" alt="user" />
+                      {task.asign_to?.[0]?.id || "N/A"}
                     </div>
                   </td>
                   <td>
-                    <span className={`md-status-btn ${task.statusClass}`}>
+                    <span
+                      className={`md-status-btn ${task.status?.toLowerCase()}`}
+                    >
                       {task.status}
                     </span>
                   </td>

@@ -7,7 +7,7 @@ const CreateMemberHeader = ({ onSave }) => (
         <img src="/SVG/vec-mem-pro.svg" alt="vec" />
         <span>Create Team Member Profile</span>
       </div>
-      <div className="cancel-changes">
+      {/* <div className="cancel-changes">
         <div className="cancel">
           <a href="#">Cancel</a>
         </div>
@@ -16,7 +16,7 @@ const CreateMemberHeader = ({ onSave }) => (
             Save changes
           </a>
         </div>
-      </div>
+      </div> */}
     </div>
   </section>
 );

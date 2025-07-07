@@ -6,7 +6,7 @@ const designationOptions = ["Senior Developer", "Junior Developer", "Manager"];
 const managerOptions = ["Sarah Johnson (CTO)", "David Lee (PM)"];
 const employmentTypes = ["Full-time", "Part-time"];
 
-const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
+const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const dropdownRef = useRef(null);
 
@@ -48,8 +48,10 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                 value={form.phone}
                 onChange={(e) => onChange("phone", e.target.value)}
               />
+              {errors?.phone && <div className="error">{errors.phone}</div>}
             </div>
           </div>
+
           <div className="profile-edit-inner email">
             <div className="profile-edit-detail mail-txt">
               <span>Email Address</span>
@@ -59,8 +61,10 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                 value={form.email}
                 onChange={(e) => onChange("email", e.target.value)}
               />
+              {errors?.email && <div className="error">{errors.email}</div>}
             </div>
           </div>
+
           <div className="profile-edit-inner home-add">
             <div className="profile-edit-detail phone-num-txt">
               <span>Home Address</span>
@@ -70,8 +74,12 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                 value={form.home_address}
                 onChange={(e) => onChange("home_address", e.target.value)}
               />
+              {errors?.home_address && (
+                <div className="error">{errors.home_address}</div>
+              )}
             </div>
           </div>
+
           <div className="profile-edit-inner date-of-birth">
             <div className="profile-edit-detail date-birth-txt">
               <span>Date of Birth</span>
@@ -80,8 +88,10 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                 value={form.dob}
                 onChange={(e) => onChange("dob", e.target.value)}
               />
+              {errors?.dob && <div className="error">{errors.dob}</div>}
             </div>
           </div>
+
           <div className="profile-edit-inner egn-contact">
             <div className="profile-edit-detail eng-cnt-txt">
               <span>Emergency Contact</span>
@@ -91,6 +101,9 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                 value={form.emrgency_contact}
                 onChange={(e) => onChange("emrgency_contact", e.target.value)}
               />
+              {errors?.emrgency_contact && (
+                <div className="error">{errors.emrgency_contact}</div>
+              )}
             </div>
           </div>
         </div>
@@ -116,6 +129,9 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                 value={form.employee_id}
                 onChange={(e) => onChange("employee_id", e.target.value)}
               />
+              {errors?.employee_id && (
+                <div className="error">{errors.employee_id}</div>
+              )}
             </div>
           </div>
 
@@ -127,7 +143,9 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                 className="dropdown_toggle2"
                 onClick={() => toggleDropdown("department")}
               >
-                <span className="text_btn2">{form.department}</span>
+                <span className="text_btn2">
+                  {form.department || "Select department"}
+                </span>
                 <img
                   src="/SVG/header-vector.svg"
                   alt="vec"
@@ -146,6 +164,9 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                   ))}
                 </ul>
               )}
+              {errors?.department && (
+                <div className="error">{errors.department}</div>
+              )}
             </div>
           </div>
 
@@ -157,7 +178,9 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                 className="dropdown_toggle2"
                 onClick={() => toggleDropdown("designation")}
               >
-                <span className="text_btn2">{form.designation}</span>
+                <span className="text_btn2">
+                  {form.designation || "Select designation"}
+                </span>
                 <img
                   src="/SVG/header-vector.svg"
                   alt="vec"
@@ -176,6 +199,9 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                   ))}
                 </ul>
               )}
+              {errors?.designation && (
+                <div className="error">{errors.designation}</div>
+              )}
             </div>
           </div>
 
@@ -187,7 +213,9 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                 className="dropdown_toggle2"
                 onClick={() => toggleDropdown("reporting_manager")}
               >
-                <span className="text_btn2">{form.reporting_manager}</span>
+                <span className="text_btn2">
+                  {form.reporting_manager || "Select manager"}
+                </span>
                 <img
                   src="/SVG/header-vector.svg"
                   alt="vec"
@@ -206,6 +234,9 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                   ))}
                 </ul>
               )}
+              {errors?.reporting_manager && (
+                <div className="error">{errors.reporting_manager}</div>
+              )}
             </div>
           </div>
 
@@ -217,6 +248,9 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                 value={form.date_of_joining}
                 onChange={(e) => onChange("date_of_joining", e.target.value)}
               />
+              {errors?.date_of_joining && (
+                <div className="error">{errors.date_of_joining}</div>
+              )}
             </div>
           </div>
 
@@ -229,6 +263,9 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                 value={form.monthly_salary}
                 onChange={(e) => onChange("monthly_salary", e.target.value)}
               />
+              {errors?.monthly_salary && (
+                <div className="error">{errors.monthly_salary}</div>
+              )}
             </div>
           </div>
 
@@ -240,7 +277,9 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                 className="dropdown_toggle2"
                 onClick={() => toggleDropdown("employement_type")}
               >
-                <span className="text_btn2">{form.employement_type}</span>
+                <span className="text_btn2">
+                  {form.employement_type || "Select employment type"}
+                </span>
                 <img
                   src="/SVG/header-vector.svg"
                   alt="vec"
@@ -258,6 +297,9 @@ const CreatePersonalProfessionalDetails = ({ form, onChange }) => {
                     </li>
                   ))}
                 </ul>
+              )}
+              {errors?.employement_type && (
+                <div className="error">{errors.employement_type}</div>
               )}
             </div>
           </div>

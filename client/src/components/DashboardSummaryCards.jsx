@@ -1,6 +1,8 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
 
 const DashboardSummaryCards = () => {
+  const [summary, setSummary] = useState(null);
   const projectRef = useRef(null);
   const clientRef = useRef(null);
   const teamRef = useRef(null);
@@ -9,31 +11,41 @@ const DashboardSummaryCards = () => {
   const taskOverdueRef = useRef(null);
 
   useEffect(() => {
-    // === Progress Bar Calculations ===
-    const setProgress = (ref, ongoing, completed) => {
-      const total = ongoing + completed;
-      const percent = (ongoing / total) * 100;
-      if (ref.current) {
-        ref.current.style.width = percent + "%";
-      }
-    };
-
-    // Apply progress bars
-    setProgress(projectRef, 12, 5);
-    setProgress(clientRef, 24, 2);
-    setProgress(teamRef, 8, 2);
-
-    // Task bar flex settings
-    if (
-      taskCompletedRef.current &&
-      taskInProgressRef.current &&
-      taskOverdueRef.current
-    ) {
-      taskCompletedRef.current.style.flex = 70;
-      taskInProgressRef.current.style.flex = 30;
-      taskOverdueRef.current.style.flex = 20;
-    }
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/api/statistics/summary`)
+      .then((res) => {
+        setSummary(res.data);
+      })
+      .catch((err) => console.error(err));
   }, []);
+
+  useEffect(() => {
+    if (summary) {
+      const setProgress = (ref, ongoing, completed) => {
+        const total = ongoing + completed;
+        const percent = total ? (ongoing / total) * 100 : 0;
+        if (ref.current) {
+          ref.current.style.width = percent + "%";
+        }
+      };
+
+      setProgress(projectRef, summary.totalProjects, summary.completedTasks);
+      setProgress(clientRef, summary.totalClients, 0);
+      setProgress(teamRef, summary.totalEmployees, 0);
+
+      if (
+        taskCompletedRef.current &&
+        taskInProgressRef.current &&
+        taskOverdueRef.current
+      ) {
+        taskCompletedRef.current.style.flex = summary.completedTasks;
+        taskInProgressRef.current.style.flex = summary.inProgressTasks;
+        taskOverdueRef.current.style.flex = summary.overdueTasks;
+      }
+    }
+  }, [summary]);
+
+  if (!summary) return <div>Loading...</div>;
 
   return (
     <section className="md-total-card-main">
@@ -47,14 +59,18 @@ const DashboardSummaryCards = () => {
             </div>
           </div>
           <div className="md-total-project-number">
-            <span className="md-total-card-number">17</span>
+            <span className="md-total-card-number">
+              {summary.totalProjects}
+            </span>
             <span className="md-total-card-text">Project</span>
           </div>
           <div className="md-ongoing-completed mt-8">
-            <span className="md-ongoing-number">12</span>
+            <span className="md-ongoing-number">{summary.inProgressTasks} {" "}</span>
             <span>Ongoing</span>
             <span>/</span>
-            <span className="md-completed-number">5</span>
+            <span className="md-completed-number">
+              {summary.completedTasks} {" "}  
+            </span>
             <span>Completed</span>
           </div>
           <div className="md-progress_container">
@@ -74,17 +90,17 @@ const DashboardSummaryCards = () => {
             </div>
           </div>
           <div className="md-total-project-number">
-            <span className="md-total-card-number">24</span>
+            <span className="md-total-card-number">{summary.totalClients}</span>
             <span className="md-total-card-text">Clients</span>
           </div>
-          <div className="mt-8">
+          {/* <div className="mt-8">
             <div className="md-up-arrow-grenn">
               <img src="SVG/up-arrow-green.svg" alt="up arrow green" />
               <div>
-                <span>2</span> new this month
+                <span>+2</span> new this month
               </div>
             </div>
-          </div>
+          </div> */}
           <div className="md-progress_container">
             <div
               className="md-progress_fill md-progress_fill-color-clients"
@@ -102,23 +118,30 @@ const DashboardSummaryCards = () => {
             </div>
           </div>
           <div className="md-total-project-number">
-            <span className="md-total-card-number">120</span>
+            <span className="md-total-card-number">
+              {summary.completedTasks +
+                summary.inProgressTasks +
+                summary.overdueTasks}
+            </span>
             <span className="md-total-card-text">Total</span>
           </div>
           <div className="mt-8 md-btn-cio">
             <div className="md-btn-completed">
-              <span>30</span> completed
+              <span>{summary.completedTasks}</span> completed
             </div>
             <div className="md-btn-in_progress">
-              <span>70</span> In progress
+              <span>{summary.inProgressTasks}</span> In progress
             </div>
             <div className="md-btn-overdue">
-              <span>30</span> Overdue
+              <span>{summary.overdueTasks}</span> Overdue
             </div>
           </div>
           <div className="md-progress_bar-second">
             <div className="md-bar md-completed" ref={taskCompletedRef}></div>
-            <div className="md-bar md-in_progress" ref={taskInProgressRef}></div>
+            <div
+              className="md-bar md-in_progress"
+              ref={taskInProgressRef}
+            ></div>
             <div className="md-bar md-overdue" ref={taskOverdueRef}></div>
           </div>
         </div>
@@ -132,15 +155,17 @@ const DashboardSummaryCards = () => {
             </div>
           </div>
           <div className="md-total-project-number">
-            <span className="md-total-card-number">10</span>
+            <span className="md-total-card-number">
+              {summary.totalEmployees}
+            </span>
             <span className="md-total-card-text">Members</span>
           </div>
-          <div className="md-ongoing-completed mt-8">
+          {/* <div className="md-ongoing-completed mt-8">
             <span>Active Today: </span>
             <span>8</span>
             <span>/</span>
-            <span>10</span>
-          </div>
+            <span>{summary.totalEmployees}</span>
+          </div> */}
           <div className="md-progress_container">
             <div
               className="md-progress_fill md-progress_fill-color-team"

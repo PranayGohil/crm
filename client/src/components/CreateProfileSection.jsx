@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 const designationOptions = ["Senior Developer", "Junior Developer", "Manager"];
 const statusOptions = ["Active", "Inactive", "Blocked"];
 
-const CreateProfileSection = ({ form, onChange, setProfilePic }) => {
+const CreateProfileSection = ({ form, onChange, setProfilePic, errors }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const dropdownRef = useRef(null);
 
@@ -21,13 +21,38 @@ const CreateProfileSection = ({ form, onChange, setProfilePic }) => {
     <section className="pe page3-main2">
       <div className="update-upload-profile">
         <div className="update-your-pro">
-          <div className="upadate-profile-img">
-            <div className="update-img">
+          <div className="upload-profile">
+            <label
+              htmlFor="profilePic"
+              className="upload-img"
+              style={{
+                cursor: "pointer",
+                width: "70px",
+                height: "70px",
+                borderRadius: "50%",
+                overflow: "hidden",
+                border: "1px solid #d1d5db",
+              }}
+            >
               <img
-                src={form.profile_pic_preview || "/Image/prn1.png"}
-                alt="prn1"
+                src={form.profile_pic_preview || "/SVG/upload-vec.svg"}
+                alt="upload"
+                style={{ width: "100%", objectFit: "cover", height: "100%" }}
               />
-            </div>
+            </label>
+            <input
+              type="file"
+              id="profilePic"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  setProfilePic(file);
+                  const previewUrl = URL.createObjectURL(file);
+                  onChange("profile_pic_preview", previewUrl);
+                }
+              }}
+            />
           </div>
           <div className="update-profile-detail">
             <div className="full-name">
@@ -37,6 +62,9 @@ const CreateProfileSection = ({ form, onChange, setProfilePic }) => {
                 value={form.full_name}
                 onChange={(e) => onChange("full_name", e.target.value)}
               />
+              {errors.full_name && (
+                <div className="error">{errors.full_name}</div>
+              )}
             </div>
             <div className="update-dropdown" ref={dropdownRef}>
               <div
@@ -54,7 +82,9 @@ const CreateProfileSection = ({ form, onChange, setProfilePic }) => {
                   }
                 >
                   <div className="t-b-inner">
-                    <span className="text_btn1">{form.designation}</span>
+                    <span className="text_btn1">
+                      {form.designation || "Select option"}
+                    </span>
                     <img
                       src="/SVG/header-vector.svg"
                       alt="vec"
@@ -78,6 +108,10 @@ const CreateProfileSection = ({ form, onChange, setProfilePic }) => {
                   </ul>
                 )}
               </div>
+              {errors.designation && (
+                <div className="error">{errors.designation}</div>
+              )}
+
               <div
                 className={`btn_main1 ${
                   openDropdown === "status" ? "open" : ""
@@ -91,7 +125,9 @@ const CreateProfileSection = ({ form, onChange, setProfilePic }) => {
                   }
                 >
                   <div className="t-b-inner">
-                    <span className="text_btn1">{form.status}</span>
+                    <span className="text_btn1">
+                      {form.status || "Select option"}
+                    </span>
                     <img
                       src="/SVG/header-vector.svg"
                       alt="vec"
@@ -115,20 +151,9 @@ const CreateProfileSection = ({ form, onChange, setProfilePic }) => {
                   </ul>
                 )}
               </div>
+              {errors.status && <div className="error">{errors.status}</div>}
             </div>
           </div>
-        </div>
-        <div className="upload-profile">
-          <label htmlFor="profilePic" className="upload-img">
-            <img src="/SVG/upload-vec.svg" alt="upload" />
-          </label>
-          <input
-            type="file"
-            id="profilePic"
-            style={{ display: "none" }}
-            onChange={(e) => setProfilePic(e.target.files[0])}
-          />
-          <span>Update Profile Picture</span>
         </div>
       </div>
     </section>

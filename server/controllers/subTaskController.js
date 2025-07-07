@@ -20,7 +20,7 @@ export const addSubTask = async (req, res) => {
       asign_to = JSON.parse(asign_to);
     }
 
-    const mediaFiles = req.files ? req.files.map((file) => file.filename) : [];
+    const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
 
     const subTask = await SubTask.create({
       project_id,

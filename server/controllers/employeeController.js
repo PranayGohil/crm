@@ -35,12 +35,12 @@ export const addEmployee = async (req, res) => {
 
     // ✅ Create new employee
     const newEmployee = new Employee({
-      username, // fixed typo (was 'usename')
+      username, // fixed typo (was 'username')
       password: hashedPassword,
       full_name,
       designation,
       status,
-      profile_pic: req.file ? req.file.filename : null,
+      profile_pic: req.file ? req.file.path : null,
       phone,
       email,
       home_address,
@@ -68,8 +68,8 @@ export const addEmployee = async (req, res) => {
 };
 
 export const loginEmployee = async (req, res) => {
-  const { usename, password } = req.body;
-  const employee = await Employee.findOne({ usename });
+  const { username, password } = req.body;
+  const employee = await Employee.findOne({ username });
   if (!employee) {
     return res.status(400).json({ error: "User not found" });
   }

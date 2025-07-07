@@ -11,6 +11,7 @@ import teamRouter from "./routes/teamRoutes.js";
 
 import fs from "fs";
 import path from "path";
+import statisticsRouter from "./routes/statisticsRoutes.js";
 
 const app = express();
 const port = 3001;
@@ -26,16 +27,17 @@ app.use(express.urlencoded({ extended: true }));
 
 connectDB();
 
-const uploadPath = path.join("uploads", "subtasks");
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, { recursive: true });
-}
+// const uploadPath = path.join("uploads", "subtasks");
+// if (!fs.existsSync(uploadPath)) {
+//   fs.mkdirSync(uploadPath, { recursive: true });
+// }
 
-app.use("/uploads", express.static("uploads"));
+// app.use("/uploads", express.static("uploads"));
 app.use("/api/client", clientRouter);
 app.use("/api/employee", employeeRouter);
 app.use("/api/project", projectRouter);
 app.use("/api/subtask", subTaskRouter);
 app.use("/api/team", teamRouter);
+app.use("/api/statistics", statisticsRouter);
 
 app.listen(port, () => console.log(`App listening on port ${port}!`));
