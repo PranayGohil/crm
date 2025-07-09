@@ -14,14 +14,14 @@ const HeaderAdmin = () => {
             <div className="header-notification">
               <div className="ha_notification__header">
                 <a href="notificationadmin">
-                  <img src="SVG/notification.svg" alt="notification icon" />
+                  <img src="/SVG/notification.svg" alt="notification icon" />
                   <span className="ha_notification_count">10</span>
                 </a>
               </div>
 
               <div className="ha-header-img-admin_name">
                 <img
-                  src="Image/Riya Sharma.png"
+                  src="/Image/Riya Sharma.png"
                   alt="riya sharma"
                   className="ha_admin_name"
                 />

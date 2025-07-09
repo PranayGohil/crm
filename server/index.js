@@ -7,7 +7,6 @@ import clientRouter from "./routes/clientRoutes.js";
 import employeeRouter from "./routes/employeeRoutes.js";
 import projectRouter from "./routes/projectRoutes.js";
 import subTaskRouter from "./routes/subTaskRoutes.js";
-import teamRouter from "./routes/teamRoutes.js";
 
 import fs from "fs";
 import path from "path";
@@ -37,7 +36,6 @@ app.use("/api/client", clientRouter);
 app.use("/api/employee", employeeRouter);
 app.use("/api/project", projectRouter);
 app.use("/api/subtask", subTaskRouter);
-app.use("/api/team", teamRouter);
 app.use("/api/statistics", statisticsRouter);
 
 app.listen(port, () => console.log(`App listening on port ${port}!`));

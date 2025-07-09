@@ -1,38 +1,38 @@
 import mongoose from "mongoose";
 
-const projectSchema = mongoose.Schema({
-  project_name: {
-    type: String,
-  },
-  tasks: {
-    type: Array,
-  },
-  client_name: {
-    type: String,
-  },
-  asign_to: [
-    {
-      role: {
-        type: String,
+const projectSchema = mongoose.Schema(
+  {
+    project_name: String,
+    client_id: String,
+    asign_to: [
+      {
+        role: String,
+        id: String,
       },
-      id: {
-        type: String,
-      },
-    },
-  ],
-  assign_date: {
-    type: Date,
-  },
-  due_date: {
-    type: Date,
-  },
-  priority: {
-    type: String,
-  },
-  status: {
-    type: String,
-  },
-});
+    ],
+    assign_date: Date,
+    due_date: Date,
+    priority: String,
+    status: String,
 
-const Project = mongoose.model("project", projectSchema);
+    // add content array
+    content: [
+      {
+        items: [
+          {
+            name: String,
+            quantity: Number,
+            price: Number,
+          },
+        ],
+        total_price: Number,
+        uploaded_files: [String],
+        description: String,
+      },
+    ],
+  },
+  { timestamps: true }
+);
+
+const Project = mongoose.model("Project", projectSchema);
 export default Project;

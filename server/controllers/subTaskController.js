@@ -123,3 +123,28 @@ export const getAllProjectsWithSubtasks = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const bulkUpdateSubtasks = async (req, res) => {
+  const { ids, update } = req.body;
+  try {
+    const result = await SubTask.updateMany(
+      { _id: { $in: ids } },
+      { $set: update }
+    );
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Bulk update failed" });
+  }
+};
+
+export const bulkDeleteSubtasks = async (req, res) => {
+  const { ids } = req.body;
+  try {
+    const result = await SubTask.deleteMany({ _id: { $in: ids } });
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Bulk delete failed" });
+  }
+};

@@ -23,6 +23,25 @@ export const addClient = async (req, res) => {
       additional_notes,
     } = req.body;
 
+    // 👉 Check if username already exists
+    const existingUsername = await Client.findOne({ username });
+    if (existingUsername) {
+      return res.json({
+        success: false,
+        message: "Username already exists. Please choose another.",
+      });
+    }
+
+    // (Optional) Also check for email
+    const existingEmail = await Client.findOne({ email });
+    if (existingEmail) {
+      return res.json({
+        success: false,
+        message: "Email already exists. Please use another email.",
+      });
+    }
+
+    // Hash the password
     const salt = await Bcrypt.genSalt(10);
     const hashedPassword = await Bcrypt.hash(password, salt);
 
@@ -44,10 +63,10 @@ export const addClient = async (req, res) => {
       additional_notes,
     });
 
-    res.status(200).json(client);
+    res.status(200).json({ success: true, message: "Client added successfully", client });
   } catch (error) {
     console.error("Error in addClient:", error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 

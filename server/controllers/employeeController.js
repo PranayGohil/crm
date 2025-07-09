@@ -26,8 +26,10 @@ export const addEmployee = async (req, res) => {
     // ✅ Check if username already exists
     const existingUser = await Employee.findOne({ username });
     if (existingUser) {
-      return res
-        .json({ success: false, message: "Username already exists. Please choose another." });
+      return res.json({
+        success: false,
+        message: "Username already exists. Please choose another.",
+      });
     }
 
     // ✅ Hash password
@@ -81,8 +83,14 @@ export const loginEmployee = async (req, res) => {
 };
 
 export const getEmployees = async (req, res) => {
-  const employees = await Employee.find();
-  res.status(200).json(employees);
+  try {
+    const employees = await Employee.find({}, "_id full_name profile_pic");
+    // only return id & full_name
+    res.status(200).json(employees);
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    res.status(500).json({ error: "Failed to fetch employees" });
+  }
 };
 
 export const getEmployeeInfo = async (req, res) => {

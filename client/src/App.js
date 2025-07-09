@@ -1,28 +1,31 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Layout from "./layout/Layout";
 import Layout_employee from "./layout/Layout_employee";
 import Layout_client from "./layout/Layout_client";
-
 
 import Plain_layout from "./layout/Plain_layout";
 
 import DashboardOverview from "./pages/DashboardOverview";
 
-import ClientDashboardPage from "./pages/ClientDashboardPage";
-import CreateNewClient from "./pages/CreateNewClient";
-import ClientDetailsPage from "./pages/ClientDetailsPage";
+import ClientDashboardPage from "./pages/client/ClientDashboardPage";
+import CreateNewClient from "./pages/client/CreateNewClient";
+import ClientDetailsPage from "./pages/client/ClientDetailsPage";
 import ClientProjectDetails from "./pages/ClientProjectDetails";
 import ClientSubtaskShow from "./pages/ClientSubtaskShow";
 
 import PreviewButton from "./pages/PreviewButton";
 
-import AllProject from "./pages/AllProject";
-import AddNewProject from "./pages/AddNewProject";
+import AllProject from "./pages/project/AllProject";
+import AddNewProject from "./pages/project/AddNewProject";
 import SubtaskManagement from "./pages/SubtaskManagement";
-import SubtaskManagementBulk from "./pages/SubtaskManagementBulk";
-import SubtaskDashboardContainer from "./pages/SubtaskDashboardContainer";
+import SubtaskManagementBulk from "./pages/project/SubtaskManagementBulk";
+import SubtaskDashboardContainer from "./pages/project/SubtaskDashboardContainer";
 
-import ProjectContent from "./pages/ProjectContent";
+import ProjectContent from "./pages/project/ProjectContent";
 import EditProjectContent from "./pages/EditProjectContent";
 import ProjectMediaGallery from "./components/ProjectMediaGallery";
 
@@ -32,12 +35,11 @@ import TeamMemberProfile from "./pages/TeamMemberProfile";
 import TaskTimeboard from "./pages/TaskTimeboard";
 import NotificationAdmin from "./pages/NotificationAdmin";
 
-import EditClient from "./pages/EditClient";
+import EditClient from "./pages/client/EditClient";
 import EditProject from "./pages/EditProject";
-import CreateProjectContent from "./pages/CreateProjectContent";
+import CreateProjectContent from "./pages/project/CreateProjectContent";
 import EditSubtaskManagement from "./pages/EditSubtaskManagement";
 import CreateEmployeeProfile from "./pages/CreateEmployeeProfile";
-
 
 import TimeTrackingDashboard from "./pages/TimeTrackingDashboard";
 import EmployeeTimeTracking from "./pages/EmployeeTimeTracking";
@@ -47,7 +49,7 @@ import EmployeeNotificationPage from "./pages/EmployeeNotificationPage";
 
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 
-// client admin 
+// client admin
 
 import ClientAdminDetailsPage from "./pages/ClientAdminDetailsPage";
 import ClientAdminProjectDetails from "./pages/ClientAdminProjectDetails";
@@ -67,40 +69,70 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<DashboardOverview />} />
           <Route path="dashboard" element={<DashboardOverview />} />
-          <Route path="client-dashboard" element={<ClientDashboardPage />} />
-          <Route path="createnewclient" element={<CreateNewClient />} />
-          <Route path="clientdetailspage/:id" element={<ClientDetailsPage />} />
-          <Route path="clientprojectdetails" element={<ClientProjectDetails />} />
+
+          {/* client */}
+          <Route path="/client/dashboard" element={<ClientDashboardPage />} />
+          <Route path="/client/create" element={<CreateNewClient />} />
+          <Route path="/client/details/:id" element={<ClientDetailsPage />} />
+          <Route path="/client/edit/:id" element={<EditClient />} />
+
+          <Route
+            path="clientprojectdetails"
+            element={<ClientProjectDetails />}
+          />
           <Route path="clientsubtaskshow" element={<ClientSubtaskShow />} />
           <Route path="previewbutton" element={<PreviewButton />} />
-          <Route path="allproject" element={<AllProject />} />
-          <Route path="addnewproject" element={<AddNewProject />} />
+          <Route path="/project/dashboard" element={<AllProject />} />
+          <Route path="/project/add" element={<AddNewProject />} />
           <Route path="subtaskmanagement" element={<SubtaskManagement />} />
-          <Route path="subtaskmanagementbulk/:projectId" element={<SubtaskManagementBulk />} />
-          <Route path="subtaskdashboardcontainer/:projectId" element={<SubtaskDashboardContainer />} />
-          <Route path="projectcontent" element={<ProjectContent />} />
+          <Route
+            path="/project/subtask/add/:projectId"
+            element={<SubtaskManagementBulk />}
+          />
+          <Route
+            path="/project/subtask-dashboard/:projectId"
+            element={<SubtaskDashboardContainer />}
+          />
+          <Route path="/project/view-content/:projectId" element={<ProjectContent />} />
           <Route path="editprojectcontent" element={<EditProjectContent />} />
-          <Route path="projectmediagallery" element={<ProjectMediaGallery />} />
+          <Route path="/project/gallery/:projectId" element={<ProjectMediaGallery />} />
           <Route path="teammemberdashboard" element={<TeamMemberDashboard />} />
           <Route path="employeeprofileedit" element={<EmployeeProfileEdit />} />
           <Route path="teammemberprofile" element={<TeamMemberProfile />} />
           <Route path="tasktimeboard" element={<TaskTimeboard />} />
-          <Route path="timetrackingdashboard" element={<TimeTrackingDashboard />} />
+          <Route
+            path="timetrackingdashboard"
+            element={<TimeTrackingDashboard />}
+          />
           <Route path="notificationadmin" element={<NotificationAdmin />} />
 
           {/* edit page */}
-          <Route path="EditClient/:id" element={<EditClient />} />
-          <Route path="EditProject" element={<EditProject />} />
-          <Route path="CreateProjectContent" element={<CreateProjectContent />} />
-          <Route path="EditSubtaskManagement" element={<EditSubtaskManagement />} />
-          <Route path="CreateEmployeeProfile" element={<CreateEmployeeProfile />} />
 
+          <Route path="/project/edit/:projectId" element={<EditProject />} />
+          <Route
+            path="/project/edit-content/:projectId"
+            element={<CreateProjectContent />}
+          />
+          <Route
+            path="EditSubtaskManagement"
+            element={<EditSubtaskManagement />}
+          />
+          <Route
+            path="CreateEmployeeProfile"
+            element={<CreateEmployeeProfile />}
+          />
         </Route>
 
         <Route path="/" element={<Layout_employee />}>
           <Route path="employeedashboard" element={<EmployeeDashboard />} />
-          <Route path="employeetimetracking" element={<EmployeeTimeTracking />} />
-          <Route path="employeenotificationpage" element={<EmployeeNotificationPage />} />
+          <Route
+            path="employeetimetracking"
+            element={<EmployeeTimeTracking />}
+          />
+          <Route
+            path="employeenotificationpage"
+            element={<EmployeeNotificationPage />}
+          />
         </Route>
 
         <Route path="/" element={<Plain_layout />}>
@@ -108,20 +140,49 @@ function App() {
         </Route>
 
         <Route path="/" element={<Layout_client />}>
-          <Route path="ClientAdminDetailsPage" element={<ClientAdminDetailsPage />} />
-          <Route path="ClientAdminProjectDetails" element={<ClientAdminProjectDetails />} />
-          <Route path="ClientAdminSubtaskShow" element={<ClientAdminSubtaskShow />} />
-          <Route path="ClientAdminProjectContent" element={<ClientAdminProjectContent />} />
-          <Route path="ClientAdminProjectMediaGallery" element={<ClientAdminProjectMediaGallery />} />
-          <Route path="ClientAdminNotificationPage" element={<ClientAdminNotificationPage />} />
-          <Route path="ClientAdminPreviewPage" element={<ClientAdminPreviewPage />} />
+          <Route
+            path="ClientAdminDetailsPage"
+            element={<ClientAdminDetailsPage />}
+          />
+          <Route
+            path="ClientAdminProjectDetails"
+            element={<ClientAdminProjectDetails />}
+          />
+          <Route
+            path="ClientAdminSubtaskShow"
+            element={<ClientAdminSubtaskShow />}
+          />
+          <Route
+            path="ClientAdminProjectContent"
+            element={<ClientAdminProjectContent />}
+          />
+          <Route
+            path="ClientAdminProjectMediaGallery"
+            element={<ClientAdminProjectMediaGallery />}
+          />
+          <Route
+            path="ClientAdminNotificationPage"
+            element={<ClientAdminNotificationPage />}
+          />
+          <Route
+            path="ClientAdminPreviewPage"
+            element={<ClientAdminPreviewPage />}
+          />
         </Route>
-
       </Routes>
-    </Router>
 
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
+    </Router>
   );
 }
 
 export default App;
-

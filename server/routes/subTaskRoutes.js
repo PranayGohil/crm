@@ -9,6 +9,8 @@ import {
   updateSubTask,
   changeSubTaskStatus,
   getAllProjectsWithSubtasks,
+  bulkUpdateSubtasks,
+  bulkDeleteSubtasks,
 } from "../controllers/subTaskController.js";
 import upload from "../middlewares/upload.js";
 
@@ -23,5 +25,8 @@ subTaskRouter.delete("/delete/:id", deleteSubTask);
 subTaskRouter.put("/update/:id", updateSubTask);
 subTaskRouter.put("/change-status/:id", changeSubTaskStatus);
 subTaskRouter.get("/all-tasks-projects", getAllProjectsWithSubtasks);
+subTaskRouter.put("/bulk-update", bulkUpdateSubtasks);
+subTaskRouter.post("/bulk-delete", bulkDeleteSubtasks);
+
 
 export default subTaskRouter;
