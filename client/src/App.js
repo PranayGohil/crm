@@ -17,7 +17,7 @@ import ClientDetailsPage from "./pages/client/ClientDetailsPage";
 import ClientProjectDetails from "./pages/ClientProjectDetails";
 import ClientSubtaskShow from "./pages/ClientSubtaskShow";
 
-import PreviewButton from "./pages/PreviewButton";
+import ProjectDetails from "./pages/ProjectDetails";
 
 import AllProject from "./pages/project/AllProject";
 import AddNewProject from "./pages/project/AddNewProject";
@@ -81,7 +81,7 @@ function App() {
             element={<ClientProjectDetails />}
           />
           <Route path="clientsubtaskshow" element={<ClientSubtaskShow />} />
-          <Route path="previewbutton" element={<PreviewButton />} />
+          <Route path="/project/details/:projectId" element={<ProjectDetails />} />
           <Route path="/project/dashboard" element={<AllProject />} />
           <Route path="/project/add" element={<AddNewProject />} />
           <Route path="subtaskmanagement" element={<SubtaskManagement />} />

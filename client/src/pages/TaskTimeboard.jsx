@@ -366,9 +366,9 @@ const TaskTimeboard = () => {
                       {/* <a href="#">
                         <img src="/SVG/delete.svg" alt="delete" />
                       </a> */}
-                      <a href="PreviewButton">
+                      <Link to={`/project/details/${project.id}`}>
                         <img src="/SVG/eye-view.svg" alt="view" />
-                      </a>
+                      </Link>
                     </td>
                   </tr>
                   {openRow === idx && (
