@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const RecentProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -131,12 +132,11 @@ const RecentProjects = () => {
                   </div>
 
                   <div className="md-project_card__button_wrap">
-                    <a
-                      href="subtaskdashboardcontainer"
+                    <Link to={`/project/subtask-dashboard/${project._id}`}
                       className="md-project_card__view_btn"
                     >
                       View Subtasks
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>

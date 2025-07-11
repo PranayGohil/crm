@@ -1,5 +1,6 @@
 import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
+import mongoose from "mongoose";
 
 export const addSubTask = async (req, res) => {
   try {
@@ -20,10 +21,19 @@ export const addSubTask = async (req, res) => {
       asign_to = JSON.parse(asign_to);
     }
 
+    // Convert project_id to ObjectId
+    const projectObjectId = new mongoose.Types.ObjectId(project_id);
+
+    // Convert asign_to[].id to ObjectId
+    asign_to = asign_to.map((a) => ({
+      role: a.role,
+      id: new mongoose.Types.ObjectId(a.id),
+    }));
+
     const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
 
     const subTask = await SubTask.create({
-      project_id,
+      project_id: projectObjectId,
       task_name,
       description,
       stage,
@@ -45,8 +55,18 @@ export const addSubTask = async (req, res) => {
 
 export const addBulkSubTasks = async (req, res) => {
   try {
-    const tasks = req.body; // should be array
-    const result = await SubTask.insertMany(tasks);
+    const tasks = req.body; // array
+
+    const tasksWithObjectIds = tasks.map((task) => ({
+      ...task,
+      project_id: new mongoose.Types.ObjectId(task.project_id),
+      asign_to: task.asign_to.map((a) => ({
+        role: a.role,
+        id: new mongoose.Types.ObjectId(a.id),
+      })),
+    }));
+
+    const result = await SubTask.insertMany(tasksWithObjectIds);
     res.status(200).json(result);
   } catch (error) {
     console.error("Error adding bulk subtasks:", error);

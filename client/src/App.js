@@ -68,7 +68,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<DashboardOverview />} />
-          <Route path="dashboard" element={<DashboardOverview />} />
+          <Route path="/dashboard" element={<DashboardOverview />} />
 
           {/* client */}
           <Route path="/client/dashboard" element={<ClientDashboardPage />} />

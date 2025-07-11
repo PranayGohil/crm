@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 
 const subTaskSchema = mongoose.Schema({
   project_id: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Project",
   },
   task_name: {
     type: String,
@@ -18,11 +19,10 @@ const subTaskSchema = mongoose.Schema({
   },
   asign_to: [
     {
-      role: {
-        type: String,
-      },
+      role: String,
       id: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Employee",
       },
     },
   ],
@@ -37,7 +37,6 @@ const subTaskSchema = mongoose.Schema({
       type: String,
     },
   ],
-
   path_to_files: {
     type: String,
   },

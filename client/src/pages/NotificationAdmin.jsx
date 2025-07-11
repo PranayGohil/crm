@@ -1,25 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import NotificationItem from "../components/NotificationItem";
+import { NotificationContext } from "../contexts/NotificationContext";
 
 const NotificationAdmin = () => {
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const { notifications, markAllAsRead } = useContext(NotificationContext);
 
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/notification/get-all`
-        );
-        setNotifications(res.data.notifications || []);
-      } catch (err) {
-        console.error("Failed to fetch notifications:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchNotifications();
+    markAllAsRead();
   }, []);
 
   if (loading) return <p>Loading...</p>;

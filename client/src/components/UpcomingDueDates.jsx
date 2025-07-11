@@ -11,6 +11,14 @@ const UpcomingDueDates = () => {
       .catch((err) => console.error(err));
   }, []);
 
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-indexed
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
   return (
     <section className="md-overview-upcoming-due-date">
       <div className="md-overview-upcoming-due-date-inner">
@@ -33,19 +41,32 @@ const UpcomingDueDates = () => {
               {dueTasks.map((task, index) => (
                 <tr key={index}>
                   <td>{task.task_name}</td>
-                  <td>{task.project_id}</td>
-                  <td>{new Date(task.due_date).toLocaleDateString()}</td>
+                  <td>{task.project_id?.project_name || "N/A"}</td>
+                  <td>
+                    {task.project_id?.due_date
+                      ? formatDate(task.project_id.due_date)
+                      : "N/A"}
+                  </td>
+
                   <td>
                     <div className="md-assigned-user">
-                      <img src="/Image/user.jpg" alt="user" />
-                      {task.asign_to?.[0]?.id || "N/A"}
+                      <img
+                        src={
+                          task.asign_to?.[0]?.id?.profile_pic ||
+                          "/Image/user.jpg"
+                        }
+                        alt="user"
+                      />
+                      {task.asign_to?.[0]?.id?.full_name || "N/A"}
                     </div>
                   </td>
                   <td>
                     <span
-                      className={`md-status-btn ${task.status?.toLowerCase()}`}
+                      className={`md-status-btn ${
+                        task.status?.toLowerCase() || "unknown"
+                      }`}
                     >
-                      {task.status}
+                      {task.status || "N/A"}
                     </span>
                   </td>
                 </tr>

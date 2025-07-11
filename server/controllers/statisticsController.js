@@ -33,11 +33,22 @@ export const Summary = async (req, res) => {
 
 export const UpcomingDueDates = async (req, res) => {
   try {
-    // Get upcoming 5 tasks sorted by due_date
-    const tasks = await SubTask.find().sort({ due_date: 1 }).limit(5).lean();
+    const tasks = await SubTask.find()
+      .sort({ due_date: 1 })  // you might sort by project due_date if you want
+      .limit(5)
+      .populate({
+        path: "project_id",
+        select: "project_name due_date"
+      })
+      .populate({
+        path: "asign_to.id",
+        select: "full_name profile_pic"
+      })
+      .lean();
 
     res.json(tasks);
   } catch (error) {
+    console.log(error.message);
     res.status(500).json({ message: error.message });
   }
 };

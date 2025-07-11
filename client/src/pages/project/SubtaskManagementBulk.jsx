@@ -11,9 +11,8 @@ const SubtaskManagementBulk = () => {
   const [employees, setEmployees] = useState([]);
   const { projectId } = useParams();
 
-  const assignToOptions = ["em1", "em2", "em3"];
   const priorityOptions = ["Low", "Medium", "High"];
-  const stageOptions = ["Design", "Render"];
+  const stageOptions = ["Jwellery Designer", "HR", "CO-CEO", "CEO", "SEO Executive", "Render Artist"];
 
   const [mediaFiles, setMediaFiles] = useState([]);
   const [mediaPreviews, setMediaPreviews] = useState([]);
