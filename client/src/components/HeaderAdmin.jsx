@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
+import { NotificationContext } from "../contexts/NotificationContext";
 
 const HeaderAdmin = () => {
+  const { unreadCount } = useContext(NotificationContext);
+
   return (
     <div className="ha-header_admin_main">
       <div className="ha-header_admin_main_inner">
@@ -13,9 +16,11 @@ const HeaderAdmin = () => {
 
             <div className="header-notification">
               <div className="ha_notification__header">
-                <a href="notificationadmin">
+                <a href="/notificationadmin">
                   <img src="/SVG/notification.svg" alt="notification icon" />
-                  <span className="ha_notification_count">10</span>
+                  {unreadCount > 0 && (
+                    <span className="ha_notification_count">{unreadCount}</span>
+                  )}
                 </a>
               </div>
 
