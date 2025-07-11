@@ -39,9 +39,7 @@ const CreateLoginSecuritySettings = ({ form, onChange, errors, onSave }) => (
       )}
     </div>
     <div className="save-changes">
-      <a href="#" onClick={onSave}>
-        Save changes
-      </a>
+      <button onClick={onSave} className="theme_btn">Save changes</button>
     </div>
   </section>
 );

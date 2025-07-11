@@ -17,15 +17,10 @@ const subTaskSchema = mongoose.Schema({
   priority: {
     type: String,
   },
-  asign_to: [
-    {
-      role: String,
-      id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Employee",
-      },
-    },
-  ],
+  asign_to: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Employee",
+  },
   assign_date: {
     type: Date,
   },

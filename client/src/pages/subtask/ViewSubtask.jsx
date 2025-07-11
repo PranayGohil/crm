@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import LoadingOverlay from "../../components/LoadingOverlay";
+import { toast } from "react-toastify";
+import { statusOptions, priorityOptions } from "../../options";
 
-const ProjectDetails = () => {
-  const { projectId } = useParams();
+const ViewSubtask = () => {
+  const { subtaskId } = useParams();
   const navigate = useNavigate();
 
+  const [subtask, setSubtask] = useState(null);
   const [project, setProject] = useState(null);
   const [client, setClient] = useState(null);
-  const [assignedEmployees, setAssignedEmployees] = useState([]);
-  const [subTasks, setSubTasks] = useState([]); // optional
+  const [assignedEmployee, setAssignedEmployee] = useState(null); // single employee
   const [loading, setLoading] = useState(true);
+
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [editingStatus, setEditingStatus] = useState("");
+  const [editingPriority, setEditingPriority] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const mediaItems = [
     { src: "/Image/jwell1.png", alt: "g-i1" },
@@ -28,68 +37,94 @@ const ProjectDetails = () => {
       text: "Please make sure to include the smaller diamond details as specified in the client brief. They want exactly 16 stones in the halo setting.",
       avatar: "/Image/prn1.png",
     },
-    {
-      id: 2,
-      name: "Emma Davis",
-      role: "Project Manager",
-      timeAgo: "2 days ago",
-      text: "Please make sure to include the smaller diamond details as specified in the client brief. They want exactly 16 stones in the halo setting.",
-      avatar: "/Image/prn1.png",
-    },
-    {
-      id: 3,
-      name: "Emma Davis",
-      role: "Project Manager",
-      timeAgo: "2 days ago",
-      text: "Please make sure to include the smaller diamond details as specified in the client brief. They want exactly 16 stones in the halo setting.",
-      avatar: "/Image/prn1.png",
-    },
   ];
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 1. Fetch project
-        const projectRes = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`
-        );
-        const proj = projectRes.data.project;
-        setProject(proj);
+        setLoading(true);
 
-        // 2. Fetch client
-        if (proj.client_id) {
-          const clientRes = await axios.get(
-            `${process.env.REACT_APP_API_URL}/api/client/get/${proj.client_id}`
+        const { data: subtaskData } = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/subtask/get/${subtaskId}`
+        );
+        setSubtask(subtaskData);
+        setEditingStatus(subtaskData.status || "");
+        setEditingPriority(subtaskData.priority || "");
+
+        console.log("Subtask Data:", subtaskData);
+
+        const { data: projectData } = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/project/get/${subtaskData.project_id}`
+        );
+        setProject(projectData.project);
+        console.log("Project Data:", projectData);
+
+        if (subtaskData.asign_to) {
+          const { data: employeeData } = await axios.get(
+            `${process.env.REACT_APP_API_URL}/api/employee/get/${subtaskData.asign_to}`
           );
-          setClient(clientRes.data.client);
+          setAssignedEmployee(employeeData);
+          console.log("Assigned Employee Data:", employeeData);
         }
 
-        // 3. Fetch assigned employees
-        if (proj.asign_to && proj.asign_to.length > 0) {
-          const employeeIds = proj.asign_to.map((a) => a.id);
-          const employeesRes = await axios.post(
-            `${process.env.REACT_APP_API_URL}/api/employee/get-multiple`,
-            { ids: employeeIds }
+        if (projectData.project.client_id) {
+          const { data: clientData } = await axios.get(
+            `${process.env.REACT_APP_API_URL}/api/client/get/${projectData.project.client_id}`
           );
-          setAssignedEmployees(employeesRes.data.employees);
+          setClient(clientData);
+          console.log("Client Data:", clientData);
         }
-
-        // 4. (Optional) Fetch subtasks
-        const subtasksRes = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/subtask/project/${projectId}`
-        );
-        setSubTasks(subtasksRes.data.subtasks || []);
-      } catch (err) {
-        console.error("Error fetching project details:", err);
+      } catch (error) {
+        console.error("Failed to load subtask details:", error);
+        toast.error("Failed to load subtask details.");
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
-  }, [projectId]);
 
-  if (loading) return <p>Loading...</p>;
-  if (!project) return <p>Project not found!</p>;
+    fetchData();
+  }, [subtaskId]);
+
+  const handleUpdate = async () => {
+    try {
+      setSaving(true);
+      // update status
+      await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/subtask/change-status/${subtaskId}`,
+        { status: editingStatus }
+      );
+      // update priority
+      await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/subtask/change-priority/${subtaskId}`,
+        { priority: editingPriority }
+      );
+
+      toast.success("Subtask updated successfully!");
+      setSubtask((prev) => ({
+        ...prev,
+        status: editingStatus,
+        priority: editingPriority,
+      }));
+      setIsEditing(false); // exit editing mode
+    } catch (error) {
+      console.error("Failed to update subtask:", error);
+      toast.error("Failed to update subtask.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
+
+  if (loading) return <LoadingOverlay />;
+  if (!subtask) return <p>Subtask not found!</p>;
 
   return (
     <div className="preview-page">
@@ -105,8 +140,8 @@ const ProjectDetails = () => {
       <section className="pb-sec2">
         <div className="pb-sec2-heading">
           <div className="pb-subtask-head">
-            <h2>{project.project_name}</h2>
-            <p>{subTasks.length > 0 ? subTasks[0].task_name : "No Subtask"}</p>
+            <h2>{project?.project_name || "Project Name"}</h2>
+            <p>{subtask.task_name || "Subtask Name"}</p>
           </div>
         </div>
       </section>
@@ -116,20 +151,62 @@ const ProjectDetails = () => {
           <div className="pb-client-id">
             <div className="pb-pro-client pb-project-id">
               <p>Project ID: </p>
-              <span>{project._id}</span>
+              <span>{project?._id}</span>
             </div>
             <div className="pb-pro-client pb-client">
               <p>Client: </p>
               <span>{client?.full_name || "N/A"}</span>
             </div>
           </div>
-          <div className="pb-subtask-process">
-            <a href="#" className="cdn-bg-color-yellow color_yellow">
-              {project.status || "Status Unknown"}
-            </a>
-            <a href="#" className="cdn-bg-color-red color_red">
-              {project.priority || "Priority Unknown"}
-            </a>
+          <div>
+            {isEditing ? (
+              <div className="d-flex align-items-center gap-2">
+                <select
+                  value={editingStatus}
+                  onChange={(e) => setEditingStatus(e.target.value)}
+                  className="dropdown_toggle"
+                  disabled={saving}
+                >
+                  <option value="">Select Status</option>
+                  {statusOptions.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={editingPriority}
+                  onChange={(e) => setEditingPriority(e.target.value)}
+                  className="dropdown_toggle"
+                  disabled={saving}
+                >
+                  <option value="">Select Priority</option>
+                  {priorityOptions.map((priority) => (
+                    <option key={priority} value={priority}>
+                      {priority}
+                    </option>
+                  ))}
+                </select>
+
+                <button onClick={handleUpdate} disabled={saving} className="theme_btn">
+                  {saving ? "Saving..." : "Update"}
+                </button>
+                <button onClick={() => setIsEditing(false)} disabled={saving} className="theme_secondary_btn">
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <>
+                <span className="cdn-bg-color-yellow color_yellow mx-2  rounded p-2">
+                  {subtask.status || "Status Unknown"}
+                </span>
+                <span className="cdn-bg-color-red color_red mx-2 rounded p-2">
+                  {subtask.priority || "Priority Unknown"}
+                </span>
+                <button onClick={() => setIsEditing(true)} className="theme_btn">Edit</button>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -143,28 +220,17 @@ const ProjectDetails = () => {
             <div className="pb-task-view overview1">
               <div className="pb-taskinner">
                 <p>Stage:</p>
-                <span>{subTasks.length > 0 ? subTasks[0].stage : "N/A"}</span>
+                <span>{subtask.stage || "N/A"}</span>
               </div>
               <div className="pb-taskinner">
                 <p>Assigned To:</p>
-                <span>
-                  {assignedEmployees.map((e) => e.full_name).join(", ") ||
-                    "N/A"}
-                </span>
+                <span>{assignedEmployee?.full_name || "N/A"}</span>
               </div>
               <div className="pb-taskinner">
                 <p>Start Date:</p>
                 <span>
-                  {project.assign_date
-                    ? new Date(project.assign_date).toLocaleDateString()
-                    : "N/A"}
-                </span>
-              </div>
-              <div className="pb-taskinner">
-                <p>Due Date:</p>
-                <span>
-                  {project.due_date
-                    ? new Date(project.due_date).toLocaleDateString()
+                  {subtask.assign_date
+                    ? formatDate(subtask.assign_date)
                     : "N/A"}
                 </span>
               </div>
@@ -176,18 +242,12 @@ const ProjectDetails = () => {
               </div>
               <div className="pb-taskinner">
                 <p>Status:</p>
-                <span>{project.status || "N/A"}</span>
+                <span>{subtask.status || "N/A"}</span>
               </div>
               <div className="pb-taskinner">
-                <p>Completion:</p>
-                <span className="pb-process-span">
-                  <div className="cd-progress_container">
-                    <div
-                      className="cd-progress"
-                      style={{ width: "83%", backgroundColor: "#10B981" }}
-                    ></div>
-                  </div>
-                  83%
+                <p>Due Date:</p>
+                <span>
+                  {subtask.due_date ? formatDate(subtask.due_date) : "N/A"}
                 </span>
               </div>
             </div>
@@ -199,7 +259,7 @@ const ProjectDetails = () => {
         <div className="pb-sec5-inner pb-sec3-inner">
           <div className="pb-project-description">
             <h3>Description</h3>
-            <p>{subTasks[0]?.description || "No description available."}</p>
+            <p>{subtask.description || "No description available."}</p>
           </div>
         </div>
       </section>
@@ -303,37 +363,8 @@ const ProjectDetails = () => {
           </div>
         </div>
       </section>
-
-      <section className="pb-sec-8 pb-sec2">
-        <div className="pb-sec8-inner pb-sec3-inner">
-          <div className="pb-btns pb-edit-delete">
-            <div className="edit-profile">
-              <a href="#">
-                <img src="/SVG/edit.svg" alt="edit" />
-                Edit
-              </a>
-            </div>
-            <div className="css-delete_btn">
-              <a href="#" className="css-high css-delete">
-                <img src="/SVG/delete-vec.svg" alt="del" />
-                Delete Selected
-              </a>
-            </div>
-          </div>
-          <div className="pb-btns add-mbr">
-            <div className="cnc-btn sms-reset-btn">
-              <a href="#">Back to Task Board</a>
-            </div>
-            <div className="plus-icon">
-              <a href="#">
-                <span>Mark Complete</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
 
-export default ProjectDetails;
+export default ViewSubtask;

@@ -6,13 +6,12 @@ import * as Yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const SubtaskManagementBulk = () => {
+import { stageOptions, priorityOptions } from "../../options";
+
+const AddSubtask = () => {
   const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
   const { projectId } = useParams();
-
-  const priorityOptions = ["Low", "Medium", "High"];
-  const stageOptions = ["Jwellery Designer", "HR", "CO-CEO", "CEO", "SEO Executive", "Render Artist"];
 
   const [mediaFiles, setMediaFiles] = useState([]);
   const [mediaPreviews, setMediaPreviews] = useState([]);
@@ -23,6 +22,8 @@ const SubtaskManagementBulk = () => {
     stage: Yup.string().required("Stage is required"),
     priority: Yup.string().required("Priority is required"),
     asign_to: Yup.string().required("Assign To is required"),
+    assign_date: Yup.string().required("Start date is required"),
+    due_date: Yup.string().required("Due date is required"),
   });
 
   const bulkSchema = Yup.object({
@@ -34,6 +35,8 @@ const SubtaskManagementBulk = () => {
     bulkStage: Yup.string().required("Stage is required"),
     bulkPriority: Yup.string().required("Priority is required"),
     bulkAssignTo: Yup.string().required("Assign To is required"),
+    bulkAssignDate: Yup.string().required("Start date is required"),
+    bulkDueDate: Yup.string().required("Due date is required"),
   });
 
   useEffect(() => {
@@ -58,11 +61,10 @@ const SubtaskManagementBulk = () => {
       formData.append("description", values.description);
       formData.append("stage", values.stage);
       formData.append("priority", values.priority);
-      formData.append(
-        "asign_to",
-        JSON.stringify([{ role: "Employee", id: values.asign_to }])
-      );
-      formData.append("status", "To do");
+      formData.append("assign_date", values.assign_date);
+      formData.append("due_date", values.due_date);
+      formData.append("asign_to", values.asign_to);
+      formData.append("status", "To Do");
       mediaFiles.forEach((file) => formData.append("media_files", file));
 
       await axios.post(
@@ -88,7 +90,9 @@ const SubtaskManagementBulk = () => {
           description: "",
           stage: values.bulkStage,
           priority: values.bulkPriority,
-          asign_to: [{ role: "Employee", id: values.bulkAssignTo }],
+          asign_to: values.bulkAssignTo,
+          assign_date: values.bulkAssignDate,
+          due_date: values.bulkDueDate,
           status: "To do",
         });
       }
@@ -111,7 +115,10 @@ const SubtaskManagementBulk = () => {
       <section className="sms-subtask-mng-header mg-auto">
         <div className="sms-header-inner">
           <div className="sms-heading-main">
-            <Link to={`/project/subtask-dashboard/${projectId}`} className="sms-back-link">
+            <Link
+              to={`/project/subtask-dashboard/${projectId}`}
+              className="sms-back-link"
+            >
               <img src="/SVG/arrow-pc.svg" alt="" />
             </Link>
             <div className="sms-heading-txt">
@@ -140,6 +147,8 @@ const SubtaskManagementBulk = () => {
                   stage: "",
                   priority: "",
                   asign_to: "",
+                  assign_date: "",
+                  due_date: "",
                 }}
                 validationSchema={singleSchema}
                 onSubmit={handleAddSingle}
@@ -248,6 +257,31 @@ const SubtaskManagementBulk = () => {
                       </div>
                     </div>
 
+                    {/* Start & end date */}
+                    <div className="anp-start_end-date sms-add_same">
+                      <span className="anp-client-name-para">
+                        Start Date - End Date
+                      </span>
+                      <div className="enp-date_input sms-add_same d-flex justify-content-around">
+                        <div>
+                          <Field type="date" name="assign_date" />
+                          <ErrorMessage
+                            name="assign_date"
+                            component="div"
+                            className="error"
+                          />
+                        </div>
+                        <div>
+                          <Field type="date" name="due_date" />
+                          <ErrorMessage
+                            name="due_date"
+                            component="div"
+                            className="error"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="sms-attach_files sms-add_same">
                       <span>Content Included</span>
                       <div className="epc-drag-drop-files">
@@ -330,6 +364,8 @@ const SubtaskManagementBulk = () => {
                   bulkStage: "",
                   bulkPriority: "",
                   bulkAssignTo: "",
+                  bulkAssignDate: "",
+                  bulkDueDate: "",
                 }}
                 validationSchema={bulkSchema}
                 onSubmit={handleBulkGenerate}
@@ -436,6 +472,31 @@ const SubtaskManagementBulk = () => {
                           className="error"
                         />
                       </div>
+
+                      {/* Start & end date */}
+                      <div className="anp-start_end-date sms-add_same">
+                        <span className="anp-client-name-para">
+                          Start Date - End Date
+                        </span>
+                        <div className="enp-date_input sms-add_same d-flex justify-content-around">
+                          <div>
+                            <Field type="date" name="bulkAssignDate" />
+                            <ErrorMessage
+                              name="bulkAssignDate"
+                              component="div"
+                              className="error"
+                            />
+                          </div>
+                          <div>
+                            <Field type="date" name="bulkDueDate" />
+                            <ErrorMessage
+                              name="bulkDueDate"
+                              component="div"
+                              className="error"
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="sms-generate_btn sms-add_same">
@@ -455,4 +516,4 @@ const SubtaskManagementBulk = () => {
   );
 };
 
-export default SubtaskManagementBulk;
+export default AddSubtask;

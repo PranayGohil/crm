@@ -107,10 +107,10 @@ const CreateProfileSection = ({ form, onChange, setProfilePic, errors }) => {
                     ))}
                   </ul>
                 )}
+                {errors.designation && (
+                  <div className="error">{errors.designation}</div>
+                )}
               </div>
-              {errors.designation && (
-                <div className="error">{errors.designation}</div>
-              )}
 
               <div
                 className={`btn_main1 ${
@@ -150,8 +150,8 @@ const CreateProfileSection = ({ form, onChange, setProfilePic, errors }) => {
                     ))}
                   </ul>
                 )}
+                {errors.status && <div className="error">{errors.status}</div>}
               </div>
-              {errors.status && <div className="error">{errors.status}</div>}
             </div>
           </div>
         </div>

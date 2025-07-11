@@ -34,24 +34,25 @@ const TaskTimeboard = () => {
     priority: ["High", "Medium", "Low"],
   };
 
+  const fetchAll = async () => {
+    try {
+      const [projectsRes, clientsRes, employeesRes] = await Promise.all([
+        axios.get(
+          `${process.env.REACT_APP_API_URL}/api/project/all-tasks-projects`
+        ),
+        axios.get(`${process.env.REACT_APP_API_URL}/api/client/get-all`),
+        axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`),
+      ]);
+      console.log("Projects:", projectsRes.data);
+      setProjects(projectsRes.data);
+      setClients(clientsRes.data);
+      setEmployees(employeesRes.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        const [projectsRes, clientsRes, employeesRes] = await Promise.all([
-          axios.get(
-            `${process.env.REACT_APP_API_URL}/api/project/all-tasks-projects`
-          ),
-          axios.get(`${process.env.REACT_APP_API_URL}/api/client/get-all`),
-          axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`),
-        ]);
-        console.log("Projects:", projectsRes.data);
-        setProjects(projectsRes.data);
-        setClients(clientsRes.data);
-        setEmployees(employeesRes.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
     fetchAll();
   }, []);
 
@@ -142,6 +143,8 @@ const TaskTimeboard = () => {
         );
         setSelections((prev) => ({ ...prev, status: "Change Status" }));
       }
+      setSelectedIds([]);
+      fetchAll(); 
     } catch (err) {
       console.error(err);
     }
@@ -298,7 +301,7 @@ const TaskTimeboard = () => {
                     }
                     onChange={(e) => {
                       if (e.target.checked) {
-                        setSelectedIds(filteredProjects.map((p) => p._id));
+                        setSelectedIds(filteredProjects.map((p) => p.id));
                       } else {
                         setSelectedIds([]);
                       }

@@ -379,11 +379,10 @@ input:focus-visible {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 144px;
   border-radius: 8px;
   border-width: 1px;
   border: 1px solid #d1d5db;
-  padding: 11.2px 16.8px;
+  padding: 11.2px;
   color: #0a3749;
   text-align: center;
   cursor: pointer;

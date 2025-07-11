@@ -22,8 +22,8 @@ import ProjectDetails from "./pages/ProjectDetails";
 import AllProject from "./pages/project/AllProject";
 import AddNewProject from "./pages/project/AddNewProject";
 import SubtaskManagement from "./pages/SubtaskManagement";
-import SubtaskManagementBulk from "./pages/project/SubtaskManagementBulk";
-import SubtaskDashboardContainer from "./pages/project/SubtaskDashboardContainer";
+import AddSubtask from "./pages/subtask/AddSubtask";
+import SubtaskDashboardContainer from "./pages/subtask/SubtaskDashboardContainer";
 
 import ProjectContent from "./pages/project/ProjectContent";
 import EditProjectContent from "./pages/EditProjectContent";
@@ -38,7 +38,7 @@ import NotificationAdmin from "./pages/NotificationAdmin";
 import EditClient from "./pages/client/EditClient";
 import EditProject from "./pages/EditProject";
 import CreateProjectContent from "./pages/project/CreateProjectContent";
-import EditSubtaskManagement from "./pages/EditSubtaskManagement";
+import EditSubtask from "./pages/subtask/EditSubtask";
 import CreateEmployeeProfile from "./pages/CreateEmployeeProfile";
 
 import TimeTrackingDashboard from "./pages/TimeTrackingDashboard";
@@ -61,6 +61,8 @@ import ClientAdminPreviewPage from "./pages/ClientAdminPreviewPage";
 import LoginPage from "./pages/LoginPage";
 
 import ClientAdminNotificationPage from "./pages/ClientAdminNotificationPage";
+
+import ViewSubtask from "./pages/subtask/ViewSubtask";
 
 function App() {
   return (
@@ -87,12 +89,14 @@ function App() {
           <Route path="subtaskmanagement" element={<SubtaskManagement />} />
           <Route
             path="/project/subtask/add/:projectId"
-            element={<SubtaskManagementBulk />}
+            element={<AddSubtask />}
           />
           <Route
             path="/project/subtask-dashboard/:projectId"
             element={<SubtaskDashboardContainer />}
           />
+
+          <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
           <Route path="/project/view-content/:projectId" element={<ProjectContent />} />
           <Route path="editprojectcontent" element={<EditProjectContent />} />
           <Route path="/project/gallery/:projectId" element={<ProjectMediaGallery />} />
@@ -114,8 +118,8 @@ function App() {
             element={<CreateProjectContent />}
           />
           <Route
-            path="EditSubtaskManagement"
-            element={<EditSubtaskManagement />}
+            path="/project/subtask/edit/:subtaskId"
+            element={<EditSubtask />}
           />
           <Route
             path="CreateEmployeeProfile"
