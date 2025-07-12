@@ -140,7 +140,7 @@ function App() {
         </Route>
 
         <Route path="/" element={<Plain_layout />}>
-          <Route path="login" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
         </Route>
 
         <Route path="/" element={<Layout_client />}>

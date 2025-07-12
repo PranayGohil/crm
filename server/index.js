@@ -12,6 +12,7 @@ import projectRouter from "./routes/projectRoutes.js";
 import subTaskRouter from "./routes/subTaskRoutes.js";
 import statisticsRouter from "./routes/statisticsRoutes.js";
 import notificationRouter from "./routes/notificationRoutes.js";
+import adminRouter from "./routes/adminRoutes.js";
 
 const app = express();
 const port = 3001;
@@ -30,6 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 
 connectDB();
 
+app.use("/api/admin", adminRouter)
 app.use("/api/client", clientRouter);
 app.use("/api/employee", employeeRouter);
 app.use("/api/project", projectRouter);

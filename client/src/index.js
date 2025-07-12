@@ -6,14 +6,17 @@ import reportWebVitals from "./reportWebVitals";
 import "bootstrap/dist/css/bootstrap.css";
 
 import { NotificationProvider } from "./contexts/NotificationContext";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <NotificationProvider>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  </NotificationProvider>
+  <AuthProvider>
+    <NotificationProvider>
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    </NotificationProvider>
+  </AuthProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
