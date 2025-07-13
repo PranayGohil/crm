@@ -3,66 +3,26 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import Layout from "./layout/Layout";
-import Layout_employee from "./layout/Layout_employee";
 import Layout_client from "./layout/Layout_client";
 
 import Plain_layout from "./layout/Plain_layout";
 
-import DashboardOverview from "./pages/admin-panel/DashboardOverview";
+import SubtaskDashboardContainer from "./pages/SubtaskDashboardContainer";
 
-import ClientDashboardPage from "./pages/admin-panel/client/ClientDashboardPage";
-import CreateNewClient from "./pages/admin-panel/client/CreateNewClient";
-import ClientDetailsPage from "./pages/admin-panel/client/ClientDetailsPage";
-import ClientProjectDetails from "./pages/ClientProjectDetails";
-import ClientSubtaskShow from "./pages/ClientSubtaskShow";
+import ProjectContent from "./pages/ProjectContent";
+import ProjectMediaGallery from "./pages/ProjectMediaGallery";
 
-import ProjectDetails from "./pages/ProjectDetails";
-
-import AllProject from "./pages/admin-panel/project/AllProject";
-import AddNewProject from "./pages/admin-panel/project/AddNewProject";
-import SubtaskManagement from "./pages/SubtaskManagement";
-import AddSubtask from "./pages/admin-panel/subtask/AddSubtask";
-import SubtaskDashboardContainer from "./pages/client-panel/SubtaskDashboardContainer";
-
-import ProjectContent from "./pages/client-panel/ProjectContent";
-import EditProjectContent from "./pages/EditProjectContent";
-import ProjectMediaGallery from "./pages/client-panel/ProjectMediaGallery";
-
-import TeamMemberDashboard from "./pages/TeamMemberDashboard";
-import EmployeeProfileEdit from "./pages/EmployeeProfileEdit";
-import TeamMemberProfile from "./pages/TeamMemberProfile";
-import TaskTimeboard from "./pages/TaskTimeboard";
-import NotificationAdmin from "./pages/NotificationAdmin";
-
-import EditClient from "./pages/admin-panel/client/EditClient";
-import EditProject from "./pages/EditProject";
-import CreateProjectContent from "./pages/admin-panel/project/CreateProjectContent";
-import EditSubtask from "./pages/admin-panel/subtask/EditSubtask";
-import CreateEmployeeProfile from "./pages/CreateEmployeeProfile";
-
-import TimeTrackingDashboard from "./pages/TimeTrackingDashboard";
-import EmployeeTimeTracking from "./pages/EmployeeTimeTracking";
-import EmployeeNotificationPage from "./pages/EmployeeNotificationPage";
-
-//employee
-
-import EmployeeDashboard from "./pages/EmployeeDashboard";
 
 // client admin
 
-import ClientAdminDetailsPage from "./pages/ClientAdminDetailsPage";
-import ClientAdminProjectDetails from "./pages/client-panel/ClientAdminProjectDetails";
-import ClientAdminSubtaskShow from "./pages/ClientAdminSubtaskShow";
-import ClientAdminProjectContent from "./pages/ClientAdminProjectContent";
-import ClientAdminProjectMediaGallery from "./components/ClientAdminProjectMediaGallery";
-import ClientAdminPreviewPage from "./pages/ClientAdminPreviewPage";
+import ClientDetailsPage from "./pages/ClientDetailsPage";
+import ClientAdminProjectDetails from "./pages/ClientAdminProjectDetails";
 
 import LoginPage from "./pages/LoginPage";
 
 import ClientAdminNotificationPage from "./pages/ClientAdminNotificationPage";
 
-import ViewSubtask from "./pages/client-panel/ViewSubtask";
+import ViewSubtask from "./pages/ViewSubtask";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -80,8 +40,8 @@ function App() {
         >
           <Route path="/" element={<ClientAdminProjectDetails />} />
           <Route
-            path="ClientAdminDetailsPage"
-            element={<ClientAdminDetailsPage />}
+            path="/profile"
+            element={<ClientDetailsPage />}
           />
           <Route
             path="/dashboard"

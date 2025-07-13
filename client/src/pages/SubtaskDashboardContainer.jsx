@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { toast } from "react-toastify";
 import axios from "axios";
-import { Modal, Button } from "react-bootstrap"; // ✅ import modal
-import LoadingOverlay from "../../components/LoadingOverlay";
-import { stageOptions, priorityOptions } from "../../options";
+import LoadingOverlay from "../components/LoadingOverlay";
+import { stageOptions, priorityOptions } from "../options";
 
 const SubtaskDashboardContainer = () => {
   const { projectId } = useParams();
@@ -18,15 +16,6 @@ const SubtaskDashboardContainer = () => {
     priority: "",
     stage: "",
   });
-
-  const [selectedSubtask, setSelectedSubtask] = useState(null);
-  const [selectedTaskIds, setSelectedTaskIds] = useState([]);
-  const [bulkAssignTo, setBulkAssignTo] = useState("");
-  const [bulkPriority, setBulkPriority] = useState("");
-  const [bulkStage, setBulkStage] = useState("");
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
 
   const fetchSubtasks = async () => {
     setLoading(true);
@@ -67,83 +56,10 @@ const SubtaskDashboardContainer = () => {
 
   const filteredSubtasks = subtasks.filter(
     (task) =>
-      (!filters.assignTo ||
-        task.assign_to?.some((a) => a.id === filters.assignTo)) &&
+      (!filters.assignTo || String(task.assign_to) === filters.assignTo) &&
       (!filters.priority || task.priority === filters.priority) &&
       (!filters.stage || task.stage === filters.stage)
   );
-
-  const handleBulkUpdateAll = async () => {
-    if (selectedTaskIds.length === 0) return;
-    const update = {};
-    if (bulkAssignTo)
-      update.assign_to = [{ role: "Employee", id: bulkAssignTo }];
-    if (bulkPriority) update.priority = bulkPriority;
-    if (bulkStage) update.stage = bulkStage;
-
-    if (Object.keys(update).length === 0) {
-      toast.info("No changes selected.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/subtask/bulk-update`,
-        { ids: selectedTaskIds, update }
-      );
-      toast.success("Changes applied!");
-      fetchSubtasks();
-      setBulkAssignTo("");
-      setBulkPriority("");
-      setBulkStage("");
-      setSelectedTaskIds([]);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to apply changes.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleConfirmDelete = async () => {
-    setLoading(true);
-    const taskId = selectedSubtask;
-    if (!taskId) return;
-    try {
-      await axios.delete(
-        `${process.env.REACT_APP_API_URL}/api/subtask/delete/${taskId}`
-      );
-      toast.success("Deleted!");
-      fetchSubtasks();
-      setShowDeleteModal(false);
-    } catch (err) {
-      console.error(err);
-      toast.error("Delete failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBulkConfirmDelete = async () => {
-    if (selectedTaskIds.length === 0) return;
-    setLoading(true);
-    try {
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/subtask/bulk-delete`,
-        { ids: selectedTaskIds }
-      );
-      toast.success("Deleted!");
-      fetchSubtasks();
-      setSelectedTaskIds([]);
-      setShowBulkDeleteModal(false);
-    } catch (err) {
-      console.error(err);
-      toast.error("Delete failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const formateDate = (dateString) => {
     const date = new Date(dateString);
@@ -160,16 +76,14 @@ const SubtaskDashboardContainer = () => {
       {/* Header */}
       <section className="sv-sec1 header">
         <div className="sv-sec1-inner">
-          <h3>Subtask View</h3>
+          <div className="d-flex">
+            <Link to="/dashboard" className="back_arrow_link mx-3">
+              <img src="/SVG/arrow-pc.svg" alt="Back" className="back_arrow" />
+            </Link>
+            <h3>Subtask View</h3>
+          </div>
           <p>{project?.project_name}</p>
         </div>
-      </section>
-
-      {/* Top buttons */}
-      <section className="sv-sec2 sv-sec1">
-        <p>
-          <a href="#">{filteredSubtasks.length}</a> Subtasks Total
-        </p>
       </section>
 
       {/* Filters */}
@@ -233,7 +147,7 @@ const SubtaskDashboardContainer = () => {
 
       {/* Table */}
       <section className="sv-sec-table p-5">
-        <table className="subtask-table">
+        <table className="subtask-table border">
           <thead>
             <tr>
               <th>Subtask Name</th>
@@ -255,16 +169,56 @@ const SubtaskDashboardContainer = () => {
                 <td>{task.priority}</td>
                 <td>{task.stage}</td>
                 <td>{task.status}</td>
-                <td>
-                  {task.assign_to?.length > 0
-                    ? (() => {
-                        const emp = employees.find(
-                          (e) => e._id === task.assign_to[0].id
-                        );
-                        return emp ? emp.full_name : task.assign_to[0].id;
-                      })()
-                    : "N/A"}
+                <td className="d-flex justify-content-start align-items-center">
+                  {(() => {
+                    const assignedEmp = employees.find(
+                      (emp) => emp._id === task.assign_to
+                    );
+                    if (!assignedEmp) return "N/A";
+
+                    const firstLetter = assignedEmp.full_name
+                      ? assignedEmp.full_name.charAt(0).toUpperCase()
+                      : "?";
+
+                    return (
+                      <span className="css-ankit d-flex align-items-center">
+                        {assignedEmp.profile_pic ? (
+                          <img
+                            src={assignedEmp.profile_pic}
+                            alt={assignedEmp.full_name}
+                            style={{
+                              width: "24px",
+                              height: "24px",
+                              borderRadius: "50%",
+                              marginRight: "4px",
+                              objectFit: "cover",
+                            }}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width: "24px",
+                              height: "24px",
+                              borderRadius: "50%",
+                              backgroundColor: "rgb(10 55 73)",
+                              color: "#fff",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "12px",
+                              marginRight: "4px",
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            {firstLetter}
+                          </div>
+                        )}
+                        {assignedEmp.full_name}
+                      </span>
+                    );
+                  })()}
                 </td>
+
                 <td>
                   <Link to={`/subtask/view/${task._id}`} className="mx-1">
                     <img src="/SVG/eye-view.svg" alt="view" />

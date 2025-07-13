@@ -67,8 +67,7 @@ const SubtaskDashboardContainer = () => {
 
   const filteredSubtasks = subtasks.filter(
     (task) =>
-      (!filters.assignTo ||
-        task.assign_to?.some((a) => a.id === filters.assignTo)) &&
+      (!filters.assignTo || String(task.assign_to) === filters.assignTo) &&
       (!filters.priority || task.priority === filters.priority) &&
       (!filters.stage || task.stage === filters.stage)
   );

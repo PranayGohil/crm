@@ -6,11 +6,8 @@ import { Outlet } from "react-router-dom"; // For React Router v6+
 const Layout_client = () => {
     return (
         <div className="layout">
-            {/* Sidebar */}
-        
-
             {/* Main Section */}
-            <div className="main-section">
+            <div className="main-section container-fluid">
                 {/* Header */}
                 <header>
                     <HeaderClient />

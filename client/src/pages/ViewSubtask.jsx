@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import LoadingOverlay from "../../components/LoadingOverlay";
+import LoadingOverlay from "../components/LoadingOverlay";
 import { toast } from "react-toastify";
-import { statusOptions, priorityOptions } from "../../options";
+import { statusOptions, priorityOptions } from "../options";
 
 const ViewSubtask = () => {
   const { subtaskId } = useParams();
@@ -14,12 +14,6 @@ const ViewSubtask = () => {
   const [client, setClient] = useState(null);
   const [assignedEmployee, setAssignedEmployee] = useState(null); // single employee
   const [loading, setLoading] = useState(true);
-
-  const [isEditing, setIsEditing] = useState(false);
-
-  const [editingStatus, setEditingStatus] = useState("");
-  const [editingPriority, setEditingPriority] = useState("");
-  const [saving, setSaving] = useState(false);
 
   const [mediaItems, setMediaItems] = useState([]);
 
@@ -43,10 +37,7 @@ const ViewSubtask = () => {
           `${process.env.REACT_APP_API_URL}/api/subtask/get/${subtaskId}`
         );
         setSubtask(subtaskData);
-        setEditingStatus(subtaskData.status || "");
-        setEditingPriority(subtaskData.priority || "");
 
-        const path = subtaskData.path_to_files || "";
         const items = (subtaskData.media_files || []).map((file) => ({
           src: `${file}`,
           alt: file,
@@ -85,35 +76,6 @@ const ViewSubtask = () => {
 
     fetchData();
   }, [subtaskId]);
-
-  const handleUpdate = async () => {
-    try {
-      setSaving(true);
-      // update status
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/subtask/change-status/${subtaskId}`,
-        { status: editingStatus }
-      );
-      // update priority
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/subtask/change-priority/${subtaskId}`,
-        { priority: editingPriority }
-      );
-
-      toast.success("Subtask updated successfully!");
-      setSubtask((prev) => ({
-        ...prev,
-        status: editingStatus,
-        priority: editingPriority,
-      }));
-      setIsEditing(false); // exit editing mode
-    } catch (error) {
-      console.error("Failed to update subtask:", error);
-      toast.error("Failed to update subtask.");
-    } finally {
-      setSaving(false);
-    }
-  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -158,69 +120,6 @@ const ViewSubtask = () => {
               <p>Client: </p>
               <span>{client?.full_name || "N/A"}</span>
             </div>
-          </div>
-          <div>
-            {isEditing ? (
-              <div className="d-flex align-items-center gap-2">
-                <select
-                  value={editingStatus}
-                  onChange={(e) => setEditingStatus(e.target.value)}
-                  className="dropdown_toggle"
-                  disabled={saving}
-                >
-                  <option value="">Select Status</option>
-                  {statusOptions.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  value={editingPriority}
-                  onChange={(e) => setEditingPriority(e.target.value)}
-                  className="dropdown_toggle"
-                  disabled={saving}
-                >
-                  <option value="">Select Priority</option>
-                  {priorityOptions.map((priority) => (
-                    <option key={priority} value={priority}>
-                      {priority}
-                    </option>
-                  ))}
-                </select>
-
-                <button
-                  onClick={handleUpdate}
-                  disabled={saving}
-                  className="theme_btn"
-                >
-                  {saving ? "Saving..." : "Update"}
-                </button>
-                <button
-                  onClick={() => setIsEditing(false)}
-                  disabled={saving}
-                  className="theme_secondary_btn"
-                >
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <>
-                <span className="cdn-bg-color-yellow color_yellow mx-2  rounded p-2">
-                  {subtask.status || "Status Unknown"}
-                </span>
-                <span className="cdn-bg-color-red color_red mx-2 rounded p-2">
-                  {subtask.priority || "Priority Unknown"}
-                </span>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="theme_btn"
-                >
-                  Edit
-                </button>
-              </>
-            )}
           </div>
         </div>
       </section>

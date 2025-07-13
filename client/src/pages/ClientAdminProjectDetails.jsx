@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import ProjectCard from "../../components/ProjectCard.jsx";
-import { statusOptions, stageOptions } from "../../options.js";
+import ProjectCard from "../components/ProjectCard.jsx";
+import { statusOptions, stageOptions } from "../options.js";
 
 const ClientAdminProjectDetails = () => {
   const [status, setStatus] = useState("All Status");
