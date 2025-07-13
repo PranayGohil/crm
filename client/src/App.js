@@ -58,7 +58,7 @@ import ClientAdminProjectContent from "./pages/ClientAdminProjectContent";
 import ClientAdminProjectMediaGallery from "./components/ClientAdminProjectMediaGallery";
 import ClientAdminPreviewPage from "./pages/ClientAdminPreviewPage";
 
-import LoginPage from "./pages/admin-panel/LoginPage";
+import LoginPage from "./pages/LoginPage";
 
 import ClientAdminNotificationPage from "./pages/ClientAdminNotificationPage";
 
@@ -70,103 +70,6 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          {/* Protected routes */}
-          <Route path="/" element={<DashboardOverview />} />
-          <Route index element={<DashboardOverview />} />
-          <Route path="/dashboard" element={<DashboardOverview />} />
-
-          {/* client */}
-          <Route path="/client/dashboard" element={<ClientDashboardPage />} />
-          <Route path="/client/create" element={<CreateNewClient />} />
-          <Route path="/client/details/:id" element={<ClientDetailsPage />} />
-          <Route path="/client/edit/:id" element={<EditClient />} />
-
-          <Route
-            path="clientprojectdetails"
-            element={<ClientProjectDetails />}
-          />
-
-          <Route path="clientsubtaskshow" element={<ClientSubtaskShow />} />
-          <Route
-            path="/project/details/:projectId"
-            element={<ProjectDetails />}
-          />
-          <Route path="/project/dashboard" element={<AllProject />} />
-          <Route path="/project/add" element={<AddNewProject />} />
-          <Route path="subtaskmanagement" element={<SubtaskManagement />} />
-          <Route
-            path="/project/subtask/add/:projectId"
-            element={<AddSubtask />}
-          />
-          <Route
-            path="/project/subtask-dashboard/:projectId"
-            element={<SubtaskDashboardContainer />}
-          />
-
-          <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
-          <Route
-            path="/project/view-content/:projectId"
-            element={<ProjectContent />}
-          />
-          <Route path="editprojectcontent" element={<EditProjectContent />} />
-          <Route
-            path="/project/gallery/:projectId"
-            element={<ProjectMediaGallery />}
-          />
-          <Route path="teammemberdashboard" element={<TeamMemberDashboard />} />
-          <Route path="employeeprofileedit" element={<EmployeeProfileEdit />} />
-          <Route path="teammemberprofile" element={<TeamMemberProfile />} />
-          <Route path="tasktimeboard" element={<TaskTimeboard />} />
-          <Route
-            path="timetrackingdashboard"
-            element={<TimeTrackingDashboard />}
-          />
-          <Route path="notificationadmin" element={<NotificationAdmin />} />
-
-          {/* edit page */}
-
-          <Route path="/project/edit/:projectId" element={<EditProject />} />
-          <Route
-            path="/project/edit-content/:projectId"
-            element={<CreateProjectContent />}
-          />
-          <Route
-            path="/project/subtask/edit/:subtaskId"
-            element={<EditSubtask />}
-          />
-          <Route
-            path="CreateEmployeeProfile"
-            element={<CreateEmployeeProfile />}
-          />
-        </Route>
-
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Layout_employee />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="employeedashboard" element={<EmployeeDashboard />} />
-          <Route
-            path="employeetimetracking"
-            element={<EmployeeTimeTracking />}
-          />
-          <Route
-            path="employeenotificationpage"
-            element={<EmployeeNotificationPage />}
-          />
-        </Route>
-
         <Route path="/" element={<Plain_layout />}>
           <Route path="/login" element={<LoginPage />} />
         </Route>
@@ -179,6 +82,7 @@ function App() {
             </ProtectedRoute>
           }
         >
+          <Route path="/" element={<ClientAdminDetailsPage />} />
           <Route
             path="ClientAdminDetailsPage"
             element={<ClientAdminDetailsPage />}

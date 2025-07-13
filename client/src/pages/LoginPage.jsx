@@ -1,20 +1,20 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(""); // store error message
 
   const validate = () => {
-    if (!email.trim()) return "Email is required";
+    if (!username.trim()) return "Username is required";
     if (!password.trim()) return "Password is required";
     return "";
   };
@@ -30,8 +30,8 @@ const LoginPage = () => {
       setLoading(true);
       setError(""); // clear previous error
       const { data } = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/admin/login`,
-        { email, password }
+        `${process.env.REACT_APP_API_URL}/api/client/login`,
+        { username, password }
       );
       login(data); // store user in context
       navigate("/"); // redirect to dashboard/home
@@ -58,11 +58,11 @@ const LoginPage = () => {
       </div>
       <div className="fd-stucture">
         <div className="fd-enter-email">
-          <p>Email</p>
+          <p>Usename</p>
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             placeholder="you@example.com"
           />
         </div>
@@ -103,7 +103,7 @@ const LoginPage = () => {
           <button
             className="theme_btn"
             onClick={handleSubmit}
-            disabled={loading || !email.trim() || !password.trim()}
+            disabled={loading || !username.trim() || !password.trim()}
           >
             {loading ? "Logging in..." : "Login"}
           </button>

@@ -2,6 +2,7 @@ import Client from "../models/clientModel.js";
 import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
 import Bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const addClient = async (req, res) => {
   try {
@@ -75,21 +76,37 @@ export const addClient = async (req, res) => {
 
 export const loginClient = async (req, res) => {
   try {
-    const { usename, password } = req.body;
-    const client = await Client.findOne({ usename });
+    const { username, password } = req.body;
+
+    // ✅ Find client by username
+    const client = await Client.findOne({ username });
     if (!client) {
-      return res.status(400).json({ error: "User not found" });
+      return res.status(401).json({ message: "Invalid username or password" });
     }
 
+    // ✅ Compare password
     const isMatch = await Bcrypt.compare(password, client.password);
     if (!isMatch) {
-      return res.status(400).json({ error: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid username or password" });
     }
 
-    res.status(200).json(client);
+    // ✅ Create token (set role as 'client')
+    const token = jwt.sign(
+      { id: client._id, role: "client" },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    // ✅ Return success response
+    res.json({
+      username: client.username,
+      full_name: client.full_name,
+      token,
+      role: "client",
+    });
   } catch (error) {
-    console.error("Error in loginClient:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Client login error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

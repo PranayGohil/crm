@@ -373,7 +373,8 @@ const TaskTimeboard = () => {
                               <th>Priority</th>
                               <th>Status</th>
                               <th>Assigned To</th>
-                              <th>Remaining Time</th> {/* ✅ added */}
+                              <th>Remaining Time</th>
+                              <th>Actions</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -436,7 +437,14 @@ const TaskTimeboard = () => {
                                   })()}
                                 </td>
                                 <td>{getRemainingDays(s.due_date)}</td>{" "}
-                                {/* ✅ added */}
+                                <td>
+                                  <Link
+                                    to={`/subtask/view/${s.id}`}
+                                    className="mx-1"
+                                  >
+                                    <img src="/SVG/eye-view.svg" alt="view" />
+                                  </Link>
+                                </td>
                               </tr>
                             ))}
                           </tbody>
