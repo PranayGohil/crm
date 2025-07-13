@@ -13,7 +13,7 @@ export const addSubTask = async (req, res) => {
       priority,
       assign_date,
       due_date,
-      asign_to,
+      assign_to,
       path_to_files,
       status,
     } = req.body;
@@ -26,7 +26,7 @@ export const addSubTask = async (req, res) => {
       description,
       stage,
       priority,
-      asign_to: new mongoose.Types.ObjectId(asign_to),
+      assign_to: new mongoose.Types.ObjectId(assign_to),
       assign_date,
       due_date,
       media_files: mediaFiles,
@@ -49,8 +49,8 @@ export const addBulkSubTasks = async (req, res) => {
     const tasksWithObjectIds = tasks.map((task) => ({
       ...task,
       project_id: new mongoose.Types.ObjectId(task.project_id),
-      asign_to: task.asign_to
-        ? new mongoose.Types.ObjectId(task.asign_to)
+      assign_to: task.assign_to
+        ? new mongoose.Types.ObjectId(task.assign_to)
         : null,
     }));
 
@@ -109,7 +109,7 @@ export const updateSubTask = async (req, res) => {
       description,
       stage,
       priority,
-      asign_to,
+      assign_to,
       assign_date,
       due_date,
       path_to_files,
@@ -121,7 +121,7 @@ export const updateSubTask = async (req, res) => {
       description,
       stage,
       priority,
-      asign_to: asign_to ? new mongoose.Types.ObjectId(asign_to) : null,
+      assign_to: assign_to ? new mongoose.Types.ObjectId(assign_to) : null,
       assign_date,
       due_date,
       path_to_files,

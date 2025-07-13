@@ -1,5 +1,6 @@
 import Client from "../models/clientModel.js";
 import SubTask from "../models/subTaskModel.js";
+import Project from "../models/projectModel.js";
 import Bcrypt from "bcrypt";
 
 export const addClient = async (req, res) => {
@@ -63,7 +64,9 @@ export const addClient = async (req, res) => {
       additional_notes,
     });
 
-    res.status(200).json({ success: true, message: "Client added successfully", client });
+    res
+      .status(200)
+      .json({ success: true, message: "Client added successfully", client });
   } catch (error) {
     console.error("Error in addClient:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -162,10 +165,71 @@ export const deleteClient = async (req, res) => {
 export const getClientTasks = async (req, res) => {
   try {
     const { id } = req.params;
-    const tasks = await SubTask.find({ asign_to: { role: "client", id: id } });
+
+    // Step 1: Find all projects for this client
+    const projects = await Project.find({ client_id: id }).select("_id");
+    const projectIds = projects.map((p) => p._id);
+
+    // Step 2: Find all subtasks where project_id in those projects
+    const tasks = await SubTask.find({ project_id: { $in: projectIds } });
+
     res.status(200).json(tasks);
   } catch (error) {
     console.error("Error in getClientTasks:", error);
     res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const getClientProjectsWithUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    // Find client by username
+    const client = await Client.findOne({ username });
+    if (!client) {
+      return res.status(404).json({ message: "Client not found" });
+    }
+    console.log("client", client);
+    // Find all projects for this client
+    const projects = await Project.find({ client_id: client._id });
+    console.log("projects", projects);
+    res.json({
+      client,
+      projects,
+    });
+  } catch (error) {
+    console.error("getClientProjectsWithUsername error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getClientsWithSubtasks = async (req, res) => {
+  try {
+    const clients = await Client.find().lean();
+
+    const clientData = await Promise.all(
+      clients.map(async (client) => {
+        const projects = await Project.find({ client_id: client._id })
+          .select("_id")
+          .lean();
+
+        const projectIds = projects.map((p) => p._id);
+
+        const subtasks = await SubTask.find({
+          project_id: { $in: projectIds },
+        }).lean();
+
+        return {
+          ...client,
+          projectsCount: projectIds.length,
+          subtasks,
+        };
+      })
+    );
+
+    res.json(clientData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to get clients with subtasks" });
   }
 };

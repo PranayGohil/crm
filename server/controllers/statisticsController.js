@@ -33,16 +33,16 @@ export const Summary = async (req, res) => {
 
 export const UpcomingDueDates = async (req, res) => {
   try {
-    const tasks = await SubTask.find()
-      .sort({ due_date: 1 })  // you might sort by project due_date if you want
+    const tasks = await SubTask.find({ status: { $ne: "Completed" } }) // filter out Completed
+      .sort({ due_date: 1 })
       .limit(5)
       .populate({
         path: "project_id",
-        select: "project_name due_date"
+        select: "project_name due_date",
       })
       .populate({
-        path: "asign_to.id",
-        select: "full_name profile_pic"
+        path: "assign_to",
+        select: "full_name profile_pic",
       })
       .lean();
 

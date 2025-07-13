@@ -17,7 +17,7 @@ const subTaskSchema = mongoose.Schema({
   priority: {
     type: String,
   },
-  asign_to: {
+  assign_to: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Employee",
   },

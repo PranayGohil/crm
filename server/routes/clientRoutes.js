@@ -9,6 +9,8 @@ import {
   updateClient,
   updateClientByUsername,
   getClientTasks,
+  getClientProjectsWithUsername,
+  getClientsWithSubtasks,
 } from "../controllers/clientController.js";
 
 const clientRouter = express.Router();
@@ -23,5 +25,8 @@ clientRouter.put("/update/:id", updateClient);
 clientRouter.put("/update-username/:username", updateClientByUsername);
 
 clientRouter.get("/tasks/:id", getClientTasks);
+clientRouter.get("/projects/:username", getClientProjectsWithUsername);
+
+clientRouter.get("/with-subtasks", getClientsWithSubtasks);
 
 export default clientRouter;

@@ -21,17 +21,13 @@ const port = 3001;
 const server = http.createServer(app);
 setupSocket(server);
 
-app.use(
-  cors({
-    origin: process.env.ORIGINS,
-  })
-);
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 connectDB();
 
-app.use("/api/admin", adminRouter)
+app.use("/api/admin", adminRouter);
 app.use("/api/client", clientRouter);
 app.use("/api/employee", employeeRouter);
 app.use("/api/project", projectRouter);

@@ -7,7 +7,7 @@ export const addProject = async (req, res) => {
       project_name,
       client_id,
       tasks,
-      asign_to,
+      assign_to,
       assign_date,
       due_date,
       priority,
@@ -17,7 +17,7 @@ export const addProject = async (req, res) => {
       project_name,
       client_id,
       tasks,
-      asign_to,
+      assign_to,
       assign_date,
       due_date,
       priority,
@@ -65,14 +65,6 @@ export const getProjectInfo = async (req, res) => {
       .status(500)
       .json({ success: false, message: "Server error", error: error.message });
   }
-};
-
-export const getProjectTasks = async (req, res) => {
-  const { id } = req.params;
-  const project = await Project.findById(id);
-  const tasks = project.tasks;
-  const subTasks = await SubTask.find({ _id: { $in: tasks } });
-  res.status(200).json(subTasks);
 };
 
 export const changeProjectStatus = async (req, res) => {
@@ -149,7 +141,7 @@ export const getAllProjectsWithTasks = async (req, res) => {
             stage: s.stage,
             priority: s.priority,
             status: s.status,
-            asign_to: s.asign_to || null,
+            assign_to: s.assign_to || null,
             assign_date: s.assign_date,
             due_date: s.due_date,
             timeTracked: "-", // add logic if you track time

@@ -4,7 +4,7 @@ const projectSchema = mongoose.Schema(
   {
     project_name: String,
     client_id: String,
-    asign_to: [
+    assign_to: [
       {
         role: String,
         id: String,
