@@ -3,8 +3,8 @@ import { useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Modal, Button } from "react-bootstrap"; // ✅ import modal
-import LoadingOverlay from "../../../components/LoadingOverlay";
-import { stageOptions, priorityOptions } from "../../../options";
+import LoadingOverlay from "../../components/LoadingOverlay";
+import { stageOptions, priorityOptions } from "../../options";
 
 const SubtaskDashboardContainer = () => {
   const { projectId } = useParams();
@@ -170,14 +170,6 @@ const SubtaskDashboardContainer = () => {
         <p>
           <a href="#">{filteredSubtasks.length}</a> Subtasks Total
         </p>
-        <div className="cd-client_dashboard cd-client-d-flex">
-          <Link to={`/project/subtask/add/${projectId}`} className="plus-icon">
-            <img src="/SVG/plus.svg" alt="plus" /> <span>New Subtask</span>
-          </Link>
-          <Link to={`/project/edit-content/${projectId}`} className="plus-icon">
-            <img src="/SVG/plus.svg" alt="plus" /> <span>New Content</span>
-          </Link>
-        </div>
       </section>
 
       {/* Filters */}
@@ -240,20 +232,10 @@ const SubtaskDashboardContainer = () => {
       </section>
 
       {/* Table */}
-      <section className="sv-sec-table">
+      <section className="sv-sec-table p-5">
         <table className="subtask-table">
           <thead>
             <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  onChange={(e) =>
-                    setSelectedTaskIds(
-                      e.target.checked ? filteredSubtasks.map((t) => t._id) : []
-                    )
-                  }
-                />
-              </th>
               <th>Subtask Name</th>
               <th>Assign Date</th>
               <th>Due Date</th>
@@ -267,19 +249,6 @@ const SubtaskDashboardContainer = () => {
           <tbody>
             {filteredSubtasks.map((task) => (
               <tr key={task._id}>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={selectedTaskIds.includes(task._id)}
-                    onChange={(e) =>
-                      setSelectedTaskIds((prev) =>
-                        e.target.checked
-                          ? [...prev, task._id]
-                          : prev.filter((id) => id !== task._id)
-                      )
-                    }
-                  />
-                </td>
                 <td>{task.task_name}</td>
                 <td>{formateDate(task.assign_date)}</td>
                 <td>{formateDate(task.due_date)}</td>
@@ -297,22 +266,6 @@ const SubtaskDashboardContainer = () => {
                     : "N/A"}
                 </td>
                 <td>
-                  <Link
-                    to={`/project/subtask/edit/${task._id}`}
-                    className="mx-1"
-                  >
-                    <img src="/SVG/edit.svg" alt="edit" />
-                  </Link>
-                  <span
-                    onClick={() => {
-                      setSelectedSubtask(task._id);
-                      setShowDeleteModal(true);
-                    }}
-                    className="mx-1"
-                    style={{ cursor: "pointer", color: "red" }}
-                  >
-                    <img src="/SVG/delete.svg" alt="delete" />
-                  </span>
                   <Link to={`/subtask/view/${task._id}`} className="mx-1">
                     <img src="/SVG/eye-view.svg" alt="view" />
                   </Link>
@@ -322,119 +275,6 @@ const SubtaskDashboardContainer = () => {
           </tbody>
         </table>
       </section>
-
-      {/* Bulk actions */}
-      <section className="sv-last-sec css-sec-last">
-        <p>
-          <span>{selectedTaskIds.length}</span> items selected
-        </p>
-        <div className="cpd-menu-bar">
-          <select
-            value={bulkAssignTo}
-            onChange={(e) => setBulkAssignTo(e.target.value)}
-            className="dropdown_toggle"
-          >
-            <option value="">Set Assign To</option>
-            {employees.map((emp) => (
-              <option key={emp._id} value={emp._id}>
-                {emp.full_name}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={bulkPriority}
-            onChange={(e) => setBulkPriority(e.target.value)}
-            className="dropdown_toggle"
-          >
-            <option value="">Set Priority</option>
-            {priorityOptions.map((opt, idx) => (
-              <option key={idx} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={bulkStage}
-            onChange={(e) => setBulkStage(e.target.value)}
-            className="dropdown_toggle"
-          >
-            <option value="">Change Stage</option>
-            {stageOptions.map((opt, idx) => (
-              <option key={idx} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-
-          <button
-            onClick={handleBulkUpdateAll}
-            className="theme_btn"
-            disabled={
-              selectedTaskIds.length === 0 ||
-              (!bulkAssignTo && !bulkPriority && !bulkStage)
-            }
-          >
-            Apply Changes
-          </button>
-
-          <button
-            className="css-high css-delete"
-            onClick={() => setShowBulkDeleteModal(true)}
-            disabled={selectedTaskIds.length === 0}
-          >
-            <img src="/SVG/delete-vec.svg" alt="del" /> Delete Selected
-          </button>
-        </div>
-      </section>
-      {/* ✅ Confirmation Modal */}
-      <Modal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete
-          selected subtask?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
-
-      <Modal
-        show={showBulkDeleteModal}
-        onHide={() => setShowBulkDeleteModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete <b>{selectedTaskIds.length}</b>{" "}
-          selected subtask(s)?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowBulkDeleteModal(false)}
-          >
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={handleBulkConfirmDelete}>
-            Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </>
   );
 };

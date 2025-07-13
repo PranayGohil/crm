@@ -23,11 +23,11 @@ import AllProject from "./pages/admin-panel/project/AllProject";
 import AddNewProject from "./pages/admin-panel/project/AddNewProject";
 import SubtaskManagement from "./pages/SubtaskManagement";
 import AddSubtask from "./pages/admin-panel/subtask/AddSubtask";
-import SubtaskDashboardContainer from "./pages/admin-panel/subtask/SubtaskDashboardContainer";
+import SubtaskDashboardContainer from "./pages/client-panel/SubtaskDashboardContainer";
 
-import ProjectContent from "./pages/admin-panel/project/ProjectContent";
+import ProjectContent from "./pages/client-panel/ProjectContent";
 import EditProjectContent from "./pages/EditProjectContent";
-import ProjectMediaGallery from "./components/ProjectMediaGallery";
+import ProjectMediaGallery from "./pages/client-panel/ProjectMediaGallery";
 
 import TeamMemberDashboard from "./pages/TeamMemberDashboard";
 import EmployeeProfileEdit from "./pages/EmployeeProfileEdit";
@@ -52,7 +52,7 @@ import EmployeeDashboard from "./pages/EmployeeDashboard";
 // client admin
 
 import ClientAdminDetailsPage from "./pages/ClientAdminDetailsPage";
-import ClientAdminProjectDetails from "./pages/ClientAdminProjectDetails";
+import ClientAdminProjectDetails from "./pages/client-panel/ClientAdminProjectDetails";
 import ClientAdminSubtaskShow from "./pages/ClientAdminSubtaskShow";
 import ClientAdminProjectContent from "./pages/ClientAdminProjectContent";
 import ClientAdminProjectMediaGallery from "./components/ClientAdminProjectMediaGallery";
@@ -62,7 +62,7 @@ import LoginPage from "./pages/LoginPage";
 
 import ClientAdminNotificationPage from "./pages/ClientAdminNotificationPage";
 
-import ViewSubtask from "./pages/admin-panel/subtask/ViewSubtask";
+import ViewSubtask from "./pages/client-panel/ViewSubtask";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -84,28 +84,28 @@ function App() {
             element={<ClientAdminDetailsPage />}
           />
           <Route
-            path="ClientAdminProjectDetails"
+            path="/dashboard"
             element={<ClientAdminProjectDetails />}
           />
           <Route
-            path="ClientAdminSubtaskShow"
-            element={<ClientAdminSubtaskShow />}
+            path="/subtasks/:projectId"
+            element={<SubtaskDashboardContainer />}
           />
           <Route
-            path="ClientAdminProjectContent"
-            element={<ClientAdminProjectContent />}
+            path="/view-content/:projectId"
+            element={<ProjectContent />}
           />
           <Route
-            path="ClientAdminProjectMediaGallery"
-            element={<ClientAdminProjectMediaGallery />}
+            path="/gallery/:projectId"
+            element={<ProjectMediaGallery />}
           />
           <Route
             path="ClientAdminNotificationPage"
             element={<ClientAdminNotificationPage />}
           />
           <Route
-            path="ClientAdminPreviewPage"
-            element={<ClientAdminPreviewPage />}
+            path="/subtask/view/:subtaskId"
+            element={<ViewSubtask />}
           />
         </Route>
         <Route path="/" element={<Plain_layout />}>

@@ -140,13 +140,13 @@ const ProjectCard = ({
 
                   <div className="md-project_card__button_wrap">
                     <Link
-                      to={`/project/subtask-dashboard/${project._id}`}
+                      to={`/subtasks/${project._id}`}
                       className="md-project_card__view_btn"
                     >
                       View Subtask
                     </Link>
                     <Link
-                      to={`/project/view-content/${project._id}`}
+                      to={`/view-content/${project._id}`}
                       className="md-project_card__view_btn"
                     >
                       View Content

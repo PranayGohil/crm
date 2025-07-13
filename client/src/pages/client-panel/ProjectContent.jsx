@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const ProjectContent = () => {
   const { projectId } = useParams();
+  const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [currency, setCurrency] = useState("INR");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -46,22 +48,11 @@ const ProjectContent = () => {
     <section className="pc">
       <section className="pc-header">
         <div className="pc-header-inner">
-          <div className="pc-back-overview">
+          <div className="pc-back-overview" style={{ cursor: "pointer" }} onClick={() =>navigate(-1)}>
             <img src="/SVG/arrow-pc.svg" alt="back" />
             <span>Back to Client Overview</span>
           </div>
-          <div className="pc-edit-content">
-            <span>
-              Last updated on{" "}
-              {project ? new Date(project.updatedAt).toLocaleDateString() : "-"}
-            </span>
-            <div className="pc-edit-content-btn">
-              <a href={`/editprojectcontent/${projectId}`}>
-                <img src="/SVG/edit-white.svg" alt="edit" />
-                Edit
-              </a>
-            </div>
-          </div>
+          
         </div>
       </section>
 
@@ -196,7 +187,7 @@ const ProjectContent = () => {
       <section className="pc-media-preview">
         <div className="pc-media-preview-inner">
           <h2>Media Preview</h2>
-          <a href={`/project/gallery/${projectId}`}>View All</a>
+          <a href={`/gallery/${projectId}`}>View All</a>
         </div>
         <div className="pc-media-pre-imgs">
           {project?.content[0]?.uploaded_files?.length > 0 ? (

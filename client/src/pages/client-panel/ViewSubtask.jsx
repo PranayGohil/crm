@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import LoadingOverlay from "../../../components/LoadingOverlay";
+import LoadingOverlay from "../../components/LoadingOverlay";
 import { toast } from "react-toastify";
-import { statusOptions, priorityOptions } from "../../../options";
+import { statusOptions, priorityOptions } from "../../options";
 
 const ViewSubtask = () => {
   const { subtaskId } = useParams();
@@ -21,12 +21,7 @@ const ViewSubtask = () => {
   const [editingPriority, setEditingPriority] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const mediaItems = [
-    { src: "/Image/jwell1.png", alt: "g-i1" },
-    { src: "/Image/jwell2.png", alt: "g-i2" },
-    { src: "/Image/jwell1.png", alt: "g-i1" },
-    { src: "/Image/jwell3.png", alt: "g-i2" },
-  ];
+  const [mediaItems, setMediaItems] = useState([]);
 
   const comments = [
     {
@@ -51,6 +46,12 @@ const ViewSubtask = () => {
         setEditingStatus(subtaskData.status || "");
         setEditingPriority(subtaskData.priority || "");
 
+        const path = subtaskData.path_to_files || "";
+        const items = (subtaskData.media_files || []).map((file) => ({
+          src: `${file}`,
+          alt: file,
+        }));
+        setMediaItems(items);
         console.log("Subtask Data:", subtaskData);
 
         const { data: projectData } = await axios.get(
@@ -189,10 +190,18 @@ const ViewSubtask = () => {
                   ))}
                 </select>
 
-                <button onClick={handleUpdate} disabled={saving} className="theme_btn">
+                <button
+                  onClick={handleUpdate}
+                  disabled={saving}
+                  className="theme_btn"
+                >
                   {saving ? "Saving..." : "Update"}
                 </button>
-                <button onClick={() => setIsEditing(false)} disabled={saving} className="theme_secondary_btn">
+                <button
+                  onClick={() => setIsEditing(false)}
+                  disabled={saving}
+                  className="theme_secondary_btn"
+                >
                   Cancel
                 </button>
               </div>
@@ -204,7 +213,12 @@ const ViewSubtask = () => {
                 <span className="cdn-bg-color-red color_red mx-2 rounded p-2">
                   {subtask.priority || "Priority Unknown"}
                 </span>
-                <button onClick={() => setIsEditing(true)} className="theme_btn">Edit</button>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="theme_btn"
+                >
+                  Edit
+                </button>
               </>
             )}
           </div>
@@ -269,28 +283,36 @@ const ViewSubtask = () => {
           <h1>Attached Media</h1>
           <div className="pb-attached-photo-sec">
             <div className="pb-project-gallary">
-              {mediaItems.map((item, index) => (
-                <div className="pb-gallary-img" key={index}>
-                  <img src={item.src} alt={item.alt} />
-                  <div className="pb-gall-icons">
-                    <a href="#">
-                      <div className="pb-media-icon">
-                        <img src="/SVG/css-eye.svg" alt="view" />
-                      </div>
-                    </a>
-                    <a href="#">
-                      <div className="pb-media-icon">
-                        <img src="/SVG/download-photo.svg" alt="download" />
-                      </div>
-                    </a>
+              {mediaItems.length === 0 ? (
+                <p>No media attached.</p>
+              ) : (
+                mediaItems.map((item, index) => (
+                  <div className="pb-gallary-img" key={index}>
+                    <img
+                      src={item.src}
+                      alt={item.alt}
+                      style={{ objectFit: "cover" }}
+                    />
+                    <div className="pb-gall-icons">
+                      <a
+                        href={item.src}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <div className="pb-media-icon">
+                          <img src="/SVG/css-eye.svg" alt="view" />
+                        </div>
+                      </a>
+                      <a href={item.src} download>
+                        <div className="pb-media-icon">
+                          <img src="/SVG/download-photo.svg" alt="download" />
+                        </div>
+                      </a>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
-          </div>
-          <div className="pb-add-img">
-            <img src="/SVG/plus-grey.svg" alt="add" />
-            <span>Add Media</span>
           </div>
         </div>
       </section>

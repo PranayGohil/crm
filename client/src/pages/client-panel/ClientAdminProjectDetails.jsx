@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import ProjectCard from "../components/ProjectCard";
-import { statusOptions, stageOptions } from "../options.js";
+import ProjectCard from "../../components/ProjectCard.jsx";
+import { statusOptions, stageOptions } from "../../options.js";
 
 const ClientAdminProjectDetails = () => {
   const [status, setStatus] = useState("All Status");
   const [stage, setStage] = useState("All Stages");
-  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState({
+    status: false,
+    stage: false,
+  });
 
   const statusRef = useRef(null);
   const stageRef = useRef(null);
@@ -15,34 +18,21 @@ const ClientAdminProjectDetails = () => {
   const [projectSubtasks, setProjectSubtasks] = useState({});
   const [employees, setEmployees] = useState({});
   const [loading, setLoading] = useState(true);
-
-  // 🧰 Toggle dropdown
-  const toggleDropdown = (type) => {
-    setActiveDropdown((prev) => (prev === type ? null : type));
-  };
-
-  // 🪄 Click outside to close
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (statusRef.current && !statusRef.current.contains(e.target)) {
-        setActiveDropdown((prev) => (prev === "status" ? null : prev));
-      }
-      if (stageRef.current && !stageRef.current.contains(e.target)) {
-        setActiveDropdown((prev) => (prev === "stage" ? null : prev));
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const [fullName, setFullName] = useState("")
 
   // 📦 Fetch data
   useEffect(() => {
+    const storedUser = localStorage.getItem("clientUser");
+    const clientUser = storedUser ? JSON.parse(storedUser) : null;
+    setFullName(clientUser?.full_name);
+    const token = clientUser?.token;
     const fetchData = async () => {
       try {
         setLoading(true);
         const username = localStorage.getItem("clientUsername");
-        console.log("username", username);
+        console.log("username:", username);
 
+        // 1️⃣ Projects
         const projectRes = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/client/projects/${username}`
         );
@@ -79,7 +69,26 @@ const ClientAdminProjectDetails = () => {
     fetchData();
   }, []);
 
-  // 🧩 Filter projects by status & stage
+  // 🪄 Click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (statusRef.current && !statusRef.current.contains(e.target)) {
+        setDropdownOpen((prev) => ({ ...prev, status: false }));
+      }
+      if (stageRef.current && !stageRef.current.contains(e.target)) {
+        setDropdownOpen((prev) => ({ ...prev, stage: false }));
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Toggle dropdown
+  const toggleDropdown = (type) => {
+    setDropdownOpen((prev) => ({ ...prev, [type]: !prev[type] }));
+  };
+
+  // 🧩 Filter projects
   const filteredProjects = projects.filter((proj) => {
     const matchStatus =
       status === "All Status" ||
@@ -90,7 +99,7 @@ const ClientAdminProjectDetails = () => {
     return matchStatus && matchStage;
   });
 
-  // Your summary cards
+  // Summary cards
   const summaryData = [
     { icon: "/SVG/cpd-join.svg", label: "Joined", value: "12 March 2024" },
     {
@@ -114,7 +123,7 @@ const ClientAdminProjectDetails = () => {
     <div className="project_client__client-main mb_40">
       <section className="cd-client_dashboard header">
         <div className="cd-head-menu head-menu cpd_header">
-          <h1>Client: Amara Jewels</h1>
+          <h1>Client: {fullName}</h1>
         </div>
         <div className="cd-nav-bar nav-bar">
           <div className="cd-nav-search nav-search">
@@ -155,10 +164,9 @@ const ClientAdminProjectDetails = () => {
           <div className="cpd-menu-bar">
             {/* Status Dropdown */}
             <div
-              className={`btn_main ${
-                activeDropdown === "status" ? "open" : ""
-              }`}
+              className={`btn_main ${dropdownOpen.status ? "open" : ""}`}
               ref={statusRef}
+              style={{ width: "150px" }}
             >
               <div
                 className="dropdown_toggle"
@@ -171,33 +179,36 @@ const ClientAdminProjectDetails = () => {
                   className="arrow_icon"
                 />
               </div>
-              <ul className="dropdown_menu">
-                <li
-                  onClick={() => {
-                    setStatus("All Status");
-                    setActiveDropdown(null);
-                  }}
-                >
-                  All Status
-                </li>
-                {statusOptions.map((option, index) => (
+              {dropdownOpen.status && (
+                <ul className="dropdown_menu">
                   <li
-                    key={index}
                     onClick={() => {
-                      setStatus(option);
-                      setActiveDropdown(null);
+                      setStatus("All Status");
+                      setDropdownOpen((prev) => ({ ...prev, status: false }));
                     }}
                   >
-                    {option}
+                    All Status
                   </li>
-                ))}
-              </ul>
+                  {statusOptions.map((option, index) => (
+                    <li
+                      key={index}
+                      onClick={() => {
+                        setStatus(option);
+                        setDropdownOpen((prev) => ({ ...prev, status: false }));
+                      }}
+                    >
+                      {option}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             {/* Stage Dropdown */}
             <div
-              className={`btn_main ${activeDropdown === "stage" ? "open" : ""}`}
+              className={`btn_main ${dropdownOpen.stage ? "open" : ""}`}
               ref={stageRef}
+              style={{ width: "200px" }}
             >
               <div
                 className="dropdown_toggle"
@@ -210,27 +221,29 @@ const ClientAdminProjectDetails = () => {
                   className="arrow_icon"
                 />
               </div>
-              <ul className="dropdown_menu">
-                <li
-                  onClick={() => {
-                    setStage("All Stages");
-                    setActiveDropdown(null);
-                  }}
-                >
-                  All Stages
-                </li>
-                {stageOptions.map((option, index) => (
+              {dropdownOpen.stage && (
+                <ul className="dropdown_menu">
                   <li
-                    key={index}
                     onClick={() => {
-                      setStage(option);
-                      setActiveDropdown(null);
+                      setStage("All Stages");
+                      setDropdownOpen((prev) => ({ ...prev, stage: false }));
                     }}
                   >
-                    {option}
+                    All Stages
                   </li>
-                ))}
-              </ul>
+                  {stageOptions.map((option, index) => (
+                    <li
+                      key={index}
+                      onClick={() => {
+                        setStage(option);
+                        setDropdownOpen((prev) => ({ ...prev, stage: false }));
+                      }}
+                    >
+                      {option}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
 
