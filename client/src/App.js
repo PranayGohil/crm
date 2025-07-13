@@ -70,10 +70,6 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Plain_layout />}>
-          <Route path="/login" element={<LoginPage />} />
-        </Route>
-
         <Route
           path="/"
           element={
@@ -82,7 +78,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/" element={<ClientAdminDetailsPage />} />
+          <Route path="/" element={<ClientAdminProjectDetails />} />
           <Route
             path="ClientAdminDetailsPage"
             element={<ClientAdminDetailsPage />}
@@ -111,6 +107,9 @@ function App() {
             path="ClientAdminPreviewPage"
             element={<ClientAdminPreviewPage />}
           />
+        </Route>
+        <Route path="/" element={<Plain_layout />}>
+          <Route path="/login" element={<LoginPage />} />
         </Route>
       </Routes>
 

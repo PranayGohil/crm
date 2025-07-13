@@ -99,6 +99,7 @@ export const loginClient = async (req, res) => {
 
     // ✅ Return success response
     res.json({
+      _id: client._id,
       username: client.username,
       full_name: client.full_name,
       token,

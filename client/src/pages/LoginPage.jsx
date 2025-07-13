@@ -33,8 +33,10 @@ const LoginPage = () => {
         `${process.env.REACT_APP_API_URL}/api/client/login`,
         { username, password }
       );
-      login(data); // store user in context
-      navigate("/"); // redirect to dashboard/home
+      login(data);
+      localStorage.setItem("clientUsername", data.username);
+
+      navigate("/");
     } catch (error) {
       console.error(error);
       setError(
