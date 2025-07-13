@@ -3,66 +3,20 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import Layout from "./layout/Layout";
 import Layout_employee from "./layout/Layout_employee";
-import Layout_client from "./layout/Layout_client";
 
 import Plain_layout from "./layout/Plain_layout";
 
-import DashboardOverview from "./pages/admin-panel/DashboardOverview";
-
-import ClientDashboardPage from "./pages/admin-panel/client/ClientDashboardPage";
-import CreateNewClient from "./pages/admin-panel/client/CreateNewClient";
-import ClientDetailsPage from "./pages/admin-panel/client/ClientDetailsPage";
-import ClientProjectDetails from "./pages/ClientProjectDetails";
-import ClientSubtaskShow from "./pages/ClientSubtaskShow";
-
-import ProjectDetails from "./pages/ProjectDetails";
-
-import AllProject from "./pages/admin-panel/project/AllProject";
-import AddNewProject from "./pages/admin-panel/project/AddNewProject";
-import SubtaskManagement from "./pages/SubtaskManagement";
-import AddSubtask from "./pages/admin-panel/subtask/AddSubtask";
-import SubtaskDashboardContainer from "./pages/admin-panel/subtask/SubtaskDashboardContainer";
-
-import ProjectContent from "./pages/admin-panel/project/ProjectContent";
-import EditProjectContent from "./pages/EditProjectContent";
-import ProjectMediaGallery from "./components/ProjectMediaGallery";
-
-import TeamMemberDashboard from "./pages/TeamMemberDashboard";
-import EmployeeProfileEdit from "./pages/EmployeeProfileEdit";
-import TeamMemberProfile from "./pages/TeamMemberProfile";
-import TaskTimeboard from "./pages/TaskTimeboard";
-import NotificationAdmin from "./pages/NotificationAdmin";
-
-import EditClient from "./pages/admin-panel/client/EditClient";
-import EditProject from "./pages/EditProject";
-import CreateProjectContent from "./pages/admin-panel/project/CreateProjectContent";
-import EditSubtask from "./pages/admin-panel/subtask/EditSubtask";
-import CreateEmployeeProfile from "./pages/CreateEmployeeProfile";
-
-import TimeTrackingDashboard from "./pages/TimeTrackingDashboard";
 import EmployeeTimeTracking from "./pages/EmployeeTimeTracking";
 import EmployeeNotificationPage from "./pages/EmployeeNotificationPage";
 
 //employee
 
-import EmployeeDashboard from "./pages/EmployeeDashboard";
+import EmployeeDashboard from "./pages/employee-panel/EmployeeDashboard";
+import ViewSubtask from "./pages/employee-panel/ViewSubtask";
+import ProjectDetails from "./pages/employee-panel/ProjectDetails";
 
-// client admin
-
-import ClientAdminDetailsPage from "./pages/ClientAdminDetailsPage";
-import ClientAdminProjectDetails from "./pages/ClientAdminProjectDetails";
-import ClientAdminSubtaskShow from "./pages/ClientAdminSubtaskShow";
-import ClientAdminProjectContent from "./pages/ClientAdminProjectContent";
-import ClientAdminProjectMediaGallery from "./components/ClientAdminProjectMediaGallery";
-import ClientAdminPreviewPage from "./pages/ClientAdminPreviewPage";
-
-import LoginPage from "./pages/admin-panel/LoginPage";
-
-import ClientAdminNotificationPage from "./pages/ClientAdminNotificationPage";
-
-import ViewSubtask from "./pages/admin-panel/subtask/ViewSubtask";
+import LoginPage from "./pages/employee-panel/LoginPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -74,89 +28,17 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          {/* Protected routes */}
-          <Route path="/" element={<DashboardOverview />} />
-          <Route index element={<DashboardOverview />} />
-          <Route path="/dashboard" element={<DashboardOverview />} />
-
-          {/* client */}
-          <Route path="/client/dashboard" element={<ClientDashboardPage />} />
-          <Route path="/client/create" element={<CreateNewClient />} />
-          <Route path="/client/details/:id" element={<ClientDetailsPage />} />
-          <Route path="/client/edit/:id" element={<EditClient />} />
-
-          <Route
-            path="clientprojectdetails"
-            element={<ClientProjectDetails />}
-          />
-
-          <Route path="clientsubtaskshow" element={<ClientSubtaskShow />} />
-          <Route
-            path="/project/details/:projectId"
-            element={<ProjectDetails />}
-          />
-          <Route path="/project/dashboard" element={<AllProject />} />
-          <Route path="/project/add" element={<AddNewProject />} />
-          <Route path="subtaskmanagement" element={<SubtaskManagement />} />
-          <Route
-            path="/project/subtask/add/:projectId"
-            element={<AddSubtask />}
-          />
-          <Route
-            path="/project/subtask-dashboard/:projectId"
-            element={<SubtaskDashboardContainer />}
-          />
-
-          <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
-          <Route
-            path="/project/view-content/:projectId"
-            element={<ProjectContent />}
-          />
-          <Route path="editprojectcontent" element={<EditProjectContent />} />
-          <Route
-            path="/project/gallery/:projectId"
-            element={<ProjectMediaGallery />}
-          />
-          <Route path="teammemberdashboard" element={<TeamMemberDashboard />} />
-          <Route path="employeeprofileedit" element={<EmployeeProfileEdit />} />
-          <Route path="teammemberprofile" element={<TeamMemberProfile />} />
-          <Route path="tasktimeboard" element={<TaskTimeboard />} />
-          <Route
-            path="timetrackingdashboard"
-            element={<TimeTrackingDashboard />}
-          />
-          <Route path="notificationadmin" element={<NotificationAdmin />} />
-
-          {/* edit page */}
-
-          <Route path="/project/edit/:projectId" element={<EditProject />} />
-          <Route
-            path="/project/edit-content/:projectId"
-            element={<CreateProjectContent />}
-          />
-          <Route
-            path="/project/subtask/edit/:subtaskId"
-            element={<EditSubtask />}
-          />
-          <Route
-            path="CreateEmployeeProfile"
-            element={<CreateEmployeeProfile />}
-          />
-        </Route>
-
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
               <Layout_employee />
             </ProtectedRoute>
           }
         >
-          <Route path="employeedashboard" element={<EmployeeDashboard />} />
+          <Route path="/" element={<EmployeeDashboard />} />
+          <Route path="/dashboard" element={<EmployeeDashboard />} />
+          <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
+          <Route
+            path="/project/details/:projectId"
+            element={<ProjectDetails />}
+          />
           <Route
             path="employeetimetracking"
             element={<EmployeeTimeTracking />}
@@ -169,44 +51,6 @@ function App() {
 
         <Route path="/" element={<Plain_layout />}>
           <Route path="/login" element={<LoginPage />} />
-        </Route>
-
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Layout_client />
-            </ProtectedRoute>
-          }
-        >
-          <Route
-            path="ClientAdminDetailsPage"
-            element={<ClientAdminDetailsPage />}
-          />
-          <Route
-            path="ClientAdminProjectDetails"
-            element={<ClientAdminProjectDetails />}
-          />
-          <Route
-            path="ClientAdminSubtaskShow"
-            element={<ClientAdminSubtaskShow />}
-          />
-          <Route
-            path="ClientAdminProjectContent"
-            element={<ClientAdminProjectContent />}
-          />
-          <Route
-            path="ClientAdminProjectMediaGallery"
-            element={<ClientAdminProjectMediaGallery />}
-          />
-          <Route
-            path="ClientAdminNotificationPage"
-            element={<ClientAdminNotificationPage />}
-          />
-          <Route
-            path="ClientAdminPreviewPage"
-            element={<ClientAdminPreviewPage />}
-          />
         </Route>
       </Routes>
 

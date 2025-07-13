@@ -8,6 +8,7 @@ import {
   deleteEmployee,
   editEmployee,
   getEmployeeTasks,
+  getEmployeeDashboardData,
 } from "../controllers/employeeController.js";
 import upload from "../middlewares/upload.js";
 
@@ -21,5 +22,6 @@ employeeRouter.post("/login", loginEmployee);
 employeeRouter.delete("/delete/:id", deleteEmployee);
 employeeRouter.put("/edit/:id", editEmployee);
 employeeRouter.get("/tasks/:id", getEmployeeTasks);
+employeeRouter.get("/dashboard/:employeeId", getEmployeeDashboardData);
 
 export default employeeRouter;

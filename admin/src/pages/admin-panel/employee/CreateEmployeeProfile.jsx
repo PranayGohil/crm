@@ -96,7 +96,7 @@ const CreateEmployeeProfile = () => {
         data
       );
       if (res.data.success) {
-        navigate("/teammemberdashboard");
+        navigate("/employee/dashboard");
       } else {
         setErrors({ general: res.data.message || "Unknown error" });
       }

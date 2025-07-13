@@ -1,6 +1,8 @@
 import Employee from "../models/employeeModel.js";
 import SubTask from "../models/subTaskModel.js";
+import Project from "../models/projectModel.js";
 import Bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const addEmployee = async (req, res) => {
   try {
@@ -70,16 +72,46 @@ export const addEmployee = async (req, res) => {
 };
 
 export const loginEmployee = async (req, res) => {
-  const { username, password } = req.body;
-  const employee = await Employee.findOne({ username });
-  if (!employee) {
-    return res.status(400).json({ error: "User not found" });
+  try {
+    const { username, password } = req.body;
+
+    // Find employee by username
+    const employee = await Employee.findOne({ username });
+    if (!employee) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+    // Compare password using bcrypt
+    const isMatch = await Bcrypt.compare(password, employee.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid username or password" });
+    }
+
+    // Create JWT token
+    const token = jwt.sign(
+      { id: employee._id, role: "employee" },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    // Return response (don't send password)
+    res.json({
+      _id: employee._id,
+      username: employee.username,
+      full_name: employee.full_name,
+      email: employee.email,
+      designation: employee.designation,
+      profile_pic: employee.profile_pic,
+      department: employee.department,
+      date_of_joining: employee.date_of_joining,
+      status: employee.status,
+      token,
+      role: "employee",
+    });
+  } catch (error) {
+    console.error("Employee login error:", error);
+    res.status(500).json({ message: "Server error" });
   }
-  const isMatch = await Bcrypt.compare(password, employee.password);
-  if (!isMatch) {
-    return res.status(400).json({ error: "Invalid credentials" });
-  }
-  res.status(200).json(employee);
 };
 
 export const getEmployees = async (req, res) => {
@@ -200,4 +232,29 @@ export const getEmployeeTasks = async (req, res) => {
   const { id } = req.params;
   const tasks = await SubTask.find({ assign_to: { role: "employee", id: id } });
   res.status(200).json(tasks);
+};
+
+export const getEmployeeDashboardData = async (req, res) => {
+  try {
+    const employeeId = req.params.employeeId;
+    console.log("employee id", employeeId);
+    // Find all subtasks assigned to this employee
+    const subtasks = await SubTask.find({ assign_to: employeeId }).populate(
+      "project_id"
+    ); // also get project data for each subtask
+    console.log("Subtasks:", subtasks);
+    // Extract unique project ids from those subtasks
+    const projectIds = subtasks.map((s) => s.project_id?._id).filter(Boolean);
+    const uniqueProjectIds = [
+      ...new Set(projectIds.map((id) => id.toString())),
+    ];
+
+    // Fetch those projects
+    const projects = await Project.find({ _id: { $in: uniqueProjectIds } });
+
+    res.json({ subtasks, projects });
+  } catch (error) {
+    console.error("Error fetching employee dashboard data:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
