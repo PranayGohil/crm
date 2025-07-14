@@ -76,8 +76,8 @@ const SubtaskDashboardContainer = () => {
   const handleBulkUpdateAll = async () => {
     if (selectedTaskIds.length === 0) return;
     const update = {};
-    if (bulkAssignTo)
-      update.assign_to = [{ role: "Employee", id: bulkAssignTo }];
+    if (bulkAssignTo) update.assign_to = bulkAssignTo;
+
     if (bulkPriority) update.priority = bulkPriority;
     if (bulkStage) update.stage = bulkStage;
 

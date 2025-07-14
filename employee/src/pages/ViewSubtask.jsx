@@ -114,9 +114,9 @@ const ViewSubtask = () => {
     try {
       const formData = new FormData();
       for (const file of files) {
+        console.log("File Data:", file);
         formData.append("media_files", file); // must match .array("media_files")
       }
-
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/add-media/${subtaskId}`,
         formData

@@ -20,7 +20,23 @@ const EmployeeProfileEdit = () => {
   const employmentTypes = ["Full-time", "Part-time"];
   const defaultManager = "Sarah Johnson (CTO)";
 
-  const [initialValues, setInitialValues] = useState(null);
+  const [initialValues, setInitialValues] = useState({
+    full_name: "",
+    username: "",
+    email: "",
+    phone: "",
+    home_address: "",
+    dob: "",
+    employee_id: "",
+    department: "",
+    designation: "",
+    status: "Active",
+    employment_type: "Full-time",
+    reportingManager: "Sarah Johnson (CTO)",
+    date_of_joining: "",
+    monthly_salary: "",
+    emergency_contact: "",
+  });
 
   const validationSchema = Yup.object().shape({
     full_name: Yup.string().required("Full name is required"),
@@ -59,7 +75,7 @@ const EmployeeProfileEdit = () => {
           dob: data.dob ? data.dob.split("T")[0] : "",
           employee_id: data.employee_id || "",
           department: data.department || "",
-          designation: data.designation || "Senior Developer",
+          designation: data.designation || "",
           status: data.status || "Active",
           employment_type: data.employment_type || employmentTypes[0],
           reportingManager: data.reportingManager || defaultManager,
@@ -112,6 +128,7 @@ const EmployeeProfileEdit = () => {
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
+        enableReinitialize
         onSubmit={async (values) => {
           setLoading(true);
           try {
@@ -121,7 +138,7 @@ const EmployeeProfileEdit = () => {
             });
 
             if (profilePreview && typeof profilePreview !== "string") {
-              console.log("Appending profile pic to formData");
+              console.log("Appending profile pic to formData", profilePreview);
               formData.append("profile_pic", profilePreview);
             }
             await axios.post(
