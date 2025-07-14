@@ -9,7 +9,7 @@ import { Modal, Button } from "react-bootstrap";
 const ViewSubtask = () => {
   const { subtaskId } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [subtask, setSubtask] = useState(null);
   const [project, setProject] = useState(null);

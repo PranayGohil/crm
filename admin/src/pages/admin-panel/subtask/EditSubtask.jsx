@@ -11,7 +11,7 @@ import { stageOptions, priorityOptions } from "../../../options";
 const EditSubtask = () => {
   const { subtaskId } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [employees, setEmployees] = useState([]);
   const [mediaPreviews, setMediaPreviews] = useState([]);

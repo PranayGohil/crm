@@ -8,7 +8,7 @@ import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 const EmployeeProfileEdit = () => {
   const { employeeId } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const dropdownRef = useRef(null);
   const [profilePreview, setProfilePreview] = useState(null);

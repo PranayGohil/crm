@@ -7,7 +7,7 @@ const RecentProjects = () => {
   const [projects, setProjects] = useState([]);
   const [projectSubtasks, setProjectSubtasks] = useState({});
   const [employees, setEmployees] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchRecentProjectsAndRelated = async () => {

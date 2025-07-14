@@ -3,7 +3,7 @@ import axios from "axios";
 import LoadingOverlay from "../components/admin/LoadingOverlay";
 
 const UpcomingDueDates = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [dueTasks, setDueTasks] = useState([]);
 
   useEffect(() => {

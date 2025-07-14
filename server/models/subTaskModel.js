@@ -53,7 +53,13 @@ const subTaskSchema = mongoose.Schema(
     status: {
       type: String,
     },
-    comments: [commentSchema], // ✅ embed comments here
+    comments: [commentSchema],
+    time_logs: [
+      {
+        start_time: { type: Date },
+        end_time: { type: Date, default: null },
+      },
+    ],
   },
   {
     timestamps: true,

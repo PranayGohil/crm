@@ -15,6 +15,8 @@ import {
   addComment,
   addMedia,
   removeMedia,
+  startTimer,
+  stopTimer,
 } from "../controllers/subTaskController.js";
 import upload from "../middlewares/upload.js";
 
@@ -46,5 +48,8 @@ subTaskRouter.post(
 );
 
 subTaskRouter.post("/remove-media/:subtaskId", removeMedia);
+
+subTaskRouter.put("/subtask/start-timer/:subtaskId", startTimer);
+subTaskRouter.put("/subtask/stop-timer/:subtaskId", stopTimer);
 
 export default subTaskRouter;

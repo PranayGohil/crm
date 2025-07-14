@@ -5,7 +5,7 @@ import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const TeamMemberProfile = () => {
   const { id } = useParams(); // get employee id from route
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [employee, setEmployee] = useState(null);
   const [showPassword, setShowPassword] = useState(false);

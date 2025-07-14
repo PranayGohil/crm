@@ -10,7 +10,7 @@ const AddNewProject = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef();
   const [clients, setClients] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [clientError, setClientError] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 

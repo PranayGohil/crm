@@ -52,7 +52,7 @@ const Dropdown = ({ label, options, selected, onChange }) => {
 };
 
 const EmployeeDashboard = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);

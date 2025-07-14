@@ -6,7 +6,7 @@ import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const ProjectContent = () => {
   const { projectId } = useParams();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [project, setProject] = useState(null);
   const [currency, setCurrency] = useState("INR");
   const [dropdownOpen, setDropdownOpen] = useState(false);

@@ -3,7 +3,7 @@ import axios from "axios";
 import LoadingOverlay from "../components/admin/LoadingOverlay";
 
 const DashboardSummaryCards = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState(null);
   const projectRef = useRef(null);
   const clientRef = useRef(null);

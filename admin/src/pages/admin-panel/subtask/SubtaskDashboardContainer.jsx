@@ -8,7 +8,7 @@ import { stageOptions, priorityOptions } from "../../../options";
 
 const SubtaskDashboardContainer = () => {
   const { projectId } = useParams();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const [project, setProject] = useState(null);
   const [subtasks, setSubtasks] = useState([]);

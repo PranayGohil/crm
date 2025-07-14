@@ -8,7 +8,7 @@ const ClientDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [client, setClient] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Fetch client + subtasks
   useEffect(() => {

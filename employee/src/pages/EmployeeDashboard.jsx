@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 const EmployeeDashboard = () => {
@@ -32,6 +32,8 @@ const EmployeeDashboard = () => {
   const [subtasks, setSubtasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [runningTimers, setRunningTimers] = useState({});
+
   useEffect(() => {
     const storedUser = localStorage.getItem("employeeUser");
     if (storedUser) {
@@ -39,6 +41,19 @@ const EmployeeDashboard = () => {
       const employeeId = user._id;
       fetchDashboardData(employeeId);
     }
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRunningTimers((prev) => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach((subtaskId) => {
+          updated[subtaskId] += 1000;
+        });
+        return updated;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchDashboardData = async (employeeId) => {
@@ -63,6 +78,18 @@ const EmployeeDashboard = () => {
       setLoading(false);
     }
   };
+
+  const totalTimeMs = (subtasks.time_logs || []).reduce((total, log) => {
+    if (log.end_time) {
+      return total + (new Date(log.end_time) - new Date(log.start_time));
+    } else {
+      return total + (new Date() - new Date(log.start_time));
+    }
+  }, runningTimers[subtasks._id] || 0);
+
+  const totalHours = Math.floor(totalTimeMs / 3600000);
+  const totalMinutes = Math.floor((totalTimeMs % 3600000) / 60000);
+  const timeTrackedDisplay = `${totalHours}h ${totalMinutes}m`;
 
   const toggleTable = (projectId) =>
     setExpandedProjectId(expandedProjectId === projectId ? null : projectId);
@@ -243,14 +270,39 @@ const EmployeeDashboard = () => {
                                 </td>
                                 <td>{task.stage}</td>
                                 <td className="ttb-table-pause">
-                                  <div className="ttb-table-pause-inner ttb-start-bg-color">
-                                    <span className="ttb-table-pasuse-btn-containter">
-                                      <img src="/SVG/start.svg" alt="start" />
-                                      <span>Start</span>
-                                    </span>
-                                  </div>
+                                  {task.status === "In Progress" ? (
+                                    runningTimers[task._id] ? (
+                                      <div
+                                        className="ttb-table-pause-inner ttb-stop-bg-color"
+                                      >
+                                        <span className="ttb-table-pasuse-btn-containter">
+                                          <img
+                                            src="/SVG/pause.svg"
+                                            alt="stop"
+                                          />
+                                          <span>Stop</span>
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <div
+                                        className="ttb-table-pause-inner ttb-start-bg-color"
+                                      >
+                                        <span className="ttb-table-pasuse-btn-containter">
+                                          <img
+                                            src="/SVG/start.svg"
+                                            alt="start"
+                                          />
+                                          <span>Start</span>
+                                        </span>
+                                      </div>
+                                    )
+                                  ) : (
+                                    <span>-</span>
+                                  )}
                                 </td>
-                                <td>-</td>
+
+                                <td>{timeTrackedDisplay}</td>
+
                                 <td className="time-table-icons">
                                   <Link to={`/subtask/view/${task._id}`}>
                                     <img

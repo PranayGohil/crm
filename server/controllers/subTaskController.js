@@ -182,29 +182,37 @@ export const changeSubTaskStatus = async (req, res) => {
     const { id } = req.params;
     const { status, userId, userRole } = req.body;
     console.log("Changing status for subtask:", id, "to", status);
-    const updated = await SubTask.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
 
-    if (!updated) {
-      console.error("Subtask not found");
-      return res.status(404).json({ message: "Subtask not found" });
+    const subtask = await SubTask.findById(id);
+    if (!subtask) return res.status(404).json({ message: "Subtask not found" });
+
+    // Handle timer
+    if (status === "In Progress") {
+      // Start new timer if no open timer
+      const hasOpenTimer = subtask.time_logs.some((log) => !log.end_time);
+      if (!hasOpenTimer) {
+        subtask.time_logs.push({ start_time: new Date() });
+      }
+    } else {
+      // Stop any open timer
+      subtask.time_logs = subtask.time_logs.map((log) => {
+        if (!log.end_time) log.end_time = new Date();
+        return log;
+      });
     }
 
-    // find subtask and related data
-    const subtask = await SubTask.findById(id);
-    const project = await Project.findById(subtask.project_id);
+    // Update status
+    subtask.status = status;
+    await subtask.save();
 
-    // create notification content
+    // existing notification logic...
+    const project = await Project.findById(subtask.project_id);
     const userWhoChanged = await (userRole === "admin"
       ? Admin.findById(userId)
       : Employee.findById(userId));
 
     const userName = userWhoChanged?.full_name || "Someone";
 
-    // send notification to admin if changed by employee
     if (userRole === "employee") {
       await Notification.create({
         title: `${userName} updated status of subtask ${subtask.task_name} to ${status}`,
@@ -219,7 +227,6 @@ export const changeSubTaskStatus = async (req, res) => {
       });
     }
 
-    // send notification to assigned employee if changed by admin
     if (userRole === "admin" && subtask.assign_to) {
       await Notification.create({
         title: `Status changed to ${status}`,
@@ -232,8 +239,9 @@ export const changeSubTaskStatus = async (req, res) => {
         created_by_role: userRole,
       });
     }
+
     console.log("Notification sent successfully");
-    res.status(200).json(updated);
+    res.status(200).json(subtask);
   } catch (error) {
     console.error("Error changing subtask status:", error);
     res.status(500).json({ error: "Failed to change status" });
@@ -436,5 +444,38 @@ export const removeMedia = async (req, res) => {
   } catch (error) {
     console.error("Error removing media:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Start timer
+export const startTimer = async (req, res) => {
+  const { subtaskId } = req.params;
+  try {
+    const subtask = await SubTask.findById(subtaskId);
+    subtask.time_logs.push({ start_time: new Date(), end_time: null });
+    await subtask.save();
+    res.json({ message: "Timer started", subtask });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to start timer" });
+  }
+};
+
+// Stop timer
+export const stopTimer = async (req, res) => {
+  const { subtaskId } = req.params;
+  try {
+    const subtask = await SubTask.findById(subtaskId);
+    const lastLog = subtask.time_logs.find((log) => log.end_time === null);
+    if (lastLog) {
+      lastLog.end_time = new Date();
+      await subtask.save();
+      res.json({ message: "Timer stopped", subtask });
+    } else {
+      res.status(400).json({ message: "No running timer found" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to stop timer" });
   }
 };

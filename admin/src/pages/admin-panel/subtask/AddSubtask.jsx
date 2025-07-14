@@ -10,7 +10,7 @@ import { stageOptions, priorityOptions } from "../../../options";
 
 const AddSubtask = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
   const { projectId } = useParams();
 

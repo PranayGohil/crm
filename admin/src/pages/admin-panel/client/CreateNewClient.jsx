@@ -9,7 +9,7 @@ import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const CreateNewClient = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -79,6 +79,7 @@ const CreateNewClient = () => {
 
   const { handleChange, handleSubmit, values, errors, touched, isSubmitting } =
     formik;
+    
   if (loading) return <LoadingOverlay />;
 
   return (

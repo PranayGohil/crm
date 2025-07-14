@@ -23,7 +23,7 @@ const AllProject = () => {
   const [projectSubtasks, setProjectSubtasks] = useState({});
   const [employees, setEmployees] = useState({}); // new: map of id -> employee
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const clientDropdownRef = useRef();
   const statusDropdownRef = useRef();
 

@@ -8,7 +8,7 @@ import CreateLoginSecuritySettings from "../../../components/CreateLoginSecurity
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 const CreateEmployeeProfile = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     username: "",
     password: "",
