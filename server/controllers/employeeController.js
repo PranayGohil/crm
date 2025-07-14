@@ -235,6 +235,13 @@ export const getEmployeeTasks = async (req, res) => {
   res.status(200).json(tasks);
 };
 
+const getWeekStart = () => {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  now.setDate(now.getDate() - now.getDay()); // Sunday as week start
+  return now;
+};
+
 export const getEmployeeDashboardData = async (req, res) => {
   try {
     const employeeId = req.params.employeeId;
@@ -253,7 +260,35 @@ export const getEmployeeDashboardData = async (req, res) => {
     // Fetch those projects
     const projects = await Project.find({ _id: { $in: uniqueProjectIds } });
 
-    res.json({ subtasks, projects });
+    // Calculate total time logged this week
+    const weekStart = getWeekStart();
+    let timeLoggedThisWeekMs = 0;
+
+    subtasks.forEach((task) => {
+      (task.time_logs || []).forEach((log) => {
+        const logStart = new Date(log.start_time);
+        const logEnd = log.end_time ? new Date(log.end_time) : new Date();
+
+        // only include if log overlaps with this week
+        if (logEnd >= weekStart) {
+          const effectiveStart = logStart < weekStart ? weekStart : logStart;
+          timeLoggedThisWeekMs += logEnd - effectiveStart;
+        }
+      });
+    });
+
+    // Convert to "Xh Ym"
+    const hours = Math.floor(timeLoggedThisWeekMs / 3600000);
+    const minutes = Math.floor((timeLoggedThisWeekMs % 3600000) / 60000);
+    const timeLoggedThisWeek = `${hours}h ${minutes}m`;
+
+    res.json({
+      subtasks,
+      projects,
+      completedThisWeek: subtasks.filter((t) => t.status === "Completed")
+        .length,
+      timeLoggedThisWeek,
+    });
   } catch (error) {
     console.error("Error fetching employee dashboard data:", error);
     res.status(500).json({ message: "Server error" });
