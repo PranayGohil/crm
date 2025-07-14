@@ -31,7 +31,7 @@ import EmployeeDashboard from "./pages/admin-panel/employee/EmployeeDashboard";
 import EmployeeProfileEdit from "./pages/admin-panel/employee/EmployeeProfileEdit";
 import TeamMemberProfile from "./pages/admin-panel/employee/TeamMemberProfile";
 import TaskTimeboard from "./pages/TaskTimeboard";
-import NotificationAdmin from "./pages/NotificationAdmin";
+import NotificationAdmin from "./pages/admin-panel/NotificationAdmin";
 
 import EditClient from "./pages/admin-panel/client/EditClient";
 import EditProject from "./pages/EditProject";
@@ -110,7 +110,7 @@ function App() {
             path="timetrackingdashboard"
             element={<TimeTrackingDashboard />}
           />
-          <Route path="notificationadmin" element={<NotificationAdmin />} />
+          <Route path="/notifications" element={<NotificationAdmin />} />
 
           {/* edit page */}
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import ProjectCard from "../components/ProjectCard";
-import LoadingOverlay from "../components/LoadingOverlay";
+import ProjectCard from "./admin/ProjectCard";
+import LoadingOverlay from "./admin/LoadingOverlay";
 
 const RecentProjects = () => {
   const [projects, setProjects] = useState([]);
@@ -11,6 +11,7 @@ const RecentProjects = () => {
 
   useEffect(() => {
     const fetchRecentProjectsAndRelated = async () => {
+      setLoading(true);
       try {
         // 1) Fetch recent projects
         const res = await axios.get(
@@ -66,9 +67,9 @@ const RecentProjects = () => {
     fetchRecentProjectsAndRelated();
   }, []);
 
+  if (loading) return <LoadingOverlay />;
   return (
     <div className="recent-projects-page">
-      <LoadingOverlay show={loading} />
       <section className="header">
         <div className="head-menu">
           <h1>Recent Projects</h1>

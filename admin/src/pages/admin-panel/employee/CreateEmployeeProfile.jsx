@@ -5,9 +5,10 @@ import CreateMemberHeader from "../../../components/CreateMemberHeader";
 import CreateProfileSection from "../../../components/CreateProfileSection";
 import CreatePersonalProfessionalDetails from "../../../components/CreatePersonalProfessionalDetails";
 import CreateLoginSecuritySettings from "../../../components/CreateLoginSecuritySettings";
-
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 const CreateEmployeeProfile = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     username: "",
     password: "",
@@ -19,7 +20,7 @@ const CreateEmployeeProfile = () => {
     email: "",
     home_address: "",
     dob: "",
-    emrgency_contact: "",
+    emergency_contact: "",
     employee_id: "",
     department: "",
     date_of_joining: "",
@@ -60,8 +61,8 @@ const CreateEmployeeProfile = () => {
     if (!form.home_address.trim())
       newErrors.home_address = "Address is required.";
     if (!form.dob) newErrors.dob = "Date of birth is required.";
-    if (!form.emrgency_contact.trim())
-      newErrors.emrgency_contact = "Emergency contact is required.";
+    if (!form.emergency_contact.trim())
+      newErrors.emergency_contact = "Emergency contact is required.";
     if (!form.employee_id.trim())
       newErrors.employee_id = "Employee ID is required.";
     if (!form.department) newErrors.department = "Select department.";
@@ -80,6 +81,7 @@ const CreateEmployeeProfile = () => {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -105,8 +107,12 @@ const CreateEmployeeProfile = () => {
       setErrors({
         general: "Error: " + (err?.response?.data?.message || "Unknown error"),
       });
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) return <LoadingOverlay />;
 
   return (
     <section className="employee_profile_edit_container">

@@ -12,11 +12,11 @@ import EmployeeNotificationPage from "./pages/EmployeeNotificationPage";
 
 //employee
 
-import EmployeeDashboard from "./pages/employee-panel/EmployeeDashboard";
-import ViewSubtask from "./pages/employee-panel/ViewSubtask";
-import ProjectDetails from "./pages/employee-panel/ProjectDetails";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
+import ViewSubtask from "./pages/ViewSubtask";
+import ProjectDetails from "./pages/ProjectDetails";
 
-import LoginPage from "./pages/employee-panel/LoginPage";
+import LoginPage from "./pages/LoginPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 

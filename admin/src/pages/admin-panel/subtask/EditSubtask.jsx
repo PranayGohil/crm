@@ -5,12 +5,13 @@ import * as Yup from "yup";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import { stageOptions, priorityOptions } from "../../../options";
 
 const EditSubtask = () => {
   const { subtaskId } = useParams();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   const [employees, setEmployees] = useState([]);
   const [mediaPreviews, setMediaPreviews] = useState([]);
@@ -38,6 +39,7 @@ const EditSubtask = () => {
   // Fetch employees & subtask details
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const [empRes, subtaskRes] = await Promise.all([
           axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`),
@@ -70,6 +72,8 @@ const EditSubtask = () => {
       } catch (error) {
         console.error("Error fetching subtask:", error);
         toast.error("Failed to load subtask details");
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -78,6 +82,7 @@ const EditSubtask = () => {
   // Handle form submit
   const handleUpdate = async (values) => {
     try {
+      setLoading(true);
       const formData = new FormData();
       formData.append("task_name", values.task_name);
       formData.append("description", values.description);
@@ -100,8 +105,12 @@ const EditSubtask = () => {
     } catch (error) {
       console.error("Update failed:", error);
       toast.error("Failed to update subtask.");
+    } finally {
+      setLoading(false);
     }
   };
+  
+  if (loading) return <LoadingOverlay />;
 
   return (
     <div className="subtask_management">

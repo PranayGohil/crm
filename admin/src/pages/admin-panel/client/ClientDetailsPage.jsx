@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const ClientDetailsPage = () => {
   const { id } = useParams();
@@ -12,6 +13,7 @@ const ClientDetailsPage = () => {
   // Fetch client + subtasks
   useEffect(() => {
     const fetchClient = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/client/get-username/${id}`
@@ -36,6 +38,7 @@ const ClientDetailsPage = () => {
   // Delete client handler
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this client?")) return;
+    setLoading(true);
     try {
       await axios.delete(
         `${process.env.REACT_APP_API_URL}/api/client/delete/${client._id}`
@@ -45,11 +48,13 @@ const ClientDetailsPage = () => {
     } catch (error) {
       console.error("Failed to delete client:", error);
       toast.error("Failed to delete client");
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading)
-    return <p style={{ textAlign: "center", marginTop: "1rem" }}>Loading...</p>;
+  if (loading) return <LoadingOverlay />;
+
   if (!client)
     return (
       <p style={{ textAlign: "center", marginTop: "1rem" }}>Client not found</p>

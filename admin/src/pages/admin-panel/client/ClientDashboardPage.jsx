@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const ClientDashboardPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,6 +35,8 @@ const ClientDashboardPage = () => {
       client.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) return <LoadingOverlay />;
 
   return (
     <>

@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import LoadingOverlay from "../components/admin/LoadingOverlay";
 
 const DashboardSummaryCards = () => {
+  const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState(null);
   const projectRef = useRef(null);
   const clientRef = useRef(null);
@@ -11,12 +13,14 @@ const DashboardSummaryCards = () => {
   const taskOverdueRef = useRef(null);
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get(`${process.env.REACT_APP_API_URL}/api/statistics/summary`)
       .then((res) => {
         setSummary(res.data);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -45,7 +49,7 @@ const DashboardSummaryCards = () => {
     }
   }, [summary]);
 
-  if (!summary) return <div>Loading...</div>;
+  if (!summary || loading) return <LoadingOverlay />;
 
   return (
     <section className="md-total-card-main">
@@ -65,11 +69,13 @@ const DashboardSummaryCards = () => {
             <span className="md-total-card-text">Project</span>
           </div>
           <div className="md-ongoing-completed mt-8">
-            <span className="md-ongoing-number">{summary.inProgressTasks} {" "}</span>
+            <span className="md-ongoing-number">
+              {summary.inProgressTasks}{" "}
+            </span>
             <span>Ongoing</span>
             <span>/</span>
             <span className="md-completed-number">
-              {summary.completedTasks} {" "}  
+              {summary.completedTasks}{" "}
             </span>
             <span>Completed</span>
           </div>

@@ -2,9 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const ProjectContent = () => {
   const { projectId } = useParams();
+  const [loading, setLoading] = useState(true);
   const [project, setProject] = useState(null);
   const [currency, setCurrency] = useState("INR");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -14,6 +16,7 @@ const ProjectContent = () => {
 
   useEffect(() => {
     const fetchProject = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`
@@ -27,6 +30,8 @@ const ProjectContent = () => {
       } catch (err) {
         console.error("Fetch project error:", err);
         toast.error("Failed to load project");
+      } finally {
+        setLoading(false);
       }
     };
     fetchProject();

@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const TeamMemberProfile = () => {
   const { id } = useParams(); // get employee id from route
-  const [employee, setEmployee] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [employee, setEmployee] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const fetchEmployee = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/employee/get/${id}`
@@ -25,7 +28,6 @@ const TeamMemberProfile = () => {
     fetchEmployee();
   }, [id]);
 
-  if (loading) return <p style={{ textAlign: "center" }}>Loading...</p>;
   if (!employee)
     return <p style={{ textAlign: "center" }}>Employee not found.</p>;
 
@@ -94,6 +96,8 @@ const TeamMemberProfile = () => {
       value: employee.reporting_manager || "N/A",
     },
   ];
+
+  if (loading) return <LoadingOverlay />;
 
   return (
     <>
@@ -167,8 +171,6 @@ const TeamMemberProfile = () => {
                       : "badge text-bg-danger p-2"
                   }`}
                 >
-                  
-
                   {employee.status === "Active"
                     ? "Active"
                     : employee.status === "on-leave"

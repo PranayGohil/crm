@@ -98,11 +98,11 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
               <input
                 type="text"
                 placeholder="+91 9012345678 (Father)"
-                value={form.emrgency_contact}
-                onChange={(e) => onChange("emrgency_contact", e.target.value)}
+                value={form.emergency_contact}
+                onChange={(e) => onChange("emergency_contact", e.target.value)}
               />
-              {errors?.emrgency_contact && (
-                <div className="error">{errors.emrgency_contact}</div>
+              {errors?.emergency_contact && (
+                <div className="error">{errors.emergency_contact}</div>
               )}
             </div>
           </div>

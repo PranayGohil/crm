@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import ProjectCard from "../../../components/ProjectCard";
+import ProjectCard from "../../../components/admin/ProjectCard.jsx";
 import { statusOptions, stageOptions } from "../../../options.js";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const ClientProjectDetails = () => {
   const { username } = useParams();
@@ -98,6 +99,8 @@ const ClientProjectDetails = () => {
 
     return matchStatus && matchStage;
   });
+
+  if (loading) return <LoadingOverlay />;
 
   return (
     <div className="project_client__client">

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import LoadingOverlay from "../../../components/LoadingOverlay";
-import ProjectCard from "../../../components/ProjectCard";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
+import ProjectCard from "../../../components/admin/ProjectCard";
 
 const AllProject = () => {
   const [selectedClient, setSelectedClient] = useState({
@@ -30,6 +30,7 @@ const AllProject = () => {
   // Fetch clients
   useEffect(() => {
     const fetchClients = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/client/get-all`
@@ -37,6 +38,8 @@ const AllProject = () => {
         setClients(res.data);
       } catch (error) {
         console.error("Error fetching clients:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchClients();
@@ -45,6 +48,7 @@ const AllProject = () => {
   // Fetch projects, subtasks & employees
   useEffect(() => {
     const fetchAllData = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/project/get-all`
@@ -126,10 +130,10 @@ const AllProject = () => {
     return clientMatch && statusMatch && searchMatch;
   });
 
+  if (loading) return <LoadingOverlay />;
+
   return (
     <div className="all-project-page">
-      <LoadingOverlay show={loading} />
-
       <section className="header">
         <div className="head-menu">
           <h1>All Projects</h1>

@@ -1,75 +1,97 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const EmployeeProfileEdit = () => {
   const { employeeId } = useParams();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
   const dropdownRef = useRef(null);
+  const [profilePreview, setProfilePreview] = useState(null);
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const dropdownOptions = ["medium", "low", "Pause", "Block", "Done"];
+  const departmentOptions = ["Engineering", "Design", "Marketing"];
+  const managerOptions = ["Sarah Johnson (CTO)", "Alex Lee (Manager)"];
   const employmentTypes = ["Full-time", "Part-time"];
   const defaultManager = "Sarah Johnson (CTO)";
 
-  const [employee, setEmployee] = useState(null);
-  const [openDropdown, setOpenDropdown] = useState(null);
-  const [showPasswords, setShowPasswords] = useState({
-    current: false,
-    new: false,
-    confirm: false,
+  const [initialValues, setInitialValues] = useState(null);
+
+  const validationSchema = Yup.object().shape({
+    full_name: Yup.string().required("Full name is required"),
+    username: Yup.string().required("Username is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    phone: Yup.string().required("Phone number is required"),
+    home_address: Yup.string().required("Address is required"),
+    dob: Yup.string().required("Date of birth is required"),
+    employee_id: Yup.string().required("Employee ID is required"),
+    department: Yup.string().required("Department is required"),
+    designation: Yup.string().required("Designation is required"),
+    status: Yup.string().required("Status is required"),
+    employment_type: Yup.string().required("Employment type is required"),
+    reportingManager: Yup.string().required("Reporting manager is required"),
+    date_of_joining: Yup.string().required("Date of joining is required"),
+    monthly_salary: Yup.number()
+      .typeError("Must be a number")
+      .required("Monthly salary is required"),
+    emergency_contact: Yup.string().required("Emergency contact is required"),
   });
 
   useEffect(() => {
     const fetchEmployee = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/employee/get/${employeeId}`
         );
-        setEmployee({
-          ...res.data,
-          designation: res.data.designation || "Senior Developer",
-          status: res.data.status || "Active",
-          department: res.data.department || "Engineering",
-          employmentType: res.data.employmentType || employmentTypes[0],
-          reportingManager: res.data.reportingManager || defaultManager,
+        const data = res.data;
+        setInitialValues({
+          full_name: data.full_name || "",
+          username: data.username || "",
+          email: data.email || "",
+          phone: data.phone || "",
+          home_address: data.home_address || "",
+          dob: data.dob ? data.dob.split("T")[0] : "",
+          employee_id: data.employee_id || "",
+          department: data.department || "",
+          designation: data.designation || "Senior Developer",
+          status: data.status || "Active",
+          employment_type: data.employment_type || employmentTypes[0],
+          reportingManager: data.reportingManager || defaultManager,
+          date_of_joining: data.date_of_joining
+            ? data.date_of_joining.split("T")[0]
+            : "",
+          monthly_salary: data.monthly_salary || "",
+          emergency_contact: data.emergency_contact || "",
         });
+        setProfilePreview(data.profile_pic || null);
       } catch (err) {
         console.error("Error fetching employee:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchEmployee();
   }, [employeeId]);
 
-  const toggleDropdown = (type) => {
-    setOpenDropdown((prev) => (prev === type ? null : type));
+  const toggleDropdown = (field, setFieldValue) => {
+    setOpenDropdown((prev) => (prev === field ? null : field));
   };
 
-  const handleSelect = (type, value) => {
-    setEmployee((prev) => ({ ...prev, [type]: value }));
+  const handleSelect = (field, value, setFieldValue) => {
+    setFieldValue(field, value);
     setOpenDropdown(null);
   };
 
-  const handleChange = (field, value) => {
-    setEmployee((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleFileChange = (e) => {
+  const handleFileChange = (e, setFieldValue) => {
     if (e.target.files[0]) {
-      handleChange("profile_pic", URL.createObjectURL(e.target.files[0]));
-    }
-  };
-
-  const handleSave = async () => {
-    try {
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/employee/edit/${employeeId}`,
-        employee
-      );
-      alert("Profile updated!");
-      navigate(`/employee/profile/${employeeId}`);
-    } catch (err) {
-      console.error("Failed to update:", err);
-      alert("Update failed");
+      setProfilePreview(e.target.files[0]);
+      setFieldValue("profile_pic", e.target.files[0]);
     }
   };
 
@@ -83,379 +105,286 @@ const EmployeeProfileEdit = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (!employee) return <p>Loading...</p>;
+  if (loading) return <LoadingOverlay />;
 
   return (
     <section className="employee_profile_edit_container">
-      <section className="page3-main1">
-        <div className="member-profile-edit">
-          <div className="pro-edit-vec">
-            <img src="/SVG/vec-mem-pro.svg" alt="vec" />
-            <span>Edit Team Member Profile</span>
-          </div>
-          <div className="cancel-changes">
-            <div className="theme_secondary_btn">
-              <a onClick={() => navigate(-1)}>Cancel</a>
-            </div>
-            <div className="theme_btn">
-              <a onClick={handleSave}>Save changes</a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={async (values) => {
+          setLoading(true);
+          try {
+            const formData = new FormData();
+            Object.entries(values).forEach(([key, val]) => {
+              formData.append(key, val);
+            });
 
-      <section className="pe page3-main2">
-        <div className="update-upload-profile">
-          <div className="update-your-pro">
-            <div className="upadate-profile-img">
-              <div className="update-img">
-                {employee.profile_pic ? (
-                  <img src={employee.profile_pic} alt="profile" />
-                ) : (
-                  <div className="profile-placeholder">
-                    {employee.full_name?.charAt(0).toUpperCase()}
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="update-profile-detail">
-              <div className="full-name">
-                <span>Full Name</span>
-                <input
-                  type="text"
-                  value={employee.full_name || ""}
-                  onChange={(e) => handleChange("full_name", e.target.value)}
-                />
-              </div>
-              <div className="update-dropdown" ref={dropdownRef}>
-                <div
-                  className={`btn_main1 ${
-                    openDropdown === "designation" ? "open" : ""
-                  }`}
-                >
-                  <p>Designation</p>
-                  <div
-                    className="dropdown_toggle1"
-                    onClick={() => toggleDropdown("designation")}
-                  >
-                    <div className="t-b-inner">
-                      <span className="text_btn1">{employee.designation}</span>
-                      <img
-                        src="/SVG/header-vector.svg"
-                        alt="vec"
-                        className="arrow_icon1"
-                      />
-                    </div>
-                  </div>
-                  {openDropdown === "designation" && (
-                    <ul className="dropdown_menu1">
-                      {dropdownOptions.map((option, idx) => (
-                        <li
-                          key={idx}
-                          onClick={() => handleSelect("designation", option)}
-                        >
-                          {option}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+            if (profilePreview && typeof profilePreview !== "string") {
+              console.log("Appending profile pic to formData");
+              formData.append("profile_pic", profilePreview);
+            }
+            await axios.post(
+              `${process.env.REACT_APP_API_URL}/api/employee/edit/${employeeId}`,
+              formData
+            );
+            alert("Profile updated!");
+            navigate(`/employee/profile/${employeeId}`);
+          } catch (err) {
+            console.error("Failed to update:", err);
+            alert("Update failed");
+          } finally {
+            setLoading(false);
+          }
+        }}
+      >
+        {({ setFieldValue, values }) => (
+          <Form>
+            {/* Top section */}
+            <section className="page3-main1">
+              <div className="member-profile-edit">
+                <div className="pro-edit-vec">
+                  <img
+                    src="/SVG/vec-mem-pro.svg"
+                    alt="vec"
+                    onClick={() => navigate(-1)}
+                    style={{ cursor: "pointer" }}
+                  />
+                  <span>Edit Team Member Profile</span>
                 </div>
-
-                <div
-                  className={`btn_main1 ${
-                    openDropdown === "status" ? "open" : ""
-                  }`}
-                >
-                  <p>Status</p>
-                  <div
-                    className="dropdown_toggle1"
-                    onClick={() => toggleDropdown("status")}
-                  >
-                    <div className="t-b-inner">
-                      <span className="text_btn1">{employee.status}</span>
-                      <img
-                        src="/SVG/header-vector.svg"
-                        alt="vec"
-                        className="arrow_icon1"
-                      />
-                    </div>
+                <div className="cancel-changes">
+                  <div className="theme_secondary_btn">
+                    <a onClick={() => navigate(-1)}>Cancel</a>
                   </div>
-                  {openDropdown === "status" && (
-                    <ul className="dropdown_menu1">
-                      {dropdownOptions.map((option, idx) => (
-                        <li
-                          key={idx}
-                          onClick={() => handleSelect("status", option)}
-                        >
-                          {option}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  <div>
+                    <button type="submit" className="theme_btn">
+                      Save changes
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="upload-profile">
-            <div className="upload-img">
-              <label>
-                <img src="/SVG/upload-vec.svg" alt="upload" />
-                <input type="file" hidden onChange={handleFileChange} />
-              </label>
-            </div>
-            <span>Update Profile Picture</span>
-          </div>
-        </div>
-      </section>
+            </section>
 
-      <section className="personal-proffesional">
-        <div className="profile-edit-header mem-personal-detail">
-          <div className="profile-heading">
-            <div className="profile-edit-heading personal-detail">
-              <span>Personal Details</span>
-            </div>
-          </div>
-          <div className="profile-inner">
-            <div className="profile-edit-inner phone-num">
-              <div className="profile-edit-detail phone-num-txt">
-                <span>Phone Number</span>
-                <input
-                  type="text"
-                  value={employee.phone || ""}
-                  onChange={(e) => handleChange("phone", e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="profile-edit-inner email">
-              <div className="profile-edit-detail mail-txt">
-                <span>Email Address</span>
-                <input
-                  type="email"
-                  value={employee.email || ""}
-                  onChange={(e) => handleChange("email", e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="profile-edit-inner home-add">
-              <div className="profile-edit-detail phone-num-txt">
-                <span>Home Address</span>
-                <input
-                  type="text"
-                  value={employee.address || ""}
-                  onChange={(e) => handleChange("address", e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="profile-edit-inner date-of-birth">
-              <div className="profile-edit-detail date-birth-txt">
-                <span>Date of Birth</span>
-                <input
-                  type="date"
-                  value={employee.dob ? employee.dob.split("T")[0] : ""}
-                  onChange={(e) => handleChange("dob", e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="profile-edit-inner egn-contact">
-              <div className="profile-edit-detail eng-cnt-txt">
-                <span>Emergency Contact</span>
-                <input
-                  type="text"
-                  value={employee.emergency_contact || ""}
-                  onChange={(e) =>
-                    handleChange("emergency_contact", e.target.value)
-                  }
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          className="profile-edit-header mem-professional-detail"
-          ref={dropdownRef}
-        >
-          <div className="profile-heading">
-            <div className="profile-edit-heading personal-detail">
-              <span>Professional Details</span>
-            </div>
-          </div>
-          <div className="profile-inner">
-            <div className="profile-edit-inner emp-id">
-              <div className="profile-edit-detail phone-num-txt">
-                <span>Employee ID</span>
-                <input
-                  type="text"
-                  value={employee.employee_id || ""}
-                  onChange={(e) => handleChange("employee_id", e.target.value)}
-                />
-              </div>
-            </div>
-
-            {[
-              { label: "Department", type: "department" },
-              { label: "Designation", type: "designation" },
-              { label: "Reporting Manager", type: "reportingManager" },
-            ].map(({ label, type }) => (
-              <div className={`profile-edit-inner emp-${type}`} key={type}>
-                <div className="Department emp-detail mail-txt">
-                  <p>{label}</p>
-                  <div
-                    className="dropdown_toggle2"
-                    onClick={() => toggleDropdown(type)}
-                  >
-                    <span className="text_btn2">{employee[type]}</span>
-                    <img
-                      src="/SVG/header-vector.svg"
-                      alt="vec"
-                      className="arrow_icon2"
+            {/* Profile pic */}
+            <section className="pe page3-main2">
+              <div className="update-upload-profile">
+                <div className="update-your-pro">
+                  <div className="upadate-profile-img">
+                    <label
+                      htmlFor="profilePic"
+                      className="update-img"
+                      style={{
+                        cursor: "pointer",
+                        width: "70px",
+                        height: "70px",
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                        border: "1px solid #d1d5db",
+                      }}
+                    >
+                      {profilePreview ? (
+                        <img
+                          src={
+                            typeof profilePreview === "string"
+                              ? profilePreview
+                              : URL.createObjectURL(profilePreview)
+                          }
+                          style={{
+                            width: "100%",
+                            objectFit: "cover",
+                            height: "100%",
+                          }}
+                          alt="profile"
+                        />
+                      ) : (
+                        <img
+                          src={"/SVG/upload-vec.svg"}
+                          alt="upload"
+                          style={{
+                            width: "100%",
+                            objectFit: "cover",
+                            height: "100%",
+                          }}
+                        />
+                      )}
+                    </label>
+                    <input
+                      type="file"
+                      id="profilePic"
+                      hidden
+                      onChange={(e) => handleFileChange(e, setFieldValue)}
                     />
                   </div>
-                  {openDropdown === type && (
-                    <ul className="dropdown_menu2">
-                      {dropdownOptions.map((option, idx) => (
-                        <li
-                          key={idx}
-                          onClick={() => handleSelect(type, option)}
+                  <div className="update-profile-detail">
+                    <div className="full-name">
+                      <span>Full Name</span>
+                      <Field type="text" name="full_name" />
+                      <ErrorMessage
+                        name="full_name"
+                        component="div"
+                        className="error"
+                      />
+                    </div>
+
+                    {/* Dropdowns */}
+                    <div className="update-dropdown" ref={dropdownRef}>
+                      {["designation", "status"].map((field) => (
+                        <div
+                          key={field}
+                          className={`btn_main1 ${
+                            openDropdown === field ? "open" : ""
+                          }`}
                         >
-                          {option}
-                        </li>
+                          <p>
+                            {field.charAt(0).toUpperCase() + field.slice(1)}
+                          </p>
+                          <div
+                            className="dropdown_toggle1"
+                            onClick={() => toggleDropdown(field, setFieldValue)}
+                          >
+                            <div className="t-b-inner">
+                              <span className="text_btn1">{values[field]}</span>
+                              <img
+                                src="/SVG/header-vector.svg"
+                                alt="vec"
+                                className="arrow_icon1"
+                              />
+                            </div>
+                          </div>
+                          {openDropdown === field && (
+                            <ul className="dropdown_menu1">
+                              {dropdownOptions.map((option, idx) => (
+                                <li
+                                  key={idx}
+                                  onClick={() =>
+                                    handleSelect(field, option, setFieldValue)
+                                  }
+                                >
+                                  {option}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          <ErrorMessage
+                            name={field}
+                            component="div"
+                            className="error"
+                          />
+                        </div>
                       ))}
-                    </ul>
-                  )}
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
+            </section>
 
-            <div className="profile-edit-inner emp-doj">
-              <div className="profile-edit-detail eng-cnt-txt">
-                <span>Date of Joining</span>
-                <input
-                  type="date"
-                  value={
-                    employee.date_of_joining
-                      ? employee.date_of_joining.split("T")[0]
-                      : ""
-                  }
-                  onChange={(e) =>
-                    handleChange("date_of_joining", e.target.value)
-                  }
-                />
+            {/* Personal Details */}
+            <section className="personal-proffesional">
+              <div className="profile-inner">
+                {[
+                  "username",
+                  "email",
+                  "phone",
+                  "home_address",
+                  "dob",
+                  "emergency_contact",
+                  "username",
+                ].map((field) => (
+                  <div className="profile-edit-inner" key={field}>
+                    <div className="profile-edit-detail">
+                      <span>{field.replace("_", " ").toUpperCase()}</span>
+                      <Field
+                        type={field === "dob" ? "date" : "text"}
+                        name={field}
+                      />
+                      <ErrorMessage
+                        name={field}
+                        component="div"
+                        className="error"
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
 
-            <div className="profile-edit-inner emp-salary">
-              <div className="profile-edit-detail eng-cnt-txt">
-                <span>Monthly Salary</span>
-                <input
-                  type="number"
-                  value={employee.monthly_salary || ""}
-                  onChange={(e) =>
-                    handleChange("monthly_salary", e.target.value)
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="profile-edit-inner emp-type">
-              <div className="Department emp-detail mail-txt">
-                <p>Employment Type</p>
-                <div
-                  className="dropdown_toggle2"
-                  onClick={() => toggleDropdown("employmentType")}
-                >
-                  <span className="text_btn2">{employee.employmentType}</span>
-                  <img
-                    src="/SVG/header-vector.svg"
-                    alt="vec"
-                    className="arrow_icon2"
+              {/* Professional Details with dropdowns */}
+              <div className="profile-inner">
+                <div className="profile-edit-detail phone-num-txt">
+                  <span>Employee ID</span>
+                  <Field type="text" name="employee_id" />
+                  <ErrorMessage
+                    name="employee_id"
+                    component="div"
+                    className="error"
                   />
                 </div>
-                {openDropdown === "employmentType" && (
-                  <ul className="dropdown_menu2">
-                    {employmentTypes.map((type, idx) => (
-                      <li
-                        key={idx}
-                        onClick={() => handleSelect("employmentType", type)}
-                      >
-                        {type}
-                      </li>
-                    ))}
-                  </ul>
+                {["department", "reportingManager", "employment_type"].map(
+                  (field) => (
+                    <div key={field} className="profile-edit-inner">
+                      <div className="Department emp-detail mail-txt">
+                        <p>{field.replace("_", " ").toUpperCase()}</p>
+                        <div
+                          className="dropdown_toggle2"
+                          onClick={() => toggleDropdown(field)}
+                        >
+                          <span className="text_btn2">{values[field]}</span>
+                          <img
+                            src="/SVG/header-vector.svg"
+                            alt="vec"
+                            className="arrow_icon2"
+                          />
+                        </div>
+                        {openDropdown === field && (
+                          <ul className="dropdown_menu2">
+                            {(field === "department"
+                              ? departmentOptions
+                              : field === "reportingManager"
+                              ? managerOptions
+                              : employmentTypes
+                            ).map((option, idx) => (
+                              <li
+                                key={idx}
+                                onClick={() =>
+                                  handleSelect(field, option, setFieldValue)
+                                }
+                              >
+                                {option}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        <ErrorMessage
+                          name={field}
+                          component="div"
+                          className="error"
+                        />
+                      </div>
+                    </div>
+                  )
                 )}
+                {["date_of_joining", "monthly_salary"].map((field) => (
+                  <div key={field} className="profile-edit-detail eng-cnt-txt">
+                    <span>{field.replace(/_/g, " ").toUpperCase()}</span>
+                    <Field
+                      type={field === "monthly_salary" ? "number" : "date"}
+                      name={field}
+                    />
+                    <ErrorMessage
+                      name={field}
+                      component="div"
+                      className="error"
+                    />
+                  </div>
+                ))}
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            </section>
 
-      <section className="login-security2">
-        <div className="login-img">
-          <span>Login & Security Settings</span>
-        </div>
-        <div className="pe-enter-pass pass-vec enter-pass">
-          <span>Username</span>
-          <input
-            type="text"
-            value={employee.username || ""}
-            onChange={(e) => handleChange("username", e.target.value)}
-          />
-        </div>
-        {["current", "new", "confirm"].map((field) => (
-          <div className="pe-enter-pass enter-pass" key={field}>
-            <span>
-              {field === "current"
-                ? "Current Password"
-                : field === "new"
-                ? "New Password"
-                : "Confirm Password"}
-            </span>
-            <div className="pass-vec">
-              <input
-                type={showPasswords[field] ? "text" : "password"}
-                onChange={(e) =>
-                  handleChange(`${field}_password`, e.target.value)
-                }
-              />
-              <img
-                src="/SVG/password-vec.svg"
-                alt="toggle"
-                onClick={() =>
-                  setShowPasswords((prev) => ({
-                    ...prev,
-                    [field]: !prev[field],
-                  }))
-                }
-                style={{ cursor: "pointer" }}
-              />
-            </div>
-          </div>
-        ))}
-        <button className="theme_btn">
-          <a>Change Password</a>
-        </button>
-      </section>
+            {/* Example: */}
 
-      <section className="delete-account mg-delete-acc">
-        <div className="delete-account-inner">
-          <span>Delete Account</span>
-        </div>
-        <div className="warning-msg">
-          <div className="warning-img">
-            <img src="/SVG/warning-vec.svg" alt="warning-img" />
-          </div>
-          <div className="warning-txt">
-            <p>Warning: This action cannot be undone</p>
-            <span>
-              Deleting this team member account will permanently remove all
-              their data, access rights, and history.
-            </span>
-          </div>
-        </div>
-        <div className="delete-Account-btn text-light">
-          <a>Delete Account</a>
-        </div>
-      </section>
+            {/* Repeat similarly for email, phone, etc. */}
+          </Form>
+        )}
+      </Formik>
     </section>
   );
 };

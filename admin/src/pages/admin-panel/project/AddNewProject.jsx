@@ -4,19 +4,20 @@ import { useNavigate, Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import LoadingOverlay from "../../../components/LoadingOverlay";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const AddNewProject = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef();
   const [clients, setClients] = useState([]);
-  const [loadingClients, setLoadingClients] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [clientError, setClientError] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // 🟢 Fetch clients on mount
   useEffect(() => {
     const fetchClients = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/client/get-all`
@@ -26,7 +27,7 @@ const AddNewProject = () => {
         console.error("Failed to fetch clients:", error);
         setClientError("Could not load clients");
       } finally {
-        setLoadingClients(false);
+        setLoading(false);
       }
     };
     fetchClients();
@@ -63,6 +64,7 @@ const AddNewProject = () => {
       priority: Yup.string().required("Priority is required"),
     }),
     onSubmit: async (values, { setSubmitting, resetForm }) => {
+      setLoading(true);
       try {
         const payload = {
           project_name: values.project_name,
@@ -86,7 +88,7 @@ const AddNewProject = () => {
         console.error("Failed to create project:", error);
         toast.error("Error creating project!");
       } finally {
-        setSubmitting(false);
+        setLoading(false);
       }
     },
   });
@@ -100,11 +102,12 @@ const AddNewProject = () => {
     touched,
     isSubmitting,
   } = formik;
-
+  
+  if (loading) {
+    return <LoadingOverlay />;
+  }
   return (
     <div className="add_new_project_page">
-      <LoadingOverlay show={isSubmitting} />
-
       <section className="anp-add_new_project-header">
         <div className="anp-header-inner">
           <div className="anp-heading-main">
@@ -172,11 +175,11 @@ const AddNewProject = () => {
                 </div>
                 {dropdownOpen && (
                   <ul className="anp-dropdown_menu">
-                    {loadingClients && <li>Loading...</li>}
+                    {loading && <li>Loading...</li>}
                     {clientError && (
                       <li style={{ color: "red" }}>{clientError}</li>
                     )}
-                    {!loadingClients &&
+                    {!loading &&
                       !clientError &&
                       clients.map((client) => (
                         <li

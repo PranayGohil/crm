@@ -16,7 +16,7 @@ export const addEmployee = async (req, res) => {
       email,
       home_address,
       dob,
-      emrgency_contact,
+      emergency_contact,
       employee_id,
       department,
       date_of_joining,
@@ -49,7 +49,7 @@ export const addEmployee = async (req, res) => {
       email,
       home_address,
       dob,
-      emrgency_contact,
+      emergency_contact,
       employee_id,
       department,
       date_of_joining,
@@ -147,8 +147,8 @@ export const getEmployeeInfo = async (req, res) => {
 
 export const editEmployee = async (req, res) => {
   try {
-    const { id } = req.params; // assuming route is: PUT /api/employees/:id
-
+    const { id } = req.params;
+    console.log("Editing employee with ID:", id);
     const {
       username,
       full_name,
@@ -158,7 +158,7 @@ export const editEmployee = async (req, res) => {
       email,
       home_address,
       dob,
-      emrgency_contact,
+      emergency_contact,
       employee_id,
       department,
       date_of_joining,
@@ -167,7 +167,6 @@ export const editEmployee = async (req, res) => {
       reporting_manager,
     } = req.body;
 
-    // ✅ Find employee by id
     const employee = await Employee.findById(id);
     if (!employee) {
       return res
@@ -175,7 +174,7 @@ export const editEmployee = async (req, res) => {
         .json({ success: false, message: "Employee not found" });
     }
 
-    // ✅ Check if username is being changed & already exists
+    // Check if username is changed & already exists
     if (username && username !== employee.username) {
       const existingUser = await Employee.findOne({ username });
       if (existingUser) {
@@ -187,7 +186,7 @@ export const editEmployee = async (req, res) => {
       employee.username = username;
     }
 
-    // ✅ Update fields
+    // Update fields
     employee.full_name = full_name || employee.full_name;
     employee.designation = designation || employee.designation;
     employee.status = status || employee.status;
@@ -195,7 +194,8 @@ export const editEmployee = async (req, res) => {
     employee.email = email || employee.email;
     employee.home_address = home_address || employee.home_address;
     employee.dob = dob || employee.dob;
-    employee.emrgency_contact = emrgency_contact || employee.emrgency_contact;
+    employee.emergency_contact =
+      emergency_contact || employee.emergency_contact;
     employee.employee_id = employee_id || employee.employee_id;
     employee.department = department || employee.department;
     employee.date_of_joining = date_of_joining || employee.date_of_joining;
@@ -204,8 +204,9 @@ export const editEmployee = async (req, res) => {
     employee.reporting_manager =
       reporting_manager || employee.reporting_manager;
 
-    // ✅ If new profile_pic uploaded, update it
+    // Update profile_pic if uploaded
     if (req.file) {
+      console.log("File uploaded:", req.file);
       employee.profile_pic = req.file.path;
     }
 

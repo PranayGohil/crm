@@ -31,7 +31,7 @@ const employeeSchema = mongoose.Schema({
   dob: {
     type: Date,
   },
-  emrgency_contact: {
+  emergency_contact: {
     type: String,
   },
   employee_id: {

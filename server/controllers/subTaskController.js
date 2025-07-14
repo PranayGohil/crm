@@ -1,6 +1,12 @@
 import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
+import Employee from "../models/employeeModel.js";
 import mongoose from "mongoose";
+
+import cloudinary from "../config/cloudinary.js";
+
+import Notification from "../models/notificationModel.js";
+import { io } from "../utils/socket.js";
 
 // Add a single subtask
 export const addSubTask = async (req, res) => {
@@ -89,7 +95,11 @@ export const getSubtasksByProjectId = async (req, res) => {
 export const getSubTaskInfo = async (req, res) => {
   try {
     const { id } = req.params;
-    const subTask = await SubTask.findById(id);
+    const subTask = await SubTask.findById(id).populate(
+      "comments.user_id",
+      "full_name profile_pic"
+    ); // populate commenter info
+
     if (!subTask) {
       return res.status(404).json({ error: "Subtask not found" });
     }
@@ -170,17 +180,59 @@ export const deleteSubTask = async (req, res) => {
 export const changeSubTaskStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
-
+    const { status, userId, userRole } = req.body;
+    console.log("Changing status for subtask:", id, "to", status);
     const updated = await SubTask.findByIdAndUpdate(
       id,
       { status },
       { new: true }
     );
+
     if (!updated) {
+      console.error("Subtask not found");
       return res.status(404).json({ message: "Subtask not found" });
     }
 
+    // find subtask and related data
+    const subtask = await SubTask.findById(id);
+    const project = await Project.findById(subtask.project_id);
+
+    // create notification content
+    const userWhoChanged = await (userRole === "admin"
+      ? Admin.findById(userId)
+      : Employee.findById(userId));
+
+    const userName = userWhoChanged?.full_name || "Someone";
+
+    // send notification to admin if changed by employee
+    if (userRole === "employee") {
+      await Notification.create({
+        title: `${userName} updated status of subtask ${subtask.task_name} to ${status}`,
+        description: `Status changed to ${status}`,
+        type: "task_update",
+        icon: userWhoChanged?.profile_pic || null,
+        related_id: subtask._id,
+        receiver_id: "admin",
+        receiver_type: "admin",
+        created_by: userId,
+        created_by_role: userRole,
+      });
+    }
+
+    // send notification to assigned employee if changed by admin
+    if (userRole === "admin" && subtask.assign_to) {
+      await Notification.create({
+        title: `Status changed to ${status}`,
+        description: `${userName} updated status of your subtask '${subtask.task_name}' to ${status}`,
+        type: "task_update",
+        related_id: subtask._id,
+        receiver_id: subtask.assign_to,
+        receiver_type: "employee",
+        created_by: userId,
+        created_by_role: userRole,
+      });
+    }
+    console.log("Notification sent successfully");
     res.status(200).json(updated);
   } catch (error) {
     console.error("Error changing subtask status:", error);
@@ -262,6 +314,127 @@ export const getAllProjectsWithSubtasks = async (req, res) => {
     res.json(projectsWithSubtasks);
   } catch (error) {
     console.error("Error fetching projects with subtasks:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const addComment = async (req, res) => {
+  const { subtaskId } = req.params;
+  const { user_id, user_type, text } = req.body;
+  console.log("Adding comment to subtask:", subtaskId);
+
+  if (!text || !user_type) {
+    console.error("Missing text or user_type");
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing text or user_type" });
+  }
+
+  // Validate user_type
+  if (!["admin", "employee"].includes(user_type)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid user_type" });
+  }
+
+  // if user_type is Employee, user_id must be present
+  if (user_type === "employee" && !user_id) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing user_id for employee" });
+  }
+
+  try {
+    // build comment object dynamically
+    const comment = {
+      user_type,
+      text,
+      created_at: new Date(),
+    };
+
+    if (user_type === "employee") {
+      comment.user_id = user_id;
+    }
+
+    const updated = await SubTask.findByIdAndUpdate(
+      subtaskId,
+      { $push: { comments: comment } },
+      { new: true }
+    ).populate({
+      path: "comments.user_id",
+      select: "full_name profile_pic",
+    });
+
+    res.json({ success: true, comments: updated.comments });
+  } catch (error) {
+    console.error("Add comment error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const addMedia = async (req, res) => {
+  try {
+    const { subtaskId } = req.params;
+    const files = req.files; // array of uploaded files
+
+    if (!files || files.length === 0) {
+      return res.status(400).json({ message: "No files uploaded" });
+    }
+
+    // Find subtask
+    const subtask = await SubTask.findById(subtaskId);
+    if (!subtask) {
+      return res.status(404).json({ message: "Subtask not found" });
+    }
+
+    // Add all uploaded file URLs
+    const newUrls = files.map((file) => file.path); // file.path is Cloudinary URL
+    subtask.media_files.push(...newUrls);
+
+    await subtask.save();
+
+    return res.status(200).json({
+      message: "Media added successfully",
+      media_files: subtask.media_files,
+    });
+  } catch (error) {
+    console.error("Error adding media:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const removeMedia = async (req, res) => {
+  try {
+    const { subtaskId } = req.params;
+    const { mediaUrl } = req.body;
+
+    const subtask = await SubTask.findById(subtaskId);
+    if (!subtask) {
+      return res.status(404).json({ message: "Subtask not found" });
+    }
+
+    // Remove from Cloudinary
+    const segments = mediaUrl.split("/");
+    const filenameWithExt = segments[segments.length - 1];
+    const publicIdWithoutExt = filenameWithExt.split(".")[0]; // remove extension
+
+    const folderSegments = segments.slice(
+      segments.findIndex((s) => s === "crm")
+    );
+    const publicId = folderSegments.join("/").replace(/\.[^/.]+$/, ""); // remove extension
+
+    await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+
+    // Remove from subtask media_files
+    subtask.media_files = subtask.media_files.filter((url) => url !== mediaUrl);
+    await subtask.save();
+
+    res.status(200).json({
+      message: "Media removed successfully",
+      media_files: subtask.media_files,
+    });
+  } catch (error) {
+    console.error("Error removing media:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

@@ -16,11 +16,11 @@ const employeeRouter = express.Router();
 
 employeeRouter.post("/add", upload.single("profile_pic"), addEmployee);
 employeeRouter.get("/get-all", getEmployees);
-employeeRouter.get('/get-multiple', getMultipleEmployees);
+employeeRouter.get("/get-multiple", getMultipleEmployees);
 employeeRouter.get("/get/:id", getEmployeeInfo);
 employeeRouter.post("/login", loginEmployee);
 employeeRouter.delete("/delete/:id", deleteEmployee);
-employeeRouter.put("/edit/:id", editEmployee);
+employeeRouter.post("/edit/:id", upload.single("profile_pic"), editEmployee);
 employeeRouter.get("/tasks/:id", getEmployeeTasks);
 employeeRouter.get("/dashboard/:employeeId", getEmployeeDashboardData);
 

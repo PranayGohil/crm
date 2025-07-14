@@ -1,25 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import LoadingOverlay from "../../../components/admin/LoadingOverlay";
+import LoadingOverlay from "../components/LoadingOverlay";
 import { toast } from "react-toastify";
-import { statusOptions, priorityOptions } from "../../../options";
+import { statusOptions, priorityOptions } from "../options";
+
 import { Modal, Button } from "react-bootstrap";
 
 const ViewSubtask = () => {
   const { subtaskId } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+
+  const employee = JSON.parse(localStorage.getItem("employeeUser"));
+  const employeeId = employee ? employee._id : null;
 
   const [subtask, setSubtask] = useState(null);
   const [project, setProject] = useState(null);
   const [client, setClient] = useState(null);
   const [assignedEmployee, setAssignedEmployee] = useState(null); // single employee
+  const [loading, setLoading] = useState(true);
 
   const [isEditing, setIsEditing] = useState(false);
 
   const [editingStatus, setEditingStatus] = useState("");
-  const [editingPriority, setEditingPriority] = useState("");
   const [saving, setSaving] = useState(false);
 
   const [mediaItems, setMediaItems] = useState([]);
@@ -32,17 +35,16 @@ const ViewSubtask = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       try {
+        setLoading(true);
+
         const { data: subtaskData } = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/subtask/get/${subtaskId}`
         );
         setSubtask(subtaskData);
         setComments(subtaskData.comments || []);
         setEditingStatus(subtaskData.status || "");
-        setEditingPriority(subtaskData.priority || "");
 
-        const path = subtaskData.path_to_files || "";
         const items = (subtaskData.media_files || []).map((file) => ({
           src: `${file}`,
           alt: file,
@@ -83,38 +85,32 @@ const ViewSubtask = () => {
   }, [subtaskId]);
 
   const handleUpdate = async () => {
-    setLoading(true);
     try {
       setSaving(true);
-      // update status
       await axios.put(
         `${process.env.REACT_APP_API_URL}/api/subtask/change-status/${subtaskId}`,
-        { status: editingStatus }
-      );
-      // update priority
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/subtask/change-priority/${subtaskId}`,
-        { priority: editingPriority }
+        {
+          status: editingStatus,
+          userId: employeeId,
+          userRole: "employee",
+        }
       );
 
       toast.success("Subtask updated successfully!");
       setSubtask((prev) => ({
         ...prev,
         status: editingStatus,
-        priority: editingPriority,
       }));
-      setIsEditing(false); // exit editing mode
+      setIsEditing(false);
     } catch (error) {
       console.error("Failed to update subtask:", error);
       toast.error("Failed to update subtask.");
     } finally {
-      setLoading(false);
       setSaving(false);
     }
   };
 
   const handleUploadMedia = async (files) => {
-    setLoading(true);
     try {
       const formData = new FormData();
       for (const file of files) {
@@ -133,14 +129,12 @@ const ViewSubtask = () => {
     } catch (error) {
       console.error("Upload failed:", error);
       toast.error("Upload failed");
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleRemoveConfirmed = async () => {
     if (!mediaToRemove) return;
-    setLoading(true);
+
     try {
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/remove-media/${subtaskId}`,
@@ -156,25 +150,21 @@ const ViewSubtask = () => {
     } finally {
       setShowRemoveModal(false);
       setMediaToRemove(null);
-      setLoading(false);
     }
   };
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
-    setLoading(true);
     try {
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/add-comment/${subtaskId}`,
-        { user_type: "admin", text: newComment }
+        { user_type: "employee", user_id: employeeId, text: newComment }
       );
       setComments(data.comments);
       setNewComment("");
     } catch (error) {
       console.error("Failed to add comment:", error);
       toast.error("Failed to add comment");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -235,20 +225,6 @@ const ViewSubtask = () => {
                   {statusOptions.map((status) => (
                     <option key={status} value={status}>
                       {status}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  value={editingPriority}
-                  onChange={(e) => setEditingPriority(e.target.value)}
-                  className="dropdown_toggle"
-                  disabled={saving}
-                >
-                  <option value="">Select Priority</option>
-                  {priorityOptions.map((priority) => (
-                    <option key={priority} value={priority}>
-                      {priority}
                     </option>
                   ))}
                 </select>
@@ -427,7 +403,11 @@ const ViewSubtask = () => {
                   onChange={(e) => setNewComment(e.target.value)}
                 />
               </div>
-              <img src="/Image/admin.jpg" alt="Riya Sharma" />
+              <img
+                src={employee?.profile_pic || "/Image/default-profile.jpg"}
+                alt={employee?.full_name || "Employee"}
+                style={{ borderRadius: "50%" }}
+              />
             </div>
             <div className="pb-add-components">
               <div></div>
@@ -459,7 +439,12 @@ const ViewSubtask = () => {
                 <div className="pb-client-comment" key={comment._id}>
                   {comment.user_type === "admin" ? (
                     <>
-                      <div className="pb-comment-description d-flex justify-content-end">
+                      <img
+                        src="/Image/admin.jpg"
+                        alt="Admin"
+                        style={{ borderRadius: "50%" }}
+                      />
+                      <div className="pb-comment-description">
                         <div
                           className="pb-comment-cilent-name"
                           style={{ width: "90%" }}
@@ -484,12 +469,75 @@ const ViewSubtask = () => {
                           <p>{comment.text}</p>
                         </div>
                       </div>
-                      <img
-                        src="/Image/admin.jpg"
-                        alt="Admin"
-                        style={{ borderRadius: "50%" }}
-                      />
                     </>
+                  ) : comment.user_id._id === employeeId ? (
+                    comment.user_id?.profile_pic ? (
+                      <>
+                        <div className="pb-comment-description d-flex justify-content-end">
+                          <div
+                            className="pb-comment-cilent-name"
+                            style={{ width: "90%" }}
+                          >
+                            <div className="pb-name-time">
+                              <div className="pb-cilent-name">
+                                <h4>
+                                  {comment.user_type === "admin"
+                                    ? "Admin"
+                                    : comment.user_id?.full_name ||
+                                      "Unknown User"}
+                                </h4>
+                                {/* Optional: add user_type badge */}
+                                <span>{comment.user_type}</span>
+                              </div>
+                              <p>
+                                <span style={{ paddingRight: "6px" }}>
+                                  {formatDate(comment.created_at)}
+                                </span>
+                              </p>
+                            </div>
+                            <p>{comment.text}</p>
+                          </div>
+                        </div>
+                        <img
+                          src={comment.user_id.profile_pic}
+                          alt={comment.user_id.full_name}
+                          style={{ borderRadius: "50%" }}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <div
+                          className="profile-letter"
+                          style={{ borderRadius: "50%" }}
+                        >
+                          {comment.user_id?.full_name
+                            ?.charAt(0)
+                            .toUpperCase() || "U"}
+                        </div>
+                        <div className="pb-comment-description">
+                          <div className="pb-comment-cilent-name">
+                            <div className="pb-name-time">
+                              <div className="pb-cilent-name">
+                                <h4>
+                                  {comment.user_type === "admin"
+                                    ? "Admin"
+                                    : comment.user_id?.full_name ||
+                                      "Unknown User"}
+                                </h4>
+                                {/* Optional: add user_type badge */}
+                                <span>{comment.user_type}</span>
+                              </div>
+                              <p>
+                                <span style={{ paddingRight: "6px" }}>
+                                  {formatDate(comment.created_at)}
+                                </span>
+                              </p>
+                            </div>
+                            <p>{comment.text}</p>
+                          </div>
+                        </div>
+                      </>
+                    )
                   ) : comment.user_id?.profile_pic ? (
                     <>
                       <img

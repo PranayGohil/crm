@@ -5,7 +5,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-import LoadingOverlay from "../../../components/LoadingOverlay";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const EditClient = () => {
   const navigate = useNavigate();
@@ -39,6 +39,7 @@ const EditClient = () => {
       client_type: Yup.string().required("Client type is required"),
     }),
     onSubmit: async (values, { setSubmitting }) => {
+      setLoading(true);
       try {
         setSubmitting(true);
         const res = await axios.put(
@@ -51,6 +52,7 @@ const EditClient = () => {
         console.error(err);
         toast.error("Failed to update client");
       } finally {
+        setLoading(false);
         setSubmitting(false);
       }
     },
@@ -60,6 +62,7 @@ const EditClient = () => {
   // Fetch client data on load
   useEffect(() => {
     const fetchClient = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/client/get-username/${id}`
@@ -95,6 +98,8 @@ const EditClient = () => {
 
   const { handleChange, handleSubmit, values, errors, touched, isSubmitting } =
     formik;
+
+  if (loading) return <LoadingOverlay />;
 
   return (
     <>

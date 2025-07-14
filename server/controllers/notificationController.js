@@ -3,9 +3,24 @@ import { io } from "../utils/socket.js";
 
 export const getAllNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.find().sort({ createdAt: -1 });
+    const { receiver_id, receiver_type } = req.query;
+    if (!receiver_id || !receiver_type) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Missing receiver_id or receiver_type",
+        });
+    }
+
+    const notifications = await Notification.find({
+      receiver_id,
+      receiver_type,
+    }).sort({ createdAt: -1 });
+
     res.json({ success: true, notifications });
   } catch (err) {
+    console.error("Error fetching notifications:", err);
     res.status(500).json({ success: false, message: err.message });
   }
 };

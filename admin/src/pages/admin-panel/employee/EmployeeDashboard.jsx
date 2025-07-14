@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const dropdownData = {
   departments: ["All", "HR", "Development", "Design", "Sales"], // customize to match your real departments
@@ -51,6 +52,8 @@ const Dropdown = ({ label, options, selected, onChange }) => {
 };
 
 const EmployeeDashboard = () => {
+  const [loading, setLoading] = useState(true);
+
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
 
@@ -70,6 +73,7 @@ const EmployeeDashboard = () => {
 
   useEffect(() => {
     const fetchEmployees = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/employee/get-all`
@@ -85,6 +89,8 @@ const EmployeeDashboard = () => {
         setStats({ total, onLeave, active, departments });
       } catch (err) {
         console.error("Failed to fetch employees:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchEmployees();
@@ -145,6 +151,8 @@ const EmployeeDashboard = () => {
       className: "inf-sec-4",
     },
   ];
+
+  if (loading) return <LoadingOverlay />;
 
   return (
     <section className="team_member_dashboard">

@@ -12,6 +12,9 @@ import {
   getAllProjectsWithSubtasks,
   bulkUpdateSubtasks,
   bulkDeleteSubtasks,
+  addComment,
+  addMedia,
+  removeMedia,
 } from "../controllers/subTaskController.js";
 import upload from "../middlewares/upload.js";
 
@@ -23,12 +26,25 @@ subTaskRouter.get("/get/:id", getSubTaskInfo);
 subTaskRouter.post("/add", upload.array("media_files", 10), addSubTask);
 subTaskRouter.post("/add-bulk", addBulkSubTasks);
 subTaskRouter.delete("/delete/:id", deleteSubTask);
-subTaskRouter.put("/update/:id", upload.array("media_files", 10), updateSubTask);
+subTaskRouter.put(
+  "/update/:id",
+  upload.array("media_files", 10),
+  updateSubTask
+);
 subTaskRouter.put("/change-status/:id", changeSubTaskStatus);
 subTaskRouter.put("/change-priority/:id", changeSubTaskPriority);
 subTaskRouter.get("/all-tasks-projects", getAllProjectsWithSubtasks);
 subTaskRouter.put("/bulk-update", bulkUpdateSubtasks);
 subTaskRouter.post("/bulk-delete", bulkDeleteSubtasks);
 
+subTaskRouter.post("/add-comment/:subtaskId", addComment);
+
+subTaskRouter.post(
+  "/add-media/:subtaskId",
+  upload.array("media_files", 10), // "media_file" must match FormData key in frontend
+  addMedia
+);
+
+subTaskRouter.post("/remove-media/:subtaskId", removeMedia);
 
 export default subTaskRouter;

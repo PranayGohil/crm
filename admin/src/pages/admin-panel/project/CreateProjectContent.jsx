@@ -2,21 +2,22 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const CreateProjectContent = () => {
   const { projectId } = useParams();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [project, setProject] = useState("");
-  const [items, setItems] = useState([]); 
+  const [items, setItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [projectDescription, setProjectDescription] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [existingFiles, setExistingFiles] = useState([]);
 
   useEffect(() => {
     const fetchContent = async () => {
-      console.log("Fetching project content for ID:", projectId);
+      setLoading(true);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`
@@ -35,6 +36,8 @@ const CreateProjectContent = () => {
         console.log("Error fetching project content:", err);
         console.error(err);
         toast.error("Failed to load project content");
+      } finally {
+        setLoading(false);
       }
     };
     fetchContent();
@@ -97,6 +100,8 @@ const CreateProjectContent = () => {
       setLoading(false);
     }
   };
+
+  if (loading) return <LoadingOverlay />;
 
   return (
     <section className="edit_project_content_container">
@@ -248,7 +253,7 @@ const CreateProjectContent = () => {
         <div className="epc-final-btn">
           <div className="cancel-final-btn">
             <button
-            className="theme_secondary_btn"
+              className="theme_secondary_btn"
               onClick={(e) => {
                 navigate(-1);
                 e.preventDefault();

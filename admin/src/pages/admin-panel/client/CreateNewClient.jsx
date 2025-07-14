@@ -1,13 +1,15 @@
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-import LoadingOverlay from "../../../components/LoadingOverlay";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const CreateNewClient = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   const formik = useFormik({
     initialValues: {
@@ -50,6 +52,7 @@ const CreateNewClient = () => {
         .required("Please confirm password"),
     }),
     onSubmit: async (values, { setSubmitting, resetForm }) => {
+      setLoading(true);
       try {
         setSubmitting(true);
         const res = await axios.post(
@@ -68,6 +71,7 @@ const CreateNewClient = () => {
         console.error(err);
         toast.error(err.error);
       } finally {
+        setLoading(false);
         setSubmitting(false);
       }
     },
@@ -75,10 +79,10 @@ const CreateNewClient = () => {
 
   const { handleChange, handleSubmit, values, errors, touched, isSubmitting } =
     formik;
-  const isLoading = isSubmitting;
+  if (loading) return <LoadingOverlay />;
+
   return (
     <>
-      <LoadingOverlay show={isLoading} />
       <section className="cnc-first cd-client_dashboard header header_back_arrow">
         <Link to="/client/dashboard" className="back_arrow_link mx-3">
           <img src="/SVG/arrow-pc.svg" alt="Back" className="back_arrow" />

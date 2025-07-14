@@ -1,44 +1,64 @@
 import mongoose from "mongoose";
 
-const subTaskSchema = mongoose.Schema({
-  project_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Project",
-  },
-  task_name: {
+const commentSchema = new mongoose.Schema({
+  user_type: {
     type: String,
+    required: true,
   },
-  description: {
-    type: String,
-  },
-  stage: {
-    type: String,
-  },
-  priority: {
-    type: String,
-  },
-  assign_to: {
+  user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Employee",
+    default: null,
   },
-  assign_date: {
-    type: Date,
-  },
-  due_date: {
-    type: Date,
-  },
-  media_files: [
-    {
-      type: String,
-    },
-  ],
-  path_to_files: {
-    type: String,
-  },
-  status: {
-    type: String,
-  },
+  text: { type: String, required: true },
+  created_at: { type: Date, default: Date.now },
 });
 
-const SubTask = mongoose.model("subtask", subTaskSchema);
+const subTaskSchema = mongoose.Schema(
+  {
+    project_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+    },
+    task_name: {
+      type: String,
+    },
+    description: {
+      type: String,
+    },
+    stage: {
+      type: String,
+    },
+    priority: {
+      type: String,
+    },
+    assign_to: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
+    },
+    assign_date: {
+      type: Date,
+    },
+    due_date: {
+      type: Date,
+    },
+    media_files: [
+      {
+        type: String,
+      },
+    ],
+    path_to_files: {
+      type: String,
+    },
+    status: {
+      type: String,
+    },
+    comments: [commentSchema], // ✅ embed comments here
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const SubTask = mongoose.model("Subtask", subTaskSchema);
 export default SubTask;

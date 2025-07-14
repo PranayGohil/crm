@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import LoadingOverlay from "../components/admin/LoadingOverlay";
 
 const UpcomingDueDates = () => {
+  const [loading, setLoading] = useState(true);
   const [dueTasks, setDueTasks] = useState([]);
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get(`${process.env.REACT_APP_API_URL}/api/statistics/upcoming-due-dates`)
       .then((res) => setDueTasks(res.data))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   }, []);
 
   const formatDate = (dateStr) => {
@@ -19,6 +23,7 @@ const UpcomingDueDates = () => {
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   };
+  if (loading) return <LoadingOverlay />;
 
   return (
     <section className="md-overview-upcoming-due-date">

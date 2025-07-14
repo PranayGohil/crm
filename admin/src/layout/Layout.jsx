@@ -1,7 +1,7 @@
 import React from "react";
 import DashboardMenu from "../components/DashboardMenu";
-import HeaderAdmin from "../components/HeaderAdmin";
-import Footer from "../components/Footer";
+import HeaderAdmin from "../components/admin/HeaderAdmin";
+import Footer from "../components/admin/Footer";
 import { Outlet } from "react-router-dom"; // For React Router v6+
 
 

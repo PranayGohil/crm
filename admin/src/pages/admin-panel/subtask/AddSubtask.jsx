@@ -5,11 +5,12 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import { stageOptions, priorityOptions } from "../../../options";
 
 const AddSubtask = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [employees, setEmployees] = useState([]);
   const { projectId } = useParams();
 
@@ -41,6 +42,7 @@ const AddSubtask = () => {
 
   useEffect(() => {
     const fetchEmployees = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/employee/get-all`
@@ -48,12 +50,15 @@ const AddSubtask = () => {
         setEmployees(res.data);
       } catch (error) {
         console.error("Error fetching employees:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchEmployees();
   }, []);
 
   const handleAddSingle = async (values) => {
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("project_id", projectId);
@@ -77,10 +82,13 @@ const AddSubtask = () => {
     } catch (error) {
       console.error("Error adding subtask:", error);
       toast.error("Failed to add subtask.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleBulkGenerate = async (values) => {
+    setLoading(true);
     try {
       const newSubtasks = [];
       for (let i = values.bulkStart; i <= values.bulkEnd; i++) {
@@ -106,9 +114,12 @@ const AddSubtask = () => {
     } catch (error) {
       console.error("Error generating subtasks:", error);
       toast.error("Failed to generate subtasks.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (loading) return <LoadingOverlay />;
   return (
     <div className="subtask-management-bulk-page">
       <ToastContainer position="top-center" />
