@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
-const CreateProjectContent = () => {
+const EditProjectContent = () => {
   const { projectId } = useParams();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -14,6 +14,7 @@ const CreateProjectContent = () => {
   const [projectDescription, setProjectDescription] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [existingFiles, setExistingFiles] = useState([]);
+  const [currency, setCurrency] = useState("INR");
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -24,17 +25,15 @@ const CreateProjectContent = () => {
         );
         if (res.data.success && res.data.project.content) {
           const content = res.data.project.content;
-          console.log("Contenet:", content);
           setProject(res.data.project);
           setItems(content[0].items?.length ? content[0].items : []);
           setTotalPrice(content[0].total_price || 0);
           setProjectDescription(content[0].description || "");
           setExistingFiles(content[0].uploaded_files || []);
+          setCurrency(content[0].currency || "INR");
         }
-        console.log("Fetched project content:", res.data);
       } catch (err) {
-        console.log("Error fetching project content:", err);
-        console.error(err);
+        console.error("Error fetching project content:", err);
         toast.error("Failed to load project content");
       } finally {
         setLoading(false);
@@ -77,6 +76,7 @@ const CreateProjectContent = () => {
           items,
           total_price: totalPrice,
           description: projectDescription,
+          currency,
         })
       );
       selectedFiles.forEach((file) => formData.append("files", file));
@@ -124,8 +124,8 @@ const CreateProjectContent = () => {
                   <tr>
                     <th>Jewelry Item</th>
                     <th>Quantity</th>
-                    <th>Price per Item (₹)</th>
-                    <th>Total (₹)</th>
+                    <th>Price per Item</th>
+                    <th>Total</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -160,7 +160,7 @@ const CreateProjectContent = () => {
                         />
                       </td>
                       <td className="total">
-                        ₹{getTotal(item.quantity, item.price)}
+                        {getTotal(item.quantity, item.price)}
                       </td>
                       <td className="action">
                         <span
@@ -197,15 +197,29 @@ const CreateProjectContent = () => {
         <div className="epc-price-overview">
           <h2>Pricing Overview</h2>
           <div className="epc-overview-inner">
-            <div className="epc-sub-total">
-              <p>Subtotal</p>
-              <span>₹{getSubTotal()}</span>
+            <div className="">
+              <p>Select Currency</p>
+              <select
+                value={currency}
+                className="pc-dropdown_toggle bg-white"
+                onChange={(e) => setCurrency(e.target.value)}
+              >
+                <option value="INR">INR</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="AED">AED</option>
+              </select>
             </div>
-            <div className="epc-total-price">
+            <div className="">
+              <p>Subtotal</p>
+              <span>{getSubTotal()}</span>
+            </div>
+            <div className="">
               <p>Total Project Price</p>
               <input
                 type="number"
                 value={totalPrice}
+                className="pc-dropdown_toggle bg-white"
                 onChange={(e) => setTotalPrice(Number(e.target.value))}
               />
             </div>
@@ -263,13 +277,7 @@ const CreateProjectContent = () => {
             </button>
           </div>
           <div className="edit-final-btn">
-            <button
-              className="theme_btn"
-              onClick={(e) => {
-                e.preventDefault();
-                handleSubmit(e);
-              }}
-            >
+            <button className="theme_btn" onClick={handleSubmit}>
               {loading ? (
                 "Saving..."
               ) : (
@@ -285,4 +293,4 @@ const CreateProjectContent = () => {
   );
 };
 
-export default CreateProjectContent;
+export default EditProjectContent;

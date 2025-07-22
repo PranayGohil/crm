@@ -56,7 +56,21 @@ const ProjectCard = ({
 
             return (
               <div className="md-project_card" key={project._id}>
-                <div className="md-project_card__header_border cdn-bg-color-blue"></div>
+                <div
+                  className={`md-project_card__header_border ${
+                    project.status === "To Do"
+                      ? "cdn-bg-color-gray"
+                      : project.status === "In Progress"
+                      ? "cdn-bg-color-blue"
+                      : project.status === "Paused"
+                      ? "cdn-bg-color-purple"
+                      : project.status === "Completed"
+                      ? "cdn-bg-color-green"
+                      : project.status === "Blocked"
+                      ? "cdn-bg-color-red"
+                      : "cdn-bg-color-gray"
+                  }`}
+                ></div>
 
                 <div className="md-project_card__content">
                   <div className="md-project_card__top_row">
@@ -65,7 +79,8 @@ const ProjectCard = ({
                     </h3>
                     <span
                       className={`md-status-btn md-status-${
-                        project.status?.toLowerCase() || "todo"
+                        project.status?.toLowerCase().replace(/\s+/g, "") ||
+                        "todo"
                       }`}
                     >
                       {project.status || "To do"}
@@ -111,24 +126,43 @@ const ProjectCard = ({
                     >
                       {employeeIds.slice(0, 3).map((id, index) => {
                         const emp = employees[id];
-                        return (
+                        const firstLetter =
+                          emp?.full_name?.charAt(0).toUpperCase() || "?";
+                        return emp?.profile_pic ? (
                           <img
                             key={id}
-                            src={
-                              emp?.profile_pic
-                                ? `${emp.profile_pic}`
-                                : "/default-avatar.png"
-                            }
-                            alt={emp?.full_name || "Employee"}
+                            src={emp.profile_pic}
+                            alt={emp.full_name || "Employee"}
                             width={42}
                             height={42}
                             style={{
                               borderRadius: "50%",
                               objectFit: "cover",
                               border: "2px solid white",
-                              marginLeft: index === 0 ? 0 : -10, 
+                              marginLeft: index === 0 ? 0 : -10,
                             }}
                           />
+                        ) : (
+                          <div
+                            key={id}
+                            style={{
+                              width: "42px",
+                              height: "42px",
+                              borderRadius: "50%",
+                              backgroundColor: "#007bff",
+                              color: "#fff",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontSize: "18px",
+                              fontWeight: "bold",
+                              textTransform: "uppercase",
+                              border: "2px solid white",
+                              marginLeft: index === 0 ? 0 : -10,
+                            }}
+                          >
+                            {firstLetter}
+                          </div>
                         );
                       })}
                     </div>

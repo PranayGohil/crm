@@ -11,7 +11,7 @@ const HeaderAdmin = () => {
           <div className="ett-header-inner">
             <div className="ha-header-maulshree-Jle">
               <img src="/SVG/diamond-rich_teal.svg" alt="d1" />
-              <h1 style={{ marginBottom: "0" }}>Admin</h1>
+              <h1 style={{ marginBottom: "0" }}>Maulshree Jewellery</h1>
             </div>
 
             <div className="header-notification">
@@ -24,13 +24,13 @@ const HeaderAdmin = () => {
                 </a>
               </div>
 
-              <div className="ha-header-img-admin_name">
+              <div className="ha-header-img-admin_name d-flex align-items-center">
                 <img
                   src="/Image/Riya Sharma.png"
                   alt="riya sharma"
                   className="ha_admin_name"
                 />
-                <p>Admin Name</p>
+                <span>Admin</span>
               </div>
             </div>
           </div>

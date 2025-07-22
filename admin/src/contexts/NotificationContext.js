@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 // Create context
 export const NotificationContext = createContext();
@@ -59,6 +60,10 @@ export const NotificationProvider = ({ children }) => {
     newSocket.on("new_notification", (notification) => {
       setNotifications((prev) => [notification, ...prev]);
       setUnreadCount((c) => c + 1);
+
+      console.log("New notification:", notification);
+      // 🎉 Show toast when a new notification arrives
+      toast.info(notification.message || "You have a new notification!");
     });
 
     setSocket(newSocket);

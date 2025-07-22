@@ -84,7 +84,9 @@ const EmployeeDashboard = () => {
 
         const total = data.length;
         const onLeave = data.filter((e) => e.status === "on-leave").length;
-        const active = data.filter((e) => e.status === "active").length;
+        const active = data.filter(
+          (e) => e.status === "active" || e.status === "Active"
+        ).length;
         const departments = new Set(data.map((e) => e.department)).size;
         setStats({ total, onLeave, active, departments });
       } catch (err) {
@@ -163,7 +165,7 @@ const EmployeeDashboard = () => {
           <div className="nav-search">
             <div className="searchbar">
               <div className="input-type">
-                <img src="/SVG/search-icon.svg" alt="search" />
+                <img src="/SVG/search-icon.svg" alt="search" className="mx-2" />
                 <input
                   type="text"
                   placeholder="Search by name, email..."
@@ -171,6 +173,7 @@ const EmployeeDashboard = () => {
                   onChange={(e) =>
                     setFilters((prev) => ({ ...prev, search: e.target.value }))
                   }
+                  className="cd-input-type-txt input-type-txt p-2"
                   style={{ border: "none" }}
                 />
               </div>
@@ -210,8 +213,7 @@ const EmployeeDashboard = () => {
             />
           </div>
           <div className="tm-filter filter">
-            <a
-              href="#"
+            <div
               onClick={(e) => {
                 e.preventDefault();
                 setFilters({
@@ -222,9 +224,9 @@ const EmployeeDashboard = () => {
                 });
               }}
             >
-              <img src="/SVG/filter-vector.svg" alt="reset" />{" "}
+              <img src="/SVG/filter-vector.svg" alt="reset" className="mx-2" />{" "}
               <span>Reset Filters</span>
-            </a>
+            </div>
           </div>
         </div>
       </section>
@@ -299,6 +301,8 @@ const EmployeeDashboard = () => {
                         ? "badge text-bg-warning"
                         : member.status === "blocked"
                         ? "badge text-bg-danger"
+                        : member.status === "Inactive"
+                        ? "badge text-bg-danger"
                         : "badge text-bg-success"
                     } prn-activity p-2`}
                   >
@@ -306,6 +310,8 @@ const EmployeeDashboard = () => {
                       ? "On Leave"
                       : member.status === "blocked"
                       ? "Blocked"
+                      : member.status === "Inactive"
+                      ? "Inactive"
                       : "Active"}
                   </div>
                 </div>

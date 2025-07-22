@@ -13,6 +13,7 @@ import subTaskRouter from "./routes/subTaskRoutes.js";
 import statisticsRouter from "./routes/statisticsRoutes.js";
 import notificationRouter from "./routes/notificationRoutes.js";
 import adminRouter from "./routes/adminRoutes.js";
+import designationRouter from "./routes/designationRoutes.js";
 
 const app = express();
 const port = 3001;
@@ -34,6 +35,7 @@ app.use("/api/project", projectRouter);
 app.use("/api/subtask", subTaskRouter);
 app.use("/api/statistics", statisticsRouter);
 app.use("/api/notification", notificationRouter);
+app.use("/api/designation", designationRouter);
 
 // Start server
 server.listen(port, () => console.log(`App listening on port ${port}!`));

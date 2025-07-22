@@ -121,10 +121,7 @@ const ClientAdminProjectDetails = () => {
 
   return (
     <div className="project_client__client-main mb_40">
-      <section className="cd-client_dashboard header">
-        <div className="cd-head-menu head-menu cpd_header">
-          <h1>Client: {fullName}</h1>
-        </div>
+      {/* <section className="cd-client_dashboard header">
         <div className="cd-nav-bar nav-bar">
           <div className="cd-nav-search nav-search">
             <div className="cd-searchbar searchbar">
@@ -143,7 +140,7 @@ const ClientAdminProjectDetails = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Summary */}
       <section className="cpd-main_section">

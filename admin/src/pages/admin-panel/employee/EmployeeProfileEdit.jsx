@@ -13,12 +13,12 @@ const EmployeeProfileEdit = () => {
   const dropdownRef = useRef(null);
   const [profilePreview, setProfilePreview] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [managers, setManagers] = useState([]);
+  const [designations, setDesignations] = useState([]);
 
-  const dropdownOptions = ["medium", "low", "Pause", "Block", "Done"];
+  const dropdownOptions = ["Active", "Inactive", "Blocked"];
   const departmentOptions = ["Engineering", "Design", "Marketing"];
-  const managerOptions = ["Sarah Johnson (CTO)", "Alex Lee (Manager)"];
   const employmentTypes = ["Full-time", "Part-time"];
-  const defaultManager = "Sarah Johnson (CTO)";
 
   const [initialValues, setInitialValues] = useState({
     full_name: "",
@@ -36,6 +36,7 @@ const EmployeeProfileEdit = () => {
     date_of_joining: "",
     monthly_salary: "",
     emergency_contact: "",
+    is_manager: false,
   });
 
   const validationSchema = Yup.object().shape({
@@ -56,6 +57,7 @@ const EmployeeProfileEdit = () => {
       .typeError("Must be a number")
       .required("Monthly salary is required"),
     emergency_contact: Yup.string().required("Emergency contact is required"),
+    is_manager: Yup.boolean(),
   });
 
   useEffect(() => {
@@ -78,12 +80,13 @@ const EmployeeProfileEdit = () => {
           designation: data.designation || "",
           status: data.status || "Active",
           employment_type: data.employment_type || employmentTypes[0],
-          reportingManager: data.reportingManager || defaultManager,
+          reportingManager: data.reportingManager || "Select Manager",
           date_of_joining: data.date_of_joining
             ? data.date_of_joining.split("T")[0]
             : "",
           monthly_salary: data.monthly_salary || "",
           emergency_contact: data.emergency_contact || "",
+          is_manager: data.is_manager || false,
         });
         setProfilePreview(data.profile_pic || null);
       } catch (err) {
@@ -94,6 +97,32 @@ const EmployeeProfileEdit = () => {
     };
     fetchEmployee();
   }, [employeeId]);
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/api/employee/managers`)
+      .then((res) => {
+        if (res.data.success) {
+          console.log("Managers:", res.data.data);
+          setManagers(res.data.data);
+        }
+      })
+      .catch((err) => console.error("Error fetching managers", err));
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`)
+      .then((res) => {
+        if (res.data.success) {
+          console.log("get all designations", res.data.designations);
+          setDesignations(res.data.designations);
+        } else {
+          console.error("Failed to fetch designations");
+        }
+      })
+      .catch((err) => console.error("Error fetching designations", err));
+  }, []);
 
   const toggleDropdown = (field, setFieldValue) => {
     setOpenDropdown((prev) => (prev === field ? null : field));
@@ -124,7 +153,7 @@ const EmployeeProfileEdit = () => {
   if (loading) return <LoadingOverlay />;
 
   return (
-    <section className="employee_profile_edit_container">
+    <section className="employee_profile_edit_container container-fluide p-3">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -134,7 +163,11 @@ const EmployeeProfileEdit = () => {
           try {
             const formData = new FormData();
             Object.entries(values).forEach(([key, val]) => {
-              formData.append(key, val);
+              if (typeof val === "boolean") {
+                formData.append(key, val.toString()); // Convert boolean to string
+              } else {
+                formData.append(key, val);
+              }
             });
 
             if (profilePreview && typeof profilePreview !== "string") {
@@ -245,50 +278,61 @@ const EmployeeProfileEdit = () => {
 
                     {/* Dropdowns */}
                     <div className="update-dropdown" ref={dropdownRef}>
-                      {["designation", "status"].map((field) => (
-                        <div
-                          key={field}
-                          className={`btn_main1 ${
-                            openDropdown === field ? "open" : ""
-                          }`}
-                        >
-                          <p>
-                            {field.charAt(0).toUpperCase() + field.slice(1)}
-                          </p>
+                      {["designation", "status"].map((field) => {
+                        const options =
+                          field === "designation"
+                            ? designations.map((d) => d.name)
+                            : dropdownOptions;
+
+                        return (
                           <div
-                            className="dropdown_toggle1"
-                            onClick={() => toggleDropdown(field, setFieldValue)}
+                            key={field}
+                            className={`btn_main1 ${
+                              openDropdown === field ? "open" : ""
+                            }`}
                           >
-                            <div className="t-b-inner">
-                              <span className="text_btn1">{values[field]}</span>
-                              <img
-                                src="/SVG/header-vector.svg"
-                                alt="vec"
-                                className="arrow_icon1"
-                              />
+                            <p>
+                              {field.charAt(0).toUpperCase() + field.slice(1)}
+                            </p>
+                            <div
+                              className="dropdown_toggle1"
+                              onClick={() =>
+                                toggleDropdown(field, setFieldValue)
+                              }
+                            >
+                              <div className="t-b-inner">
+                                <span className="text_btn1">
+                                  {values[field]}
+                                </span>
+                                <img
+                                  src="/SVG/header-vector.svg"
+                                  alt="vec"
+                                  className="arrow_icon1"
+                                />
+                              </div>
                             </div>
+                            {openDropdown === field && (
+                              <ul className="dropdown_menu1">
+                                {options.map((option, idx) => (
+                                  <li
+                                    key={idx}
+                                    onClick={() =>
+                                      handleSelect(field, option, setFieldValue)
+                                    }
+                                  >
+                                    {option}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                            <ErrorMessage
+                              name={field}
+                              component="div"
+                              className="error"
+                            />
                           </div>
-                          {openDropdown === field && (
-                            <ul className="dropdown_menu1">
-                              {dropdownOptions.map((option, idx) => (
-                                <li
-                                  key={idx}
-                                  onClick={() =>
-                                    handleSelect(field, option, setFieldValue)
-                                  }
-                                >
-                                  {option}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                          <ErrorMessage
-                            name={field}
-                            component="div"
-                            className="error"
-                          />
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -356,7 +400,7 @@ const EmployeeProfileEdit = () => {
                             {(field === "department"
                               ? departmentOptions
                               : field === "reportingManager"
-                              ? managerOptions
+                              ? managers.map((m) => m.full_name)
                               : employmentTypes
                             ).map((option, idx) => (
                               <li
@@ -393,6 +437,21 @@ const EmployeeProfileEdit = () => {
                     />
                   </div>
                 ))}
+                <div className="profile-edit-inner is-manager-checkbox">
+                  <div className="checkbox-field">
+                    <label>
+                      <Field type="checkbox" name="is_manager" />
+                      <span style={{ marginLeft: "8px" }}>
+                        Is Reporting Manager
+                      </span>
+                    </label>
+                    <ErrorMessage
+                      name="is_manager"
+                      component="div"
+                      className="error"
+                    />
+                  </div>
+                </div>
               </div>
             </section>
 

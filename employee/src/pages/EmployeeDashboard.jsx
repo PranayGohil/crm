@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import axios from "axios";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+
+// Extend dayjs with duration
+dayjs.extend(duration);
 
 const EmployeeDashboard = () => {
   const [expandedProjectId, setExpandedProjectId] = useState(null);
@@ -31,7 +37,6 @@ const EmployeeDashboard = () => {
   const [projects, setProjects] = useState([]);
   const [subtasks, setSubtasks] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [runningTimers, setRunningTimers] = useState({});
 
   useEffect(() => {
@@ -43,7 +48,6 @@ const EmployeeDashboard = () => {
     }
   }, []);
 
-  // every second: add +1s to running timers
   useEffect(() => {
     const interval = setInterval(() => {
       setRunningTimers((prev) => {
@@ -71,13 +75,12 @@ const EmployeeDashboard = () => {
         { ...prev[2], value: res.data.timeLoggedThisWeek || "0h 0m" },
       ]);
 
-      // Initialize runningTimers: if any subtask is "In Progress" & has open timer
       const timers = {};
       (res.data.subtasks || []).forEach((task) => {
         if (task.status === "In Progress") {
           const lastLog = task.time_logs?.[task.time_logs.length - 1];
           if (lastLog && !lastLog.end_time) {
-            const elapsed = new Date() - new Date(lastLog.start_time);
+            const elapsed = dayjs().diff(dayjs(lastLog.start_time));
             timers[task._id] = elapsed;
           }
         }
@@ -85,6 +88,9 @@ const EmployeeDashboard = () => {
       setRunningTimers(timers);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
+      toast.error(
+        error.response.data.message || "Failed to fetch dashboard data."
+      );
     } finally {
       setLoading(false);
     }
@@ -93,7 +99,6 @@ const EmployeeDashboard = () => {
   const toggleTable = (projectId) =>
     setExpandedProjectId(expandedProjectId === projectId ? null : projectId);
 
-  // Start / stop handlers
   const handleStartStop = async (task) => {
     try {
       const user = JSON.parse(localStorage.getItem("employeeUser"));
@@ -109,10 +114,12 @@ const EmployeeDashboard = () => {
         }
       );
 
-      // refresh dashboard data
       fetchDashboardData(user._id);
     } catch (error) {
       console.error("Failed to change subtask status:", error);
+      toast.error(
+        error.response.data.message || "Failed to change subtask status."
+      );
     }
   };
 
@@ -176,7 +183,17 @@ const EmployeeDashboard = () => {
 
                 return (
                   <React.Fragment key={project._id}>
-                    <tr className="time-table-row">
+                    <tr
+                      className={`time-table-row ${
+                        projectSubtasks.some(
+                          (task) =>
+                            task.status === "In Progress" &&
+                            runningTimers[task._id]
+                        )
+                          ? "highlight-running"
+                          : ""
+                      }`}
+                    >
                       <td>
                         <img
                           src="/SVG/arrow.svg"
@@ -202,7 +219,44 @@ const EmployeeDashboard = () => {
                         </span>
                       </td>
                       <td>{projectSubtasks.length}</td>
-                      <td>-</td>
+                      <td>
+                        {(() => {
+                          const totalProjectMs = projectSubtasks.reduce(
+                            (acc, task) => {
+                              let taskMs = 0;
+                              (task.time_logs || []).forEach((log) => {
+                                const start = dayjs(log.start_time);
+                                const end = log.end_time
+                                  ? dayjs(log.end_time)
+                                  : dayjs();
+                                taskMs += end.diff(start);
+                              });
+
+                              // If currently running, add live duration
+                              if (
+                                task.status === "In Progress" &&
+                                runningTimers[task._id]
+                              ) {
+                                const unfinishedLog = task.time_logs?.find(
+                                  (log) => !log.end_time
+                                );
+                                if (unfinishedLog) {
+                                  const logStart = dayjs(
+                                    unfinishedLog.start_time
+                                  );
+                                  taskMs -= dayjs().diff(logStart);
+                                  taskMs += runningTimers[task._id];
+                                }
+                              }
+
+                              return acc + taskMs;
+                            },
+                            0
+                          );
+                          const dur = dayjs.duration(totalProjectMs);
+                          return `${dur.hours()}h ${dur.minutes()}m ${dur.seconds()}s`;
+                        })()}
+                      </td>
                       <td>
                         <span
                           className={`time-table-badge md-status-${(
@@ -214,12 +268,12 @@ const EmployeeDashboard = () => {
                       </td>
                       <td>
                         {project.assign_date
-                          ? new Date(project.assign_date).toLocaleDateString()
+                          ? dayjs(project.assign_date).format("DD/MM/YYYY")
                           : "-"}
                       </td>
                       <td>
                         {project.due_date
-                          ? new Date(project.due_date).toLocaleDateString()
+                          ? dayjs(project.due_date).format("DD/MM/YYYY")
                           : "-"}
                       </td>
                       <td className="time-table-icons">
@@ -257,59 +311,61 @@ const EmployeeDashboard = () => {
                               let isRunning = false;
 
                               (task.time_logs || []).forEach((log) => {
-                                if (log.end_time) {
-                                  totalMs +=
-                                    new Date(log.end_time) -
-                                    new Date(log.start_time);
-                                } else {
-                                  isRunning = true;
-                                  totalMs +=
-                                    new Date() - new Date(log.start_time);
-                                }
+                                const start = dayjs(log.start_time);
+                                const end = log.end_time
+                                  ? dayjs(log.end_time)
+                                  : dayjs();
+                                totalMs += end.diff(start);
+                                if (!log.end_time) isRunning = true;
                               });
 
                               if (isRunning && runningTimers[task._id]) {
-                                totalMs -=
-                                  new Date() -
-                                  new Date(
-                                    task.time_logs.find(
-                                      (log) => !log.end_time
-                                    )?.start_time
-                                  );
+                                totalMs -= dayjs().diff(
+                                  dayjs(
+                                    task.time_logs.find((log) => !log.end_time)
+                                      ?.start_time
+                                  )
+                                );
                                 totalMs += runningTimers[task._id];
                               }
 
                               const runningMs = runningTimers[task._id] || 0;
-                              const runningHours = Math.floor(
-                                runningMs / 3600000
-                              );
-                              const runningMinutes = Math.floor(
-                                (runningMs % 3600000) / 60000
-                              );
-                              const runningTimeDisplay = `${runningHours}h ${runningMinutes}m`;
+                              const runningDur = dayjs.duration(runningMs);
+                              const totalDur = dayjs.duration(totalMs);
 
-                              const totalHours = Math.floor(totalMs / 3600000);
-                              const totalMinutes = Math.floor(
-                                (totalMs % 3600000) / 60000
+                              const runningTimeDisplay = `${runningDur.hours()}h ${runningDur.minutes()}m ${runningDur.seconds()}s`;
+                              const timeTrackedDisplay = `${totalDur.hours()}h ${totalDur.minutes()}m ${totalDur.seconds()}s`;
+
+                              const anotherTaskRunning = Object.entries(
+                                runningTimers
+                              ).some(
+                                ([id, time]) => id !== task._id && time > 0
                               );
-                              const timeTrackedDisplay = `${totalHours}h ${totalMinutes}m`;
 
                               return (
-                                <tr key={task._id}>
+                                <tr
+                                  key={task._id}
+                                  className={`subtask-row ${
+                                    task.status === "In Progress" &&
+                                    runningTimers[task._id]
+                                      ? "highlight-running"
+                                      : ""
+                                  }`}
+                                >
                                   <td></td>
                                   <td>{task.task_name}</td>
                                   <td>
                                     {task.assign_date
-                                      ? new Date(
-                                          task.assign_date
-                                        ).toLocaleDateString()
+                                      ? dayjs(task.assign_date).format(
+                                          "DD/MM/YYYY"
+                                        )
                                       : "-"}
                                   </td>
                                   <td>
                                     {task.due_date
-                                      ? new Date(
-                                          task.due_date
-                                        ).toLocaleDateString()
+                                      ? dayjs(task.due_date).format(
+                                          "DD/MM/YYYY"
+                                        )
                                       : "-"}
                                   </td>
                                   <td>
@@ -334,31 +390,36 @@ const EmployeeDashboard = () => {
                                   </td>
                                   <td>{task.stage}</td>
                                   <td className="ttb-table-pause">
-                                    <div
-                                      className={`ttb-table-pause-inner ${
-                                        task.status === "In Progress"
-                                          ? "ttb-stop-bg-color"
-                                          : "ttb-start-bg-color"
-                                      }`}
-                                      onClick={() => handleStartStop(task)}
-                                      style={{ cursor: "pointer" }}
-                                    >
-                                      <span className="ttb-table-pasuse-btn-containter">
-                                        <img
-                                          src={
-                                            task.status === "In Progress"
-                                              ? "/SVG/pause.svg"
-                                              : "/SVG/start.svg"
-                                          }
-                                          alt="toggle"
-                                        />
-                                        <span>
-                                          {task.status === "In Progress"
-                                            ? runningTimeDisplay // show live timer instead of "Stop"
-                                            : "Start"}
+                                    {task.status === "In Progress" ||
+                                    !anotherTaskRunning ? (
+                                      <div
+                                        className={`ttb-table-pause-inner ${
+                                          task.status === "In Progress"
+                                            ? "ttb-stop-bg-color"
+                                            : "ttb-start-bg-color"
+                                        }`}
+                                        onClick={() => handleStartStop(task)}
+                                        style={{ cursor: "pointer" }}
+                                      >
+                                        <span className="ttb-table-pasuse-btn-containter">
+                                          <img
+                                            src={
+                                              task.status === "In Progress"
+                                                ? "/SVG/pause.svg"
+                                                : "/SVG/start.svg"
+                                            }
+                                            alt="toggle"
+                                          />
+                                          <span>
+                                            {task.status === "In Progress"
+                                              ? runningTimeDisplay
+                                              : "Start"}
+                                          </span>
                                         </span>
-                                      </span>
-                                    </div>
+                                      </div>
+                                    ) : (
+                                      "-"
+                                    )}
                                   </td>
                                   <td>{timeTrackedDisplay}</td>
                                   <td className="time-table-icons">

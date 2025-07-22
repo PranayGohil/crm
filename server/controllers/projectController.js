@@ -23,7 +23,9 @@ export const addProject = async (req, res) => {
       priority,
       status,
     });
-    res.status(200).json({success: true, message: "Project added successfully", project});
+    res
+      .status(200)
+      .json({ success: true, message: "Project added successfully", project });
   } catch (error) {
     console.error("Error adding project:", error);
     return res.status(500).json({ success: false, message: error.message });
@@ -67,23 +69,78 @@ export const getProjectInfo = async (req, res) => {
   }
 };
 
+// Change status of a project
 export const changeProjectStatus = async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-  const project = await Project.findByIdAndUpdate(id, { status });
-  res.status(200).json(project);
+  try {
+    const { projectId } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ message: "Status is required." });
+    }
+
+    const updatedProject = await Project.findByIdAndUpdate(
+      projectId,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedProject) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
+    res.status(200).json({
+      message: "Project status updated successfully.",
+      project: updatedProject,
+    });
+  } catch (error) {
+    console.error("Error updating project status:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+};
+
+// Change priority of a project
+export const changeProjectPriority = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { priority } = req.body;
+
+    if (!priority) {
+      return res.status(400).json({ message: "Priority is required." });
+    }
+
+    const updatedProject = await Project.findByIdAndUpdate(
+      projectId,
+      { priority },
+      { new: true }
+    );
+
+    if (!updatedProject) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
+    res.status(200).json({
+      message: "Project priority updated successfully.",
+      project: updatedProject,
+    });
+  } catch (error) {
+    console.error("Error updating project priority:", error);
+    res.status(500).json({ message: "Server error." });
+  }
 };
 
 export const addProjectContent = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { items, total_price, description } = JSON.parse(req.body.data);
+    const { items, total_price, description, currency } = JSON.parse(
+      req.body.data
+    );
 
     let newUploadedFiles = [];
     if (req.files && req.files.length > 0) {
       newUploadedFiles = req.files.map((file) => file.path);
     }
-    
+
     const project = await Project.findById(projectId);
     if (!project) {
       return res
@@ -106,6 +163,7 @@ export const addProjectContent = async (req, res) => {
       total_price,
       uploaded_files: finalUploadedFiles,
       description,
+      currency,
     };
 
     await project.save();

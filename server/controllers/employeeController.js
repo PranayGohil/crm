@@ -1,6 +1,7 @@
 import Employee from "../models/employeeModel.js";
 import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
+import Designation from "../models/designationModel.js";
 import Bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -23,6 +24,7 @@ export const addEmployee = async (req, res) => {
       monthly_salary,
       employement_type,
       reporting_manager,
+      is_manager,
     } = req.body;
 
     // ✅ Check if username already exists
@@ -56,6 +58,7 @@ export const addEmployee = async (req, res) => {
       monthly_salary,
       employement_type,
       reporting_manager,
+      is_manager,
     });
 
     await newEmployee.save();
@@ -165,6 +168,7 @@ export const editEmployee = async (req, res) => {
       monthly_salary,
       employement_type,
       reporting_manager,
+      is_manager,
     } = req.body;
 
     const employee = await Employee.findById(id);
@@ -203,6 +207,7 @@ export const editEmployee = async (req, res) => {
     employee.employement_type = employement_type || employee.employement_type;
     employee.reporting_manager =
       reporting_manager || employee.reporting_manager;
+    employee.is_manager = is_manager || employee.is_manager;
 
     // Update profile_pic if uploaded
     if (req.file) {
@@ -246,21 +251,16 @@ export const getEmployeeDashboardData = async (req, res) => {
   try {
     const employeeId = req.params.employeeId;
     console.log("employee id", employeeId);
-    // Find all subtasks assigned to this employee
     const subtasks = await SubTask.find({ assign_to: employeeId }).populate(
       "project_id"
-    ); // also get project data for each subtask
+    ); 
     console.log("Subtasks:", subtasks);
-    // Extract unique project ids from those subtasks
     const projectIds = subtasks.map((s) => s.project_id?._id).filter(Boolean);
     const uniqueProjectIds = [
       ...new Set(projectIds.map((id) => id.toString())),
     ];
-
-    // Fetch those projects
     const projects = await Project.find({ _id: { $in: uniqueProjectIds } });
 
-    // Calculate total time logged this week
     const weekStart = getWeekStart();
     let timeLoggedThisWeekMs = 0;
 
@@ -269,7 +269,6 @@ export const getEmployeeDashboardData = async (req, res) => {
         const logStart = new Date(log.start_time);
         const logEnd = log.end_time ? new Date(log.end_time) : new Date();
 
-        // only include if log overlaps with this week
         if (logEnd >= weekStart) {
           const effectiveStart = logStart < weekStart ? weekStart : logStart;
           timeLoggedThisWeekMs += logEnd - effectiveStart;
@@ -277,10 +276,10 @@ export const getEmployeeDashboardData = async (req, res) => {
       });
     });
 
-    // Convert to "Xh Ym"
     const hours = Math.floor(timeLoggedThisWeekMs / 3600000);
     const minutes = Math.floor((timeLoggedThisWeekMs % 3600000) / 60000);
-    const timeLoggedThisWeek = `${hours}h ${minutes}m`;
+    const seconds = Math.floor((timeLoggedThisWeekMs % 60000) / 1000);
+    const timeLoggedThisWeek = `${hours}h ${minutes}m ${seconds}s`;
 
     res.json({
       subtasks,
@@ -292,5 +291,17 @@ export const getEmployeeDashboardData = async (req, res) => {
   } catch (error) {
     console.error("Error fetching employee dashboard data:", error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getManagers = async (req, res) => {
+  try {
+    const managers = await Employee.find(
+      { is_manager: true },
+      "full_name email"
+    );
+    res.json({ success: true, data: managers });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };

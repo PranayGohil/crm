@@ -1,11 +1,4 @@
-export const stageOptions = [
-  "Jewellery Designer",
-  "HR",
-  "CO-CEO",
-  "CEO",
-  "SEO Executive",
-  "Render Artist",
-];
+export const stageOptions = ["CAD Design", "SET Design", "Render", "Delivery"];
 
 export const priorityOptions = ["Low", "Medium", "High"];
 

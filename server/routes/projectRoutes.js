@@ -6,6 +6,7 @@ import {
   deleteProject,
   updateProject,
   changeProjectStatus,
+  changeProjectPriority,
   addProjectContent,
   getAllProjectsWithTasks,
   bulkUpdate,
@@ -20,7 +21,8 @@ projectRouter.get("/get/:id", getProjectInfo);
 projectRouter.post("/add", addProject);
 projectRouter.delete("/delete/:id", deleteProject);
 projectRouter.put("/update/:id", updateProject);
-projectRouter.put("/change-status/:id", changeProjectStatus);
+projectRouter.put("/change-status/:projectId", changeProjectStatus);
+projectRouter.put("/change-priority/:projectId", changeProjectPriority);
 projectRouter.post(
   "/content/:projectId",
   upload.array("files"),

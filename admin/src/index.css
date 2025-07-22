@@ -98,6 +98,11 @@ input:focus-visible {
   border-color: var(--purple) !important;
 }
 
+.cdn-bg-color-gray {
+  background-color: var(--gray);
+  border-color: var(--gray) !important;
+}
+
 /* second_color */
 
 .cdn-bg-color-yellow.color_yellow {
@@ -1035,10 +1040,10 @@ input:focus-visible {
   font-weight: 500;
 }
 
-.md-status-progress,
+.md-status-inprogress,
 .md-status-medium {
-  color: var(--yellow);
-  background-color: #fff4d6;
+  color: var(--blue);
+  background-color: var(--blue-shadow);
 }
 
 .md-status-blocked,
@@ -1054,8 +1059,8 @@ input:focus-visible {
 
 .md-status-todo,
 .md-status-low {
-  color: var(--blue);
-  background-color: var(--blue-shadow);
+  color: var(--gray);
+  background-color: var(--gray-shadow);
 }
 
 .md-status-paused {
@@ -2717,10 +2722,7 @@ input[type="checkbox"]:checked::after {
   color: #374151;
   font-weight: 500;
   font-size: 14px;
-  line-height: 20px;
   letter-spacing: 0;
-  padding-top: 16px;
-  gap: 4px;
 }
 
 .Department p {
@@ -2981,15 +2983,6 @@ input[type="checkbox"]:checked::after {
   background: #f9fafb;
   border: 1px solid #d1d5db;
   padding: 10px;
-}
-
-.profile-edit-detail input::placeholder {
-  font-family: "Inter", sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-  letter-spacing: 0;
-  color: #000000;
 }
 
 .profile-inner {
@@ -4670,14 +4663,6 @@ textarea {
   letter-spacing: 0;
 }
 
-.sms-add_same input::placeholder {
-  color: #9ca3af;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 100%;
-  letter-spacing: 0;
-}
-
 .sms-add_des input {
   height: 90px !important;
 }
@@ -6160,14 +6145,6 @@ textarea {
   color: #1f2937 !important;
 }
 
-.cnc-client-inf input::placeholder {
-  color: #9ca3af;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 100%;
-  letter-spacing: 0;
-}
-
 .cnc-add input {
   padding-bottom: 56px;
   font-weight: 400;
@@ -6196,14 +6173,6 @@ textarea {
 
 .cnc-part3 input {
   background: #f9fafb !important;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 100%;
-  letter-spacing: 0;
-  color: #1f2937 !important;
-}
-
-.cnc-part3 input::placeholder {
   font-weight: 400;
   font-size: 16px;
   line-height: 100%;
@@ -6706,7 +6675,7 @@ textarea {
 }
 
 .pb-taskinner span {
-  width: 135px;
+  width: 235px;
   font-weight: 500;
   font-size: 16px;
   line-height: 24px;
@@ -7414,14 +7383,6 @@ textarea {
   letter-spacing: 0;
 }
 
-.fd-enter-email input::placeholder {
-  color: #9ca3af;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 100%;
-  letter-spacing: 0;
-}
-
 .fd-reset-btn {
   display: flex;
   flex-direction: column;
@@ -8044,5 +8005,6 @@ a {
 .active-link {
   border-radius: 8px;
   background-color: #0c4559;
-  color: #ffffff;
+  color: #ffffff !important;
+  padding: 11px 16px;
 }

@@ -75,7 +75,7 @@ const ViewSubtask = () => {
         }
       } catch (error) {
         console.error("Failed to load subtask details:", error);
-        toast.error("Failed to load subtask details.");
+        toast.error(error.response.data.message || "Failed to load subtask details.");
       } finally {
         setLoading(false);
       }
@@ -104,7 +104,7 @@ const ViewSubtask = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Failed to update subtask:", error);
-      toast.error("Failed to update subtask.");
+      toast.error(error.response.data.message || "Failed to update subtask.");
     } finally {
       setSaving(false);
     }
@@ -340,11 +340,6 @@ const ViewSubtask = () => {
                       >
                         <div className="pb-media-icon">
                           <img src="/SVG/css-eye.svg" alt="view" />
-                        </div>
-                      </a>
-                      <a href={item.src} download>
-                        <div className="pb-media-icon">
-                          <img src="/SVG/download-photo.svg" alt="download" />
                         </div>
                       </a>
                       <button

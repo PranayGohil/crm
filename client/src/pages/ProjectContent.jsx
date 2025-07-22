@@ -1,21 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 const ProjectContent = () => {
-  const { projectId } = useParams();
   const navigate = useNavigate();
+  const { projectId } = useParams();
+  const [loading, setLoading] = useState(false);
   const [project, setProject] = useState(null);
-  const [currency, setCurrency] = useState("INR");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  const currencyOptions = ["INR", "USD", "EUR"];
 
   useEffect(() => {
     const fetchProject = async () => {
+      setLoading(true);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`
@@ -29,37 +26,23 @@ const ProjectContent = () => {
       } catch (err) {
         console.error("Fetch project error:", err);
         toast.error("Failed to load project");
+      } finally {
+        setLoading(false);
       }
     };
     fetchProject();
   }, [projectId]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
+  const currency = project?.content?.[0]?.currency || "INR";
+  const totalPrice = project?.content?.[0]?.total_price || 0;
 
   return (
     <section className="pc">
-      <section className="pc-header">
-        <div className="pc-header-inner">
-          <div className="pc-back-overview" style={{ cursor: "pointer" }} onClick={() =>navigate(-1)}>
-            <img src="/SVG/arrow-pc.svg" alt="back" />
-            <span>Back to Client Overview</span>
-          </div>
-          
-        </div>
-      </section>
+      {loading && <LoadingOverlay />}
 
       <section className="pc-main-content">
         <div className="pc-content-inner-txt">
-          <h1>Project Content for {project?.name || "Loading..."}</h1>
-          <span>Manage all project content, items, and pricing details</span>
+          <h1>Project Content for {project?.project_name || "Loading..."}</h1>
         </div>
       </section>
 
@@ -69,14 +52,14 @@ const ProjectContent = () => {
             <h2>Jewelry Items & Pricing</h2>
           </div>
           <div className="pc-item-table">
-            {project?.content[0]?.items?.length > 0 ? (
+            {project?.content?.[0]?.items?.length > 0 ? (
               <table>
                 <thead>
                   <tr>
                     <th>Jewelry Item</th>
                     <th>Quantity</th>
-                    <th>Price per Item (₹)</th>
-                    <th>Total (₹)</th>
+                    <th>Price per Item ({currency})</th>
+                    <th>Total ({currency})</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -112,42 +95,13 @@ const ProjectContent = () => {
             <div className="prc-txt">
               <h2>Pricing Overview</h2>
             </div>
-
-            <p>Currency</p>
-            <div
-              className={`pc-currancy-dropdown ${dropdownOpen ? "open" : ""}`}
-              ref={dropdownRef}
-            >
-              <div
-                className="pc-dropdown_toggle"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-              >
-                <span className="pc-text_btn">{currency}</span>
-                <img
-                  src="/SVG/header-vector.svg"
-                  alt="arrow"
-                  className="pc-arrow_icon"
-                />
-              </div>
-              <ul className="pc-dropdown_menu">
-                {currencyOptions.map((opt, idx) => (
-                  <li
-                    key={idx}
-                    onClick={() => {
-                      setCurrency(opt);
-                      setDropdownOpen(false);
-                    }}
-                  >
-                    {opt}
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
+
           <div className="pc-total-project-price">
             <p>Total Project Price</p>
-            <span>₹{project?.content[0]?.total_price || 0}</span>
-            <h5>Price Distribution</h5>
+            <span>
+              {currency} {totalPrice}
+            </span>
           </div>
         </div>
       </section>
@@ -166,7 +120,9 @@ const ProjectContent = () => {
                 </div>
               </div>
               <div className="pc-item-contain">
-                <span>{project?.content[0]?.uploaded_files?.length || 0}</span>
+                <span>
+                  {project?.content?.[0]?.uploaded_files?.length || 0}
+                </span>
               </div>
             </div>
           </div>
@@ -179,7 +135,7 @@ const ProjectContent = () => {
         </div>
         <div className="pc-description">
           <span>
-            {project?.content[0]?.description || "No description added."}
+            {project?.content?.[0]?.description || "No description added."}
           </span>
         </div>
       </section>
@@ -190,7 +146,7 @@ const ProjectContent = () => {
           <a href={`/gallery/${projectId}`}>View All</a>
         </div>
         <div className="pc-media-pre-imgs">
-          {project?.content[0]?.uploaded_files?.length > 0 ? (
+          {project?.content?.[0]?.uploaded_files?.length > 0 ? (
             project.content[0].uploaded_files
               .slice(0, 3)
               .map((url, idx) => (

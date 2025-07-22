@@ -56,7 +56,21 @@ const ProjectCard = ({
 
             return (
               <div className="md-project_card" key={project._id}>
-                <div className="md-project_card__header_border cdn-bg-color-blue"></div>
+                <div
+                  className={`md-project_card__header_border ${
+                    project.status === "To Do"
+                      ? "cdn-bg-color-gray"
+                      : project.status === "In Progress"
+                      ? "cdn-bg-color-blue"
+                      : project.status === "Paused"
+                      ? "cdn-bg-color-purple"
+                      : project.status === "Completed"
+                      ? "cdn-bg-color-green"
+                      : project.status === "Blocked"
+                      ? "cdn-bg-color-red"
+                      : "cdn-bg-color-gray"
+                  }`}
+                ></div>
 
                 <div className="md-project_card__content">
                   <div className="md-project_card__top_row">
@@ -65,7 +79,8 @@ const ProjectCard = ({
                     </h3>
                     <span
                       className={`md-status-btn md-status-${
-                        project.status?.toLowerCase() || "todo"
+                        project.status?.toLowerCase().replace(/\s+/g, "") ||
+                        "todo"
                       }`}
                     >
                       {project.status || "To do"}
@@ -165,10 +180,10 @@ const ProjectCard = ({
                       View Subtask
                     </Link>
                     <Link
-                      to={`/project/view-content/${project._id}`}
+                      to={`/project/details/${project._id}`}
                       className="md-project_card__view_btn"
                     >
-                      View Content
+                      View Project
                     </Link>
                   </div>
                 </div>

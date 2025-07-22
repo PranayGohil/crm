@@ -174,9 +174,6 @@ const SubtaskDashboardContainer = () => {
           <Link to={`/project/subtask/add/${projectId}`} className="plus-icon">
             <img src="/SVG/plus.svg" alt="plus" /> <span>New Subtask</span>
           </Link>
-          <Link to={`/project/edit-content/${projectId}`} className="plus-icon">
-            <img src="/SVG/plus.svg" alt="plus" /> <span>New Content</span>
-          </Link>
         </div>
       </section>
 

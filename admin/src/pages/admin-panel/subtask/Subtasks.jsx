@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { stageOptions, priorityOptions, statusOptions } from "../../../options";
 
-const TaskTimeboard = () => {
+const Subtasks = () => {
   const [projects, setProjects] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectedCount, setSelectedCount] = useState(0);
@@ -19,6 +20,7 @@ const TaskTimeboard = () => {
     client: "All Client",
     status: "Status",
     priority: "Priority",
+    stage: "Stage",
   });
 
   const [selections, setSelections] = useState({
@@ -30,8 +32,9 @@ const TaskTimeboard = () => {
   const bulkRef = useRef(null);
 
   const dropdownData = {
-    status: ["To do", "In progress", "Pause", "Blocked", "Done"],
-    priority: ["High", "Medium", "Low"],
+    status: statusOptions,
+    priority: priorityOptions,
+    stage: stageOptions,
   };
 
   const fetchAll = async () => {
@@ -95,6 +98,7 @@ const TaskTimeboard = () => {
       client: "All Client",
       status: "Status",
       priority: "Priority",
+      stage: "Stage", // ✅ added
     });
   };
 
@@ -160,18 +164,27 @@ const TaskTimeboard = () => {
 
   const filteredProjects = projects.filter((p) => {
     const clientName = clientIdToName[p.client_id];
-    const matchFilter =
+
+    const matchProjectLevelFilter =
       (filters.client === "All Client" ||
         clientName?.toLowerCase() === filters.client?.toLowerCase()) &&
       (filters.status === "Status" ||
         p.status?.toLowerCase() === filters.status?.toLowerCase()) &&
       (filters.priority === "Priority" ||
         p.priority?.toLowerCase() === filters.priority?.toLowerCase());
+
     const matchSearch =
       p.project_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.status?.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchFilter && matchSearch;
+
+    const matchStage =
+      filters.stage === "Stage" ||
+      p.subtasks?.some(
+        (s) => s.stage?.toLowerCase() === filters.stage?.toLowerCase()
+      );
+
+    return matchProjectLevelFilter && matchSearch && matchStage;
   });
 
   // ✅ helper to compute remaining days
@@ -215,6 +228,7 @@ const TaskTimeboard = () => {
               className={`btn_main ttb-btn ${
                 headerDropdownOpen === "client" ? "open" : ""
               }`}
+              style={{ marginLeft: "10px", width: "150px" }}
             >
               <div
                 className="dropdown_toggle"
@@ -241,12 +255,13 @@ const TaskTimeboard = () => {
                 </ul>
               )}
             </div>
-            {["status", "priority"].map((key) => (
+            {["status", "priority", "stage"].map((key) => (
               <div
                 key={key}
                 className={`btn_main ttb-btn ${
                   headerDropdownOpen === key ? "open" : ""
                 }`}
+                style={{ marginLeft: "10px", width: "150px" }}
               >
                 <div
                   className="dropdown_toggle"
@@ -280,7 +295,7 @@ const TaskTimeboard = () => {
             <thead>
               <tr>
                 <th></th>
-                <th>
+                {/* <th>
                   <input
                     type="checkbox"
                     checked={
@@ -293,7 +308,7 @@ const TaskTimeboard = () => {
                         : setSelectedIds([])
                     }
                   />
-                </th>
+                </th> */}
                 <th>Project Name</th>
                 <th>Client</th>
                 <th>Status</th>
@@ -320,13 +335,13 @@ const TaskTimeboard = () => {
                         onClick={() => setOpenRow(openRow === idx ? null : idx)}
                       />
                     </td>
-                    <td>
+                    {/* <td>
                       <input
                         type="checkbox"
                         checked={selectedIds.includes(project.id)}
                         onChange={() => toggleSelect(project.id)}
                       />
-                    </td>
+                    </td> */}
                     <td>{project.project_name}</td>
                     <td>{clientIdToName[project.client_id] || "N/A"}</td>
                     <td>
@@ -378,75 +393,83 @@ const TaskTimeboard = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {project.subtasks?.map((s, sIdx) => (
-                              <tr key={sIdx}>
-                                <td></td>
-                                <td>{s.task_name}</td>
-                                <td>{s.stage}</td>
-                                <td>{s.priority}</td>
-                                <td>{s.status}</td>
-                                <td className="d-flex justify-content-start align-items-center">
-                                  {(() => {
-                                    const assignedEmp = employees.find(
-                                      (emp) => emp._id === s.assign_to
-                                    );
-                                    if (!assignedEmp) return "N/A";
+                            {project.subtasks
+                              ?.filter((s) => {
+                                return (
+                                  filters.stage === "Stage" ||
+                                  s.stage?.toLowerCase() ===
+                                    filters.stage.toLowerCase()
+                                );
+                              })
+                              .map((s, sIdx) => (
+                                <tr key={sIdx}>
+                                  <td></td>
+                                  <td>{s.task_name}</td>
+                                  <td>{s.stage}</td>
+                                  <td>{s.priority}</td>
+                                  <td>{s.status}</td>
+                                  <td className="d-flex justify-content-start align-items-center">
+                                    {(() => {
+                                      const assignedEmp = employees.find(
+                                        (emp) => emp._id === s.assign_to
+                                      );
+                                      if (!assignedEmp) return "N/A";
+                                      const firstLetter = assignedEmp.full_name
+                                        ? assignedEmp.full_name
+                                            .charAt(0)
+                                            .toUpperCase()
+                                        : "?";
 
-                                    const firstLetter = assignedEmp.full_name
-                                      ? assignedEmp.full_name
-                                          .charAt(0)
-                                          .toUpperCase()
-                                      : "?";
-
-                                    return (
-                                      <span className="css-ankit d-flex align-items-center">
-                                        {assignedEmp.profile_pic ? (
-                                          <img
-                                            src={assignedEmp.profile_pic}
-                                            alt={assignedEmp.full_name}
-                                            style={{
-                                              width: "24px",
-                                              height: "24px",
-                                              borderRadius: "50%",
-                                              marginRight: "4px",
-                                              objectFit: "cover",
-                                            }}
-                                          />
-                                        ) : (
-                                          <div
-                                            style={{
-                                              width: "24px",
-                                              height: "24px",
-                                              borderRadius: "50%",
-                                              backgroundColor: "rgb(10 55 73)",
-                                              color: "#fff",
-                                              display: "flex",
-                                              alignItems: "center",
-                                              justifyContent: "center",
-                                              fontSize: "12px",
-                                              marginRight: "4px",
-                                              textTransform: "uppercase",
-                                            }}
-                                          >
-                                            {firstLetter}
-                                          </div>
-                                        )}
-                                        {assignedEmp.full_name}
-                                      </span>
-                                    );
-                                  })()}
-                                </td>
-                                <td>{getRemainingDays(s.due_date)}</td>{" "}
-                                <td>
-                                  <Link
-                                    to={`/subtask/view/${s.id}`}
-                                    className="mx-1"
-                                  >
-                                    <img src="/SVG/eye-view.svg" alt="view" />
-                                  </Link>
-                                </td>
-                              </tr>
-                            ))}
+                                      return (
+                                        <span className="css-ankit d-flex align-items-center">
+                                          {assignedEmp.profile_pic ? (
+                                            <img
+                                              src={assignedEmp.profile_pic}
+                                              alt={assignedEmp.full_name}
+                                              style={{
+                                                width: "24px",
+                                                height: "24px",
+                                                borderRadius: "50%",
+                                                marginRight: "4px",
+                                                objectFit: "cover",
+                                              }}
+                                            />
+                                          ) : (
+                                            <div
+                                              style={{
+                                                width: "24px",
+                                                height: "24px",
+                                                borderRadius: "50%",
+                                                backgroundColor:
+                                                  "rgb(10 55 73)",
+                                                color: "#fff",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                fontSize: "12px",
+                                                marginRight: "4px",
+                                                textTransform: "uppercase",
+                                              }}
+                                            >
+                                              {firstLetter}
+                                            </div>
+                                          )}
+                                          {assignedEmp.full_name}
+                                        </span>
+                                      );
+                                    })()}
+                                  </td>
+                                  <td>{getRemainingDays(s.due_date)}</td>
+                                  <td>
+                                    <Link
+                                      to={`/subtask/view/${s.id}`}
+                                      className="mx-1"
+                                    >
+                                      <img src="/SVG/eye-view.svg" alt="view" />
+                                    </Link>
+                                  </td>
+                                </tr>
+                              ))}
                           </tbody>
                         </table>
                       </td>
@@ -464,4 +487,4 @@ const TaskTimeboard = () => {
   );
 };
 
-export default TaskTimeboard;
+export default Subtasks;

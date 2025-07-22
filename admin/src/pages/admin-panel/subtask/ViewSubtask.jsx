@@ -366,11 +366,6 @@ const ViewSubtask = () => {
                           <img src="/SVG/css-eye.svg" alt="view" />
                         </div>
                       </a>
-                      <a href={item.src} download>
-                        <div className="pb-media-icon">
-                          <img src="/SVG/download-photo.svg" alt="download" />
-                        </div>
-                      </a>
                       <button
                         className="pb-media-icon bg-light"
                         type="button"

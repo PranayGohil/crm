@@ -28,6 +28,7 @@ const projectSchema = mongoose.Schema(
         total_price: Number,
         uploaded_files: [String],
         description: String,
+        currency: String,
       },
     ],
   },

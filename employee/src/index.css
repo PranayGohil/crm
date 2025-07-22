@@ -8089,3 +8089,8 @@ a {
   background-color: #0c4559;
   color: #ffffff;
 }
+
+.highlight-running {
+  border: 2px solid #28a745 !important; /* Bootstrap green */
+  box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
+}

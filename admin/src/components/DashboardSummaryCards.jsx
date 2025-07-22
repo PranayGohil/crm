@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import LoadingOverlay from "../components/admin/LoadingOverlay";
+import { Link } from "react-router-dom";
+import { stageOptions } from "../options";
 
 const DashboardSummaryCards = () => {
   const [loading, setLoading] = useState(false);
@@ -55,7 +57,7 @@ const DashboardSummaryCards = () => {
     <section className="md-total-card-main">
       <div className="md-total-card-main-inner">
         {/* Total Projects */}
-        <div className="md-common-total-card">
+        <Link to="/project/dashboard" className="md-common-total-card">
           <div className="md-common-para-icon">
             <span>Total Project</span>
             <div className="md-common-icon">
@@ -68,7 +70,7 @@ const DashboardSummaryCards = () => {
             </span>
             <span className="md-total-card-text">Project</span>
           </div>
-          <div className="md-ongoing-completed mt-8">
+          {/* <div className="md-ongoing-completed mt-8">
             <span className="md-ongoing-number">
               {summary.inProgressTasks}{" "}
             </span>
@@ -84,11 +86,11 @@ const DashboardSummaryCards = () => {
               className="md-progress_fill md-progress_fill-color-projects"
               ref={projectRef}
             ></div>
-          </div>
-        </div>
+          </div> */}
+        </Link>
 
         {/* Total Clients */}
-        <div className="md-common-total-card">
+        <Link to="/client/dashboard" className="md-common-total-card">
           <div className="md-common-para-icon md-para-icon-client">
             <span>Total Clients</span>
             <div className="md-common-icon">
@@ -107,53 +109,51 @@ const DashboardSummaryCards = () => {
               </div>
             </div>
           </div> */}
-          <div className="md-progress_container">
+          {/* <div className="md-progress_container">
             <div
               className="md-progress_fill md-progress_fill-color-clients"
               ref={clientRef}
             ></div>
-          </div>
-        </div>
+          </div> */}
+        </Link>
 
         {/* Tasks */}
-        <div className="md-common-total-card">
+        <Link to="/subtasks" className="md-common-total-card">
           <div className="md-common-para-icon md-para-icon-tasks">
-            <span>Tasks</span>
+            <span>Subtasks</span>
             <div className="md-common-icon">
               <img src="SVG/true-green.svg" alt="total tasks" />
             </div>
           </div>
           <div className="md-total-project-number">
-            <span className="md-total-card-number">
-              {summary.completedTasks +
-                summary.inProgressTasks +
-                summary.overdueTasks}
-            </span>
+            <span className="md-total-card-number">{summary.totalTasks}</span>
             <span className="md-total-card-text">Total</span>
           </div>
           <div className="mt-8 md-btn-cio">
-            <div className="md-btn-completed">
-              <span>{summary.completedTasks}</span> completed
-            </div>
-            <div className="md-btn-in_progress">
-              <span>{summary.inProgressTasks}</span> In progress
-            </div>
-            <div className="md-btn-overdue">
-              <span>{summary.overdueTasks}</span> Overdue
-            </div>
+            {summary.tasksByStage &&
+              Object.entries(summary.tasksByStage).map(([stage, count]) => (
+                <div
+                  key={stage}
+                  className={`${
+                    stage === "CAD Design"
+                      ? "badge bg-primary"
+                      : stage === "SET Design"
+                      ? "badge bg-warning"
+                      : stage === "Delivery"
+                      ? "badge bg-success"
+                      : stage === "Render"
+                      ? "badge bg-info"
+                      : ""
+                  } `}
+                >
+                  {count} {stage}
+                </div>
+              ))}
           </div>
-          <div className="md-progress_bar-second">
-            <div className="md-bar md-completed" ref={taskCompletedRef}></div>
-            <div
-              className="md-bar md-in_progress"
-              ref={taskInProgressRef}
-            ></div>
-            <div className="md-bar md-overdue" ref={taskOverdueRef}></div>
-          </div>
-        </div>
+        </Link>
 
         {/* Team Members */}
-        <div className="md-common-total-card">
+        <Link to="/employee/dashboard" className="md-common-total-card">
           <div className="md-common-para-icon md-para-icon-team">
             <span>Team Members</span>
             <div className="md-common-icon">
@@ -172,13 +172,13 @@ const DashboardSummaryCards = () => {
             <span>/</span>
             <span>{summary.totalEmployees}</span>
           </div> */}
-          <div className="md-progress_container">
+          {/* <div className="md-progress_container">
             <div
               className="md-progress_fill md-progress_fill-color-team"
               ref={teamRef}
             ></div>
-          </div>
-        </div>
+          </div> */}
+        </Link>
       </div>
     </section>
   );

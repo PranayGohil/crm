@@ -38,7 +38,8 @@ const UpcomingDueDates = () => {
               <tr>
                 <th>Task Name</th>
                 <th>Project</th>
-                <th>Due Date</th>
+                <th>Task Due Date</th>
+                <th>Project Due Date</th>
                 <th>Assigned To</th>
                 <th>Remaining Days</th>
                 <th>Status</th>
@@ -75,6 +76,7 @@ const UpcomingDueDates = () => {
                       <td>{task.task_name || "N/A"}</td>
                       <td>{task.project_id?.project_name || "N/A"}</td>
                       <td>{formatDate(task.due_date)}</td>
+                      <td>{formatDate(task.project_id?.due_date)}</td>
                       <td>
                         <div
                           className="md-assigned-user"

@@ -3,30 +3,31 @@ import Employee from "../models/employeeModel.js";
 import Project from "../models/projectModel.js";
 import SubTask from "../models/subTaskModel.js";
 
+const stageOptions = ["CAD Design", "SET Design", "Render", "Delivery"];
+
 export const Summary = async (req, res) => {
   try {
     const totalProjects = await Project.countDocuments();
     const totalClients = await Client.countDocuments();
     const totalEmployees = await Employee.countDocuments();
 
-    // Task summary: completed, in progress, overdue
-    const completedTasks = await SubTask.countDocuments({
-      status: "Completed",
-    });
-    const inProgressTasks = await SubTask.countDocuments({
-      status: "In Progress",
-    });
-    const overdueTasks = await SubTask.countDocuments({ status: "Overdue" });
+    const totalTasks = await SubTask.countDocuments();
+
+    // Count subtasks by stage
+    const tasksByStage = {};
+    for (const stage of stageOptions) {
+      tasksByStage[stage] = await SubTask.countDocuments({ stage });
+    }
 
     res.json({
       totalProjects,
       totalClients,
       totalEmployees,
-      completedTasks,
-      inProgressTasks,
-      overdueTasks,
+      totalTasks,
+      tasksByStage, // { "CAD Design": 3, "SET Design": 7, ... }
     });
   } catch (error) {
+    console.error("Summary fetch error:", error);
     res.status(500).json({ message: error.message });
   }
 };

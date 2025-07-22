@@ -186,26 +186,39 @@ export const changeSubTaskStatus = async (req, res) => {
     const subtask = await SubTask.findById(id);
     if (!subtask) return res.status(404).json({ message: "Subtask not found" });
 
-    // Handle timer
+    // ⛔️ Prevent multiple running tasks for employee
+    if (status === "In Progress" && userRole === "employee") {
+      const existingRunningTask = await SubTask.findOne({
+        assign_to: userId,
+        status: "In Progress",
+        _id: { $ne: id }, // Exclude current task
+      });
+
+      if (existingRunningTask) {
+        return res.status(400).json({
+          message: `You already have a task "${existingRunningTask.task_name}" in progress.`,
+        });
+      }
+    }
+
+    // ✅ Handle time logs
     if (status === "In Progress") {
-      // Start new timer if no open timer
       const hasOpenTimer = subtask.time_logs.some((log) => !log.end_time);
       if (!hasOpenTimer) {
         subtask.time_logs.push({ start_time: new Date() });
       }
     } else {
-      // Stop any open timer
       subtask.time_logs = subtask.time_logs.map((log) => {
         if (!log.end_time) log.end_time = new Date();
         return log;
       });
     }
 
-    // Update status
+    // ✅ Update status
     subtask.status = status;
     await subtask.save();
 
-    // existing notification logic...
+    // ✅ Send notification
     const project = await Project.findById(subtask.project_id);
     const userWhoChanged = await (userRole === "admin"
       ? Admin.findById(userId)

@@ -27,6 +27,7 @@ const CreateEmployeeProfile = () => {
     monthly_salary: "",
     employement_type: "",
     reporting_manager: "",
+    is_manager: false,
   });
   const [profilePic, setProfilePic] = useState(null);
   const [errors, setErrors] = useState({});
@@ -73,15 +74,12 @@ const CreateEmployeeProfile = () => {
     else if (isNaN(Number(form.monthly_salary)))
       newErrors.monthly_salary = "Salary must be a number.";
     if (!form.employement_type)
-      newErrors.employement_type = "Select employment type.";
-    if (!form.reporting_manager)
-      newErrors.reporting_manager = "Select reporting manager.";
+      newErrors.employement_type = "Select Employment Type.";
 
     return newErrors;
   };
 
   const handleSubmit = async () => {
-    setLoading(true);
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -89,6 +87,7 @@ const CreateEmployeeProfile = () => {
     }
 
     try {
+      setLoading(true);
       const data = new FormData();
       Object.entries(form).forEach(([key, value]) => data.append(key, value));
       if (profilePic) data.append("profile_pic", profilePic);
@@ -115,8 +114,8 @@ const CreateEmployeeProfile = () => {
   if (loading) return <LoadingOverlay />;
 
   return (
-    <section className="employee_profile_edit_container">
-      <CreateMemberHeader onSave={handleSubmit} />
+    <section className="employee_profile_edit_container p-3">
+      <CreateMemberHeader />
       {errors.general && (
         <div style={{ color: "red", marginLeft: "20px", marginTop: "10px" }}>
           {errors.general}

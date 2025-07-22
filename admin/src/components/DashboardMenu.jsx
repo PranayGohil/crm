@@ -79,13 +79,28 @@ const DashboardMenu = () => {
               <p>Tasks</p>
               <div className="commen-dashboard-list-inner">
                 <Link
-                  to="/tasktimeboard"
+                  to="/subtasks"
                   className={`common-icon-para ${
-                    isActive("/tasktimeboard") ? "active-link" : ""
+                    isActive("/subtasks") ? "active-link" : ""
                   }`}
                 >
                   <img src="/SVG/task-managment.svg" alt="task" />
                   <span>Task Management</span>
+                </Link>
+              </div>
+            </div>
+
+            <div className="commen-dashboard-list">
+              <p>Reports</p>
+              <div className="commen-dashboard-list-inner">
+                <Link
+                  to="/time-tracking"
+                  className={`common-icon-para ${
+                    isActive("/time-tracking") ? "active-link" : ""
+                  }`}
+                >
+                  <img src="/SVG/reports.svg" alt="time-tracking" />
+                  <span>Team Time Tracking</span>
                 </Link>
               </div>
             </div>

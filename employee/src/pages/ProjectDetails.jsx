@@ -218,11 +218,6 @@ const ProjectDetails = () => {
                         <img src="/SVG/css-eye.svg" alt="view" />
                       </div>
                     </a>
-                    <a href="#">
-                      <div className="pb-media-icon">
-                        <img src="/SVG/download-photo.svg" alt="download" />
-                      </div>
-                    </a>
                   </div>
                 </div>
               ))}

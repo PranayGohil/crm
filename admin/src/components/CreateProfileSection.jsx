@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 
-const designationOptions = ["Senior Developer", "Junior Developer", "Manager"];
 const statusOptions = ["Active", "Inactive", "Blocked"];
 
 const CreateProfileSection = ({ form, onChange, setProfilePic, errors }) => {
+  const [designations, setDesignations] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
   const dropdownRef = useRef(null);
 
@@ -15,6 +16,20 @@ const CreateProfileSection = ({ form, onChange, setProfilePic, errors }) => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`)
+      .then((res) => {
+        if (res.data.success) {
+          console.log("get all designations", res.data.designations);
+          setDesignations(res.data.designations);
+        } else {
+          console.error("Failed to fetch designations");
+        }
+      })
+      .catch((err) => console.error("Error fetching designations", err));
   }, []);
 
   return (
@@ -54,7 +69,7 @@ const CreateProfileSection = ({ form, onChange, setProfilePic, errors }) => {
               }}
             />
           </div>
-          <div className="update-profile-detail">
+          <div className="update-profile-detail d-flex">
             <div className="full-name">
               <span>Full Name</span>
               <input
@@ -94,15 +109,15 @@ const CreateProfileSection = ({ form, onChange, setProfilePic, errors }) => {
                 </div>
                 {openDropdown === "designation" && (
                   <ul className="dropdown_menu1">
-                    {designationOptions.map((option, idx) => (
+                    {designations.map((option, idx) => (
                       <li
                         key={idx}
                         onClick={() => {
-                          onChange("designation", option);
+                          onChange("designation", option.name);
                           setOpenDropdown(null);
                         }}
                       >
-                        {option}
+                        {option.name}
                       </li>
                     ))}
                   </ul>

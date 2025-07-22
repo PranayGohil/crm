@@ -15,7 +15,7 @@ import ClientDetailsPage from "./pages/admin-panel/client/ClientDetailsPage";
 import ClientProjectDetails from "./pages/admin-panel/client/ClientProjectDetails";
 import ClientSubtaskShow from "./pages/ClientSubtaskShow";
 
-import ProjectDetails from "./pages/ProjectDetails";
+import ProjectDetails from "./pages/admin-panel/project/ProjectDetails";
 
 import AllProject from "./pages/admin-panel/project/AllProject";
 import AddNewProject from "./pages/admin-panel/project/AddNewProject";
@@ -24,28 +24,29 @@ import AddSubtask from "./pages/admin-panel/subtask/AddSubtask";
 import SubtaskDashboardContainer from "./pages/admin-panel/subtask/SubtaskDashboardContainer";
 
 import ProjectContent from "./pages/admin-panel/project/ProjectContent";
-import EditProjectContent from "./pages/EditProjectContent";
 import ProjectMediaGallery from "./components/ProjectMediaGallery";
 
 import EmployeeDashboard from "./pages/admin-panel/employee/EmployeeDashboard";
 import EmployeeProfileEdit from "./pages/admin-panel/employee/EmployeeProfileEdit";
 import TeamMemberProfile from "./pages/admin-panel/employee/TeamMemberProfile";
-import TaskTimeboard from "./pages/TaskTimeboard";
+import Subtasks from "./pages/admin-panel/subtask/Subtasks";
 import NotificationAdmin from "./pages/admin-panel/NotificationAdmin";
 
 import EditClient from "./pages/admin-panel/client/EditClient";
 import EditProject from "./pages/EditProject";
-import CreateProjectContent from "./pages/admin-panel/project/CreateProjectContent";
+import EditProjectContent from "./pages/admin-panel/project/EditProjectContent";
 import EditSubtask from "./pages/admin-panel/subtask/EditSubtask";
 import CreateEmployeeProfile from "./pages/admin-panel/employee/CreateEmployeeProfile";
 
-import TimeTrackingDashboard from "./pages/TimeTrackingDashboard";
+import TimeTrackingDashboard from "./pages/admin-panel/TimeTrackingDashboard";
 
 import LoginPage from "./pages/LoginPage";
 
 import ViewSubtask from "./pages/admin-panel/subtask/ViewSubtask";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+
+import Designation from "./pages/admin-panel/Designation";
 
 function App() {
   return (
@@ -103,13 +104,13 @@ function App() {
             element={<ProjectMediaGallery />}
           />
           <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
-          <Route path="/employee/edit/:employeeId" element={<EmployeeProfileEdit />} />
-          <Route path="/employee/profile/:id" element={<TeamMemberProfile />} />
-          <Route path="tasktimeboard" element={<TaskTimeboard />} />
           <Route
-            path="timetrackingdashboard"
-            element={<TimeTrackingDashboard />}
+            path="/employee/edit/:employeeId"
+            element={<EmployeeProfileEdit />}
           />
+          <Route path="/employee/profile/:id" element={<TeamMemberProfile />} />
+          <Route path="/subtasks" element={<Subtasks />} />
+          <Route path="/time-tracking" element={<TimeTrackingDashboard />} />
           <Route path="/notifications" element={<NotificationAdmin />} />
 
           {/* edit page */}
@@ -117,7 +118,7 @@ function App() {
           <Route path="/project/edit/:projectId" element={<EditProject />} />
           <Route
             path="/project/edit-content/:projectId"
-            element={<CreateProjectContent />}
+            element={<EditProjectContent />}
           />
           <Route
             path="/project/subtask/edit/:subtaskId"
@@ -127,6 +128,7 @@ function App() {
             path="/employee/create-profile"
             element={<CreateEmployeeProfile />}
           />
+          <Route path="/designation" element={<Designation />} />
         </Route>
 
         <Route path="/" element={<Plain_layout />}>

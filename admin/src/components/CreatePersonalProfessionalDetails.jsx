@@ -1,14 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 
 // Options
 const departmentOptions = ["Engineering", "Design", "Marketing"];
-const designationOptions = ["Senior Developer", "Junior Developer", "Manager"];
-const managerOptions = ["Sarah Johnson (CTO)", "David Lee (PM)"];
 const employmentTypes = ["Full-time", "Part-time"];
 
 const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
+  const [managers, setManagers] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/api/employee/managers`)
+      .then((res) => {
+        if (res.data.success) {
+          console.log("Managers:", res.data.data);
+          setManagers(res.data.data);
+        }
+      })
+      .catch((err) => console.error("Error fetching managers", err));
+  }, []);
 
   const toggleDropdown = (type) => {
     setOpenDropdown((prev) => (prev === type ? null : type));
@@ -144,7 +156,7 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
                 onClick={() => toggleDropdown("department")}
               >
                 <span className="text_btn2">
-                  {form.department || "Select department"}
+                  {form.department || "Select Department"}
                 </span>
                 <img
                   src="/SVG/header-vector.svg"
@@ -170,41 +182,6 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
             </div>
           </div>
 
-          {/* Designation Dropdown */}
-          <div className="profile-edit-inner emp-designation">
-            <div className="Department emp-detail mail-txt">
-              <p>Designation</p>
-              <div
-                className="dropdown_toggle2"
-                onClick={() => toggleDropdown("designation")}
-              >
-                <span className="text_btn2">
-                  {form.designation || "Select designation"}
-                </span>
-                <img
-                  src="/SVG/header-vector.svg"
-                  alt="vec"
-                  className="arrow_icon2"
-                />
-              </div>
-              {openDropdown === "designation" && (
-                <ul className="dropdown_menu2">
-                  {designationOptions.map((option, idx) => (
-                    <li
-                      key={idx}
-                      onClick={() => handleSelect("designation", option)}
-                    >
-                      {option}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {errors?.designation && (
-                <div className="error">{errors.designation}</div>
-              )}
-            </div>
-          </div>
-
           {/* Reporting Manager Dropdown */}
           <div className="profile-edit-inner emp-reportingManager">
             <div className="Department emp-detail mail-txt">
@@ -214,7 +191,7 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
                 onClick={() => toggleDropdown("reporting_manager")}
               >
                 <span className="text_btn2">
-                  {form.reporting_manager || "Select manager"}
+                  {form.reporting_manager || "Select Manager"}
                 </span>
                 <img
                   src="/SVG/header-vector.svg"
@@ -224,12 +201,17 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
               </div>
               {openDropdown === "reporting_manager" && (
                 <ul className="dropdown_menu2">
-                  {managerOptions.map((option, idx) => (
+                  <li onClick={() => handleSelect("reporting_manager", "")}>
+                    Select Manager
+                  </li>
+                  {managers.map((option, idx) => (
                     <li
                       key={idx}
-                      onClick={() => handleSelect("reporting_manager", option)}
+                      onClick={() =>
+                        handleSelect("reporting_manager", option.full_name)
+                      }
                     >
-                      {option}
+                      {option.full_name}
                     </li>
                   ))}
                 </ul>
@@ -278,7 +260,7 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
                 onClick={() => toggleDropdown("employement_type")}
               >
                 <span className="text_btn2">
-                  {form.employement_type || "Select employment type"}
+                  {form.employement_type || "Select Employment Type"}
                 </span>
                 <img
                   src="/SVG/header-vector.svg"
@@ -301,6 +283,18 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
               {errors?.employement_type && (
                 <div className="error">{errors.employement_type}</div>
               )}
+            </div>
+          </div>
+          <div className="profile-edit-inner is-manager-checkbox">
+            <div className="checkbox-field">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={form.is_manager}
+                  onChange={(e) => onChange("is_manager", e.target.checked)}
+                />
+                <span style={{ marginLeft: "8px" }}>Is Reporting Manager</span>
+              </label>
             </div>
           </div>
         </div>
