@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 const TeamMemberProfile = () => {
-  const { id } = useParams(); // get employee id from route
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const [employee, setEmployee] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     const fetchEmployee = async () => {
@@ -97,6 +103,21 @@ const TeamMemberProfile = () => {
     },
   ];
 
+  const handleDeleteEmployee = async () => {
+    try {
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/api/employee/delete/${employee._id}`
+      );
+      toast.success("Employee deleted successfully!");
+      window.location.href = "/employee/dashboard";
+    } catch (err) {
+      console.error(err);
+      toast.error("Delete failed!");
+    } finally {
+      setShowDeleteModal(false);
+    }
+  };
+
   if (loading) return <LoadingOverlay />;
 
   return (
@@ -104,14 +125,31 @@ const TeamMemberProfile = () => {
       <section className="page2-main1">
         <div className="member-profile">
           <div className="mem-pro-vec">
-            <img src="/SVG/vec-mem-pro.svg" alt="vec" />
+            <img
+              src="/SVG/vec-mem-pro.svg"
+              alt="vec"
+              onClick={() => navigate(-1)}
+              style={{ cursor: "pointer" }}
+            />
             <span>Team Member Profile</span>
           </div>
-          <div className="edit-profile">
-            <Link to={`/employee/edit/${employee._id}`}>
-              <img src="/SVG/edit-white.svg" alt="edit" />
+          <div className="d-flex gap-3">
+            <Link to={`/employee/edit/${employee._id}`} className="theme_btn">
+              <img src="/SVG/edit-white.svg" alt="edit" className="me-2" />
               Edit
             </Link>
+            <button
+              className="theme_btn bg-danger"
+              onClick={() => setShowDeleteModal(true)}
+            >
+              <img
+                src="/SVG/delete.svg"
+                alt="edit"
+                style={{ filter: "invert(1)" }}
+                className="me-2"
+              />
+              Delete
+            </button>
           </div>
         </div>
       </section>
@@ -239,6 +277,7 @@ const TeamMemberProfile = () => {
                 <span>Current Password</span>
                 <input
                   type={showPassword ? "text" : "password"}
+                  value={employee.password || ""}
                   style={{ paddingRight: "30px" }}
                 />
                 <span
@@ -250,10 +289,9 @@ const TeamMemberProfile = () => {
                     transform: "translateY(-50%)",
                     cursor: "pointer",
                     fontSize: "14px",
-                    color: "#007bff",
                   }}
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
             </div>
@@ -261,6 +299,24 @@ const TeamMemberProfile = () => {
           <div className="tmp-50"></div>
         </div>
       </section>
+      {showDeleteModal && (
+        <div className="custom-modal-overlay">
+          <div className="custom-modal">
+            <h3>Are you sure you want to delete this employee?</h3>
+            <div className="modal-buttons">
+              <button className="confirm-btn" onClick={handleDeleteEmployee}>
+                Yes, Delete
+              </button>
+              <button
+                className="cancel-btn"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

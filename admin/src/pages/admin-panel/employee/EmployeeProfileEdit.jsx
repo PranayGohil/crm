@@ -5,6 +5,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 const EmployeeProfileEdit = () => {
   const { employeeId } = useParams();
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ const EmployeeProfileEdit = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [managers, setManagers] = useState([]);
   const [designations, setDesignations] = useState([]);
+  const [showPassword, setShowPassword] = useState(false);
 
   const dropdownOptions = ["Active", "Inactive", "Blocked"];
   const departmentOptions = ["Engineering", "Design", "Marketing"];
@@ -23,11 +26,11 @@ const EmployeeProfileEdit = () => {
   const [initialValues, setInitialValues] = useState({
     full_name: "",
     username: "",
+    password: "",
     email: "",
     phone: "",
     home_address: "",
     dob: "",
-    employee_id: "",
     department: "",
     designation: "",
     status: "Active",
@@ -41,12 +44,23 @@ const EmployeeProfileEdit = () => {
 
   const validationSchema = Yup.object().shape({
     full_name: Yup.string().required("Full name is required"),
-    username: Yup.string().required("Username is required"),
+    username: Yup.string()
+      .matches(/^[a-zA-Z0-9_-]+$/, {
+        message:
+          "Username can only contain letters, numbers, underscores (_) and dashes (-).",
+        excludeEmptyString: true,
+      })
+      .required("Username is required"),
+    password: Yup.string()
+      .required("Password is required")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/,
+        "Password must be at least 8 characters, include an uppercase letter, a lowercase letter, a number, and a special character."
+      ),
     email: Yup.string().email("Invalid email").required("Email is required"),
     phone: Yup.string().required("Phone number is required"),
     home_address: Yup.string().required("Address is required"),
     dob: Yup.string().required("Date of birth is required"),
-    employee_id: Yup.string().required("Employee ID is required"),
     department: Yup.string().required("Department is required"),
     designation: Yup.string().required("Designation is required"),
     status: Yup.string().required("Status is required"),
@@ -56,7 +70,6 @@ const EmployeeProfileEdit = () => {
     monthly_salary: Yup.number()
       .typeError("Must be a number")
       .required("Monthly salary is required"),
-    emergency_contact: Yup.string().required("Emergency contact is required"),
     is_manager: Yup.boolean(),
   });
 
@@ -71,11 +84,11 @@ const EmployeeProfileEdit = () => {
         setInitialValues({
           full_name: data.full_name || "",
           username: data.username || "",
+          password: data.password || "",
           email: data.email || "",
           phone: data.phone || "",
           home_address: data.home_address || "",
           dob: data.dob ? data.dob.split("T")[0] : "",
-          employee_id: data.employee_id || "",
           department: data.department || "",
           designation: data.designation || "",
           status: data.status || "Active",
@@ -343,7 +356,6 @@ const EmployeeProfileEdit = () => {
             <section className="personal-proffesional">
               <div className="profile-inner">
                 {[
-                  "username",
                   "email",
                   "phone",
                   "home_address",
@@ -366,19 +378,43 @@ const EmployeeProfileEdit = () => {
                     </div>
                   </div>
                 ))}
+                <div className="profile-edit-inner">
+                  <div className="profile-edit-detail" style={{ position: "relative" }}>
+                    <Field
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      className="form-control"
+                      placeholder="Enter password"
+                    />
+
+                    <span
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: "absolute",
+                        right: "10px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {showPassword ? (
+                        <FaEyeSlash />
+                      ) : (
+                        <FaEye />
+                      )}
+                    </span>
+                  </div>
+                    <ErrorMessage
+                      name="password"
+                      component="div"
+                      className="error"
+                      style={{ width: "494px" }}
+                    />
+                </div>
               </div>
 
               {/* Professional Details with dropdowns */}
               <div className="profile-inner">
-                <div className="profile-edit-detail phone-num-txt">
-                  <span>Employee ID</span>
-                  <Field type="text" name="employee_id" />
-                  <ErrorMessage
-                    name="employee_id"
-                    component="div"
-                    className="error"
-                  />
-                </div>
                 {["department", "reportingManager", "employment_type"].map(
                   (field) => (
                     <div key={field} className="profile-edit-inner">

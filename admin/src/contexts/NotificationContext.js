@@ -58,12 +58,21 @@ export const NotificationProvider = ({ children }) => {
 
     // Listen for incoming notifications
     newSocket.on("new_notification", (notification) => {
-      setNotifications((prev) => [notification, ...prev]);
-      setUnreadCount((c) => c + 1);
+      // ✅ Only show if notification is meant for this user
+      if (
+        notification.receiver_id === user._id &&
+        notification.receiver_type === user.role
+      ) {
+        setNotifications((prev) => [notification, ...prev]);
+        setUnreadCount((c) => c + 1);
 
-      console.log("New notification:", notification);
-      // 🎉 Show toast when a new notification arrives
-      toast.info(notification.message || "You have a new notification!");
+        console.log("🔥 Showing notification:", notification);
+        toast.info(
+          notification.title ||
+            notification.description ||
+            "📢 New notification!"
+        );
+      }
     });
 
     setSocket(newSocket);

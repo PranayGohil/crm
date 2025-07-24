@@ -12,8 +12,6 @@ const SubtaskDashboardContainer = () => {
   const [employees, setEmployees] = useState([]);
 
   const [filters, setFilters] = useState({
-    assignTo: "",
-    priority: "",
     stage: "",
   });
 
@@ -56,8 +54,6 @@ const SubtaskDashboardContainer = () => {
 
   const filteredSubtasks = subtasks.filter(
     (task) =>
-      (!filters.assignTo || String(task.assign_to) === filters.assignTo) &&
-      (!filters.priority || task.priority === filters.priority) &&
       (!filters.stage || task.stage === filters.stage)
   );
 
@@ -90,36 +86,6 @@ const SubtaskDashboardContainer = () => {
       <section className="sv-sec3 cpd-filters_section">
         <div className="cpd-menu-bar">
           <select
-            value={filters.assignTo}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, assignTo: e.target.value }))
-            }
-            className="dropdown_toggle"
-          >
-            <option value="">Filter by Assign To</option>
-            {employees.map((emp) => (
-              <option key={emp._id} value={emp._id}>
-                {emp.full_name}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={filters.priority}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, priority: e.target.value }))
-            }
-            className="dropdown_toggle"
-          >
-            <option value="">Filter by Priority</option>
-            {priorityOptions.map((opt, idx) => (
-              <option key={idx} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-
-          <select
             value={filters.stage}
             onChange={(e) =>
               setFilters((prev) => ({ ...prev, stage: e.target.value }))
@@ -137,7 +103,7 @@ const SubtaskDashboardContainer = () => {
           <span
             className="css-filter"
             onClick={() =>
-              setFilters({ assignTo: "", priority: "", stage: "" })
+              setFilters({ stage: "" })
             }
           >
             <img src="/SVG/filter-vector.svg" alt="filter icon" /> Reset Filters
@@ -153,10 +119,8 @@ const SubtaskDashboardContainer = () => {
               <th>Subtask Name</th>
               <th>Assign Date</th>
               <th>Due Date</th>
-              <th>Priority</th>
               <th>Stage</th>
               <th>Status</th>
-              <th>Assigned</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -166,58 +130,8 @@ const SubtaskDashboardContainer = () => {
                 <td>{task.task_name}</td>
                 <td>{formateDate(task.assign_date)}</td>
                 <td>{formateDate(task.due_date)}</td>
-                <td>{task.priority}</td>
                 <td>{task.stage}</td>
                 <td>{task.status}</td>
-                <td className="d-flex justify-content-start align-items-center">
-                  {(() => {
-                    const assignedEmp = employees.find(
-                      (emp) => emp._id === task.assign_to
-                    );
-                    if (!assignedEmp) return "N/A";
-
-                    const firstLetter = assignedEmp.full_name
-                      ? assignedEmp.full_name.charAt(0).toUpperCase()
-                      : "?";
-
-                    return (
-                      <span className="css-ankit d-flex align-items-center">
-                        {assignedEmp.profile_pic ? (
-                          <img
-                            src={assignedEmp.profile_pic}
-                            alt={assignedEmp.full_name}
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                              borderRadius: "50%",
-                              marginRight: "4px",
-                              objectFit: "cover",
-                            }}
-                          />
-                        ) : (
-                          <div
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                              borderRadius: "50%",
-                              backgroundColor: "rgb(10 55 73)",
-                              color: "#fff",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontSize: "12px",
-                              marginRight: "4px",
-                              textTransform: "uppercase",
-                            }}
-                          >
-                            {firstLetter}
-                          </div>
-                        )}
-                        {assignedEmp.full_name}
-                      </span>
-                    );
-                  })()}
-                </td>
 
                 <td>
                   <Link to={`/subtask/view/${task._id}`} className="mx-1">

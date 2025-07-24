@@ -33,7 +33,7 @@ import Subtasks from "./pages/admin-panel/subtask/Subtasks";
 import NotificationAdmin from "./pages/admin-panel/NotificationAdmin";
 
 import EditClient from "./pages/admin-panel/client/EditClient";
-import EditProject from "./pages/EditProject";
+import EditProject from "./pages/admin-panel/project/EditProject";
 import EditProjectContent from "./pages/admin-panel/project/EditProjectContent";
 import EditSubtask from "./pages/admin-panel/subtask/EditSubtask";
 import CreateEmployeeProfile from "./pages/admin-panel/employee/CreateEmployeeProfile";

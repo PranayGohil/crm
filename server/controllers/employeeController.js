@@ -2,7 +2,6 @@ import Employee from "../models/employeeModel.js";
 import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
 import Designation from "../models/designationModel.js";
-import Bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const addEmployee = async (req, res) => {
@@ -18,7 +17,6 @@ export const addEmployee = async (req, res) => {
       home_address,
       dob,
       emergency_contact,
-      employee_id,
       department,
       date_of_joining,
       monthly_salary,
@@ -36,13 +34,10 @@ export const addEmployee = async (req, res) => {
       });
     }
 
-    // ✅ Hash password
-    const hashedPassword = await Bcrypt.hash(password, 10);
-
     // ✅ Create new employee
     const newEmployee = new Employee({
       username, // fixed typo (was 'username')
-      password: hashedPassword,
+      password,
       full_name,
       designation,
       status,
@@ -52,7 +47,6 @@ export const addEmployee = async (req, res) => {
       home_address,
       dob,
       emergency_contact,
-      employee_id,
       department,
       date_of_joining,
       monthly_salary,
@@ -84,8 +78,13 @@ export const loginEmployee = async (req, res) => {
       return res.status(401).json({ message: "Invalid username or password" });
     }
 
-    // Compare password using bcrypt
-    const isMatch = await Bcrypt.compare(password, employee.password);
+    // Compare password
+    const isMatch = false;
+    if (password === employee.password) {
+      isMatch = true;
+    } else {
+      isMatch = false;
+    }
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
@@ -154,6 +153,7 @@ export const editEmployee = async (req, res) => {
     console.log("Editing employee with ID:", id);
     const {
       username,
+      password,
       full_name,
       designation,
       status,
@@ -162,7 +162,6 @@ export const editEmployee = async (req, res) => {
       home_address,
       dob,
       emergency_contact,
-      employee_id,
       department,
       date_of_joining,
       monthly_salary,
@@ -191,6 +190,7 @@ export const editEmployee = async (req, res) => {
     }
 
     // Update fields
+    employee.password = password || employee.password;
     employee.full_name = full_name || employee.full_name;
     employee.designation = designation || employee.designation;
     employee.status = status || employee.status;
@@ -200,7 +200,6 @@ export const editEmployee = async (req, res) => {
     employee.dob = dob || employee.dob;
     employee.emergency_contact =
       emergency_contact || employee.emergency_contact;
-    employee.employee_id = employee_id || employee.employee_id;
     employee.department = department || employee.department;
     employee.date_of_joining = date_of_joining || employee.date_of_joining;
     employee.monthly_salary = monthly_salary || employee.monthly_salary;
@@ -253,7 +252,7 @@ export const getEmployeeDashboardData = async (req, res) => {
     console.log("employee id", employeeId);
     const subtasks = await SubTask.find({ assign_to: employeeId }).populate(
       "project_id"
-    ); 
+    );
     console.log("Subtasks:", subtasks);
     const projectIds = subtasks.map((s) => s.project_id?._id).filter(Boolean);
     const uniqueProjectIds = [

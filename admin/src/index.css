@@ -3036,6 +3036,7 @@ input[type="checkbox"]:checked::after {
   letter-spacing: 0;
   color: #374151;
   gap: 4px;
+  width: 436px;
 }
 
 .enter-pass p {

@@ -4,12 +4,15 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { toast } from "react-toastify";
-
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
+
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const CreateNewClient = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -36,7 +39,12 @@ const CreateNewClient = () => {
       phone: Yup.string().required("Phone is required"),
       joining_date: Yup.date().required("Joining date is required"),
       address: Yup.string().required("Address is required"),
-      username: Yup.string().required("Username is required"),
+      username: Yup.string()
+        .matches(/^[a-zA-Z0-9_-]+$/, {
+          message:
+            "Username can only contain letters, numbers, underscores (_) and dashes (-).",
+        })
+        .required("Username is required"),
       client_type: Yup.string().required("Client type is required"),
       password: Yup.string()
         .min(8, "Password must be at least 8 characters")
@@ -52,9 +60,8 @@ const CreateNewClient = () => {
         .required("Please confirm password"),
     }),
     onSubmit: async (values, { setSubmitting, resetForm }) => {
-      setLoading(true);
       try {
-        setSubmitting(true);
+        setLoading(true);
         const res = await axios.post(
           `${process.env.REACT_APP_API_URL}/api/client/add`,
           values
@@ -71,7 +78,6 @@ const CreateNewClient = () => {
         console.error(err);
         toast.error(err.error);
       } finally {
-        setLoading(false);
         setSubmitting(false);
       }
     },
@@ -79,7 +85,7 @@ const CreateNewClient = () => {
 
   const { handleChange, handleSubmit, values, errors, touched, isSubmitting } =
     formik;
-    
+
   if (loading) return <LoadingOverlay />;
 
   return (
@@ -218,34 +224,68 @@ const CreateNewClient = () => {
               </div>
 
               <div className="cnc-ci">
-                <div className="ci-inner cnc-css">
+                <div
+                  className="ci-inner cnc-css"
+                >
                   <p>Password</p>
-                  <input
-                    type="password"
-                    name="password"
-                    value={values.password}
-                    onChange={handleChange}
-                    placeholder="********"
-                    disabled={isSubmitting}
-                  />
-                  {touched.password && errors.password && (
-                    <div className="error">{errors.password}</div>
-                  )}
+                  <div style={{ position: "relative" }}>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={values.password}
+                      onChange={handleChange}
+                      placeholder="********"
+                      disabled={isSubmitting}
+                    />
+                    <span
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="eye-icon"
+                      style={{
+                        position: "absolute",
+                        right: "10px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {showPassword ? <FaEye /> : <FaEyeSlash />}
+                    </span>
+                  </div>
                 </div>
+                {touched.password && errors.password && (
+                  <div className="error">{errors.password}</div>
+                )}
                 <div className="ci-inner cnc-css">
                   <p>Confirm Password</p>
-                  <input
-                    type="password"
-                    name="confirm_password"
-                    value={values.confirm_password}
-                    onChange={handleChange}
-                    placeholder="********"
-                    disabled={isSubmitting}
-                  />
-                  {touched.confirm_password && errors.confirm_password && (
-                    <div className="error">{errors.confirm_password}</div>
-                  )}
+                  <div style={{ position: "relative" }}>
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirm_password"
+                      value={values.confirm_password}
+                      onChange={handleChange}
+                      placeholder="********"
+                      disabled={isSubmitting}
+                    />
+                    <span
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="eye-icon"
+                      style={{
+                        position: "absolute",
+                        right: "10px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+                    </span>
+                  </div>
                 </div>
+                {touched.confirm_password && errors.confirm_password && (
+                  <div className="error">{errors.confirm_password}</div>
+                )}
               </div>
             </div>
           </div>

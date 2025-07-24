@@ -7,10 +7,13 @@ import { toast } from "react-toastify";
 
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 const EditClient = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -20,6 +23,7 @@ const EditClient = () => {
       joining_date: "",
       address: "",
       username: "",
+      password: "",
       client_type: "",
       company_name: "",
       gst_number: "",
@@ -35,12 +39,27 @@ const EditClient = () => {
       phone: Yup.string().required("Phone is required"),
       joining_date: Yup.date().required("Joining date is required"),
       address: Yup.string().required("Address is required"),
-      username: Yup.string().required("Username is required"),
+      username: Yup.string()
+        .matches(/^[a-zA-Z0-9_-]+$/, {
+          message:
+            "Username can only contain letters, numbers, underscores (_) and dashes (-).",
+          excludeEmptyString: true,
+        })
+        .required("Username is required"),
+      password: Yup.string()
+        .min(8, "Password must be at least 8 characters")
+        .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .matches(/[0-9]/, "Password must contain at least one number")
+        .matches(
+          /[!@#$%^&*(),.?":{}|<>]/,
+          "Password must contain at least one special character"
+        )
+        .required("Password is required"),
       client_type: Yup.string().required("Client type is required"),
     }),
     onSubmit: async (values, { setSubmitting }) => {
-      setLoading(true);
       try {
+        setLoading(true);
         setSubmitting(true);
         const res = await axios.put(
           `${process.env.REACT_APP_API_URL}/api/client/update-username/${id}`,
@@ -62,8 +81,8 @@ const EditClient = () => {
   // Fetch client data on load
   useEffect(() => {
     const fetchClient = async () => {
-      setLoading(true);
       try {
+        setLoading(true);
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/client/get-username/${id}`
         );
@@ -77,6 +96,7 @@ const EditClient = () => {
             : "",
           address: client.address || "",
           username: client.username || "",
+          password: client.password || "",
           client_type: client.client_type || "",
           company_name: client.company_name || "",
           gst_number: client.gst_number || "",
@@ -86,6 +106,7 @@ const EditClient = () => {
           business_address: client.business_address || "",
           additional_notes: client.additional_notes || "",
         });
+        console.log("client", client);
       } catch (err) {
         console.error(err);
         toast.error("Failed to load client data");
@@ -103,7 +124,6 @@ const EditClient = () => {
 
   return (
     <>
-      <LoadingOverlay show={loading || isSubmitting} />
       <section className="cnc-first cd-client_dashboard header header_back_arrow">
         <Link
           to={`/client/details/${values.username}`}
@@ -224,6 +244,39 @@ const EditClient = () => {
                     <div className="error">{errors.username}</div>
                   )}
                 </div>
+                <div className="ci-inner cnc-css">
+                  <p>Password</p>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={values.password}
+                      onChange={handleChange}
+                      placeholder="Password"
+                      disabled={isSubmitting}
+                    />
+                    <span
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="eye-icon"
+                      style={{
+                        position: "absolute",
+                        right: "10px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                      }}
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </span>
+                  </div>
+
+                  {touched.password && errors.password && (
+                    <div className="error">{errors.password}</div>
+                  )}
+                </div>
+              </div>
+              <div className="cnc-ci">
                 <div className="ci-inner cnc-css">
                   <p>Client Type / Category</p>
                   <input

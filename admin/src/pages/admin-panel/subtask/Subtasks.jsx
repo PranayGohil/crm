@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { stageOptions, priorityOptions, statusOptions } from "../../../options";
 
 const Subtasks = () => {
+  const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [selectedCount, setSelectedCount] = useState(0);
@@ -13,6 +14,8 @@ const Subtasks = () => {
   const [employees, setEmployees] = useState([]);
   const [headerDropdownOpen, setHeaderDropdownOpen] = useState(null);
   const [bulkDropdownOpen, setBulkDropdownOpen] = useState(null);
+
+  const [summary, setSummary] = useState(null);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -56,6 +59,17 @@ const Subtasks = () => {
 
   useEffect(() => {
     fetchAll();
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/api/statistics/summary`)
+      .then((res) => {
+        setSummary(res.data);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -204,6 +218,39 @@ const Subtasks = () => {
           <h1>Task Time board</h1>
           <p>Manage your jewelry production workflow</p>
         </div>
+        <Link to="/subtasks" className="md-common-total-card">
+          <div className="md-common-para-icon md-para-icon-tasks">
+            <span>Subtasks</span>
+            <div className="md-common-icon">
+              <img src="SVG/true-green.svg" alt="total tasks" />
+            </div>
+          </div>
+          <div className="md-total-project-number">
+            <span className="md-total-card-number">{summary?.totalTasks}</span>
+            <span className="md-total-card-text">Total</span>
+          </div>
+          <div className="mt-8 md-btn-cio">
+            {summary?.tasksByStage &&
+              Object.entries(summary.tasksByStage).map(([stage, count]) => (
+                <div
+                  key={stage}
+                  className={`${
+                    stage === "CAD Design"
+                      ? "badge bg-primary"
+                      : stage === "SET Design"
+                      ? "badge bg-warning"
+                      : stage === "Delivery"
+                      ? "badge bg-success"
+                      : stage === "Render"
+                      ? "badge bg-info"
+                      : ""
+                  } `}
+                >
+                  {count} {stage}
+                </div>
+              ))}
+          </div>
+        </Link>
       </section>
 
       <section className="ttb-search-btn-bar-main">

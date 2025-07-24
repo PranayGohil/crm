@@ -132,21 +132,6 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
           </div>
         </div>
         <div className="profile-inner">
-          <div className="profile-edit-inner emp-id">
-            <div className="profile-edit-detail phone-num-txt">
-              <span>Employee ID</span>
-              <input
-                type="text"
-                placeholder="EMP2341"
-                value={form.employee_id}
-                onChange={(e) => onChange("employee_id", e.target.value)}
-              />
-              {errors?.employee_id && (
-                <div className="error">{errors.employee_id}</div>
-              )}
-            </div>
-          </div>
-
           {/* Department Dropdown */}
           <div className="profile-edit-inner emp-department">
             <div className="Department emp-detail mail-txt">

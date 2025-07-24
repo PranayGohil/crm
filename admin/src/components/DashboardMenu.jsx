@@ -134,6 +134,21 @@ const DashboardMenu = () => {
                 </Link>
               </div>
             </div>
+
+            <div className="commen-dashboard-list">
+              <p>Designation</p>
+              <div className="commen-dashboard-list-inner">
+                <Link
+                  to="/designation"
+                  className={`common-icon-para ${
+                    isActive("/designation") ? "active-link" : ""
+                  }`}
+                >
+                  <img src="/SVG/team-member.svg" alt="team" />
+                  <span>Designation</span>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
 

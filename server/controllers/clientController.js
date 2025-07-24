@@ -1,7 +1,6 @@
 import Client from "../models/clientModel.js";
 import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
-import Bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const addClient = async (req, res) => {
@@ -43,10 +42,6 @@ export const addClient = async (req, res) => {
       });
     }
 
-    // Hash the password
-    const salt = await Bcrypt.genSalt(10);
-    const hashedPassword = await Bcrypt.hash(password, salt);
-
     const client = await Client.create({
       full_name,
       email,
@@ -55,7 +50,7 @@ export const addClient = async (req, res) => {
       address,
       username,
       client_type,
-      password: hashedPassword,
+      password,
       company_name,
       gst_number,
       business_phone,
@@ -85,8 +80,13 @@ export const loginClient = async (req, res) => {
     }
 
     // ✅ Compare password
-    const isMatch = await Bcrypt.compare(password, client.password);
-    if (!isMatch) {
+    const isMatch = false;
+    if (password === client.password) {
+      isMatch = true;
+    } else {
+      isMatch = false;
+    }
+    if (isMatch === false) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
 

@@ -21,7 +21,6 @@ const CreateEmployeeProfile = () => {
     home_address: "",
     dob: "",
     emergency_contact: "",
-    employee_id: "",
     department: "",
     date_of_joining: "",
     monthly_salary: "",
@@ -39,7 +38,12 @@ const CreateEmployeeProfile = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!form.full_name.trim()) newErrors.full_name = "Full name is required.";
-    if (!form.username.trim()) newErrors.username = "Username is required.";
+    if (!form.username.trim()) {
+      newErrors.username = "Username is required.";
+    } else if (!/^[a-zA-Z0-9_-]+$/.test(form.username)) {
+      newErrors.username =
+        "Username can only contain letters, numbers, underscores (_) and dashes (-).";
+    }
     if (!form.password) newErrors.password = "Password is required.";
     else if (form.password.length < 8)
       newErrors.password = "Password must be at least 8 characters.";
@@ -62,10 +66,6 @@ const CreateEmployeeProfile = () => {
     if (!form.home_address.trim())
       newErrors.home_address = "Address is required.";
     if (!form.dob) newErrors.dob = "Date of birth is required.";
-    if (!form.emergency_contact.trim())
-      newErrors.emergency_contact = "Emergency contact is required.";
-    if (!form.employee_id.trim())
-      newErrors.employee_id = "Employee ID is required.";
     if (!form.department) newErrors.department = "Select department.";
     if (!form.date_of_joining)
       newErrors.date_of_joining = "Date of joining required.";

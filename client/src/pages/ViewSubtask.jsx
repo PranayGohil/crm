@@ -12,7 +12,6 @@ const ViewSubtask = () => {
   const [subtask, setSubtask] = useState(null);
   const [project, setProject] = useState(null);
   const [client, setClient] = useState(null);
-  const [assignedEmployee, setAssignedEmployee] = useState(null); // single employee
   const [loading, setLoading] = useState(true);
 
   const [mediaItems, setMediaItems] = useState([]);
@@ -39,14 +38,6 @@ const ViewSubtask = () => {
         );
         setProject(projectData.project);
         console.log("Project Data:", projectData);
-
-        if (subtaskData.assign_to) {
-          const { data: employeeData } = await axios.get(
-            `${process.env.REACT_APP_API_URL}/api/employee/get/${subtaskData.assign_to}`
-          );
-          setAssignedEmployee(employeeData);
-          console.log("Assigned Employee Data:", employeeData);
-        }
 
         if (projectData.project.client_id) {
           const { data: clientData } = await axios.get(
@@ -123,10 +114,6 @@ const ViewSubtask = () => {
               <div className="pb-taskinner">
                 <p>Stage:</p>
                 <span>{subtask.stage || "N/A"}</span>
-              </div>
-              <div className="pb-taskinner">
-                <p>Assigned To:</p>
-                <span>{assignedEmployee?.full_name || "N/A"}</span>
               </div>
               <div className="pb-taskinner">
                 <p>Start Date:</p>
