@@ -118,6 +118,21 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
               )}
             </div>
           </div>
+
+          <div className="profile-edit-inner egn-contact">
+            <div className="profile-edit-detail eng-cnt-txt">
+              <span>Capacity</span>
+              <input
+                type="number"
+                placeholder="Enter number of Capacity per Day"
+                value={form.capacity}
+                onChange={(e) => onChange("capacity", e.target.value)}
+              />
+              {errors?.capacity && (
+                <div className="error">{errors.capacity}</div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -5,6 +5,22 @@ import SubTask from "../models/subTaskModel.js";
 
 const stageOptions = ["CAD Design", "SET Design", "Render", "Delivery"];
 
+// Count number of Sundays in a month
+const countSundays = (year, month) => {
+  let sundays = 0;
+  const date = new Date(year, month, 1);
+  while (date.getMonth() === month) {
+    if (date.getDay() === 0) sundays++; // 0 = Sunday
+    date.setDate(date.getDate() + 1);
+  }
+  return sundays;
+};
+
+// Get number of days in a month
+const getDaysInMonth = (year, month) => {
+  return new Date(year, month + 1, 0).getDate();
+};
+
 export const Summary = async (req, res) => {
   try {
     const totalProjects = await Project.countDocuments();
@@ -63,5 +79,53 @@ export const RecentProjects = async (req, res) => {
     res.json(projects);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const getDepartmentCapacities = async (req, res) => {
+  try {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth(); // 0-indexed (July = 6)
+
+    const daysInMonth = getDaysInMonth(year, month);
+    const sundays = countSundays(year, month);
+    const workingDays = daysInMonth - sundays;
+
+    // Fetch all employees
+    const employees = await Employee.find();
+
+    // Group by department
+    const departmentData = {};
+
+    employees.forEach((emp) => {
+      const dept = emp.department || "Unknown";
+      if (!departmentData[dept]) {
+        departmentData[dept] = {
+          totalDailyCapacity: 0,
+          totalMonthlyCapacityWithSundays: 0,
+          totalMonthlyCapacityWithoutSundays: 0,
+        };
+      }
+
+      const cap = emp.capacity || 0;
+
+      departmentData[dept].totalDailyCapacity += cap;
+      departmentData[dept].totalMonthlyCapacityWithSundays += cap * daysInMonth;
+      departmentData[dept].totalMonthlyCapacityWithoutSundays +=
+        cap * workingDays;
+    });
+
+    res.status(200).json({
+      month: now.toLocaleString("default", { month: "long" }),
+      year,
+      daysInMonth,
+      sundays,
+      workingDays,
+      departmentCapacities: departmentData,
+    });
+  } catch (error) {
+    console.error("Error fetching department capacities:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

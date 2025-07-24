@@ -6,18 +6,13 @@ import { stageOptions, priorityOptions, statusOptions } from "../../../options";
 const Subtasks = () => {
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState([]);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [selectedCount, setSelectedCount] = useState(0);
   const [openRow, setOpenRow] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [clients, setClients] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [headerDropdownOpen, setHeaderDropdownOpen] = useState(null);
-  const [bulkDropdownOpen, setBulkDropdownOpen] = useState(null);
 
   const [summary, setSummary] = useState(null);
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const [filters, setFilters] = useState({
     client: "All Client",
@@ -26,13 +21,7 @@ const Subtasks = () => {
     stage: "Stage",
   });
 
-  const [selections, setSelections] = useState({
-    priority: "Set Priority",
-    status: "Change Status",
-  });
-
   const headerRef = useRef(null);
-  const bulkRef = useRef(null);
 
   const dropdownData = {
     status: statusOptions,
@@ -73,16 +62,9 @@ const Subtasks = () => {
   }, []);
 
   useEffect(() => {
-    setSelectedCount(selectedIds.length);
-  }, [selectedIds]);
-
-  useEffect(() => {
     const handleClickOutside = (e) => {
       if (headerRef.current && !headerRef.current.contains(e.target)) {
         setHeaderDropdownOpen(null);
-      }
-      if (bulkRef.current && !bulkRef.current.contains(e.target)) {
-        setBulkDropdownOpen(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -93,18 +75,9 @@ const Subtasks = () => {
     setHeaderDropdownOpen(headerDropdownOpen === key ? null : key);
   };
 
-  const handleBulkToggle = (key) => {
-    setBulkDropdownOpen(bulkDropdownOpen === key ? null : key);
-  };
-
   const handleFilterSelect = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setHeaderDropdownOpen(null);
-  };
-
-  const handleBulkSelect = (key, value) => {
-    setSelections((prev) => ({ ...prev, [key]: value }));
-    setBulkDropdownOpen(null);
   };
 
   const handleResetFilters = () => {
@@ -114,58 +87,6 @@ const Subtasks = () => {
       priority: "Priority",
       stage: "Stage", // ✅ added
     });
-  };
-
-  const toggleSelect = (id) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
-
-  const handleBulkUpdateBoth = async () => {
-    try {
-      if (selections.priority !== "Set Priority") {
-        await axios.patch(
-          `${process.env.REACT_APP_API_URL}/api/project/bulk-update`,
-          {
-            ids: selectedIds,
-            field: "priority",
-            value: selections.priority,
-          }
-        );
-      }
-      if (selections.status !== "Change Status") {
-        await axios.patch(
-          `${process.env.REACT_APP_API_URL}/api/project/bulk-update`,
-          {
-            ids: selectedIds,
-            field: "status",
-            value: selections.status,
-          }
-        );
-      }
-      setSelections({ priority: "Set Priority", status: "Change Status" });
-      setSelectedIds([]);
-      fetchAll();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleConfirmDelete = async () => {
-    try {
-      await axios.delete(
-        `${process.env.REACT_APP_API_URL}/api/project/bulk-delete`,
-        {
-          data: { ids: selectedIds },
-        }
-      );
-      setProjects((prev) => prev.filter((p) => !selectedIds.includes(p._id)));
-      setSelectedIds([]);
-      setShowDeleteModal(false);
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   const clientIdToName = useMemo(() => {
@@ -179,26 +100,35 @@ const Subtasks = () => {
   const filteredProjects = projects.filter((p) => {
     const clientName = clientIdToName[p.client_id];
 
-    const matchProjectLevelFilter =
-      (filters.client === "All Client" ||
-        clientName?.toLowerCase() === filters.client?.toLowerCase()) &&
-      (filters.status === "Status" ||
-        p.status?.toLowerCase() === filters.status?.toLowerCase()) &&
-      (filters.priority === "Priority" ||
-        p.priority?.toLowerCase() === filters.priority?.toLowerCase());
+    // ✅ Match Project-level filters
+    const matchClient =
+      filters.client === "All Client" ||
+      clientName?.toLowerCase() === filters.client.toLowerCase();
+
+    const matchStatus =
+      filters.status === "Status" ||
+      p.subtasks?.some(
+        (s) => s.status?.toLowerCase() === filters.status.toLowerCase()
+      );
+
+    const matchPriority =
+      filters.priority === "Priority" ||
+      p.priority?.toLowerCase() === filters.priority.toLowerCase();
+
+    const matchStage =
+      filters.stage === "Stage" ||
+      p.subtasks?.some(
+        (s) => s.stage?.toLowerCase() === filters.stage.toLowerCase()
+      );
 
     const matchSearch =
       p.project_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.status?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchStage =
-      filters.stage === "Stage" ||
-      p.subtasks?.some(
-        (s) => s.stage?.toLowerCase() === filters.stage?.toLowerCase()
-      );
-
-    return matchProjectLevelFilter && matchSearch && matchStage;
+    return (
+      matchClient && matchStatus && matchPriority && matchStage && matchSearch
+    );
   });
 
   // ✅ helper to compute remaining days
@@ -442,11 +372,17 @@ const Subtasks = () => {
                           <tbody>
                             {project.subtasks
                               ?.filter((s) => {
-                                return (
+                                const stageMatch =
                                   filters.stage === "Stage" ||
                                   s.stage?.toLowerCase() ===
-                                    filters.stage.toLowerCase()
-                                );
+                                    filters.stage.toLowerCase();
+
+                                const statusMatch =
+                                  filters.status === "Status" ||
+                                  s.status?.toLowerCase() ===
+                                    filters.status.toLowerCase();
+
+                                return stageMatch && statusMatch;
                               })
                               .map((s, sIdx) => (
                                 <tr key={sIdx}>

@@ -18,7 +18,7 @@ const ClientAdminProjectDetails = () => {
   const [projectSubtasks, setProjectSubtasks] = useState({});
   const [employees, setEmployees] = useState({});
   const [loading, setLoading] = useState(true);
-  const [fullName, setFullName] = useState("")
+  const [fullName, setFullName] = useState("");
 
   // 📦 Fetch data
   useEffect(() => {
@@ -69,6 +69,11 @@ const ClientAdminProjectDetails = () => {
     fetchData();
   }, []);
 
+  const totalSubtasks = Object.values(projectSubtasks).reduce(
+    (acc, subtasks) => acc + (subtasks?.length || 0),
+    0
+  );
+
   // 🪄 Click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -101,11 +106,15 @@ const ClientAdminProjectDetails = () => {
 
   // Summary cards
   const summaryData = [
-    { icon: "/SVG/cpd-join.svg", label: "Joined", value: "12 March 2024" },
     {
       icon: "/SVG/cpd-total.svg",
       label: "Total Projects",
       value: projects.length,
+    },
+    {
+      icon: "/SVG/clipboard.svg",
+      label: "Total Subtasks",
+      value: totalSubtasks,
     },
     {
       icon: "/SVG/cpd-complete.svg",

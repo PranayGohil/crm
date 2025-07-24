@@ -9,6 +9,10 @@ const TimeTrackingDashboard = () => {
   const [employees, setEmployees] = useState([]);
   const [openTable, setOpenTable] = useState(null);
   const [selectedFilter, setSelectedFilter] = useState("Today");
+  const [customDateRange, setCustomDateRange] = useState({
+    from: null,
+    to: null,
+  });
 
   // Fetch all data on mount
   useEffect(() => {
@@ -37,14 +41,23 @@ const TimeTrackingDashboard = () => {
     const date = moment(dateStr);
     const now = moment();
 
-    if (selectedFilter === "Today") {
-      return date.isSame(now, "day");
-    } else if (selectedFilter === "This Week") {
-      return date.isSame(now, "week");
-    } else if (selectedFilter === "This Month") {
-      return date.isSame(now, "month");
+    switch (selectedFilter) {
+      case "Today":
+        return date.isSame(now, "day");
+      case "This Week":
+        return date.isSame(now, "week");
+      case "This Month":
+        return date.isSame(now, "month");
+      case "Custom":
+        if (customDateRange.from && customDateRange.to) {
+          const from = moment(customDateRange.from);
+          const to = moment(customDateRange.to).endOf("day");
+          return date.isBetween(from, to, null, "[]");
+        }
+        return false;
+      default:
+        return true;
     }
-    return true;
   };
 
   const calculateTimeSpent = (timeLogs) => {
@@ -116,17 +129,46 @@ const TimeTrackingDashboard = () => {
             </div>
           </div>
           <div className="ett-time-duration">
-            <div className="ett-time-type d-flex">
-              {["Today", "This Week", "This Month"].map((label) => (
-                <a
-                  key={label}
-                  href="#"
-                  className={selectedFilter === label ? "ett-today active" : ""}
-                  onClick={() => setSelectedFilter(label)}
-                >
-                  {label}
-                </a>
-              ))}
+            <div>
+              <div className="ett-time-type d-flex gap-3">
+                {["Today", "This Week", "This Month", "Custom"].map((label) => (
+                  <a
+                    key={label}
+                    href="#"
+                    className={
+                      selectedFilter === label ? "ett-today active" : ""
+                    }
+                    onClick={() => setSelectedFilter(label)}
+                  >
+                    {label}
+                  </a>
+                ))}
+              </div>
+
+              {selectedFilter === "Custom" && (
+                <div className="d-flex gap-3 mt-2">
+                  <input
+                    type="date"
+                    className="form-control"
+                    onChange={(e) =>
+                      setCustomDateRange((prev) => ({
+                        ...prev,
+                        from: e.target.value,
+                      }))
+                    }
+                  />
+                  <input
+                    type="date"
+                    className="form-control"
+                    onChange={(e) =>
+                      setCustomDateRange((prev) => ({
+                        ...prev,
+                        to: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              )}
             </div>
 
             {/* <div className="filter">
@@ -271,8 +313,7 @@ const TimeTrackingDashboard = () => {
           </p>
         </div>
         <div className="tt-showing-time-tracking">
-          <p>Total time tracked this week:</p>
-          <span>{totalTimeTrackedFormatted}</span>
+          <span>Total time tracked: {totalTimeTrackedFormatted}</span>
         </div>
       </section>
 

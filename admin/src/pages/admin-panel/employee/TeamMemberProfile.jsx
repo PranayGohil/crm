@@ -63,6 +63,11 @@ const TeamMemberProfile = () => {
       label: "Emergency Contact",
       value: employee.emergency_contact || "N/A",
     },
+    {
+      icon: "/SVG/menu-css.svg",
+      label: "Capacity",
+      value: employee.capacity || "N/A",
+    }
   ];
 
   const professionalDetails = [
@@ -211,8 +216,8 @@ const TeamMemberProfile = () => {
                 >
                   {employee.status === "Active"
                     ? "Active"
-                    : employee.status === "on-leave"
-                    ? "On Leave"
+                    : employee.status === "Inactive"
+                    ? "Inactive"
                     : "Blocked"}
                 </div>
               </div>

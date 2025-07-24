@@ -34,6 +34,9 @@ const employeeSchema = mongoose.Schema({
   emergency_contact: {
     type: String,
   },
+  capacity: {
+    type: Number,
+  },
   department: {
     type: String,
   },

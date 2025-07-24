@@ -21,6 +21,7 @@ const CreateEmployeeProfile = () => {
     home_address: "",
     dob: "",
     emergency_contact: "",
+    capacity: "",
     department: "",
     date_of_joining: "",
     monthly_salary: "",

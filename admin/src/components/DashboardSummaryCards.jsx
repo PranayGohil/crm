@@ -7,6 +7,8 @@ import { stageOptions } from "../options";
 const DashboardSummaryCards = () => {
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState(null);
+  const [departmentCapacities, setDepartmentCapacities] = useState(null);
+  const [capacityView, setCapacityView] = useState("monthlyWithSundays"); // Options: daily, monthlyWithSundays, monthlyWithoutSundays
   const projectRef = useRef(null);
   const clientRef = useRef(null);
   const teamRef = useRef(null);
@@ -20,6 +22,17 @@ const DashboardSummaryCards = () => {
       .get(`${process.env.REACT_APP_API_URL}/api/statistics/summary`)
       .then((res) => {
         setSummary(res.data);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+
+    axios
+      .get(
+        `${process.env.REACT_APP_API_URL}/api/statistics/department-capacities`
+      )
+      .then((res) => {
+        console.log(res.data);
+        setDepartmentCapacities(res.data);
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
@@ -54,23 +67,24 @@ const DashboardSummaryCards = () => {
   if (!summary || loading) return <LoadingOverlay />;
 
   return (
-    <section className="md-total-card-main">
-      <div className="md-total-card-main-inner">
-        {/* Total Projects */}
-        <Link to="/project/dashboard" className="md-common-total-card">
-          <div className="md-common-para-icon">
-            <span>Total Project</span>
-            <div className="md-common-icon">
-              <img src="SVG/project-file.svg" alt="total project" />
+    <>
+      <section className="md-total-card-main">
+        <div className="md-total-card-main-inner">
+          {/* Total Projects */}
+          <Link to="/project/dashboard" className="md-common-total-card">
+            <div className="md-common-para-icon">
+              <span>Total Project</span>
+              <div className="md-common-icon">
+                <img src="SVG/project-file.svg" alt="total project" />
+              </div>
             </div>
-          </div>
-          <div className="md-total-project-number">
-            <span className="md-total-card-number">
-              {summary.totalProjects}
-            </span>
-            <span className="md-total-card-text">Project</span>
-          </div>
-          {/* <div className="md-ongoing-completed mt-8">
+            <div className="md-total-project-number">
+              <span className="md-total-card-number">
+                {summary.totalProjects}
+              </span>
+              <span className="md-total-card-text">Project</span>
+            </div>
+            {/* <div className="md-ongoing-completed mt-8">
             <span className="md-ongoing-number">
               {summary.inProgressTasks}{" "}
             </span>
@@ -87,21 +101,23 @@ const DashboardSummaryCards = () => {
               ref={projectRef}
             ></div>
           </div> */}
-        </Link>
+          </Link>
 
-        {/* Total Clients */}
-        <Link to="/client/dashboard" className="md-common-total-card">
-          <div className="md-common-para-icon md-para-icon-client">
-            <span>Total Clients</span>
-            <div className="md-common-icon">
-              <img src="SVG/d-client.svg" alt="total clients" />
+          {/* Total Clients */}
+          <Link to="/client/dashboard" className="md-common-total-card">
+            <div className="md-common-para-icon md-para-icon-client">
+              <span>Total Clients</span>
+              <div className="md-common-icon">
+                <img src="SVG/d-client.svg" alt="total clients" />
+              </div>
             </div>
-          </div>
-          <div className="md-total-project-number">
-            <span className="md-total-card-number">{summary.totalClients}</span>
-            <span className="md-total-card-text">Clients</span>
-          </div>
-          {/* <div className="mt-8">
+            <div className="md-total-project-number">
+              <span className="md-total-card-number">
+                {summary.totalClients}
+              </span>
+              <span className="md-total-card-text">Clients</span>
+            </div>
+            {/* <div className="mt-8">
             <div className="md-up-arrow-grenn">
               <img src="SVG/up-arrow-green.svg" alt="up arrow green" />
               <div>
@@ -109,78 +125,114 @@ const DashboardSummaryCards = () => {
               </div>
             </div>
           </div> */}
-          {/* <div className="md-progress_container">
+            {/* <div className="md-progress_container">
             <div
               className="md-progress_fill md-progress_fill-color-clients"
               ref={clientRef}
             ></div>
           </div> */}
-        </Link>
+          </Link>
 
-        {/* Tasks */}
-        <Link to="/subtasks" className="md-common-total-card">
-          <div className="md-common-para-icon md-para-icon-tasks">
-            <span>Subtasks</span>
-            <div className="md-common-icon">
-              <img src="SVG/true-green.svg" alt="total tasks" />
+          {/* Tasks */}
+          <Link to="/subtasks" className="md-common-total-card">
+            <div className="md-common-para-icon md-para-icon-tasks">
+              <span>Subtasks</span>
+              <div className="md-common-icon">
+                <img src="SVG/true-green.svg" alt="total tasks" />
+              </div>
+            </div>
+            <div className="md-total-project-number">
+              <span className="md-total-card-number">{summary.totalTasks}</span>
+              <span className="md-total-card-text">Total</span>
+            </div>
+            <div className="mt-8 md-btn-cio">
+              {summary.tasksByStage &&
+                Object.entries(summary.tasksByStage).map(([stage, count]) => (
+                  <div
+                    key={stage}
+                    className={`${
+                      stage === "CAD Design"
+                        ? "badge bg-primary"
+                        : stage === "SET Design"
+                        ? "badge bg-warning"
+                        : stage === "Delivery"
+                        ? "badge bg-success"
+                        : stage === "Render"
+                        ? "badge bg-info"
+                        : ""
+                    } `}
+                  >
+                    {count} {stage}
+                  </div>
+                ))}
+            </div>
+          </Link>
+
+          <div className="md-common-total-card">
+            <div className="md-common-para-icon md-para-icon-tasks">
+              <span>Department Capacity</span>
+              <div>
+                <img src="SVG/icon-4.svg" alt="total tasks" />
+              </div>
+            </div>
+            <div className="mb-4 flex items-center gap-2">
+              <span htmlFor="capacityFilter"></span>
+              <select
+                id="capacityFilter"
+                value={capacityView}
+                onChange={(e) => setCapacityView(e.target.value)}
+                className="form-select"
+              >
+                <option value="daily">Daily</option>
+                <option value="monthlyWithSundays">
+                  Monthly (with Sundays)
+                </option>
+                <option value="monthlyWithoutSundays">
+                  Monthly (without Sundays)
+                </option>
+              </select>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {departmentCapacities &&
+                Object.entries(departmentCapacities.departmentCapacities).map(
+                  ([dept, data]) => {
+                    const value =
+                      capacityView === "daily"
+                        ? data.totalDailyCapacity
+                        : capacityView === "monthlyWithSundays"
+                        ? data.totalMonthlyCapacityWithSundays
+                        : data.totalMonthlyCapacityWithoutSundays;
+
+                    return (
+                      <div
+                        key={dept}
+                        className="p-2 rounded-xl shadow-md bg-white"
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="font-semibold text-lg capitalize">
+                            <span className="fw-bold"> {dept} </span> ~{value}{" "}
+                            Units -{" "}
+                            {capacityView === "daily"
+                              ? "per day"
+                              : `per month (${
+                                  capacityView.includes("Without")
+                                    ? "excl."
+                                    : "incl."
+                                } Sundays)`}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+                )}
             </div>
           </div>
-          <div className="md-total-project-number">
-            <span className="md-total-card-number">{summary.totalTasks}</span>
-            <span className="md-total-card-text">Total</span>
-          </div>
-          <div className="mt-8 md-btn-cio">
-            {summary.tasksByStage &&
-              Object.entries(summary.tasksByStage).map(([stage, count]) => (
-                <div
-                  key={stage}
-                  className={`${
-                    stage === "CAD Design"
-                      ? "badge bg-primary"
-                      : stage === "SET Design"
-                      ? "badge bg-warning"
-                      : stage === "Delivery"
-                      ? "badge bg-success"
-                      : stage === "Render"
-                      ? "badge bg-info"
-                      : ""
-                  } `}
-                >
-                  {count} {stage}
-                </div>
-              ))}
-          </div>
-        </Link>
-
-        {/* Team Members */}
-        <Link to="/employee/dashboard" className="md-common-total-card">
-          <div className="md-common-para-icon md-para-icon-team">
-            <span>Team Members</span>
-            <div className="md-common-icon">
-              <img src="SVG/team-yellow.svg" alt="team members" />
-            </div>
-          </div>
-          <div className="md-total-project-number">
-            <span className="md-total-card-number">
-              {summary.totalEmployees}
-            </span>
-            <span className="md-total-card-text">Members</span>
-          </div>
-          {/* <div className="md-ongoing-completed mt-8">
-            <span>Active Today: </span>
-            <span>8</span>
-            <span>/</span>
-            <span>{summary.totalEmployees}</span>
-          </div> */}
-          {/* <div className="md-progress_container">
-            <div
-              className="md-progress_fill md-progress_fill-color-team"
-              ref={teamRef}
-            ></div>
-          </div> */}
-        </Link>
-      </div>
-    </section>
+        </div>
+      </section>
+      <section className="md-total-card-main mt-6">
+        <h3 className="text-xl font-semibold mb-2"></h3>
+      </section>
+    </>
   );
 };
 

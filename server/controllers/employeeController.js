@@ -17,6 +17,7 @@ export const addEmployee = async (req, res) => {
       home_address,
       dob,
       emergency_contact,
+      capacity,
       department,
       date_of_joining,
       monthly_salary,
@@ -47,6 +48,7 @@ export const addEmployee = async (req, res) => {
       home_address,
       dob,
       emergency_contact,
+      capacity,
       department,
       date_of_joining,
       monthly_salary,
@@ -162,6 +164,7 @@ export const editEmployee = async (req, res) => {
       home_address,
       dob,
       emergency_contact,
+      capacity,
       department,
       date_of_joining,
       monthly_salary,
@@ -200,6 +203,7 @@ export const editEmployee = async (req, res) => {
     employee.dob = dob || employee.dob;
     employee.emergency_contact =
       emergency_contact || employee.emergency_contact;
+    employee.capacity = capacity || employee.capacity;
     employee.department = department || employee.department;
     employee.date_of_joining = date_of_joining || employee.date_of_joining;
     employee.monthly_salary = monthly_salary || employee.monthly_salary;

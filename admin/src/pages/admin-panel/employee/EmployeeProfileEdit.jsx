@@ -39,6 +39,7 @@ const EmployeeProfileEdit = () => {
     date_of_joining: "",
     monthly_salary: "",
     emergency_contact: "",
+    capacity: "",
     is_manager: false,
   });
 
@@ -99,6 +100,7 @@ const EmployeeProfileEdit = () => {
             : "",
           monthly_salary: data.monthly_salary || "",
           emergency_contact: data.emergency_contact || "",
+          capacity: data.capacity || "",
           is_manager: data.is_manager || false,
         });
         setProfilePreview(data.profile_pic || null);
@@ -361,6 +363,7 @@ const EmployeeProfileEdit = () => {
                   "home_address",
                   "dob",
                   "emergency_contact",
+                  "capacity",
                   "username",
                 ].map((field) => (
                   <div className="profile-edit-inner" key={field}>
@@ -379,37 +382,36 @@ const EmployeeProfileEdit = () => {
                   </div>
                 ))}
                 <div className="profile-edit-inner">
-                  <div className="profile-edit-detail" style={{ position: "relative" }}>
-                    <Field
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      className="form-control"
-                      placeholder="Enter password"
-                    />
+                  <div className="profile-edit-detail">
+                    <span>Password</span>
+                    <div style={{ position: "relative" }}>
+                      <Field
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        className="form-control"
+                        placeholder="Enter password"
+                      />
 
-                    <span
-                      onClick={() => setShowPassword(!showPassword)}
-                      style={{
-                        position: "absolute",
-                        right: "10px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        cursor: "pointer",
-                      }}
-                    >
-                      {showPassword ? (
-                        <FaEyeSlash />
-                      ) : (
-                        <FaEye />
-                      )}
-                    </span>
+                      <span
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{
+                          position: "absolute",
+                          right: "10px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </span>
+                    </div>
                   </div>
-                    <ErrorMessage
-                      name="password"
-                      component="div"
-                      className="error"
-                      style={{ width: "494px" }}
-                    />
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="error"
+                    style={{ width: "494px" }}
+                  />
                 </div>
               </div>
 

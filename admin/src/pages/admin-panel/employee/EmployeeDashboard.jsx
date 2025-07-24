@@ -2,12 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
-const dropdownData = {
-  departments: ["All", "HR", "Development", "Design", "Sales"], // customize to match your real departments
-  roles: ["All", "Manager", "Developer", "Designer", "HR"], // customize roles
-  statuses: ["All", "active", "on-leave", "blocked"],
-};
-
 // Reusable Dropdown Component
 const Dropdown = ({ label, options, selected, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -71,6 +65,14 @@ const EmployeeDashboard = () => {
     departments: 0,
   });
 
+  const [designations, setDesignations] = useState([]);
+
+  const dropdownData = {
+    departments: ["HR", "Development", "Design", "Sales"], // customize to match your real departments
+    designations: designations.map((d) => d.name),
+    statuses: ["Active", "Inactive", "Blocked"],
+  };
+
   useEffect(() => {
     const fetchEmployees = async () => {
       setLoading(true);
@@ -95,7 +97,18 @@ const EmployeeDashboard = () => {
         setLoading(false);
       }
     };
+    const fetchDesignations = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/designation/get-all`
+        );
+        setDesignations(res.data.designations);
+      } catch (err) {
+        console.error("Failed to fetch designations:", err);
+      }
+    };
     fetchEmployees();
+    fetchDesignations();
   }, []);
 
   // Apply filters when filters change
@@ -198,9 +211,9 @@ const EmployeeDashboard = () => {
               }
             />
             <Dropdown
-              label="All Roles"
-              options={dropdownData.roles}
-              selected={filters.role || "All Roles"}
+              label="All Designation"
+              options={dropdownData.designations}
+              selected={filters.role || "All Designations"}
               onChange={(val) => setFilters((prev) => ({ ...prev, role: val }))}
             />
             <Dropdown
