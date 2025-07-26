@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import LoadingOverlay from "../components/admin/LoadingOverlay";
+import LoadingOverlay from "./LoadingOverlay";
 
 const UpcomingDueDates = () => {
   const [loading, setLoading] = useState(false);

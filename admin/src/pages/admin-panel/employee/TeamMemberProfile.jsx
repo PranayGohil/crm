@@ -223,9 +223,9 @@ const TeamMemberProfile = () => {
               </div>
               <div className="time-tracker">
                 <img src="/SVG/time.svg" alt="time" />
-                {/* <Link to={`/employee/timetracking/${employee._id}`}>
+                <Link to={`/employee/timetracking/${employee._id}`}>
                   View Time Tracking
-                </Link> */}
+                </Link>
               </div>
             </div>
           </div>

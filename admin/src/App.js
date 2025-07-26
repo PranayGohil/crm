@@ -13,22 +13,21 @@ import ClientDashboardPage from "./pages/admin-panel/client/ClientDashboardPage"
 import CreateNewClient from "./pages/admin-panel/client/CreateNewClient";
 import ClientDetailsPage from "./pages/admin-panel/client/ClientDetailsPage";
 import ClientProjectDetails from "./pages/admin-panel/client/ClientProjectDetails";
-import ClientSubtaskShow from "./pages/ClientSubtaskShow";
 
 import ProjectDetails from "./pages/admin-panel/project/ProjectDetails";
 
 import AllProject from "./pages/admin-panel/project/AllProject";
 import AddNewProject from "./pages/admin-panel/project/AddNewProject";
-import SubtaskManagement from "./pages/SubtaskManagement";
 import AddSubtask from "./pages/admin-panel/subtask/AddSubtask";
 import SubtaskDashboardContainer from "./pages/admin-panel/subtask/SubtaskDashboardContainer";
 
 import ProjectContent from "./pages/admin-panel/project/ProjectContent";
-import ProjectMediaGallery from "./components/ProjectMediaGallery";
+import ProjectMediaGallery from "./components/admin/ProjectMediaGallery";
 
 import EmployeeDashboard from "./pages/admin-panel/employee/EmployeeDashboard";
 import EmployeeProfileEdit from "./pages/admin-panel/employee/EmployeeProfileEdit";
 import TeamMemberProfile from "./pages/admin-panel/employee/TeamMemberProfile";
+import EmployeeTimeTracking from "./pages/admin-panel/employee/EmployeeTimeTracking";
 import Subtasks from "./pages/admin-panel/subtask/Subtasks";
 import NotificationAdmin from "./pages/admin-panel/NotificationAdmin";
 
@@ -40,11 +39,11 @@ import CreateEmployeeProfile from "./pages/admin-panel/employee/CreateEmployeePr
 
 import TimeTrackingDashboard from "./pages/admin-panel/TimeTrackingDashboard";
 
-import LoginPage from "./pages/LoginPage";
+import LoginPage from "./pages/admin-panel/LoginPage";
 
 import ViewSubtask from "./pages/admin-panel/subtask/ViewSubtask";
 
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 import Designation from "./pages/admin-panel/Designation";
 
@@ -76,14 +75,12 @@ function App() {
             element={<ClientProjectDetails />}
           />
 
-          <Route path="clientsubtaskshow" element={<ClientSubtaskShow />} />
           <Route
             path="/project/details/:projectId"
             element={<ProjectDetails />}
           />
           <Route path="/project/dashboard" element={<AllProject />} />
           <Route path="/project/add" element={<AddNewProject />} />
-          <Route path="subtaskmanagement" element={<SubtaskManagement />} />
           <Route
             path="/project/subtask/add/:projectId"
             element={<AddSubtask />}
@@ -109,6 +106,7 @@ function App() {
             element={<EmployeeProfileEdit />}
           />
           <Route path="/employee/profile/:id" element={<TeamMemberProfile />} />
+          <Route path="/employee/timetracking/:id" element={<EmployeeTimeTracking />} />
           <Route path="/subtasks" element={<Subtasks />} />
           <Route path="/time-tracking" element={<TimeTrackingDashboard />} />
           <Route path="/notifications" element={<NotificationAdmin />} />

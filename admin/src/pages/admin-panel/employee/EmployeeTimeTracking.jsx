@@ -1,5 +1,6 @@
 // EmployeeTimeTracking.jsx
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 
@@ -13,15 +14,7 @@ const EmployeeTimeTracking = () => {
     to: null,
   });
 
-  const [employeeId, setEmployeeId] = useState("");
-
-  useEffect(() => {
-      const storedUser = localStorage.getItem("employeeUser");
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        setEmployeeId(user._id);
-      }
-    }, []);
+  const employeeId = useParams().id;
 
 
   useEffect(() => {

@@ -6,22 +6,20 @@ import * as Yup from "yup";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+const dropdownOptions = ["Active", "Inactive", "Blocked"];
+const departmentOptions = ["SET Design", "CAD Design", "Render"];
+const employmentTypes = ["Full-time", "Part-time"];
 const EmployeeProfileEdit = () => {
   const { employeeId } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const dropdownRef = useRef(null);
+  const dropdownRefs = useRef({});
   const [profilePreview, setProfilePreview] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [managers, setManagers] = useState([]);
   const [designations, setDesignations] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
-
-  const dropdownOptions = ["Active", "Inactive", "Blocked"];
-  const departmentOptions = ["SET Design", "CAD Design", "Render"];
-  const employmentTypes = ["Full-time", "Part-time"];
 
   const [initialValues, setInitialValues] = useState({
     full_name: "",
@@ -34,8 +32,8 @@ const EmployeeProfileEdit = () => {
     department: "",
     designation: "",
     status: "Active",
-    employment_type: "Full-time",
-    reportingManager: "Sarah Johnson (CTO)",
+    employment_type: "Select Employment Type",
+    reportingManager: "Select Manager",
     date_of_joining: "",
     monthly_salary: "",
     emergency_contact: "",
@@ -139,7 +137,7 @@ const EmployeeProfileEdit = () => {
       .catch((err) => console.error("Error fetching designations", err));
   }, []);
 
-  const toggleDropdown = (field, setFieldValue) => {
+  const toggleDropdown = (field) => {
     setOpenDropdown((prev) => (prev === field ? null : field));
   };
 
@@ -156,13 +154,21 @@ const EmployeeProfileEdit = () => {
   };
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+    const handleClickOutside = (event) => {
+      const dropdownElements = Object.values(dropdownRefs.current);
+      const clickedOutside = dropdownElements.every((ref) => {
+        return ref?.contains instanceof Function && !ref.contains(event.target);
+      });
+
+      if (clickedOutside) {
         setOpenDropdown(null);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   if (loading) return <LoadingOverlay />;
@@ -292,7 +298,7 @@ const EmployeeProfileEdit = () => {
                     </div>
 
                     {/* Dropdowns */}
-                    <div className="update-dropdown" ref={dropdownRef}>
+                    <div className="update-dropdown" ref={dropdownRefs}>
                       {["designation", "status"].map((field) => {
                         const options =
                           field === "designation"
@@ -419,7 +425,13 @@ const EmployeeProfileEdit = () => {
               <div className="profile-inner">
                 {["department", "reportingManager", "employment_type"].map(
                   (field) => (
-                    <div key={field} className="profile-edit-inner">
+                    <div
+                      key={field}
+                      className="profile-edit-inner"
+                      ref={(el) => {
+                        if (el) dropdownRefs.current[field] = el;
+                      }}
+                    >
                       <div className="Department emp-detail mail-txt">
                         <p>{field.replace("_", " ").toUpperCase()}</p>
                         <div
@@ -461,6 +473,7 @@ const EmployeeProfileEdit = () => {
                     </div>
                   )
                 )}
+
                 {["date_of_joining", "monthly_salary"].map((field) => (
                   <div key={field} className="profile-edit-detail eng-cnt-txt">
                     <span>{field.replace(/_/g, " ").toUpperCase()}</span>

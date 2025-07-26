@@ -67,7 +67,12 @@ const EmployeeDashboard = () => {
       const res = await axios.get(
         `${process.env.REACT_APP_API_URL}/api/employee/dashboard/${employeeId}`
       );
-      setProjects(res.data.projects || []);
+
+      const filteredProjects = (res.data.projects || []).filter(
+        (project) => project.status !== "Completed"
+      );
+
+      setProjects(filteredProjects);
       setSubtasks(res.data.subtasks || []);
       setTaskStats((prev) => [
         { ...prev[0], value: res.data.subtasks?.length || "0" },
@@ -170,7 +175,6 @@ const EmployeeDashboard = () => {
                 <th>Priority</th>
                 <th>Start Date</th>
                 <th>End Date</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -275,11 +279,6 @@ const EmployeeDashboard = () => {
                         {project.due_date
                           ? dayjs(project.due_date).format("DD/MM/YYYY")
                           : "-"}
-                      </td>
-                      <td className="time-table-icons">
-                        <Link to={`/project/details/${project._id}`}>
-                          <img src="/SVG/eye-view.svg" alt="eye-view button" />
-                        </Link>
                       </td>
                     </tr>
                     <tr

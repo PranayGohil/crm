@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import ProjectCard from "./admin/ProjectCard";
-import LoadingOverlay from "./admin/LoadingOverlay";
+import ProjectCard from "./ProjectCard";
+import LoadingOverlay from "./LoadingOverlay";
 
 const RecentProjects = () => {
   const [projects, setProjects] = useState([]);

@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import LoadingOverlay from "../components/admin/LoadingOverlay";
+import LoadingOverlay from "./LoadingOverlay";
 import { Link } from "react-router-dom";
-import { stageOptions } from "../options";
+import { stageOptions } from "../../options";
 
 const DashboardSummaryCards = () => {
   const [loading, setLoading] = useState(false);
@@ -209,17 +209,10 @@ const DashboardSummaryCards = () => {
                         className="p-2 rounded-xl shadow-md bg-white"
                       >
                         <div className="flex justify-between items-center">
-                          <span className="font-semibold text-lg capitalize">
+                          <small className="font-semibold capitalize">
                             <span className="fw-bold"> {dept} </span> ~{value}{" "}
-                            Units -{" "}
-                            {capacityView === "daily"
-                              ? "per day"
-                              : `this month (${
-                                  capacityView.includes("Without")
-                                    ? "excl."
-                                    : "incl."
-                                } Sundays, from tomorrow)`}
-                          </span>
+                            Units (from Tomorrow)
+                          </small>
                         </div>
                       </div>
                     );

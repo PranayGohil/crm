@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import CreateMemberHeader from "../../../components/CreateMemberHeader";
-import CreateProfileSection from "../../../components/CreateProfileSection";
-import CreatePersonalProfessionalDetails from "../../../components/CreatePersonalProfessionalDetails";
-import CreateLoginSecuritySettings from "../../../components/CreateLoginSecuritySettings";
+import CreateMemberHeader from "../../../components/admin/CreateMemberHeader";
+import CreateProfileSection from "../../../components/admin/CreateProfileSection";
+import CreatePersonalProfessionalDetails from "../../../components/admin/CreatePersonalProfessionalDetails";
+import CreateLoginSecuritySettings from "../../../components/admin/CreateLoginSecuritySettings";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 const CreateEmployeeProfile = () => {
   const navigate = useNavigate();

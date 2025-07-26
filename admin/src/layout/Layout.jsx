@@ -1,5 +1,5 @@
 import React from "react";
-import DashboardMenu from "../components/DashboardMenu";
+import DashboardMenu from "../components/admin/DashboardMenu";
 import HeaderAdmin from "../components/admin/HeaderAdmin";
 import Footer from "../components/admin/Footer";
 import { Outlet } from "react-router-dom"; // For React Router v6+
