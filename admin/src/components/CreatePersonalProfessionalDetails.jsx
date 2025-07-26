@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 // Options
-const departmentOptions = ["Engineering", "Design", "Marketing"];
+const departmentOptions = ["SET Design", "CAD Design", "Render"];
 const employmentTypes = ["Full-time", "Part-time"];
 
 const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {

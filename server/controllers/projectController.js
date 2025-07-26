@@ -46,7 +46,8 @@ export const updateProject = async (req, res) => {
 export const deleteProject = async (req, res) => {
   const { id } = req.params;
   const project = await Project.findByIdAndDelete(id);
-  res.status(200).json(project);
+  const subtasks = await SubTask.deleteMany({ project_id: id });
+  res.status(200).json(project, subtasks);
 };
 
 export const getProjectInfo = async (req, res) => {
@@ -229,6 +230,7 @@ export const bulkDelete = async (req, res) => {
   const { ids } = req.body;
   try {
     await Project.deleteMany({ _id: { $in: ids } });
+    await SubTask.deleteMany({ project_id: { $in: ids } }); 
     res.json({ success: true });
   } catch (e) {
     console.error(e);

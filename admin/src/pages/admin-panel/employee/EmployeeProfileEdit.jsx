@@ -20,7 +20,7 @@ const EmployeeProfileEdit = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const dropdownOptions = ["Active", "Inactive", "Blocked"];
-  const departmentOptions = ["Engineering", "Design", "Marketing"];
+  const departmentOptions = ["SET Design", "CAD Design", "Render"];
   const employmentTypes = ["Full-time", "Part-time"];
 
   const [initialValues, setInitialValues] = useState({

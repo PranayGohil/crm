@@ -185,10 +185,10 @@ const DashboardSummaryCards = () => {
               >
                 <option value="daily">Daily</option>
                 <option value="monthlyWithSundays">
-                  Monthly (with Sundays)
+                  Remaining Month (incl. Sundays)
                 </option>
                 <option value="monthlyWithoutSundays">
-                  Monthly (without Sundays)
+                  Remaining Month (excl. Sundays)
                 </option>
               </select>
             </div>
@@ -200,8 +200,8 @@ const DashboardSummaryCards = () => {
                       capacityView === "daily"
                         ? data.totalDailyCapacity
                         : capacityView === "monthlyWithSundays"
-                        ? data.totalMonthlyCapacityWithSundays
-                        : data.totalMonthlyCapacityWithoutSundays;
+                        ? data.totalRemainingMonthlyCapacityWithSundays
+                        : data.totalRemainingMonthlyCapacityWithoutSundays;
 
                     return (
                       <div
@@ -214,11 +214,11 @@ const DashboardSummaryCards = () => {
                             Units -{" "}
                             {capacityView === "daily"
                               ? "per day"
-                              : `per month (${
+                              : `this month (${
                                   capacityView.includes("Without")
                                     ? "excl."
                                     : "incl."
-                                } Sundays)`}
+                                } Sundays, from tomorrow)`}
                           </span>
                         </div>
                       </div>

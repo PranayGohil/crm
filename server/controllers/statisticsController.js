@@ -86,42 +86,58 @@ export const getDepartmentCapacities = async (req, res) => {
   try {
     const now = new Date();
     const year = now.getFullYear();
-    const month = now.getMonth(); // 0-indexed (July = 6)
+    const month = now.getMonth(); // 0-indexed
+    const today = now.getDate();
 
     const daysInMonth = getDaysInMonth(year, month);
-    const sundays = countSundays(year, month);
-    const workingDays = daysInMonth - sundays;
+    const remainingDays = [];
 
-    // Fetch all employees
+    // 👉 Build array of remaining dates from tomorrow to end of month
+    for (let d = today + 1; d <= daysInMonth; d++) {
+      remainingDays.push(new Date(year, month, d));
+    }
+
+    const remainingSundays = remainingDays.filter(
+      (date) => date.getDay() === 0 // Sunday = 0
+    ).length;
+
+    const remainingWorkingDays = remainingDays.length - remainingSundays;
+
     const employees = await Employee.find();
+    const allowedDepartments = ["SET Design", "CAD Design", "Render"];
 
-    // Group by department
     const departmentData = {};
 
     employees.forEach((emp) => {
       const dept = emp.department || "Unknown";
+      if (!allowedDepartments.includes(dept)) return;
+
       if (!departmentData[dept]) {
         departmentData[dept] = {
           totalDailyCapacity: 0,
-          totalMonthlyCapacityWithSundays: 0,
-          totalMonthlyCapacityWithoutSundays: 0,
+          totalRemainingMonthlyCapacityWithSundays: 0,
+          totalRemainingMonthlyCapacityWithoutSundays: 0,
         };
       }
 
       const cap = emp.capacity || 0;
 
       departmentData[dept].totalDailyCapacity += cap;
-      departmentData[dept].totalMonthlyCapacityWithSundays += cap * daysInMonth;
-      departmentData[dept].totalMonthlyCapacityWithoutSundays +=
-        cap * workingDays;
+      departmentData[dept].totalRemainingMonthlyCapacityWithSundays +=
+        cap * remainingDays.length;
+
+      departmentData[dept].totalRemainingMonthlyCapacityWithoutSundays +=
+        cap * remainingWorkingDays;
     });
 
     res.status(200).json({
       month: now.toLocaleString("default", { month: "long" }),
       year,
       daysInMonth,
-      sundays,
-      workingDays,
+      today,
+      remainingDays: remainingDays.length,
+      remainingSundays,
+      remainingWorkingDays,
       departmentCapacities: departmentData,
     });
   } catch (error) {
