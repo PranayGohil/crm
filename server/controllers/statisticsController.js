@@ -1,3 +1,12 @@
+import {
+  getDaysInMonth,
+  startOfTomorrow,
+  eachDayOfInterval,
+  isSunday,
+  addDays,
+  isSameDay,
+} from "date-fns";
+
 import Client from "../models/clientModel.js";
 import Employee from "../models/employeeModel.js";
 import Project from "../models/projectModel.js";
@@ -14,11 +23,6 @@ const countSundays = (year, month) => {
     date.setDate(date.getDate() + 1);
   }
   return sundays;
-};
-
-// Get number of days in a month
-const getDaysInMonth = (year, month) => {
-  return new Date(year, month + 1, 0).getDate();
 };
 
 export const Summary = async (req, res) => {
@@ -104,21 +108,26 @@ export const getDepartmentCapacities = async (req, res) => {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth(); // 0-indexed
-    const today = now.getDate();
 
-    const daysInMonth = getDaysInMonth(year, month);
-    const remainingDays = [];
+    const totalDaysInMonth = getDaysInMonth(new Date(year, month));
+    const startDate = startOfTomorrow();
+    const endDate = new Date(year, month, totalDaysInMonth);
 
-    // 👉 Build array of remaining dates from tomorrow to end of month
-    for (let d = today + 1; d <= daysInMonth; d++) {
-      remainingDays.push(new Date(year, month, d));
-    }
+    const allDaysInMonth = eachDayOfInterval({
+      start: startDate,
+      end: endDate,
+    });
 
-    const remainingSundays = remainingDays.filter(
-      (date) => date.getDay() === 0 // Sunday = 0
-    ).length;
+    const customHolidays = [
+      new Date(2025, 6, 29), // July 29
+      new Date(2025, 7, 15), // August 15
+    ];
 
-    const remainingWorkingDays = remainingDays.length - remainingSundays;
+    const isHoliday = (date) =>
+      isSunday(date) ||
+      customHolidays.some((holiday) => isSameDay(date, holiday));
+
+    const workingDays = allDaysInMonth.filter((date) => !isHoliday(date));
 
     const employees = await Employee.find();
     const allowedDepartments = ["SET Design", "CAD Design", "Render"];
@@ -135,20 +144,20 @@ export const getDepartmentCapacities = async (req, res) => {
           totalRemainingMonthlyCapacityWithSundays: 0,
           totalRemainingMonthlyCapacityWithoutSundays: 0,
           estimatedDaysToComplete: 0,
+          estimatedDaysToCompleteWithoutSundays: 0,
+          estimatedCompletionDate: null,
         };
       }
 
       const cap = emp.capacity || 0;
-
       departmentData[dept].totalDailyCapacity += cap;
       departmentData[dept].totalRemainingMonthlyCapacityWithSundays +=
-        cap * remainingDays.length;
-
+        cap * allDaysInMonth.length;
       departmentData[dept].totalRemainingMonthlyCapacityWithoutSundays +=
-        cap * remainingWorkingDays;
+        cap * workingDays.length;
     });
 
-    // Count tasks by each stage
+    // Task stage logic
     const stageCounts = {
       "CAD Design": await SubTask.countDocuments({ stage: "CAD Design" }),
       "SET Design":
@@ -160,24 +169,73 @@ export const getDepartmentCapacities = async (req, res) => {
         (await SubTask.countDocuments({ stage: "Render" })),
     };
 
-    // Calculate estimated days to complete
-    Object.entries(stageCounts).forEach(([stage, totalTasks]) => {
-      if (departmentData[stage]) {
-        const cap = departmentData[stage].totalDailyCapacity;
-        departmentData[stage].estimatedDaysToComplete = cap
-          ? Math.ceil(totalTasks / cap)
-          : null;
+    // Loop over departments and simulate task completion
+    for (const [stage, totalTasks] of Object.entries(stageCounts)) {
+      const dept = departmentData[stage];
+      if (!dept) continue;
+
+      const dailyCap = dept.totalDailyCapacity;
+      if (!dailyCap || totalTasks === 0) continue;
+
+      // === Estimated Calendar Days ===
+      let calendarRemainingTasks = totalTasks;
+      let calendarDaysNeeded = 0;
+      let calendarDate = startDate;
+
+      while (calendarRemainingTasks > 0) {
+        calendarRemainingTasks -= dailyCap;
+        calendarDaysNeeded++;
+        calendarDate = addDays(calendarDate, 1);
       }
-    });
+
+      dept.estimatedDaysToComplete = calendarDaysNeeded;
+
+      // === Simulate Working Day-Based Completion ===
+      let remainingTasks = totalTasks;
+      let workingDaysNeeded = 0;
+      let currentDate = startDate;
+
+      while (remainingTasks > 0) {
+        if (!isHoliday(currentDate)) {
+          remainingTasks -= dailyCap;
+          workingDaysNeeded++;
+        }
+        currentDate = addDays(currentDate, 1);
+      }
+
+      dept.estimatedDaysToCompleteWithoutSundays = workingDaysNeeded;
+      // Function to add working days to a date
+      const addWorkingDays = (date, numberOfDays) => {
+        let result = new Date(date);
+        let addedDays = 0;
+
+        while (addedDays < numberOfDays) {
+          result = addDays(result, 1);
+          if (!isHoliday(result)) {
+            addedDays++;
+          }
+        }
+
+        return result;
+      };
+
+      // Replace the wrong line with correct working-day based date
+      dept.estimatedCompletionDate = addWorkingDays(
+        startDate,
+        workingDaysNeeded
+      );
+    }
+
+    console.log("Department Data:", departmentData);
 
     res.status(200).json({
       month: now.toLocaleString("default", { month: "long" }),
       year,
-      daysInMonth,
-      today,
-      remainingDays: remainingDays.length,
-      remainingSundays,
-      remainingWorkingDays,
+      today: now.getDate(),
+      daysInMonth: totalDaysInMonth,
+      remainingDays: allDaysInMonth.length,
+      totalHolidays: allDaysInMonth.filter(isHoliday).length,
+      remainingWorkingDays: workingDays.length,
       departmentCapacities: departmentData,
     });
   } catch (error) {

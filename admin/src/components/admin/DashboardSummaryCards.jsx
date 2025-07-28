@@ -16,6 +16,9 @@ const DashboardSummaryCards = () => {
   const taskInProgressRef = useRef(null);
   const taskOverdueRef = useRef(null);
 
+  const [capacityMode, setCapacityMode] = useState("employee"); // 'employee' or 'time'
+  const [viewOption, setViewOption] = useState("daily"); // Changes based on capacityMode
+
   useEffect(() => {
     setLoading(true);
     axios
@@ -173,50 +176,149 @@ const DashboardSummaryCards = () => {
                 <img src="SVG/icon-4.svg" alt="total tasks" />
               </div>
             </div>
-            <div className="mb-4 flex items-center gap-2">
-              <span htmlFor="capacityFilter"></span>
-              <select
-                id="capacityFilter"
-                value={capacityView}
-                onChange={(e) => setCapacityView(e.target.value)}
-                className="form-select"
-              >
-                <option value="daily">Daily</option>
-                <option value="monthlyWithSundays">
-                  Remaining Month (incl. Sundays)
-                </option>
-                <option value="monthlyWithoutSundays">
-                  Remaining Month (excl. Sundays)
-                </option>
-              </select>
+            <div className="mb-4">
+              {/* Primary toggle */}
+              <div className="flex gap-2 mb-2">
+                <button
+                  className={`btn btn-sm ${
+                    capacityMode === "time"
+                      ? "btn-primary"
+                      : "btn-outline-primary"
+                  }`}
+                  onClick={() => {
+                    setCapacityMode("time");
+                    setViewOption("withSundays");
+                  }}
+                >
+                  Time to Complete Tasks
+                </button>
+                <button
+                  className={`btn btn-sm ${
+                    capacityMode === "employee"
+                      ? "btn-primary"
+                      : "btn-outline-primary"
+                  }`}
+                  onClick={() => {
+                    setCapacityMode("employee");
+                    setViewOption("daily");
+                  }}
+                >
+                  Employee Capacity
+                </button>
+              </div>
+
+              {/* Secondary toggle based on mode */}
+              <div className="flex gap-2">
+                {capacityMode === "time" ? (
+                  <>
+                    <button
+                      className={`btn btn-sm ${
+                        viewOption === "withSundays"
+                          ? "btn-success"
+                          : "btn-outline-success"
+                      }`}
+                      onClick={() => setViewOption("withSundays")}
+                    >
+                      With Sundays
+                    </button>
+                    <button
+                      className={`btn btn-sm ${
+                        viewOption === "withoutSundays"
+                          ? "btn-success"
+                          : "btn-outline-success"
+                      }`}
+                      onClick={() => setViewOption("withoutSundays")}
+                    >
+                      Without Sundays
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      className={`btn btn-sm ${
+                        viewOption === "daily"
+                          ? "btn-success"
+                          : "btn-outline-success"
+                      }`}
+                      onClick={() => setViewOption("daily")}
+                    >
+                      Daily
+                    </button>
+                    <button
+                      className={`btn btn-sm ${
+                        viewOption === "monthlyWithSundays"
+                          ? "btn-success"
+                          : "btn-outline-success"
+                      }`}
+                      onClick={() => setViewOption("monthlyWithSundays")}
+                    >
+                      Monthly (With Sundays)
+                    </button>
+                    <button
+                      className={`btn btn-sm ${
+                        viewOption === "monthlyWithoutSundays"
+                          ? "btn-success"
+                          : "btn-outline-success"
+                      }`}
+                      onClick={() => setViewOption("monthlyWithoutSundays")}
+                    >
+                      Monthly (Without Sundays)
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {departmentCapacities &&
                 Object.entries(departmentCapacities.departmentCapacities).map(
                   ([dept, data]) => {
-                    const value =
-                      capacityView === "daily"
-                        ? data.totalDailyCapacity
-                        : capacityView === "monthlyWithSundays"
-                        ? data.totalRemainingMonthlyCapacityWithSundays
-                        : data.totalRemainingMonthlyCapacityWithoutSundays;
+                    let value = null;
+                    let label = "";
+
+                    if (capacityMode === "employee") {
+                      if (viewOption === "daily") {
+                        value = data.totalDailyCapacity;
+                        label = "Units / day";
+                      } else if (viewOption === "monthlyWithSundays") {
+                        value = data.totalRemainingMonthlyCapacityWithSundays;
+                        label = "Units this month (incl. Sundays)";
+                      } else {
+                        value =
+                          data.totalRemainingMonthlyCapacityWithoutSundays;
+                        label = "Units this month (excl. Sundays)";
+                      }
+                    } else {
+                      const days =
+                        viewOption === "withSundays"
+                          ? data.estimatedDaysToComplete
+                          : data.estimatedDaysToCompleteWithoutSundays; // You could implement an "estimatedDaysToCompleteWithoutSundays" if needed
+
+                      value = days;
+                      label =
+                        days !== null
+                          ? `~${days} ${
+                              viewOption === "withSundays"
+                                ? "calendar"
+                                : "working"
+                            } days to complete tasks`
+                          : "Insufficient capacity";
+                    }
 
                     return (
                       <div
                         key={dept}
                         className="p-2 rounded-xl shadow-md bg-white"
                       >
-                        {/* <div className="flex justify-between items-center">
+                        <div className="flex flex-col justify-between items-start">
                           <small className="font-semibold capitalize">
-                            <span className="fw-bold"> {dept} </span> ~{value}{" "}
-                            Units (from Tomorrow)
+                            <span className="fw-bold"> {dept} </span>
                           </small>
-                        </div> */}
-                        {data.estimatedDaysToComplete !== null && (
-                          <small className="text-sm text-gray-500">
-                            ~{data.estimatedDaysToComplete} days to complete
+                          <small className="text-sm text-gray-700">
+                            {label}:{" "}
+                            <strong>{value !== null ? value : "N/A"}</strong>
                           </small>
-                        )}
+                        </div>
                       </div>
                     );
                   }

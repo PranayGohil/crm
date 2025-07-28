@@ -21,7 +21,6 @@ const EditSubtask = () => {
     task_name: Yup.string().required("Subtask name is required"),
     stage: Yup.string().required("Stage is required"),
     priority: Yup.string().required("Priority is required"),
-    assign_to: Yup.string().required("Assign To is required"),
     assign_date: Yup.string().required("Start date is required"),
     due_date: Yup.string().required("Due date is required"),
   });

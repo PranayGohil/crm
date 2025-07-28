@@ -23,7 +23,6 @@ const AddSubtask = () => {
     stage: Yup.string().required("Stage is required"),
     priority: Yup.string().required("Priority is required"),
     assign_to: Yup.string().required("Assign To is required"),
-    assign_date: Yup.string().required("Start date is required"),
     due_date: Yup.string().required("Due date is required"),
   });
 
@@ -35,7 +34,6 @@ const AddSubtask = () => {
       .moreThan(Yup.ref("bulkStart"), "End must be greater than start"),
     bulkStage: Yup.string().required("Stage is required"),
     bulkPriority: Yup.string().required("Priority is required"),
-    bulkAssignTo: Yup.string().required("Assign To is required"),
     bulkAssignDate: Yup.string().required("Start date is required"),
     bulkDueDate: Yup.string().required("Due date is required"),
   });
