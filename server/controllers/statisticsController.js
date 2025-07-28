@@ -29,18 +29,35 @@ export const Summary = async (req, res) => {
 
     const totalTasks = await SubTask.countDocuments();
 
-    // Count subtasks by stage
-    const tasksByStage = {};
-    for (const stage of stageOptions) {
-      tasksByStage[stage] = await SubTask.countDocuments({ stage });
+    // Only focus on the 3 main stages
+    const stages = ["CAD Design", "SET Design", "Render"];
+
+    // Count tasks by each stage
+    const stageCounts = {};
+    for (const stage of stages) {
+      stageCounts[stage] = await SubTask.countDocuments({ stage });
     }
+
+    // Cumulative logic for remaining tasks
+    const tasksByStage = {
+      "CAD Design": stageCounts["CAD Design"],
+
+      "SET Design": stageCounts["CAD Design"] + stageCounts["SET Design"],
+
+      Render:
+        stageCounts["CAD Design"] +
+        stageCounts["SET Design"] +
+        stageCounts["Render"],
+    };
+
+    console.log("Tasks by stage:", tasksByStage);
 
     res.json({
       totalProjects,
       totalClients,
       totalEmployees,
       totalTasks,
-      tasksByStage, // { "CAD Design": 3, "SET Design": 7, ... }
+      tasksByStage, // cumulative remaining tasks by stage
     });
   } catch (error) {
     console.error("Summary fetch error:", error);
@@ -117,6 +134,7 @@ export const getDepartmentCapacities = async (req, res) => {
           totalDailyCapacity: 0,
           totalRemainingMonthlyCapacityWithSundays: 0,
           totalRemainingMonthlyCapacityWithoutSundays: 0,
+          estimatedDaysToComplete: 0,
         };
       }
 
@@ -128,6 +146,28 @@ export const getDepartmentCapacities = async (req, res) => {
 
       departmentData[dept].totalRemainingMonthlyCapacityWithoutSundays +=
         cap * remainingWorkingDays;
+    });
+
+    // Count tasks by each stage
+    const stageCounts = {
+      "CAD Design": await SubTask.countDocuments({ stage: "CAD Design" }),
+      "SET Design":
+        (await SubTask.countDocuments({ stage: "CAD Design" })) +
+        (await SubTask.countDocuments({ stage: "SET Design" })),
+      Render:
+        (await SubTask.countDocuments({ stage: "CAD Design" })) +
+        (await SubTask.countDocuments({ stage: "SET Design" })) +
+        (await SubTask.countDocuments({ stage: "Render" })),
+    };
+
+    // Calculate estimated days to complete
+    Object.entries(stageCounts).forEach(([stage, totalTasks]) => {
+      if (departmentData[stage]) {
+        const cap = departmentData[stage].totalDailyCapacity;
+        departmentData[stage].estimatedDaysToComplete = cap
+          ? Math.ceil(totalTasks / cap)
+          : null;
+      }
     });
 
     res.status(200).json({

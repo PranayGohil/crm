@@ -154,15 +154,13 @@ const DashboardSummaryCards = () => {
                       stage === "CAD Design"
                         ? "badge bg-primary"
                         : stage === "SET Design"
-                        ? "badge bg-warning"
-                        : stage === "Delivery"
                         ? "badge bg-success"
                         : stage === "Render"
                         ? "badge bg-info"
                         : ""
                     } `}
                   >
-                    {count} {stage}
+                    {count} {stage} Tasks Remaining
                   </div>
                 ))}
             </div>
@@ -208,12 +206,17 @@ const DashboardSummaryCards = () => {
                         key={dept}
                         className="p-2 rounded-xl shadow-md bg-white"
                       >
-                        <div className="flex justify-between items-center">
+                        {/* <div className="flex justify-between items-center">
                           <small className="font-semibold capitalize">
                             <span className="fw-bold"> {dept} </span> ~{value}{" "}
                             Units (from Tomorrow)
                           </small>
-                        </div>
+                        </div> */}
+                        {data.estimatedDaysToComplete !== null && (
+                          <small className="text-sm text-gray-500">
+                            ~{data.estimatedDaysToComplete} days to complete
+                          </small>
+                        )}
                       </div>
                     );
                   }
