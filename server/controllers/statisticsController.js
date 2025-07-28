@@ -1,10 +1,11 @@
 import {
-  getDaysInMonth,
-  startOfTomorrow,
-  eachDayOfInterval,
-  isSunday,
   addDays,
+  eachDayOfInterval,
+  endOfMonth,
+  getDaysInMonth,
   isSameDay,
+  isSunday,
+  startOfTomorrow,
 } from "date-fns";
 
 import Client from "../models/clientModel.js";
@@ -102,7 +103,6 @@ export const RecentProjects = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 export const getDepartmentCapacities = async (req, res) => {
   try {
     const now = new Date();
@@ -118,22 +118,15 @@ export const getDepartmentCapacities = async (req, res) => {
       end: endDate,
     });
 
-    const customHolidays = [
-      new Date(2025, 6, 29), // July 29
-      new Date(2025, 7, 15), // August 15
-    ];
+    const isHoliday = (date) => isSunday(date);
 
-    const isHoliday = (date) =>
-      isSunday(date) ||
-      customHolidays.some((holiday) => isSameDay(date, holiday));
-
-    const workingDays = allDaysInMonth.filter((date) => !isHoliday(date));
+    const workingDaysInMonth = allDaysInMonth.filter((d) => !isHoliday(d));
 
     const employees = await Employee.find();
     const allowedDepartments = ["SET Design", "CAD Design", "Render"];
-
     const departmentData = {};
 
+    // STEP 1: Aggregate department capacities
     employees.forEach((emp) => {
       const dept = emp.department || "Unknown";
       if (!allowedDepartments.includes(dept)) return;
@@ -143,9 +136,8 @@ export const getDepartmentCapacities = async (req, res) => {
           totalDailyCapacity: 0,
           totalRemainingMonthlyCapacityWithSundays: 0,
           totalRemainingMonthlyCapacityWithoutSundays: 0,
-          estimatedDaysToComplete: 0,
-          estimatedDaysToCompleteWithoutSundays: 0,
-          estimatedCompletionDate: null,
+          estimatedCompletionDateWithSundays: null,
+          estimatedCompletionDateWithoutSundays: null,
         };
       }
 
@@ -154,10 +146,10 @@ export const getDepartmentCapacities = async (req, res) => {
       departmentData[dept].totalRemainingMonthlyCapacityWithSundays +=
         cap * allDaysInMonth.length;
       departmentData[dept].totalRemainingMonthlyCapacityWithoutSundays +=
-        cap * workingDays.length;
+        cap * workingDaysInMonth.length;
     });
 
-    // Task stage logic
+    // STEP 2: Count SubTasks by stage
     const stageCounts = {
       "CAD Design": await SubTask.countDocuments({ stage: "CAD Design" }),
       "SET Design":
@@ -169,61 +161,44 @@ export const getDepartmentCapacities = async (req, res) => {
         (await SubTask.countDocuments({ stage: "Render" })),
     };
 
-    // Loop over departments and simulate task completion
+    // STEP 3: Estimate only completion dates (not days count)
     for (const [stage, totalTasks] of Object.entries(stageCounts)) {
       const dept = departmentData[stage];
-      if (!dept) continue;
+      if (!dept || totalTasks === 0 || dept.totalDailyCapacity === 0) continue;
 
       const dailyCap = dept.totalDailyCapacity;
-      if (!dailyCap || totalTasks === 0) continue;
 
-      // === Estimated Calendar Days ===
-      let calendarRemainingTasks = totalTasks;
-      let calendarDaysNeeded = 0;
-      let calendarDate = startDate;
+      // === With Sundays (Calendar Days) ===
+      let remainingCalendarTasks = totalTasks;
+      let calendarDate = new Date(startDate);
 
-      while (calendarRemainingTasks > 0) {
-        calendarRemainingTasks -= dailyCap;
-        calendarDaysNeeded++;
+      while (remainingCalendarTasks > 0) {
+        remainingCalendarTasks -= dailyCap;
         calendarDate = addDays(calendarDate, 1);
       }
 
-      dept.estimatedDaysToComplete = calendarDaysNeeded;
+      dept.estimatedCompletionDateWithSundays = calendarDate;
+      dept.estimatedDaysToComplete = eachDayOfInterval({
+        start: startDate,
+        end: calendarDate,
+      }).length;
 
-      // === Simulate Working Day-Based Completion ===
-      let remainingTasks = totalTasks;
-      let workingDaysNeeded = 0;
-      let currentDate = startDate;
+      // === Without Sundays (Working Days Only) ===
+      let remainingWorkingTasks = totalTasks;
+      let workingDate = new Date(startDate);
 
-      while (remainingTasks > 0) {
-        if (!isHoliday(currentDate)) {
-          remainingTasks -= dailyCap;
-          workingDaysNeeded++;
+      while (remainingWorkingTasks > 0) {
+        if (!isHoliday(workingDate)) {
+          remainingWorkingTasks -= dailyCap;
         }
-        currentDate = addDays(currentDate, 1);
+        workingDate = addDays(workingDate, 1);
       }
 
-      dept.estimatedDaysToCompleteWithoutSundays = workingDaysNeeded;
-      // Function to add working days to a date
-      const addWorkingDays = (date, numberOfDays) => {
-        let result = new Date(date);
-        let addedDays = 0;
-
-        while (addedDays < numberOfDays) {
-          result = addDays(result, 1);
-          if (!isHoliday(result)) {
-            addedDays++;
-          }
-        }
-
-        return result;
-      };
-
-      // Replace the wrong line with correct working-day based date
-      dept.estimatedCompletionDate = addWorkingDays(
-        startDate,
-        workingDaysNeeded
-      );
+      dept.estimatedCompletionDateWithoutSundays = workingDate;
+      dept.estimatedDaysToCompleteWithoutSundays = eachDayOfInterval({
+        start: startDate,
+        end: workingDate,
+      }).length;
     }
 
     console.log("Department Data:", departmentData);
@@ -235,11 +210,16 @@ export const getDepartmentCapacities = async (req, res) => {
       daysInMonth: totalDaysInMonth,
       remainingDays: allDaysInMonth.length,
       totalHolidays: allDaysInMonth.filter(isHoliday).length,
-      remainingWorkingDays: workingDays.length,
+      remainingWorkingDays: workingDaysInMonth.length,
       departmentCapacities: departmentData,
     });
   } catch (error) {
     console.error("Error fetching department capacities:", error);
     res.status(500).json({ message: "Server error" });
   }
+};
+
+export const countWorkingDaysBetween = (start, end) => {
+  const days = eachDayOfInterval({ start, end });
+  return days.filter((d) => !isSunday(d)).length;
 };

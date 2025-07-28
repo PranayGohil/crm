@@ -80,7 +80,7 @@ export const loginClient = async (req, res) => {
     }
 
     // ✅ Compare password
-    const isMatch = false;
+    let isMatch = false;
     if (password === client.password) {
       isMatch = true;
     } else {

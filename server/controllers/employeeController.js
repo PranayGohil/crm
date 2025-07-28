@@ -81,7 +81,7 @@ export const loginEmployee = async (req, res) => {
     }
 
     // Compare password
-    const isMatch = false;
+    let isMatch = false;
     if (password === employee.password) {
       isMatch = true;
     } else {
