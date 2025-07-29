@@ -21,6 +21,7 @@ export const NotificationProvider = ({ children }) => {
   useEffect(() => {
     const fetchNotifications = async () => {
       if (!user) return;
+      console.log("Fetching notifications for user:", user._id);
       try {
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/notification/get-all`,
@@ -33,7 +34,11 @@ export const NotificationProvider = ({ children }) => {
         );
         const all = res.data.notifications || [];
         setNotifications(all);
-        setUnreadCount(all.filter((n) => !n.read).length);
+        if (all.length != unreadCount) {
+          console.log("🔥 Showing notification:", all.length, " - ", unreadCount);
+          toast.info("📢 New notification!");
+          setUnreadCount(all.length);
+        }
       } catch (err) {
         console.error("Failed to fetch notifications:", err);
       }
@@ -45,33 +50,27 @@ export const NotificationProvider = ({ children }) => {
   // Setup socket for real-time
   useEffect(() => {
     if (!user) return;
-
+    console.log("Setting up socket for user:", user._id);
     const newSocket = io(process.env.REACT_APP_API_URL, {
       transports: ["websocket"],
     });
 
     // Register this user so backend knows where to send
-    newSocket.emit("register", {
-      userId: user._id,
-      userRole: user.role,
-    });
+    newSocket.emit("register", user._id);
 
     // Listen for incoming notifications
     newSocket.on("new_notification", (notification) => {
-      // ✅ Only show if notification is meant for this user
-      if (
-        notification.receiver_id === user._id &&
-        notification.receiver_type === user.role
-      ) {
+      console.log("Received notification:", notification);
+      if (notification.receiver_id === user._id) {
         setNotifications((prev) => [notification, ...prev]);
         setUnreadCount((c) => c + 1);
 
         console.log("🔥 Showing notification:", notification);
-        toast.info(
-          notification.title ||
-            notification.description ||
-            "📢 New notification!"
-        );
+        // toast.info(
+        //   notification.title ||
+        //     notification.description ||
+        //     "📢 New notification!"
+        // );
       }
     });
 

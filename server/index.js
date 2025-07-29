@@ -20,7 +20,6 @@ const port = 3001;
 
 // create HTTP server and pass to socket
 const server = http.createServer(app);
-setupSocket(server);
 
 app.use(cors());
 app.use(express.json());
@@ -39,3 +38,4 @@ app.use("/api/designation", designationRouter);
 
 // Start server
 server.listen(port, () => console.log(`App listening on port ${port}!`));
+setupSocket(server);

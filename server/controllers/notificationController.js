@@ -32,11 +32,7 @@ export const addNotification = async (req, res) => {
     // io.emit("new_notification", notification);
     emitToUser(receiver_id, "new_notification", notification);
 
-    io.to(`${notification.receiver_type}_${notification.receiver_id}`).emit(
-      "new_notification",
-      notification
-    );
-
+    emitToUser(notification.receiver_id, "new_notification", notification);
 
     res.json({ success: true, notification });
   } catch (err) {
