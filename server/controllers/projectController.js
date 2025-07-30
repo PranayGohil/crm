@@ -203,6 +203,7 @@ export const getAllProjectsWithTasks = async (req, res) => {
             assign_to: s.assign_to || null,
             assign_date: s.assign_date,
             due_date: s.due_date,
+            time_logs: s.time_logs,
             timeTracked: "-", // add logic if you track time
           })),
         };

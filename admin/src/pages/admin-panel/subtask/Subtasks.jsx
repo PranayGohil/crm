@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { Modal, Button } from "react-bootstrap";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import { stageOptions, priorityOptions, statusOptions } from "../../../options";
+
+dayjs.extend(duration);
 
 const Subtasks = () => {
   const [loading, setLoading] = useState(true);
@@ -10,6 +16,15 @@ const Subtasks = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [clients, setClients] = useState([]);
   const [employees, setEmployees] = useState([]);
+
+  const [selectedTaskIds, setSelectedTaskIds] = useState([]);
+  const [bulkAssignTo, setBulkAssignTo] = useState("");
+  const [bulkPriority, setBulkPriority] = useState("");
+  const [bulkStage, setBulkStage] = useState("");
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+
   const [headerDropdownOpen, setHeaderDropdownOpen] = useState(null);
 
   const [summary, setSummary] = useState(null);
@@ -19,6 +34,7 @@ const Subtasks = () => {
     status: "Status",
     priority: "Priority",
     stage: "Stage",
+    employee: "Employee",
   });
 
   const headerRef = useRef(null);
@@ -28,6 +44,7 @@ const Subtasks = () => {
     priority: priorityOptions,
     stage: stageOptions,
   };
+  dropdownData.employee = ["Employee", ...employees.map((e) => e.full_name)];
 
   const fetchAll = async () => {
     try {
@@ -85,7 +102,8 @@ const Subtasks = () => {
       client: "All Client",
       status: "Status",
       priority: "Priority",
-      stage: "Stage", // ✅ added
+      stage: "Stage",
+      employee: "Employee",
     });
   };
 
@@ -121,13 +139,25 @@ const Subtasks = () => {
         (s) => s.stage?.toLowerCase() === filters.stage.toLowerCase()
       );
 
+    const matchEmployee =
+      filters.employee === "Employee" ||
+      p.subtasks?.some((s) => {
+        const assignedEmp = employees.find((e) => e._id === s.assign_to);
+        return assignedEmp?.full_name === filters.employee;
+      });
+
     const matchSearch =
       p.project_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.status?.toLowerCase().includes(searchTerm.toLowerCase());
 
     return (
-      matchClient && matchStatus && matchPriority && matchStage && matchSearch
+      matchClient &&
+      matchStatus &&
+      matchPriority &&
+      matchStage &&
+      matchEmployee &&
+      matchSearch
     );
   });
 
@@ -139,6 +169,76 @@ const Subtasks = () => {
     const diffTime = due - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays >= 0 ? `${diffDays} days` : "Overdue";
+  };
+
+  const handleBulkUpdateAll = async () => {
+    if (selectedTaskIds.length === 0) return;
+
+    const update = {};
+    if (bulkAssignTo) update.assign_to = bulkAssignTo;
+    if (bulkPriority) update.priority = bulkPriority;
+    if (bulkStage) update.stage = bulkStage;
+
+    if (Object.keys(update).length === 0) {
+      toast.info("No changes selected.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/subtask/bulk-update`,
+        {
+          ids: selectedTaskIds,
+          update,
+        }
+      );
+      toast.success("Changes applied!");
+      setBulkAssignTo("");
+      setBulkPriority("");
+      setBulkStage("");
+      setSelectedTaskIds([]);
+      fetchAll(); // re-fetch data
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to apply changes.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBulkConfirmDelete = async () => {
+    if (selectedTaskIds.length === 0) return;
+    setLoading(true);
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/subtask/bulk-delete`,
+        { ids: selectedTaskIds }
+      );
+      toast.success("Deleted!");
+      fetchAll();
+      setSelectedTaskIds([]);
+      setShowBulkDeleteModal(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Delete failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateTimeTracked = (timeLogs = []) => {
+    console.log("Calculating time tracked for logs:", timeLogs);
+    let totalMs = 0;
+    timeLogs.forEach((log) => {
+      const start = dayjs(log.start_time);
+      const end = log.end_time ? dayjs(log.end_time) : dayjs();
+      totalMs += end.diff(start);
+    });
+
+    const dur = dayjs.duration(totalMs);
+    console.log("oooooooooooooooooooooooooo", { dur });
+    return `${dur.hours()}h ${dur.minutes()}m ${dur.seconds()}s`;
   };
 
   return (
@@ -232,7 +332,7 @@ const Subtasks = () => {
                 </ul>
               )}
             </div>
-            {["status", "priority", "stage"].map((key) => (
+            {["status", "priority", "stage", "employee"].map((key) => (
               <div
                 key={key}
                 className={`btn_main ttb-btn ${
@@ -365,6 +465,7 @@ const Subtasks = () => {
                               <th>Priority</th>
                               <th>Status</th>
                               <th>Assigned To</th>
+                              <th>Time Tracked</th>
                               <th>Remaining Time</th>
                               <th>Actions</th>
                             </tr>
@@ -382,16 +483,44 @@ const Subtasks = () => {
                                   s.status?.toLowerCase() ===
                                     filters.status.toLowerCase();
 
-                                return stageMatch && statusMatch;
+                                const employeeMatch =
+                                  filters.employee === "Employee" ||
+                                  employees.find((e) => e._id === s.assign_to)
+                                    ?.full_name === filters.employee;
+
+                                return (
+                                  stageMatch && statusMatch && employeeMatch
+                                );
                               })
+
                               .map((s, sIdx) => (
-                                <tr key={sIdx}>
-                                  <td></td>
+                                <tr key={s.id}>
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedTaskIds.includes(s.id)}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                          setSelectedTaskIds([
+                                            ...selectedTaskIds,
+                                            s.id,
+                                          ]);
+                                        } else {
+                                          setSelectedTaskIds(
+                                            selectedTaskIds.filter(
+                                              (id) => id !== s.id
+                                            )
+                                          );
+                                        }
+                                        console.log({ selectedTaskIds });
+                                      }}
+                                    />
+                                  </td>
                                   <td>{s.task_name}</td>
                                   <td>{s.stage}</td>
                                   <td>{s.priority}</td>
                                   <td>{s.status}</td>
-                                  <td className="d-flex justify-content-start align-items-center">
+                                  <td className="d-flex justify-content-center align-items-center">
                                     {(() => {
                                       const assignedEmp = employees.find(
                                         (emp) => emp._id === s.assign_to
@@ -442,8 +571,15 @@ const Subtasks = () => {
                                       );
                                     })()}
                                   </td>
+                                  <td>{calculateTimeTracked(s.time_logs)}</td>{" "}
                                   <td>{getRemainingDays(s.due_date)}</td>
                                   <td>
+                                    <Link
+                                      to={`/project/subtask/edit/${s.id}`}
+                                      className="mx-1"
+                                    >
+                                      <img src="/SVG/edit.svg" alt="edit" />
+                                    </Link>
                                     <Link
                                       to={`/subtask/view/${s.id}`}
                                       className="mx-1"
@@ -462,10 +598,97 @@ const Subtasks = () => {
               ))}
             </tbody>
           </table>
+
+          <section className="sv-last-sec css-sec-last mt-3">
+            <p>
+              <span>{selectedTaskIds.length}</span> items selected
+            </p>
+            <div className="cpd-menu-bar">
+              <select
+                value={bulkAssignTo}
+                onChange={(e) => setBulkAssignTo(e.target.value)}
+                className="dropdown_toggle"
+              >
+                <option value="">Set Assign To</option>
+                {employees.map((emp) => (
+                  <option key={emp._id} value={emp._id}>
+                    {emp.full_name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={bulkPriority}
+                onChange={(e) => setBulkPriority(e.target.value)}
+                className="dropdown_toggle"
+              >
+                <option value="">Set Priority</option>
+                {priorityOptions.map((opt, idx) => (
+                  <option key={idx} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={bulkStage}
+                onChange={(e) => setBulkStage(e.target.value)}
+                className="dropdown_toggle"
+              >
+                <option value="">Change Stage</option>
+                {stageOptions.map((opt, idx) => (
+                  <option key={idx} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                onClick={handleBulkUpdateAll}
+                className="theme_btn"
+                disabled={
+                  selectedTaskIds.length === 0 ||
+                  (!bulkAssignTo && !bulkPriority && !bulkStage)
+                }
+              >
+                Apply Changes
+              </button>
+              <button
+                className="css-high css-delete"
+                onClick={() => setShowBulkDeleteModal(true)}
+                disabled={selectedTaskIds.length === 0}
+              >
+                <img src="/SVG/delete-vec.svg" alt="del" /> Delete Selected
+              </button>
+            </div>
+          </section>
         </div>
       </section>
 
-      {/* rest of bulk bar and modal unchanged */}
+      <Modal
+        show={showBulkDeleteModal}
+        onHide={() => setShowBulkDeleteModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete <b>{selectedTaskIds.length}</b>{" "}
+          selected subtask(s)?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowBulkDeleteModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleBulkConfirmDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </section>
   );
 };

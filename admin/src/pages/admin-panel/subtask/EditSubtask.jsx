@@ -28,6 +28,7 @@ const EditSubtask = () => {
   const [initialValues, setInitialValues] = useState({
     task_name: "",
     description: "",
+    url: "",
     stage: "",
     priority: "",
     assign_to: "",
@@ -54,6 +55,7 @@ const EditSubtask = () => {
         setInitialValues({
           task_name: subtask.task_name || "",
           description: subtask.description || "",
+          url: subtask.url || "",
           stage: subtask.stage || "",
           priority: subtask.priority || "",
           assign_to: subtask.assign_to?._id || subtask.assign_to || "",
@@ -85,6 +87,7 @@ const EditSubtask = () => {
       const formData = new FormData();
       formData.append("task_name", values.task_name);
       formData.append("description", values.description);
+      formData.append("url", values.url);
       formData.append("stage", values.stage);
       formData.append("priority", values.priority);
       formData.append("assign_date", values.assign_date);
@@ -169,6 +172,22 @@ const EditSubtask = () => {
                         />
                         <ErrorMessage
                           name="description"
+                          component="div"
+                          className="error"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sms-add_task-form">
+                      <div className="sms-add_name sms-add_same">
+                        <span>URL</span>
+                        <Field
+                          type="text"
+                          name="url"
+                          placeholder="URL"
+                        />
+                        <ErrorMessage
+                          name="url"
                           component="div"
                           className="error"
                         />

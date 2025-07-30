@@ -26,6 +26,9 @@ const subTaskSchema = mongoose.Schema(
     description: {
       type: String,
     },
+    url: {
+      type: String,
+    },
     stage: {
       type: String,
     },

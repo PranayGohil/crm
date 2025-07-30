@@ -314,7 +314,7 @@ const ViewSubtask = () => {
             </div>
             <div className="pb-task-view overview2">
               <div className="pb-taskinner">
-                <p>Created By:</p>
+                <p>Url:</p>
                 <span>{client?.full_name || "N/A"}</span>
               </div>
               <div className="pb-taskinner">
@@ -339,6 +339,14 @@ const ViewSubtask = () => {
             <p>{subtask.description || "No description available."}</p>
           </div>
         </div>
+        {subtask.url && (
+          <div className="pb-sec5-inner pb-sec3-inner">
+            <div className="pb-project-description">
+              <h3>Url</h3>
+              <p>{subtask.url || "No description available."}</p>
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="pb-sec-6 pb-sec2">

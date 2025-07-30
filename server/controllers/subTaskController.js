@@ -15,6 +15,7 @@ export const addSubTask = async (req, res) => {
       project_id,
       task_name,
       description,
+      url,
       stage,
       priority,
       assign_date,
@@ -30,6 +31,7 @@ export const addSubTask = async (req, res) => {
       project_id: new mongoose.Types.ObjectId(project_id),
       task_name,
       description,
+      url,
       stage,
       priority,
       assign_to: new mongoose.Types.ObjectId(assign_to),
@@ -117,6 +119,7 @@ export const updateSubTask = async (req, res) => {
     const {
       task_name,
       description,
+      url,
       stage,
       priority,
       assign_to,
@@ -129,6 +132,7 @@ export const updateSubTask = async (req, res) => {
     let updateData = {
       task_name,
       description,
+      url,
       stage,
       priority,
       assign_to: assign_to ? new mongoose.Types.ObjectId(assign_to) : null,

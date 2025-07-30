@@ -62,6 +62,7 @@ const AddSubtask = () => {
       formData.append("project_id", projectId);
       formData.append("task_name", values.task_name);
       formData.append("description", values.description);
+      formData.append("url", values.url);
       formData.append("stage", values.stage);
       formData.append("priority", values.priority);
       formData.append("assign_date", values.assign_date);
@@ -94,6 +95,7 @@ const AddSubtask = () => {
           project_id: projectId,
           task_name: `${values.bulkPrefix} ${i}`,
           description: "",
+          url: values.bulkUrl,
           stage: values.bulkStage,
           priority: values.bulkPriority,
           assign_to: values.bulkAssignTo,
@@ -131,11 +133,7 @@ const AddSubtask = () => {
               <img src="/SVG/arrow-pc.svg" alt="" />
             </Link>
             <div className="sms-heading-txt">
-              <h1>Subtask Management</h1>
-              <div className="sms-client-inf">
-                <span>Client: Luxe Jewelry Co.</span>
-                <span>• May 15, 2023 - July 30, 2023</span>
-              </div>
+              <h1>Add Subtask</h1>
             </div>
           </div>
         </div>
@@ -153,6 +151,7 @@ const AddSubtask = () => {
                 initialValues={{
                   task_name: "",
                   description: "",
+                  url: "",
                   stage: "",
                   priority: "",
                   assign_to: "",
@@ -190,6 +189,18 @@ const AddSubtask = () => {
                         />
                         <ErrorMessage
                           name="description"
+                          component="div"
+                          className="error"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="sms-add_task-form">
+                      <div className="sms-add_url sms-add_same">
+                        <span>URL</span>
+                        <Field type="text" name="url" placeholder="URL" />
+                        <ErrorMessage
+                          name="url"
                           component="div"
                           className="error"
                         />
@@ -414,6 +425,20 @@ const AddSubtask = () => {
                           className="error"
                         />
                       </div>
+                    </div>
+
+                    <div className="sms-add_subfix sms-add_same">
+                      <span>URL</span>
+                      <Field
+                        name="bulkUrl"
+                        type="text"
+                        placeholder="e.g., Ring"
+                      />
+                      <ErrorMessage
+                        name="bulkUrl"
+                        component="div"
+                        className="error"
+                      />
                     </div>
 
                     <div className="sms-comman-setting">
