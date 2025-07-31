@@ -276,6 +276,21 @@ const ProjectDetails = () => {
           </div>
         </div>
       </section>
+
+      <section className="pb-sec-5 pb-sec2">
+        <div className="pb-sec5-inner pb-sec3-inner d-flex flex-column">
+          <div className="pb-task-overview-head">
+            <p>Description</p>
+          </div>
+          <div className="pb-assigned-employees">
+            <div className="pb-task-view overview1">
+              <div className="pb-taskinner">
+                <p>{project.description || "No description provided."}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

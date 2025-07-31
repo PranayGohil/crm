@@ -11,6 +11,7 @@ export const addProject = async (req, res) => {
       assign_date,
       due_date,
       priority,
+      description,
       status,
     } = req.body;
     const project = await Project.create({
@@ -21,6 +22,7 @@ export const addProject = async (req, res) => {
       assign_date,
       due_date,
       priority,
+      description,
       status,
     });
     res

@@ -14,6 +14,7 @@ const projectSchema = mongoose.Schema(
     due_date: Date,
     priority: String,
     status: String,
+    description: String,
 
     // add content array
     content: [

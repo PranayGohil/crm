@@ -22,6 +22,7 @@ const EditProject = () => {
   const [priority, setPriority] = useState("");
   const [startDate, setStartDate] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [description, setDescription] = useState("");
 
   const validationSchema = Yup.object().shape({
     project_name: Yup.string().required("Project name is required"),
@@ -52,6 +53,7 @@ const EditProject = () => {
         setStartDate(proj.assign_date ? proj.assign_date.substr(0, 10) : "");
         setDueDate(proj.due_date ? proj.due_date.substr(0, 10) : "");
         setClients(clientsRes.data);
+        setDescription(proj.description || "");
       } catch (err) {
         console.error(err);
       }
@@ -93,6 +95,7 @@ const EditProject = () => {
           priority,
           assign_date: startDate,
           due_date: dueDate,
+          description,
         }
       );
       toast.success("Project updated successfully!");
@@ -247,6 +250,17 @@ const EditProject = () => {
                   <img src="/SVG/low-vec.svg" alt="Low" /> Low
                 </div>
               </div>
+            </div>
+
+            <div className="anp-project_description sms-add_same">
+              <span>Description</span>
+              <textarea
+                className="form-control"
+                name="description"
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              ></textarea>
             </div>
 
             <div className="anp-create_btn">

@@ -298,6 +298,7 @@ const EmployeeDashboard = () => {
                               <th>End</th>
                               <th>Priority</th>
                               <th>Status</th>
+                              <th>URL</th>
                               <th>Stage</th>
                               <th>Timer</th>
                               <th>Time Tracked</th>
@@ -387,6 +388,29 @@ const EmployeeDashboard = () => {
                                       {task.status}
                                     </span>
                                   </td>
+                                  <td
+                                    style={{ width: "200px" }}
+                                    title={task.url}
+                                  >
+                                    <a
+                                      href={task.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      style={{
+                                        maxWidth: "200px",
+                                        whiteSpace: "nowrap",
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                        display: "block",
+                                        color: "#007bff",
+                                        textDecoration: "none",
+                                      }}
+                                      title={task.url}
+                                    >
+                                      {task.url}
+                                    </a>
+                                  </td>
+
                                   <td>{task.stage}</td>
                                   <td className="ttb-table-pause">
                                     {task.status === "In Progress" ||

@@ -85,7 +85,7 @@ const EmployeeDashboard = () => {
         setFilteredEmployees(data);
 
         const total = data.length;
-        const onLeave = data.filter((e) => e.status === "on-leave").length;
+        const onLeave = data.filter((e) => (e.status === "on-leave" || e.status === "Inactive")).length;
         const active = data.filter(
           (e) => e.status === "active" || e.status === "Active"
         ).length;
@@ -148,7 +148,7 @@ const EmployeeDashboard = () => {
       className: "inf-sec-1",
     },
     {
-      label: "On Leave",
+      label: "On Leave / Inactive",
       value: stats.onLeave,
       icon: "/SVG/icon-2.svg",
       className: "inf-sec-2",

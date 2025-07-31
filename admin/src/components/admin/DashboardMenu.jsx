@@ -121,7 +121,7 @@ const DashboardMenu = () => {
             </div>
 
             <div className="commen-dashboard-list">
-              <p>Team</p>
+              <p>employees</p>
               <div className="commen-dashboard-list-inner">
                 <Link
                   to="/employee/dashboard"
@@ -130,7 +130,7 @@ const DashboardMenu = () => {
                   }`}
                 >
                   <img src="/SVG/team-member.svg" alt="team" />
-                  <span>Team Members</span>
+                  <span>Employees</span>
                 </Link>
               </div>
             </div>

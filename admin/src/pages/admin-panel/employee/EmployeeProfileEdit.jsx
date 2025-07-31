@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-const dropdownOptions = ["Active", "Inactive", "Blocked"];
+const dropdownOptions = ["Active", "Inactive",  "Blocked"];
 const departmentOptions = ["SET Design", "CAD Design", "Render"];
 const employmentTypes = ["Full-time", "Part-time"];
 const EmployeeProfileEdit = () => {
@@ -223,16 +223,6 @@ const EmployeeProfileEdit = () => {
                   />
                   <span>Edit Team Member Profile</span>
                 </div>
-                <div className="cancel-changes">
-                  <div className="theme_secondary_btn">
-                    <a onClick={() => navigate(-1)}>Cancel</a>
-                  </div>
-                  <div>
-                    <button type="submit" className="theme_btn">
-                      Save changes
-                    </button>
-                  </div>
-                </div>
               </div>
             </section>
 
@@ -361,8 +351,8 @@ const EmployeeProfileEdit = () => {
             </section>
 
             {/* Personal Details */}
-            <section className="personal-proffesional">
-              <div className="profile-inner">
+            <section className="row py-3 px-5">
+              <div className="col-md-6">
                 {[
                   "email",
                   "phone",
@@ -372,7 +362,7 @@ const EmployeeProfileEdit = () => {
                   "capacity",
                   "username",
                 ].map((field) => (
-                  <div className="profile-edit-inner" key={field}>
+                  <div className="profile-edit-inner mb-3" key={field}>
                     <div className="profile-edit-detail">
                       <span>{field.replace("_", " ").toUpperCase()}</span>
                       <Field
@@ -390,7 +380,7 @@ const EmployeeProfileEdit = () => {
                 <div className="profile-edit-inner">
                   <div className="profile-edit-detail">
                     <span>Password</span>
-                    <div style={{ position: "relative" }}>
+                    <div style={{ position: "relative", width: "fit-content" }}>
                       <Field
                         type={showPassword ? "text" : "password"}
                         name="password"
@@ -422,12 +412,12 @@ const EmployeeProfileEdit = () => {
               </div>
 
               {/* Professional Details with dropdowns */}
-              <div className="profile-inner">
+              <div className="col-md-6">
                 {["department", "reportingManager", "employment_type"].map(
                   (field) => (
                     <div
                       key={field}
-                      className="profile-edit-inner"
+                      className="profile-edit-inner mb-3"
                       ref={(el) => {
                         if (el) dropdownRefs.current[field] = el;
                       }}
@@ -475,7 +465,7 @@ const EmployeeProfileEdit = () => {
                 )}
 
                 {["date_of_joining", "monthly_salary"].map((field) => (
-                  <div key={field} className="profile-edit-detail eng-cnt-txt">
+                  <div key={field} className="profile-edit-detail eng-cnt-txt mb-3">
                     <span>{field.replace(/_/g, " ").toUpperCase()}</span>
                     <Field
                       type={field === "monthly_salary" ? "number" : "date"}
@@ -488,7 +478,7 @@ const EmployeeProfileEdit = () => {
                     />
                   </div>
                 ))}
-                <div className="profile-edit-inner is-manager-checkbox">
+                <div className="profile-edit-inner is-manager-checkbox mb-3">
                   <div className="checkbox-field">
                     <label>
                       <Field type="checkbox" name="is_manager" />
@@ -505,6 +495,12 @@ const EmployeeProfileEdit = () => {
                 </div>
               </div>
             </section>
+
+            <div className="d-flex justify-content-end mt-3 mx-5">
+              <button type="submit" className="theme_btn">
+                Save changes
+              </button>
+            </div>
 
             {/* Example: */}
 

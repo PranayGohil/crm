@@ -12,6 +12,7 @@ const TimeTrackingDashboard = () => {
     from: null,
     to: null,
   });
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState("All");
 
   // Fetch all data on mount
   useEffect(() => {
@@ -95,10 +96,14 @@ const TimeTrackingDashboard = () => {
     return employees.find((emp) => emp._id === id);
   };
 
+  const filteredSubtasks = subtasks.filter(
+    (s) => selectedEmployeeId === "All" || s.assign_to === selectedEmployeeId
+  );
+
   const summaryData = {
-    mainTasks: projects.length,
-    subtasks: subtasks.length,
-    totalTimeTracked: subtasks.reduce((acc, sub) => {
+    mainTasks: new Set(filteredSubtasks.map((s) => s.project_id)).size,
+    subtasks: filteredSubtasks.length,
+    totalTimeTracked: filteredSubtasks.reduce((acc, sub) => {
       const time = sub.time_logs?.reduce((subTotal, log) => {
         if (log.start_time && log.end_time && isWithinFilter(log.start_time)) {
           const diff = moment(log.end_time).diff(
@@ -169,6 +174,21 @@ const TimeTrackingDashboard = () => {
                 </div>
               )}
             </div>
+            <div className="mt-3">
+              <select
+                className="form-select"
+                style={{ maxWidth: "300px" }}
+                value={selectedEmployeeId}
+                onChange={(e) => setSelectedEmployeeId(e.target.value)}
+              >
+                <option value="All">All Employees</option>
+                {employees.map((emp) => (
+                  <option key={emp._id} value={emp._id}>
+                    {emp.full_name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             {/* <div className="filter">
               <img src="/SVG/filter-vector.svg" alt="search" />
@@ -187,8 +207,12 @@ const TimeTrackingDashboard = () => {
 
         {projects.map((project) => {
           const projectSubtasks = subtasks.filter(
-            (s) => s.project_id === project._id
+            (s) =>
+              s.project_id === project._id &&
+              (selectedEmployeeId === "All" ||
+                s.assign_to === selectedEmployeeId)
           );
+
           const totalTime = projectSubtasks.reduce((acc, sub) => {
             const time = moment
               .duration(calculateTimeSpent(sub.time_logs))

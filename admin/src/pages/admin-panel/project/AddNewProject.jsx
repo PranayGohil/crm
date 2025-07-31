@@ -52,6 +52,7 @@ const AddNewProject = () => {
       assign_date: "",
       due_date: "",
       priority: "",
+      description: "",
     },
 
     validationSchema: Yup.object({
@@ -73,6 +74,7 @@ const AddNewProject = () => {
           assign_date: values.assign_date,
           due_date: values.due_date,
           priority: values.priority,
+          description: values.description,
           status: "To do",
           tasks: [],
         };
@@ -102,7 +104,7 @@ const AddNewProject = () => {
     touched,
     isSubmitting,
   } = formik;
-  
+
   if (loading) {
     return <LoadingOverlay />;
   }
@@ -124,16 +126,6 @@ const AddNewProject = () => {
             <div className="head-menu">
               <h1>Add New Project</h1>
             </div>
-          </div>
-          <div className="anp-header-btn">
-            <button
-              type="submit"
-              className="anp-save-btn"
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-            >
-              <img src="/SVG/save-vec.svg" alt="save" /> Save Project
-            </button>
           </div>
         </div>
       </section>
@@ -266,6 +258,22 @@ const AddNewProject = () => {
               </div>
               {touched.priority && errors.priority && (
                 <div className="error">{errors.priority}</div>
+              )}
+            </div>
+
+            {/* Description */}
+            <div className="anp-project_description sms-add_same">
+              <span>Description</span>
+              <textarea
+                name="description"
+                className="form-control"
+                value={values.description}
+                onChange={handleChange}
+                placeholder="Enter Description"
+                disabled={isSubmitting}
+              />
+              {touched.description && errors.description && (
+                <div className="error">{errors.description}</div>
               )}
             </div>
 
