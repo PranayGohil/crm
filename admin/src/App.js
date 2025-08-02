@@ -21,7 +21,6 @@ import AddNewProject from "./pages/admin-panel/project/AddNewProject";
 import AddSubtask from "./pages/admin-panel/subtask/AddSubtask";
 import SubtaskDashboardContainer from "./pages/admin-panel/subtask/SubtaskDashboardContainer";
 
-import ProjectContent from "./pages/admin-panel/project/ProjectContent";
 import ProjectMediaGallery from "./components/admin/ProjectMediaGallery";
 
 import EmployeeDashboard from "./pages/admin-panel/employee/EmployeeDashboard";
@@ -33,8 +32,9 @@ import NotificationAdmin from "./pages/admin-panel/NotificationAdmin";
 
 import EditClient from "./pages/admin-panel/client/EditClient";
 import EditProject from "./pages/admin-panel/project/EditProject";
-import EditProjectContent from "./pages/admin-panel/project/EditProjectContent";
+
 import EditSubtask from "./pages/admin-panel/subtask/EditSubtask";
+import UpcomingDueDatesPage from "./pages/admin-panel/UpcomingDueDatesPage";
 import CreateEmployeeProfile from "./pages/admin-panel/employee/CreateEmployeeProfile";
 
 import TimeTrackingDashboard from "./pages/admin-panel/TimeTrackingDashboard";
@@ -92,10 +92,9 @@ function App() {
 
           <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
           <Route
-            path="/project/view-content/:projectId"
-            element={<ProjectContent />}
+            path="/subtask/upcoming-due-dates"
+            element={<UpcomingDueDatesPage />}
           />
-          <Route path="editprojectcontent" element={<EditProjectContent />} />
           <Route
             path="/project/gallery/:projectId"
             element={<ProjectMediaGallery />}
@@ -106,7 +105,10 @@ function App() {
             element={<EmployeeProfileEdit />}
           />
           <Route path="/employee/profile/:id" element={<TeamMemberProfile />} />
-          <Route path="/employee/timetracking/:id" element={<EmployeeTimeTracking />} />
+          <Route
+            path="/employee/timetracking/:id"
+            element={<EmployeeTimeTracking />}
+          />
           <Route path="/subtasks" element={<Subtasks />} />
           <Route path="/time-tracking" element={<TimeTrackingDashboard />} />
           <Route path="/notifications" element={<NotificationAdmin />} />
@@ -114,10 +116,7 @@ function App() {
           {/* edit page */}
 
           <Route path="/project/edit/:projectId" element={<EditProject />} />
-          <Route
-            path="/project/edit-content/:projectId"
-            element={<EditProjectContent />}
-          />
+
           <Route
             path="/project/subtask/edit/:subtaskId"
             element={<EditSubtask />}

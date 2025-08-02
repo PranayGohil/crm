@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
-const statusOptions = ["Active", "Inactive", "Blocked"];
+// const statusOptions = ["Active", "Inactive", "Blocked"];
 
 const CreateProfileSection = ({ form, onChange, setProfilePic, errors }) => {
   const [designations, setDesignations] = useState([]);
@@ -127,7 +127,7 @@ const CreateProfileSection = ({ form, onChange, setProfilePic, errors }) => {
                 )}
               </div>
 
-              <div
+              {/* <div
                 className={`btn_main1 ${
                   openDropdown === "status" ? "open" : ""
                 }`}
@@ -166,7 +166,7 @@ const CreateProfileSection = ({ form, onChange, setProfilePic, errors }) => {
                   </ul>
                 )}
                 {errors.status && <div className="error">{errors.status}</div>}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

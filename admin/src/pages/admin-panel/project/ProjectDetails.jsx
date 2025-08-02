@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { statusOptions, priorityOptions } from "../../../options";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const ProjectDetails = () => {
   const { projectId } = useParams();
@@ -24,6 +25,7 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const projectRes = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`
@@ -55,21 +57,22 @@ const ProjectDetails = () => {
         setSubTasks(subtasksRes.data || []);
       } catch (err) {
         console.error("Error fetching project details:", err);
+        toast.error("Failed to load project data");
       } finally {
         setLoading(false);
       }
     };
     fetchData();
+  }, [projectId]);
 
-    // Count completed subtasks
+  useEffect(() => {
     setCompletedCount(
       subTasks.filter((t) => t.status?.toLowerCase() === "completed").length
     );
-
     setProgressPercent(
       subTasks.length ? Math.round((completedCount / subTasks.length) * 100) : 0
     );
-  }, [projectId]);
+  }, [subTasks, completedCount]);
 
   const handleUpdate = async () => {
     try {
@@ -97,11 +100,14 @@ const ProjectDetails = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  const currency = project?.content?.[0]?.currency || "INR";
+  const totalPrice = project?.content?.[0]?.total_price || 0;
+
+  if (loading) return <LoadingOverlay />;
   if (!project) return <p>Project not found!</p>;
 
   return (
-    <div className="preview-page">
+    <div className="preview-page p-5">
       <section className="pb-sec1 d-flex justify-content-between">
         <div>
           <a
@@ -114,18 +120,6 @@ const ProjectDetails = () => {
           <span>Back</span>
         </div>
         <div className="d-flex">
-          <Link
-            to={`/project/view-content/${projectId}`}
-            className="theme_btn me-2"
-          >
-            <img
-              src="/SVG/eye-view.svg"
-              alt="view"
-              className="me-2"
-              style={{ filter: "invert(1)" }}
-            />{" "}
-            <span>View Content</span>
-          </Link>
           <Link to={`/project/edit/${project._id}`} className="theme_btn ms-2">
             <img
               src="/SVG/edit.svg"
@@ -231,33 +225,32 @@ const ProjectDetails = () => {
             <p>Project Overview</p>
           </div>
           <div className="pb-task-overview-inner">
-            <div className="pb-task-view overview1">
-              <div className="pb-taskinner">
-                <p>Start Date:</p>
-                <span>
+            <div className="pb-task-view overview1 row">
+              <div className="pb-taskinner row">
+                <div className="col-md-4">Start Date:</div>
+                <div className="col-md-8">
                   {project.assign_date
                     ? new Date(project.assign_date).toLocaleDateString()
                     : "N/A"}
-                </span>
+                </div>
               </div>
-              <div className="pb-taskinner">
-                <p>Due Date:</p>
-                <span>
+              <div className="pb-taskinner row">
+                <div className="col-md-4">Due Date:</div>
+                <div className="col-md-8">
                   {project.due_date
                     ? new Date(project.due_date).toLocaleDateString()
                     : "N/A"}
-                </span>
+                </div>
               </div>
             </div>
-            <div className="pb-task-view overview2">
+            <div className="pb-task-view overview2 row">
               <div className="pb-taskinner">
-                <p>Status:</p>
-                <span>{project.status || "N/A"}</span>
+                <div className="col-md-4">Status:</div>
+                <div className="col-md-8">{project.status || "N/A"}</div>
               </div>
-
               <div className="pb-taskinner">
-                <p>Completion:</p>
-                <span className="d-flex flex-column">
+                <div className="col-md-4">Completion:</div>
+                <div className="col-md-8 d-flex flex-column">
                   <div className="md-project-card__subtask_text">
                     <div className="md-subtask-text">Subtasks Completed</div>
                     <div className="md-subtask-total-sub_number">
@@ -270,7 +263,7 @@ const ProjectDetails = () => {
                       style={{ width: `${progressPercent}%` }}
                     ></div>
                   </div>
-                </span>
+                </div>
               </div>
             </div>
           </div>
@@ -285,10 +278,131 @@ const ProjectDetails = () => {
           <div className="pb-assigned-employees">
             <div className="pb-task-view overview1">
               <div className="pb-taskinner">
-                <p>{project.description || "No description provided."}</p>
+                <p>
+                  {project.content[0].description || "No description provided."}
+                </p>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Project Content */}
+      <section className="pc-main-content">
+        <div className="pc-content-inner-txt">
+          <h4>Project Content</h4>
+          <span>Manage all project content, items, and pricing details</span>
+        </div>
+      </section>
+
+      <section className="pc-price-and-overview pc-sec-content">
+        <div className="pc-item-price">
+          <div className="pc-item-price-inner">
+            <h2>Jewelry Items & Pricing</h2>
+          </div>
+          <div className="pc-item-table">
+            {project?.content?.[0]?.items?.length > 0 ? (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Jewelry Item</th>
+                    <th>Quantity</th>
+                    <th>Price per Item ({currency})</th>
+                    <th>Total ({currency})</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {project.content[0].items.map((item, idx) => (
+                    <tr key={idx}>
+                      <td>{item.name}</td>
+                      <td>{item.quantity}</td>
+                      <td>{item.price}</td>
+                      <td>{item.quantity * item.price}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan="3">Sub Total</td>
+                    <td>
+                      {project.content[0].items.reduce(
+                        (sum, i) => sum + i.quantity * i.price,
+                        0
+                      )}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            ) : (
+              <p>No items added yet.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="pc-pricing-overview">
+          <div className="pc-prc-inner">
+            <div className="prc-txt">
+              <h2>Pricing Overview</h2>
+            </div>
+          </div>
+          <div className="pc-total-project-price">
+            <p>Total Project Price</p>
+            <span>
+              {currency} {totalPrice}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section className="pc-content-include">
+        <div className="pc-content-inner">
+          <h2>Content Included</h2>
+        </div>
+        <div className="pc-photo-video">
+          <div className="pc-content-photo">
+            <div className="pc-photo-detail">
+              <div className="photo-video-inner">
+                <div className="not-completed-text">
+                  <h3>Media</h3>
+                  <p>Uploaded Media</p>
+                </div>
+              </div>
+              <div className="pc-item-contain">
+                <span>
+                  {project?.content?.[0]?.uploaded_files?.length || 0}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="pc-notes-description">
+        <div className="pc-not-des-inner">
+          <h2>Project Notes / Description</h2>
+        </div>
+        <div className="pc-description">
+          <span>
+            {project?.content?.[0]?.description || "No description added."}
+          </span>
+        </div>
+      </section>
+
+      <section className="pc-media-preview">
+        <div className="pc-media-preview-inner">
+          <h2>Media Preview</h2>
+          <a href={`/project/gallery/${projectId}`}>View All</a>
+        </div>
+        <div className="pc-media-pre-imgs">
+          {project?.content?.[0]?.uploaded_files?.length > 0 ? (
+            project.content[0].uploaded_files
+              .slice(0, 3)
+              .map((url, idx) => (
+                <img key={idx} src={url} alt={`media${idx}`} />
+              ))
+          ) : (
+            <p>No media uploaded.</p>
+          )}
         </div>
       </section>
     </div>

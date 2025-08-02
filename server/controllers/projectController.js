@@ -1,3 +1,4 @@
+import e from "express";
 import Project from "../models/projectModel.js";
 import SubTask from "../models/subTaskModel.js";
 
@@ -13,23 +14,37 @@ export const addProject = async (req, res) => {
       priority,
       description,
       status,
-    } = req.body;
+      content,
+    } = JSON.parse(req.body.data);
+
+    let newUploadedFiles = [];
+    if (req.files && req.files.length > 0) {
+      newUploadedFiles = req.files.map((file) => file.path); // Cloudinary URL
+    }
+
     const project = await Project.create({
       project_name,
       client_id,
-      tasks,
       assign_to,
       assign_date,
       due_date,
       priority,
       description,
       status,
+      tasks,
+      content: [
+        {
+          ...content,
+          uploaded_files: newUploadedFiles,
+        },
+      ],
     });
-    res
+
+    return res
       .status(200)
-      .json({ success: true, message: "Project added successfully", project });
+      .json({ success: true, message: "Project created", project });
   } catch (error) {
-    console.error("Error adding project:", error);
+    console.error("addProjectWithContent error:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -40,9 +55,29 @@ export const getProjects = async (req, res) => {
 };
 
 export const updateProject = async (req, res) => {
-  const { id } = req.params;
-  const project = await Project.findByIdAndUpdate(id, req.body);
-  res.status(200).json(project);
+  try {
+    const { data } = req.body;
+    const parsedData = JSON.parse(data);
+
+    const uploadedFiles = req.files?.map((file) => file.path) || []; // Cloudinary URL
+    const retainedFiles = parsedData.content.existing_files || [];
+
+    const updatedFields = {
+      ...parsedData,
+      content: [
+        {
+          ...parsedData.content,
+          uploaded_files: [...retainedFiles, ...uploadedFiles],
+        },
+      ],
+    };
+
+    await Project.findByIdAndUpdate(req.params.id, updatedFields);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: "Update failed" });
+  }
 };
 
 export const deleteProject = async (req, res) => {
@@ -202,6 +237,7 @@ export const getAllProjectsWithTasks = async (req, res) => {
             stage: s.stage,
             priority: s.priority,
             status: s.status,
+            url: s.url,
             assign_to: s.assign_to || null,
             assign_date: s.assign_date,
             due_date: s.due_date,
@@ -233,7 +269,7 @@ export const bulkDelete = async (req, res) => {
   const { ids } = req.body;
   try {
     await Project.deleteMany({ _id: { $in: ids } });
-    await SubTask.deleteMany({ project_id: { $in: ids } }); 
+    await SubTask.deleteMany({ project_id: { $in: ids } });
     res.json({ success: true });
   } catch (e) {
     console.error(e);

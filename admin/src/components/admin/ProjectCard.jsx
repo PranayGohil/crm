@@ -149,7 +149,7 @@ const ProjectCard = ({
                               width: "42px",
                               height: "42px",
                               borderRadius: "50%",
-                              backgroundColor: "#007bff",
+                              backgroundColor: "#0a3749",
                               color: "#fff",
                               display: "flex",
                               alignItems: "center",

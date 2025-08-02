@@ -153,6 +153,21 @@ const SubtaskDashboardContainer = () => {
     return `${day} ${month} ${year}`;
   };
 
+  const handleCopyToClipboard = (url, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.ctrlKey || e.metaKey) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    navigator.clipboard
+      .writeText(url)
+      .then(() => toast.success("URL copied to clipboard!"))
+      .catch(() => toast.error("Failed to copy URL."));
+  };
+
   if (loading) return <LoadingOverlay />;
 
   return (
@@ -257,6 +272,7 @@ const SubtaskDashboardContainer = () => {
               <th>Priority</th>
               <th>Stage</th>
               <th>Status</th>
+              <th>URL</th>
               <th>Assigned</th>
               <th>Action</th>
             </tr>
@@ -283,6 +299,64 @@ const SubtaskDashboardContainer = () => {
                 <td>{task.priority}</td>
                 <td>{task.stage}</td>
                 <td>{task.status}</td>
+                <td
+                  style={{
+                    width: "200px",
+                    position: "relative",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "200px",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      cursor: "pointer",
+                      color: "#007bff",
+                      paddingRight: "20px", // To give space for the icon
+                      position: "relative",
+                    }}
+                    onClick={(e) => handleCopyToClipboard(task.url, e)}
+                    title="Click to copy. Ctrl+Click to open."
+                  >
+                    <span
+                      style={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {task.url}
+                    </span>
+
+                    <span
+                      onClick={(e) => handleCopyToClipboard(task.url, e)}
+                      style={{
+                        position: "absolute",
+                        right: "2px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        fontSize: "14px",
+                        color: "#555",
+                        cursor: "pointer",
+                      }}
+                      title="Copy URL"
+                    >
+                      <img
+                        src="/SVG/clipboard.svg"
+                        alt="copy icon"
+                        style={{
+                          width: "16px",
+                          height: "16px",
+                          filter: "hue-rotate(310deg)",
+                          opacity: 0.8,
+                        }}
+                      />
+                    </span>
+                  </div>
+                </td>
                 <td className="d-flex justify-content-start align-items-center">
                   {(() => {
                     const assignedEmp = employees.find(

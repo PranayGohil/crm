@@ -756,8 +756,9 @@ input:focus-visible {
 .md-total-card-main-inner {
   margin-inline: 24px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+  margin-bottom: 24px;
 }
 
 .md-common-para-icon {

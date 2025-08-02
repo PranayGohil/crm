@@ -227,6 +227,20 @@ const Subtasks = () => {
     }
   };
 
+  const calculateProjectTotalTime = (subtasks = []) => {
+    let totalMs = 0;
+    subtasks.forEach((s) => {
+      s.time_logs?.forEach((log) => {
+        const start = dayjs(log.start_time);
+        const end = log.end_time ? dayjs(log.end_time) : dayjs();
+        totalMs += end.diff(start);
+      });
+    });
+
+    const dur = dayjs.duration(totalMs);
+    return `${dur.hours()}h ${dur.minutes()}m ${dur.seconds()}s`;
+  };
+
   const calculateTimeTracked = (timeLogs = []) => {
     console.log("Calculating time tracked for logs:", timeLogs);
     let totalMs = 0;
@@ -239,6 +253,21 @@ const Subtasks = () => {
     const dur = dayjs.duration(totalMs);
     console.log("oooooooooooooooooooooooooo", { dur });
     return `${dur.hours()}h ${dur.minutes()}m ${dur.seconds()}s`;
+  };
+
+  const handleCopyToClipboard = (url, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.ctrlKey || e.metaKey) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    navigator.clipboard
+      .writeText(url)
+      .then(() => toast.success("URL copied to clipboard!"))
+      .catch(() => toast.error("Failed to copy URL."));
   };
 
   return (
@@ -425,7 +454,7 @@ const Subtasks = () => {
                       <span className="time-table-badge">{project.status}</span>
                     </td>
                     <td>{project.subtasks?.length}</td>
-                    <td>{project.totalTime || "-"}</td>
+                    <td>{calculateProjectTotalTime(project.subtasks)}</td>
                     <td>
                       <span className="time-table-badge">
                         {project.priority}
@@ -464,6 +493,7 @@ const Subtasks = () => {
                               <th>Stage</th>
                               <th>Priority</th>
                               <th>Status</th>
+                              <th>URL</th>
                               <th>Assigned To</th>
                               <th>Time Tracked</th>
                               <th>Remaining Time</th>
@@ -520,6 +550,68 @@ const Subtasks = () => {
                                   <td>{s.stage}</td>
                                   <td>{s.priority}</td>
                                   <td>{s.status}</td>
+                                  <td
+                                    style={{
+                                      width: "200px",
+                                      position: "relative",
+                                    }}
+                                  >
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                        width: "200px",
+                                        whiteSpace: "nowrap",
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                        cursor: "pointer",
+                                        color: "#007bff",
+                                        paddingRight: "20px", // To give space for the icon
+                                        position: "relative",
+                                      }}
+                                      onClick={(e) =>
+                                        handleCopyToClipboard(s.url, e)
+                                      }
+                                      title="Click to copy. Ctrl+Click to open."
+                                    >
+                                      <span
+                                        style={{
+                                          overflow: "hidden",
+                                          textOverflow: "ellipsis",
+                                        }}
+                                      >
+                                        {s.url}
+                                      </span>
+
+                                      <span
+                                        onClick={(e) =>
+                                          handleCopyToClipboard(s.url, e)
+                                        }
+                                        style={{
+                                          position: "absolute",
+                                          right: "2px",
+                                          top: "50%",
+                                          transform: "translateY(-50%)",
+                                          fontSize: "14px",
+                                          color: "#555",
+                                          cursor: "pointer",
+                                        }}
+                                        title="Copy URL"
+                                      >
+                                        <img
+                                          src="/SVG/clipboard.svg"
+                                          alt="copy icon"
+                                          style={{
+                                            width: "16px",
+                                            height: "16px",
+                                            filter: "hue-rotate(310deg)",
+                                            opacity: 0.8,
+                                          }}
+                                        />
+                                      </span>
+                                    </div>
+                                  </td>
                                   <td className="d-flex justify-content-center align-items-center">
                                     {(() => {
                                       const assignedEmp = employees.find(

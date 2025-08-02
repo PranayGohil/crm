@@ -15,7 +15,7 @@ const CreateEmployeeProfile = () => {
     confirmPassword: "",
     full_name: "",
     designation: "",
-    status: "",
+    status: "Inactive",
     phone: "",
     email: "",
     home_address: "",
@@ -57,7 +57,7 @@ const CreateEmployeeProfile = () => {
       newErrors.confirmPassword = "Passwords do not match.";
 
     if (!form.designation) newErrors.designation = "Select designation.";
-    if (!form.status) newErrors.status = "Select status.";
+    // if (!form.status) newErrors.status = "Select status.";
     if (!form.phone.trim()) newErrors.phone = "Phone number is required.";
     else if (!/^\+?\d{10,15}$/.test(form.phone))
       newErrors.phone = "Enter valid phone number.";

@@ -8,7 +8,7 @@ const DashboardSummaryCards = () => {
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState(null);
   const [departmentCapacities, setDepartmentCapacities] = useState(null);
-  const [capacityView, setCapacityView] = useState("monthlyWithSundays"); // Options: daily, monthlyWithSundays, monthlyWithoutSundays
+  const [capacityView, setCapacityView] = useState("monthlyWithSundays");
   const projectRef = useRef(null);
   const clientRef = useRef(null);
   const teamRef = useRef(null);
@@ -16,8 +16,8 @@ const DashboardSummaryCards = () => {
   const taskInProgressRef = useRef(null);
   const taskOverdueRef = useRef(null);
 
-  const [capacityMode, setCapacityMode] = useState("employee"); // 'employee' or 'time'
-  const [viewOption, setViewOption] = useState("daily"); // Changes based on capacityMode
+  const [capacityMode, setCapacityMode] = useState("time");
+  const [viewOption, setViewOption] = useState("withoutSundays");
 
   useEffect(() => {
     setLoading(true);
@@ -71,8 +71,8 @@ const DashboardSummaryCards = () => {
 
   return (
     <>
-      <section className="md-total-card-main">
-        <div className="md-total-card-main-inner">
+      <section className="md-total-card-main row">
+        <div className="md-total-card-main-inner ">
           {/* Total Projects */}
           <Link to="/project/dashboard" className="md-common-total-card">
             <div className="md-common-para-icon">
@@ -135,7 +135,8 @@ const DashboardSummaryCards = () => {
             ></div>
           </div> */}
           </Link>
-
+        </div>
+        <div className="md-total-card-main-inner">
           {/* Tasks */}
           <Link to="/subtasks" className="md-common-total-card">
             <div className="md-common-para-icon md-para-icon-tasks">
@@ -176,24 +177,24 @@ const DashboardSummaryCards = () => {
                 <img src="SVG/icon-4.svg" alt="total tasks" />
               </div>
             </div>
-            <div className="mb-4">
+            <div className="mb-4 d-flex justify-content-between align-items-center">
               {/* Primary toggle */}
               <div className="flex gap-2 mb-2">
                 <button
-                  className={`btn btn-sm ${
+                  className={`btn btn-sm mx-2 ${
                     capacityMode === "time"
                       ? "btn-primary"
                       : "btn-outline-primary"
                   }`}
                   onClick={() => {
-                    setCapacityMode("time");
+                    setCapacityMode("mx-2");
                     setViewOption("withSundays");
                   }}
                 >
                   Time to Complete Tasks
                 </button>
                 <button
-                  className={`btn btn-sm ${
+                  className={`btn btn-sm mx-2 ${
                     capacityMode === "employee"
                       ? "btn-primary"
                       : "btn-outline-primary"
@@ -212,7 +213,7 @@ const DashboardSummaryCards = () => {
                 {capacityMode === "time" ? (
                   <>
                     <button
-                      className={`btn btn-sm ${
+                      className={`btn btn-sm mx-2 ${
                         viewOption === "withSundays"
                           ? "btn-success"
                           : "btn-outline-success"
@@ -222,7 +223,7 @@ const DashboardSummaryCards = () => {
                       With Sundays
                     </button>
                     <button
-                      className={`btn btn-sm ${
+                      className={`btn btn-sm mx-2 ${
                         viewOption === "withoutSundays"
                           ? "btn-success"
                           : "btn-outline-success"
@@ -235,7 +236,7 @@ const DashboardSummaryCards = () => {
                 ) : (
                   <>
                     <button
-                      className={`btn btn-sm ${
+                      className={`btn btn-sm mx-2 ${
                         viewOption === "daily"
                           ? "btn-success"
                           : "btn-outline-success"
@@ -255,7 +256,7 @@ const DashboardSummaryCards = () => {
                       Monthly (With Sundays)
                     </button>
                     <button
-                      className={`btn btn-sm ${
+                      className={`btn btn-sm mx-2 ${
                         viewOption === "monthlyWithoutSundays"
                           ? "btn-success"
                           : "btn-outline-success"

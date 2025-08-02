@@ -152,7 +152,6 @@ export const getEmployeeInfo = async (req, res) => {
 export const editEmployee = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("Editing employee with ID:", id);
     const {
       username,
       password,
@@ -214,7 +213,6 @@ export const editEmployee = async (req, res) => {
 
     // Update profile_pic if uploaded
     if (req.file) {
-      console.log("File uploaded:", req.file);
       employee.profile_pic = req.file.path;
     }
 
@@ -243,53 +241,59 @@ export const getEmployeeTasks = async (req, res) => {
   res.status(200).json(tasks);
 };
 
-const getWeekStart = () => {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  now.setDate(now.getDate() - now.getDay()); // Sunday as week start
-  return now;
-};
-
 export const getEmployeeDashboardData = async (req, res) => {
   try {
     const employeeId = req.params.employeeId;
-    console.log("employee id", employeeId);
+    const { startDate, endDate } = req.query;
+
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
+
     const subtasks = await SubTask.find({ assign_to: employeeId }).populate(
       "project_id"
     );
-    console.log("Subtasks:", subtasks);
     const projectIds = subtasks.map((s) => s.project_id?._id).filter(Boolean);
     const uniqueProjectIds = [
       ...new Set(projectIds.map((id) => id.toString())),
     ];
     const projects = await Project.find({ _id: { $in: uniqueProjectIds } });
 
-    const weekStart = getWeekStart();
-    let timeLoggedThisWeekMs = 0;
+    let totalMs = 0;
+    let completedCount = 0;
 
     subtasks.forEach((task) => {
+      const isCompleted = task.status === "Completed";
+      if (isCompleted) {
+        const completedAt = new Date(task.updatedAt || task.createdAt);
+        if (!start || (completedAt >= start && completedAt <= end)) {
+          completedCount++;
+        }
+      }
+
       (task.time_logs || []).forEach((log) => {
         const logStart = new Date(log.start_time);
         const logEnd = log.end_time ? new Date(log.end_time) : new Date();
 
-        if (logEnd >= weekStart) {
-          const effectiveStart = logStart < weekStart ? weekStart : logStart;
-          timeLoggedThisWeekMs += logEnd - effectiveStart;
+        if (!start || logEnd >= start) {
+          const effectiveStart = start && logStart < start ? start : logStart;
+          const effectiveEnd = end && logEnd > end ? end : logEnd;
+          if (!end || logStart <= end) {
+            totalMs += effectiveEnd - effectiveStart;
+          }
         }
       });
     });
 
-    const hours = Math.floor(timeLoggedThisWeekMs / 3600000);
-    const minutes = Math.floor((timeLoggedThisWeekMs % 3600000) / 60000);
-    const seconds = Math.floor((timeLoggedThisWeekMs % 60000) / 1000);
-    const timeLoggedThisWeek = `${hours}h ${minutes}m ${seconds}s`;
+    const hours = Math.floor(totalMs / 3600000);
+    const minutes = Math.floor((totalMs % 3600000) / 60000);
+    const seconds = Math.floor((totalMs % 60000) / 1000);
+    const timeLogged = `${hours}h ${minutes}m ${seconds}s`;
 
     res.json({
       subtasks,
       projects,
-      completedThisWeek: subtasks.filter((t) => t.status === "Completed")
-        .length,
-      timeLoggedThisWeek,
+      completed: completedCount,
+      timeLogged,
     });
   } catch (error) {
     console.error("Error fetching employee dashboard data:", error);

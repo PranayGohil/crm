@@ -7,22 +7,20 @@ const EmployeeTimeTracking = () => {
   const [projects, setProjects] = useState([]);
   const [subtasks, setSubtasks] = useState([]);
   const [openTable, setOpenTable] = useState(null);
-  const [selectedFilter, setSelectedFilter] = useState("Today");
+  const [selectedFilter, setSelectedFilter] = useState("All Time");
   const [customDateRange, setCustomDateRange] = useState({
     from: null,
     to: null,
   });
-
   const [employeeId, setEmployeeId] = useState("");
 
   useEffect(() => {
-      const storedUser = localStorage.getItem("employeeUser");
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        setEmployeeId(user._id);
-      }
-    }, []);
-
+    const storedUser = localStorage.getItem("employeeUser");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setEmployeeId(user._id);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,7 +35,7 @@ const EmployeeTimeTracking = () => {
         console.error("Data fetching error:", error);
       }
     };
-    fetchData();
+    if (employeeId) fetchData();
   }, [employeeId]);
 
   const handleToggle = (id) =>
@@ -61,6 +59,7 @@ const EmployeeTimeTracking = () => {
         }
         return false;
       }
+      case "All Time":
       default:
         return true;
     }
@@ -92,10 +91,16 @@ const EmployeeTimeTracking = () => {
       : `${duration.days()}d ${duration.hours()}h ${duration.minutes()}m`;
   };
 
+  const filteredSubtasks = subtasks.filter((s) =>
+    s.time_logs?.some((log) =>
+      log.start_time && log.end_time ? isWithinFilter(log.start_time) : false
+    )
+  );
+
   const summaryData = {
-    mainTasks: projects.length,
-    subtasks: subtasks.length,
-    totalTimeTracked: subtasks.reduce((acc, sub) => {
+    mainTasks: new Set(filteredSubtasks.map((s) => s.project_id)).size,
+    subtasks: filteredSubtasks.length,
+    totalTimeTracked: filteredSubtasks.reduce((acc, sub) => {
       const time = sub.time_logs?.reduce((subTotal, log) => {
         if (log.start_time && log.end_time && isWithinFilter(log.start_time)) {
           const diff = moment(log.end_time).diff(
@@ -126,16 +131,20 @@ const EmployeeTimeTracking = () => {
           </div>
           <div className="ett-time-duration">
             <div className="ett-time-type d-flex gap-3">
-              {["Today", "This Week", "This Month", "Custom"].map((label) => (
-                <a
-                  key={label}
-                  href="#"
-                  className={selectedFilter === label ? "ett-today active" : ""}
-                  onClick={() => setSelectedFilter(label)}
-                >
-                  {label}
-                </a>
-              ))}
+              {["All Time", "Today", "This Week", "This Month", "Custom"].map(
+                (label) => (
+                  <a
+                    key={label}
+                    href="#"
+                    className={
+                      selectedFilter === label ? "ett-today active" : ""
+                    }
+                    onClick={() => setSelectedFilter(label)}
+                  >
+                    {label}
+                  </a>
+                )
+              )}
             </div>
             {selectedFilter === "Custom" && (
               <div className="d-flex gap-3 mt-2">
@@ -167,7 +176,7 @@ const EmployeeTimeTracking = () => {
 
       <section className="ett-task-time p-3">
         {projects.map((project) => {
-          const projectSubtasks = subtasks.filter(
+          const projectSubtasks = filteredSubtasks.filter(
             (s) => s.project_id === project._id
           );
           if (projectSubtasks.length === 0) return null;

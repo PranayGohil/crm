@@ -74,7 +74,6 @@ export const UpcomingDueDates = async (req, res) => {
   try {
     const tasks = await SubTask.find({ status: { $ne: "Completed" } }) // filter out Completed
       .sort({ due_date: 1 })
-      .limit(5)
       .populate({
         path: "project_id",
         select: "project_name due_date",

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import LoadingOverlay from "./LoadingOverlay";
+import LoadingOverlay from "../../components/admin/LoadingOverlay";
 import { Link } from "react-router-dom";
 
-const UpcomingDueDates = () => {
+const UpcomingDueDatesPage = () => {
   const [loading, setLoading] = useState(false);
   const [dueTasks, setDueTasks] = useState([]);
 
@@ -31,7 +31,6 @@ const UpcomingDueDates = () => {
       <div className="md-overview-upcoming-due-date-inner">
         <div className="md-upcomoing-header-btn">
           <h2>Upcoming Due Dates</h2>
-          <Link to="/subtask/upcoming-due-dates">View All</Link>
         </div>
         <div className="md-overview-upcoming-table">
           <table className="md-table-container">
@@ -55,7 +54,7 @@ const UpcomingDueDates = () => {
                   </td>
                 </tr>
               ) : (
-                dueTasks.slice(0, 5).map((task, index) => {
+                dueTasks.map((task, index) => {
                   const dueDate = task.due_date
                     ? new Date(task.due_date)
                     : null;
@@ -151,4 +150,4 @@ const UpcomingDueDates = () => {
   );
 };
 
-export default UpcomingDueDates;
+export default UpcomingDueDatesPage;

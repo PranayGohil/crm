@@ -1,20 +1,26 @@
+// imports
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import axios from "axios";
 import { toast } from "react-toastify";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const AddNewProject = () => {
   const navigate = useNavigate();
   const dropdownRef = useRef();
+
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(false);
   const [clientError, setClientError] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [items, setItems] = useState([{ name: "", quantity: 0, price: 0 }]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [projectDescription, setProjectDescription] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [currency, setCurrency] = useState("INR");
 
-  // 🟢 Fetch clients on mount
   useEffect(() => {
     const fetchClients = async () => {
       setLoading(true);
@@ -24,7 +30,6 @@ const AddNewProject = () => {
         );
         setClients(res.data);
       } catch (error) {
-        console.error("Failed to fetch clients:", error);
         setClientError("Could not load clients");
       } finally {
         setLoading(false);
@@ -33,10 +38,9 @@ const AddNewProject = () => {
     fetchClients();
   }, []);
 
-  // Close dropdown on outside click
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
       }
     };
@@ -52,9 +56,7 @@ const AddNewProject = () => {
       assign_date: "",
       due_date: "",
       priority: "",
-      description: "",
     },
-
     validationSchema: Yup.object({
       project_name: Yup.string().required("Project name is required"),
       client_id: Yup.string().required("Client is required"),
@@ -65,30 +67,42 @@ const AddNewProject = () => {
       priority: Yup.string().required("Priority is required"),
     }),
     onSubmit: async (values, { setSubmitting, resetForm }) => {
+      if (!items.length) return toast.error("Add at least one item");
       setLoading(true);
       try {
-        const payload = {
-          project_name: values.project_name,
-          client_id: values.client_id,
-          assign_to: [],
-          assign_date: values.assign_date,
-          due_date: values.due_date,
-          priority: values.priority,
-          description: values.description,
-          status: "To do",
-          tasks: [],
-        };
-
-        await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/project/add`,
-          payload
+        const formData = new FormData();
+        formData.append(
+          "data",
+          JSON.stringify({
+            ...values,
+            assign_to: [],
+            tasks: [],
+            status: "To do",
+            content: {
+              items,
+              total_price: totalPrice,
+              description: projectDescription,
+              currency,
+            },
+          })
         );
-        toast.success("Project created successfully!");
-        resetForm();
-        navigate("/project/dashboard");
+        selectedFiles.forEach((file) => formData.append("files", file));
+
+        const res = await axios.post(
+          `${process.env.REACT_APP_API_URL}/api/project/add`,
+          formData
+        );
+
+        if (res.data.success) {
+          toast.success("Project and content added!");
+          resetForm();
+          navigate("/project/dashboard");
+        } else {
+          toast.error("Failed to add project");
+        }
       } catch (error) {
-        console.error("Failed to create project:", error);
-        toast.error("Error creating project!");
+        console.error("Add Project Error:", error);
+        toast.error("Something went wrong!");
       } finally {
         setLoading(false);
       }
@@ -105,11 +119,33 @@ const AddNewProject = () => {
     isSubmitting,
   } = formik;
 
-  if (loading) {
-    return <LoadingOverlay />;
-  }
+  const updateItem = (index, field, value) => {
+    const updated = [...items];
+    updated[index][field] = field === "name" ? value : Number(value);
+    setItems(updated);
+  };
+
+  const addItem = () =>
+    setItems([...items, { name: "", quantity: 0, price: 0 }]);
+  const deleteRow = (index) => setItems(items.filter((_, i) => i !== index));
+  const resetRow = (index) =>
+    setItems(
+      items.map((item, i) =>
+        i === index ? { name: "", quantity: 0, price: 0 } : item
+      )
+    );
+
+  const getTotal = (q, p) => q * p;
+  const getSubTotal = () =>
+    items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+
+  const handleFileChange = (e) => setSelectedFiles([...e.target.files]);
+
+  if (loading) return <LoadingOverlay />;
+
   return (
     <div className="add_new_project_page">
+      {/* Header */}
       <section className="anp-add_new_project-header">
         <div className="anp-header-inner">
           <div className="anp-heading-main">
@@ -130,10 +166,11 @@ const AddNewProject = () => {
         </div>
       </section>
 
-      <section className="anp-add_new_project_form">
-        <form onSubmit={handleSubmit}>
+      {/* Form */}
+      <form onSubmit={handleSubmit}>
+        <section className="anp-add_new_project_form">
           <div className="anp-add_project_inner">
-            {/* Project name */}
+            {/* Project Name */}
             <div className="anp-prj_name sms-add_same">
               <span>Project Name</span>
               <input
@@ -148,8 +185,9 @@ const AddNewProject = () => {
                 <div className="error">{errors.project_name}</div>
               )}
             </div>
+
             <div className="d-flex flex-col gap-4">
-              {/* Client name dropdown */}
+              {/* Client Dropdown */}
               <div className="anp-client-name btn_main" ref={dropdownRef}>
                 <span className="anp-client-name-para">Client Name</span>
                 <div
@@ -159,11 +197,7 @@ const AddNewProject = () => {
                   <span className="text_btn">
                     {values.client_name || "Select Client"}
                   </span>
-                  <img
-                    src="/SVG/header-vector.svg"
-                    alt="arrow"
-                    className="arrow_icon"
-                  />
+                  <img src="/SVG/header-vector.svg" alt="arrow" />
                 </div>
                 {dropdownOpen && (
                   <ul className="anp-dropdown_menu">
@@ -172,7 +206,6 @@ const AddNewProject = () => {
                       <li style={{ color: "red" }}>{clientError}</li>
                     )}
                     {!loading &&
-                      !clientError &&
                       clients.map((client) => (
                         <li
                           key={client._id}
@@ -187,19 +220,14 @@ const AddNewProject = () => {
                       ))}
                   </ul>
                 )}
-                {touched.client_name && errors.client_name && (
-                  <div className="error">{errors.client_name}</div>
-                )}
                 <a href="/client/create" className="anp-add_client_btn">
                   <img src="/SVG/plus-vec.svg" alt="plus" /> Add New Client
                 </a>
               </div>
 
-              {/* Start & end date */}
+              {/* Dates */}
               <div className="anp-start_end-date sms-add_same">
-                <span className="anp-client-name-para">
-                  Start Date - End Date
-                </span>
+                <span>Start Date - End Date</span>
                 <div className="enp-date_input sms-add_same">
                   <input
                     type="date"
@@ -231,30 +259,39 @@ const AddNewProject = () => {
             <div className="anp-client_priority sms-add_same">
               <span>Priority</span>
               <div className="anp-priority_btn">
-                <div
-                  className={`anp-high_btn pr_btn ${
-                    values.priority === "high" ? "active" : ""
-                  }`}
-                  onClick={() => setFieldValue("priority", "high")}
-                >
-                  <img src="/SVG/high-vec.svg" alt="High" /> High
-                </div>
-                <div
-                  className={`anp-mid_btn pr_btn ${
-                    values.priority === "medium" ? "active" : ""
-                  }`}
-                  onClick={() => setFieldValue("priority", "medium")}
-                >
-                  <img src="/SVG/mid-vec.svg" alt="Medium" /> Medium
-                </div>
-                <div
-                  className={`anp-low_btn pr_btn ${
-                    values.priority === "low" ? "active" : ""
-                  }`}
-                  onClick={() => setFieldValue("priority", "low")}
-                >
-                  <img src="/SVG/low-vec.svg" alt="Low" /> Low
-                </div>
+                {["high", "mid", "low"].map((level) =>
+                  level === "high" ? (
+                    <div
+                      key={level}
+                      className={`pr_btn anp-${level}_btn ${
+                        values.priority === "High" ? "active" : ""
+                      }`}
+                      onClick={() => setFieldValue("priority", "High")}
+                    >
+                      <img src={`/SVG/${level}-vec.svg`} alt={level} /> High
+                    </div>
+                  ) : level === "mid" ? (
+                    <div
+                      key={level}
+                      className={`pr_btn anp-${level}_btn ${
+                        values.priority === "Medium" ? "active" : ""
+                      }`}
+                      onClick={() => setFieldValue("priority", "Medium")}
+                    >
+                      <img src={`/SVG/${level}-vec.svg`} alt={level} /> Medium
+                    </div>
+                  ) : (
+                    <div
+                      key={level}
+                      className={`pr_btn anp-${level}_btn ${
+                        values.priority === "Low" ? "active" : ""
+                      }`}
+                      onClick={() => setFieldValue("priority", "Low")}
+                    >
+                      <img src={`/SVG/${level}-vec.svg`} alt={level} /> Low
+                    </div>
+                  )
+                )}
               </div>
               {touched.priority && errors.priority && (
                 <div className="error">{errors.priority}</div>
@@ -262,22 +299,134 @@ const AddNewProject = () => {
             </div>
 
             {/* Description */}
-            <div className="anp-project_description sms-add_same">
-              <span>Description</span>
+            <div className="epc-description-notes">
+              <span>Project Description / Notes</span>
               <textarea
-                name="description"
+                rows={5}
                 className="form-control"
-                value={values.description}
-                onChange={handleChange}
-                placeholder="Enter Description"
-                disabled={isSubmitting}
+                value={projectDescription}
+                onChange={(e) => setProjectDescription(e.target.value)}
               />
-              {touched.description && errors.description && (
-                <div className="error">{errors.description}</div>
-              )}
             </div>
 
-            {/* Save button */}
+            {/* Jewelry Items Table */}
+            <div className="epc-add-item-table">
+              <table className="jwell-table">
+                <thead>
+                  <tr>
+                    <th>Jewelry Item</th>
+                    <th>Quantity</th>
+                    <th>Price per Item</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item, idx) => (
+                    <tr key={idx}>
+                      <td>
+                        <input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) =>
+                            updateItem(idx, "name", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            updateItem(idx, "quantity", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          value={item.price}
+                          onChange={(e) =>
+                            updateItem(idx, "price", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>{getTotal(item.quantity, item.price)}</td>
+                      <td>
+                        <span onClick={() => deleteRow(idx)}>
+                          <img src="/SVG/delete-vec.svg" alt="delete" />
+                        </span>
+                        <span onClick={() => resetRow(idx)}>
+                          <img src="/SVG/refresh-vec.svg" alt="reset" />
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <a
+                href="#"
+                className="epc-add-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  addItem();
+                }}
+              >
+                <img src="/SVG/plus-vec.svg" alt="plus" /> Add Item
+              </a>
+            </div>
+
+            {/* Price & Currency */}
+            <div className="epc-price-overview">
+              <div>
+                <p>Select Currency</p>
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  className="pc-dropdown_toggle bg-white"
+                >
+                  {["INR", "USD", "EUR", "AED"].map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <p>Subtotal</p>
+                <span>{getSubTotal()}</span>
+              </div>
+              <div>
+                <p>Total Project Price</p>
+                <input
+                  type="number"
+                  value={totalPrice}
+                  onChange={(e) => setTotalPrice(Number(e.target.value))}
+                  className="pc-dropdown_toggle bg-white"
+                />
+              </div>
+            </div>
+
+            {/* File Upload */}
+            <div className="epc-drag-drop-files">
+              <img src="/SVG/drag-drop-vec.svg" alt="drag" />
+              <span>Drag and drop files here or</span>
+              <label className="browse-btn">
+                Browse Files
+                <input
+                  type="file"
+                  multiple
+                  hidden
+                  onChange={handleFileChange}
+                />
+              </label>
+            </div>
+            <div className="epc-num-of-file-uploaded">
+              <span>{selectedFiles.length}</span>
+              <p>new files selected</p>
+            </div>
+
+            {/* Submit Button */}
             <div className="anp-create_btn">
               <button
                 type="submit"
@@ -294,8 +443,8 @@ const AddNewProject = () => {
               </button>
             </div>
           </div>
-        </form>
-      </section>
+        </section>
+      </form>
     </div>
   );
 };

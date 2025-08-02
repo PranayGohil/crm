@@ -60,7 +60,7 @@ const EmployeeDashboard = () => {
 
   const [stats, setStats] = useState({
     total: 0,
-    onLeave: 0,
+    inActive: 0,
     active: 0,
     departments: 0,
   });
@@ -85,12 +85,12 @@ const EmployeeDashboard = () => {
         setFilteredEmployees(data);
 
         const total = data.length;
-        const onLeave = data.filter((e) => (e.status === "on-leave" || e.status === "Inactive")).length;
+        const inActive = data.filter((e) => (e.status === "Inactive")).length;
         const active = data.filter(
           (e) => e.status === "active" || e.status === "Active"
         ).length;
         const departments = new Set(data.map((e) => e.department)).size;
-        setStats({ total, onLeave, active, departments });
+        setStats({ total, inActive, active, departments });
       } catch (err) {
         console.error("Failed to fetch employees:", err);
       } finally {
@@ -148,8 +148,8 @@ const EmployeeDashboard = () => {
       className: "inf-sec-1",
     },
     {
-      label: "On Leave / Inactive",
-      value: stats.onLeave,
+      label: "Inactive",
+      value: stats.inActive,
       icon: "/SVG/icon-2.svg",
       className: "inf-sec-2",
     },
@@ -286,7 +286,7 @@ const EmployeeDashboard = () => {
                       width: "100px",
                       height: "100px",
                       borderRadius: "50%",
-                      backgroundColor: "#007bff",
+                      backgroundColor: "#0a3749",
                       color: "#fff",
                       display: "flex",
                       alignItems: "center",
@@ -310,18 +310,14 @@ const EmployeeDashboard = () => {
                 <div>
                   <div
                     className={`${
-                      member.status === "on-leave"
-                        ? "badge text-bg-warning"
-                        : member.status === "blocked"
+                      member.status === "blocked"
                         ? "badge text-bg-danger"
                         : member.status === "Inactive"
                         ? "badge text-bg-danger"
                         : "badge text-bg-success"
                     } prn-activity p-2`}
                   >
-                    {member.status === "on-leave"
-                      ? "On Leave"
-                      : member.status === "blocked"
+                    {member.status === "blocked"
                       ? "Blocked"
                       : member.status === "Inactive"
                       ? "Inactive"

@@ -1,295 +1,545 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+// File: EditProject.jsx
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import axios from "axios";
 import { toast } from "react-toastify";
-import * as Yup from "yup";
+import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const EditProject = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
-
-  // State
-  const [project, setProject] = useState(null);
-  const [clients, setClients] = useState([]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-
   const dropdownRef = useRef();
 
-  // For controlled fields
-  const [projectName, setProjectName] = useState("");
-  const [selectedClient, setSelectedClient] = useState("");
-  const [priority, setPriority] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [dueDate, setDueDate] = useState("");
-  const [description, setDescription] = useState("");
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [clientError, setClientError] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [items, setItems] = useState([{ name: "", quantity: 0, price: 0 }]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [projectDescription, setProjectDescription] = useState("");
+  const [existingFiles, setExistingFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [currency, setCurrency] = useState("INR");
 
-  const validationSchema = Yup.object().shape({
-    project_name: Yup.string().required("Project name is required"),
-    client_id: Yup.string().required("Client must be selected"),
-    priority: Yup.string().required("Priority is required"),
-    assign_date: Yup.date().required("Start date is required"),
-    due_date: Yup.date()
-      .required("Due date is required")
-      .min(Yup.ref("assign_date"), "Due date must be after start date"),
-  });
-
-  // Fetch data on mount
   useEffect(() => {
-    const fetchProjectAndClients = async () => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const [projectRes, clientsRes] = await Promise.all([
-          axios.get(
-            `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`
-          ),
-          axios.get(`${process.env.REACT_APP_API_URL}/api/client/get-all`),
-        ]);
-
-        const proj = projectRes.data.project; // because your controller sends { success, project }
-        setProject(proj);
-        setProjectName(proj.project_name);
-        setSelectedClient(proj.client_id);
-        setPriority(proj.priority);
-        setStartDate(proj.assign_date ? proj.assign_date.substr(0, 10) : "");
-        setDueDate(proj.due_date ? proj.due_date.substr(0, 10) : "");
-        setClients(clientsRes.data);
-        setDescription(proj.description || "");
+        const projectRes = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        const project = projectRes.data.project;
+        formik.setValues({
+          project_name: project.project_name,
+          client_id: project.client_id,
+          client_name: project.client_name || "",
+          assign_date: project.assign_date?.split("T")[0] || "",
+          due_date: project.due_date?.split("T")[0] || "",
+          priority: project.priority,
+        });
+        setItems(project.content[0]?.items || []);
+        setTotalPrice(project.content[0]?.total_price || 0);
+        setProjectDescription(project.content[0]?.description || "");
+        setCurrency(project.content[0]?.currency || "INR");
+        setExistingFiles(project.content[0]?.uploaded_files || []);
       } catch (err) {
-        console.error(err);
+        toast.error("Failed to load project");
+      } finally {
+        setLoading(false);
       }
     };
-    fetchProjectAndClients();
+
+    const fetchClients = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/client/get-all`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setClients(res.data);
+      } catch (err) {
+        setClientError("Could not load clients");
+      }
+    };
+
+    fetchData();
+    fetchClients();
   }, [projectId]);
 
-  // Dropdown close on outside click
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const formik = useFormik({
+    initialValues: {
+      project_name: "",
+      client_id: "",
+      client_name: "",
+      assign_date: "",
+      due_date: "",
+      priority: "",
+    },
+    enableReinitialize: true,
+    validationSchema: Yup.object({
+      project_name: Yup.string().required("Project name is required"),
+      client_id: Yup.string().required("Client is required"),
+      assign_date: Yup.date().required("Start date is required"),
+      due_date: Yup.date()
+        .required("End date is required")
+        .min(Yup.ref("assign_date"), "End date cannot be before start date"),
+      priority: Yup.string().required("Priority is required"),
+    }),
+    onSubmit: async (values) => {
+      if (!items.length) return toast.error("Add at least one item");
+      setLoading(true);
+      setIsSubmitting(true);
+      try {
+        const formData = new FormData();
+        formData.append(
+          "data",
+          JSON.stringify({
+            ...values,
+            content: {
+              ...values.content,
+              items,
+              total_price: totalPrice,
+              description: projectDescription,
+              currency,
+              existing_files: existingFiles, // Important for retaining unremoved images
+            },
+          })
+        );
 
-  // Handlers
-  const handleUpdateProject = async () => {
-    try {
-      // validate inputs first
-      await validationSchema.validate(
-        {
-          project_name: projectName,
-          client_id: selectedClient,
-          priority,
-          assign_date: startDate,
-          due_date: dueDate,
-        },
-        { abortEarly: false }
-      );
+        selectedFiles.forEach((file) => formData.append("files", file));
 
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/project/update/${projectId}`,
-        {
-          project_name: projectName,
-          client_id: selectedClient,
-          priority,
-          assign_date: startDate,
-          due_date: dueDate,
-          description,
+        const res = await axios.put(
+          `${process.env.REACT_APP_API_URL}/api/project/update/${projectId}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (res.data.success) {
+          toast.success("Project updated successfully");
+          navigate("/project/dashboard");
+        } else {
+          toast.error("Failed to update project");
         }
-      );
-      toast.success("Project updated successfully!");
-      navigate(-1);
-    } catch (err) {
-      if (err.name === "ValidationError") {
-        // Show all validation errors
-        err.inner.forEach((e) => toast.error(e.message));
-      } else {
-        console.error(err);
-        toast.error("Update failed!");
+      } catch (error) {
+        toast.error("Something went wrong!");
+      } finally {
+        setLoading(false);
+        setIsSubmitting(false);
       }
-    }
+    },
+  });
+
+  const { handleChange, handleSubmit, setFieldValue, values, errors, touched } =
+    formik;
+
+  const updateItem = (index, field, value) => {
+    const updated = [...items];
+    updated[index][field] = field === "name" ? value : Number(value);
+    setItems(updated);
   };
 
-  const handleDeleteProject = async () => {
-    try {
-      await axios.delete(
-        `${process.env.REACT_APP_API_URL}/api/project/delete/${projectId}`
-      );
-      toast.success("Project deleted successfully!");
-      navigate(-1);
-    } catch (err) {
-      console.error(err);
-      toast.error("Delete failed!");
-    } finally {
-      setShowDeleteModal(false);
-    }
+  const addItem = () =>
+    setItems([...items, { name: "", quantity: 0, price: 0 }]);
+  const deleteRow = (index) => setItems(items.filter((_, i) => i !== index));
+  const resetRow = (index) =>
+    setItems(
+      items.map((item, i) =>
+        i === index ? { name: "", quantity: 0, price: 0 } : item
+      )
+    );
+  const getTotal = (q, p) => q * p;
+  const getSubTotal = () =>
+    items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+
+  const handleFileChange = (e) => {
+    const filesArray = Array.from(e.target.files);
+    setSelectedFiles((prev) => [...prev, ...filesArray]);
   };
 
-  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
-  const handleClientSelect = (clientId) => {
-    setSelectedClient(clientId);
-    setDropdownOpen(false);
+  const handleRemoveExistingFile = (url) => {
+    setExistingFiles(existingFiles.filter((file) => file !== url));
   };
 
-  if (!project) return <p>Loading...</p>;
+  const handleRemoveSelectedFile = (index) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  if (loading) return <LoadingOverlay />;
 
   return (
-    <>
-      <div className="edit_project_page">
-        <section className="anp-add_new_project-header">
-          <div className="anp-header-inner">
-            <div className="anp-heading-main">
-              <a onClick={() => navigate(-1)} style={{ cursor: "pointer" }}>
-                <img src="/SVG/arrow-pc.svg" alt="Back" />
-              </a>
-              <div className="anp-heading-txt">
-                <h1>Edit Project</h1>
-              </div>
-            </div>
-            <div className="anp-header-btn">
-              <button
-                className="anp-delete-btn"
-                onClick={() => setShowDeleteModal(true)}
-              >
-                <img src="/SVG/delete-vec.svg" alt="Delete" /> Delete Project
-              </button>
+    <div className="add_new_project_page">
+      <section className="anp-add_new_project-header">
+        <div className="anp-header-inner">
+          <div className="anp-heading-main">
+            <Link
+              to="/project/dashboard"
+              className="anp-back-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(-1);
+              }}
+            >
+              <img src="/SVG/arrow-pc.svg" alt="back" />
+            </Link>
+            <div className="head-menu">
+              <h1>Edit Project</h1>
             </div>
           </div>
-        </section>
-
+        </div>
+      </section>
+      <form onSubmit={handleSubmit}>
         <section className="anp-add_new_project_form">
           <div className="anp-add_project_inner">
-            <div className="anp-project_fields">
-              <div className="anp-prj_name sms-add_same">
-                <span>Project Name</span>
-                <input
-                  type="text"
-                  value={projectName}
-                  onChange={(e) => setProjectName(e.target.value)}
-                />
-              </div>
+            {/* Project Name */}
+            <div className="anp-prj_name sms-add_same">
+              <span>Project Name</span>
+              <input
+                type="text"
+                name="project_name"
+                value={values.project_name}
+                onChange={handleChange}
+                placeholder="Enter Project Name"
+                disabled={isSubmitting}
+              />
+              {touched.project_name && errors.project_name && (
+                <div className="error">{errors.project_name}</div>
+              )}
             </div>
 
-            <div className="anp-client_pro_date">
+            <div className="d-flex flex-col gap-4">
+              {/* Client Dropdown */}
               <div className="anp-client-name btn_main" ref={dropdownRef}>
                 <span className="anp-client-name-para">Client Name</span>
                 <div
                   className="anp-dropdown_toggle dropdown_toggle"
-                  onClick={toggleDropdown}
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
                 >
                   <span className="text_btn">
-                    {clients.find((c) => c._id === selectedClient)?.full_name ||
-                      "Select Client"}
+                    {values.client_name || "Select Client"}
                   </span>
-                  <img
-                    src="/SVG/header-vector.svg"
-                    alt="vec"
-                    className="arrow_icon"
-                  />
+                  <img src="/SVG/header-vector.svg" alt="arrow" />
                 </div>
                 {dropdownOpen && (
-                  <ul className="anp-dropdown_menu dropdown_menu">
-                    {clients.map((client) => (
-                      <li
-                        key={client._id}
-                        onClick={() => handleClientSelect(client._id)}
-                      >
-                        {client.full_name}
-                      </li>
-                    ))}
+                  <ul className="anp-dropdown_menu">
+                    {loading && <li>Loading...</li>}
+                    {clientError && (
+                      <li style={{ color: "red" }}>{clientError}</li>
+                    )}
+                    {!loading &&
+                      clients.map((client) => (
+                        <li
+                          key={client._id}
+                          onClick={() => {
+                            setFieldValue("client_name", client.full_name);
+                            setFieldValue("client_id", client._id);
+                            setDropdownOpen(false);
+                          }}
+                        >
+                          {client.full_name}
+                        </li>
+                      ))}
                   </ul>
                 )}
-                <a href="/createnewclient" className="anp-add_client_btn">
+                <a href="/client/create" className="anp-add_client_btn">
                   <img src="/SVG/plus-vec.svg" alt="plus" /> Add New Client
                 </a>
               </div>
 
+              {/* Dates */}
               <div className="anp-start_end-date sms-add_same">
                 <span>Start Date - End Date</span>
                 <div className="enp-date_input sms-add_same">
                   <input
                     type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
+                    name="assign_date"
+                    value={values.assign_date}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
                   />
                   <input
                     type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
+                    name="due_date"
+                    value={values.due_date}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
                   />
+                </div>
+                <div className="error-group">
+                  {touched.assign_date && errors.assign_date && (
+                    <div className="error">{errors.assign_date}</div>
+                  )}
+                  {touched.due_date && errors.due_date && (
+                    <div className="error">{errors.due_date}</div>
+                  )}
                 </div>
               </div>
             </div>
 
+            {/* Priority */}
             <div className="anp-client_priority sms-add_same">
               <span>Priority</span>
               <div className="anp-priority_btn">
-                <div
-                  className={`anp-high_btn pr_btn ${
-                    priority === "High" ? "active" : ""
-                  }`}
-                  onClick={() => setPriority("High")}
+                {["high", "mid", "low"].map((level) =>
+                  level === "high" ? (
+                    <div
+                      key={level}
+                      className={`pr_btn anp-${level}_btn ${
+                        values.priority === "High" ? "active" : ""
+                      }`}
+                      onClick={() => setFieldValue("priority", "High")}
+                    >
+                      <img src={`/SVG/${level}-vec.svg`} alt={level} /> High
+                    </div>
+                  ) : level === "mid" ? (
+                    <div
+                      key={level}
+                      className={`pr_btn anp-${level}_btn ${
+                        values.priority === "Medium" ? "active" : ""
+                      }`}
+                      onClick={() => setFieldValue("priority", "Medium")}
+                    >
+                      <img src={`/SVG/${level}-vec.svg`} alt={level} /> Medium
+                    </div>
+                  ) : (
+                    <div
+                      key={level}
+                      className={`pr_btn anp-${level}_btn ${
+                        values.priority === "Low" ? "active" : ""
+                      }`}
+                      onClick={() => setFieldValue("priority", "Low")}
+                    >
+                      <img src={`/SVG/${level}-vec.svg`} alt={level} /> Low
+                    </div>
+                  )
+                )}
+              </div>
+              {touched.priority && errors.priority && (
+                <div className="error">{errors.priority}</div>
+              )}
+            </div>
+
+            {/* Description */}
+            <div className="epc-description-notes">
+              <span>Project Description / Notes</span>
+              <textarea
+                rows={5}
+                className="form-control"
+                value={projectDescription}
+                onChange={(e) => setProjectDescription(e.target.value)}
+              />
+            </div>
+
+            {/* Jewelry Items Table */}
+            <div className="epc-add-item-table">
+              <table className="jwell-table">
+                <thead>
+                  <tr>
+                    <th>Jewelry Item</th>
+                    <th>Quantity</th>
+                    <th>Price per Item</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item, idx) => (
+                    <tr key={idx}>
+                      <td>
+                        <input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) =>
+                            updateItem(idx, "name", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) =>
+                            updateItem(idx, "quantity", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          value={item.price}
+                          onChange={(e) =>
+                            updateItem(idx, "price", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>{getTotal(item.quantity, item.price)}</td>
+                      <td>
+                        <span onClick={() => deleteRow(idx)}>
+                          <img src="/SVG/delete-vec.svg" alt="delete" />
+                        </span>
+                        <span onClick={() => resetRow(idx)}>
+                          <img src="/SVG/refresh-vec.svg" alt="reset" />
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <a
+                href="#"
+                className="epc-add-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  addItem();
+                }}
+              >
+                <img src="/SVG/plus-vec.svg" alt="plus" /> Add Item
+              </a>
+            </div>
+
+            {/* Price & Currency */}
+            <div className="epc-price-overview">
+              <div>
+                <p>Select Currency</p>
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  className="pc-dropdown_toggle bg-white"
                 >
-                  <img src="/SVG/high-vec.svg" alt="High" /> High
-                </div>
-                <div
-                  className={`anp-mid_btn pr_btn ${
-                    priority === "Medium" ? "active" : ""
-                  }`}
-                  onClick={() => setPriority("Medium")}
-                >
-                  <img src="/SVG/mid-vec.svg" alt="Medium" /> Medium
-                </div>
-                <div
-                  className={`anp-low_btn pr_btn ${
-                    priority === "Low" ? "active" : ""
-                  }`}
-                  onClick={() => setPriority("Low")}
-                >
-                  <img src="/SVG/low-vec.svg" alt="Low" /> Low
-                </div>
+                  {["INR", "USD", "EUR", "AED"].map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <p>Subtotal</p>
+                <span>{getSubTotal()}</span>
+              </div>
+              <div>
+                <p>Total Project Price</p>
+                <input
+                  type="number"
+                  value={totalPrice}
+                  onChange={(e) => setTotalPrice(Number(e.target.value))}
+                  className="pc-dropdown_toggle bg-white"
+                />
               </div>
             </div>
 
-            <div className="anp-project_description sms-add_same">
-              <span>Description</span>
-              <textarea
-                className="form-control"
-                name="description"
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              ></textarea>
+            {/* File Upload */}
+            {existingFiles.length > 0 && (
+              <div className="uploaded-files-preview mt-3">
+                <ul className="file-list d-flex">
+                  {existingFiles.map((file, index) => (
+                    <li
+                      key={index}
+                      className="file-item d-flex flex-column mx-3"
+                    >
+                      <img
+                        src={file}
+                        alt="file"
+                        style={{
+                          width: "150px",
+                          height: "150px",
+                          objectFit: "contain",
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveExistingFile(file)}
+                      >
+                        ❌ Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {selectedFiles.length > 0 && (
+              <div className="uploaded-files-preview mt-3">
+                <h4>New Files to Upload</h4>
+                <ul className="file-list d-flex">
+                  {selectedFiles.map((file, index) => (
+                    <li
+                      key={index}
+                      className="file-item d-flex flex-column mx-3"
+                    >
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt="preview"
+                        style={{
+                          width: "150px",
+                          height: "150px",
+                          objectFit: "contain",
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSelectedFile(index)}
+                      >
+                        ❌ Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="epc-drag-drop-files">
+              <img src="/SVG/drag-drop-vec.svg" alt="drag" />
+              <span>Drag and drop files here or</span>
+              <label className="browse-btn">
+                Browse Files
+                <input
+                  type="file"
+                  multiple
+                  hidden
+                  onChange={handleFileChange}
+                />
+              </label>
+            </div>
+            <div className="epc-num-of-file-uploaded">
+              <span>{selectedFiles.length}</span>
+              <p>new files selected</p>
             </div>
 
+            {/* Submit Button */}
             <div className="anp-create_btn">
-              <button className="anp-save-btn" onClick={handleUpdateProject}>
-                <img src="/SVG/save-vec.svg" alt="Save" /> Update Project
+              <button
+                type="submit"
+                className="anp-create_task-btn"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <div className="loader"></div>
+                ) : (
+                  <>
+                    <img src="/SVG/save-vec.svg" alt="save" /> Save Project
+                  </>
+                )}
               </button>
             </div>
           </div>
         </section>
-      </div>
-      {showDeleteModal && (
-        <div className="custom-modal-overlay">
-          <div className="custom-modal">
-            <h3>Are you sure you want to delete this project?</h3>
-            <div className="modal-buttons">
-              <button className="confirm-btn" onClick={handleDeleteProject}>
-                Yes, Delete
-              </button>
-              <button
-                className="cancel-btn"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+      </form>
+    </div>
   );
 };
 

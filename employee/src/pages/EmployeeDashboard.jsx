@@ -39,6 +39,16 @@ const EmployeeDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [runningTimers, setRunningTimers] = useState({});
 
+  const filterOptions = [
+    "All Time",
+    "Today",
+    "This Week",
+    "This Month",
+    "Custom",
+  ];
+  const [selectedFilter, setSelectedFilter] = useState("This Week");
+  const [customRange, setCustomRange] = useState({ start: "", end: "" });
+
   useEffect(() => {
     const storedUser = localStorage.getItem("employeeUser");
     if (storedUser) {
@@ -61,11 +71,51 @@ const EmployeeDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem("employeeUser");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      fetchDashboardData(user._id);
+    }
+  }, [selectedFilter, customRange]);
+
+  const getFilterDates = () => {
+    const now = dayjs();
+    switch (selectedFilter) {
+      case "Today":
+        return {
+          startDate: now.startOf("day").toISOString(),
+          endDate: now.endOf("day").toISOString(),
+        };
+      case "This Week":
+        return {
+          startDate: now.startOf("week").toISOString(),
+          endDate: now.endOf("week").toISOString(),
+        };
+      case "This Month":
+        return {
+          startDate: now.startOf("month").toISOString(),
+          endDate: now.endOf("month").toISOString(),
+        };
+      case "Custom":
+        return {
+          startDate: new Date(customRange.start).toISOString(),
+          endDate: new Date(customRange.end).toISOString(),
+        };
+      default:
+        return {};
+    }
+  };
+
   const fetchDashboardData = async (employeeId) => {
     try {
       setLoading(true);
+      const filter = getFilterDates();
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/employee/dashboard/${employeeId}`
+        `${process.env.REACT_APP_API_URL}/api/employee/dashboard/${employeeId}`,
+        {
+          params: filter,
+        }
       );
 
       const filteredProjects = (res.data.projects || []).filter(
@@ -76,8 +126,8 @@ const EmployeeDashboard = () => {
       setSubtasks(res.data.subtasks || []);
       setTaskStats((prev) => [
         { ...prev[0], value: res.data.subtasks?.length || "0" },
-        { ...prev[1], value: res.data.completedThisWeek || "0" },
-        { ...prev[2], value: res.data.timeLoggedThisWeek || "0h 0m" },
+        { ...prev[1], value: res.data.completed || "0" },
+        { ...prev[2], value: res.data.timeLogged || "0h 0m" },
       ]);
 
       const timers = {};
@@ -94,7 +144,7 @@ const EmployeeDashboard = () => {
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
       toast.error(
-        error.response.data.message || "Failed to fetch dashboard data."
+        error.response?.data?.message || "Failed to fetch dashboard data."
       );
     } finally {
       setLoading(false);
@@ -128,6 +178,21 @@ const EmployeeDashboard = () => {
     }
   };
 
+  const handleCopyToClipboard = (url, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.ctrlKey || e.metaKey) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    navigator.clipboard
+      .writeText(url)
+      .then(() => toast.success("URL copied to clipboard!"))
+      .catch(() => toast.error("Failed to copy URL."));
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -138,28 +203,63 @@ const EmployeeDashboard = () => {
           <p>Manage your jewelry production workflow</p>
         </div>
       </section>
-
-      <section className="empan-boxes-main">
-        <div className="empan-boxes-inner">
-          {taskStats.map((item, index) => {
-            const content = (
-              <div className="empan-icon-text-box">
-                <div className={`empan-icon ${item.bgClass}`}>
-                  <img src={item.icon} alt={item.alt} />
-                </div>
-                <div className="empan-text">
-                  <span className="emapn-header-text">{item.label}</span>
-                  <span className="emapn-main-text-number">{item.value}</span>
-                </div>
+      <section className="ett-main-sec">
+        <div className="tt-time-tracking ett-emp-tracking-time">
+          <div className="ett-time-duration">
+            <div className="ett-time-type d-flex gap-3">
+              {filterOptions.map((label) => (
+                <a
+                  key={label}
+                  href="#"
+                  className={selectedFilter === label ? "ett-today active" : ""}
+                  onClick={() => setSelectedFilter(label)}
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+            {selectedFilter === "Custom" && (
+              <div className="d-flex gap-3 mt-2">
+                <input
+                  type="date"
+                  className="form-control"
+                  onChange={(e) =>
+                    setCustomRange({ ...customRange, start: e.target.value })
+                  }
+                />
+                <input
+                  type="date"
+                  className="form-control"
+                  onChange={(e) =>
+                    setCustomRange({ ...customRange, end: e.target.value })
+                  }
+                />
               </div>
-            );
-            return (
-              <div key={index}>
-                {item.link ? <a href={item.link}>{content}</a> : content}
-              </div>
-            );
-          })}
+            )}
+          </div>
         </div>
+        <section className="empan-boxes-main">
+          <div className="empan-boxes-inner">
+            {taskStats.map((item, index) => {
+              const content = (
+                <div className="empan-icon-text-box">
+                  <div className={`empan-icon ${item.bgClass}`}>
+                    <img src={item.icon} alt={item.alt} />
+                  </div>
+                  <div className="empan-text">
+                    <span className="emapn-header-text">{item.label}</span>
+                    <span className="emapn-main-text-number">{item.value}</span>
+                  </div>
+                </div>
+              );
+              return (
+                <div key={index}>
+                  {item.link ? <a href={item.link}>{content}</a> : content}
+                </div>
+              );
+            })}
+          </div>
+        </section>
       </section>
 
       <section className="ttb-table-main">
@@ -389,26 +489,66 @@ const EmployeeDashboard = () => {
                                     </span>
                                   </td>
                                   <td
-                                    style={{ width: "200px" }}
-                                    title={task.url}
+                                    style={{
+                                      width: "200px",
+                                      position: "relative",
+                                    }}
                                   >
-                                    <a
-                                      href={task.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
+                                    <div
                                       style={{
-                                        maxWidth: "200px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                        width: "200px",
                                         whiteSpace: "nowrap",
                                         overflow: "hidden",
                                         textOverflow: "ellipsis",
-                                        display: "block",
+                                        cursor: "pointer",
                                         color: "#007bff",
-                                        textDecoration: "none",
+                                        paddingRight: "20px", // To give space for the icon
+                                        position: "relative",
                                       }}
-                                      title={task.url}
+                                      onClick={(e) =>
+                                        handleCopyToClipboard(task.url, e)
+                                      }
+                                      title="Click to copy. Ctrl+Click to open."
                                     >
-                                      {task.url}
-                                    </a>
+                                      <span
+                                        style={{
+                                          overflow: "hidden",
+                                          textOverflow: "ellipsis",
+                                        }}
+                                      >
+                                        {task.url}
+                                      </span>
+
+                                      <span
+                                        onClick={(e) =>
+                                          handleCopyToClipboard(task.url, e)
+                                        }
+                                        style={{
+                                          position: "absolute",
+                                          right: "2px",
+                                          top: "50%",
+                                          transform: "translateY(-50%)",
+                                          fontSize: "14px",
+                                          color: "#555",
+                                          cursor: "pointer",
+                                        }}
+                                        title="Copy URL"
+                                      >
+                                        <img
+                                          src="/SVG/clipboard.svg"
+                                          alt="copy icon"
+                                          style={{
+                                            width: "16px",
+                                            height: "16px",
+                                            filter: "hue-rotate(310deg)",
+                                            opacity: 0.8,
+                                          }}
+                                        />
+                                      </span>
+                                    </div>
                                   </td>
 
                                   <td>{task.stage}</td>

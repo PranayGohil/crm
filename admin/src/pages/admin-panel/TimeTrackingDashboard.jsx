@@ -7,14 +7,13 @@ const TimeTrackingDashboard = () => {
   const [subtasks, setSubtasks] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [openTable, setOpenTable] = useState(null);
-  const [selectedFilter, setSelectedFilter] = useState("Today");
+  const [selectedFilter, setSelectedFilter] = useState("All Time");
   const [customDateRange, setCustomDateRange] = useState({
     from: null,
     to: null,
   });
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("All");
 
-  // Fetch all data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,6 +54,7 @@ const TimeTrackingDashboard = () => {
           return date.isBetween(from, to, null, "[]");
         }
         return false;
+      case "All Time":
       default:
         return true;
     }
@@ -63,11 +63,7 @@ const TimeTrackingDashboard = () => {
   const calculateTimeSpent = (timeLogs) => {
     let total = 0;
     timeLogs?.forEach((log) => {
-      if (
-        log.start_time &&
-        log.end_time &&
-        isWithinFilter(log.start_time) // Filter-aware
-      ) {
+      if (log.start_time && log.end_time && isWithinFilter(log.start_time)) {
         const diff = moment(log.end_time).diff(
           moment(log.start_time),
           "seconds"
@@ -97,7 +93,11 @@ const TimeTrackingDashboard = () => {
   };
 
   const filteredSubtasks = subtasks.filter(
-    (s) => selectedEmployeeId === "All" || s.assign_to === selectedEmployeeId
+    (s) =>
+      (selectedEmployeeId === "All" || s.assign_to === selectedEmployeeId) &&
+      s.time_logs?.some((log) =>
+        log.start_time && log.end_time ? isWithinFilter(log.start_time) : false
+      )
   );
 
   const summaryData = {
@@ -135,20 +135,21 @@ const TimeTrackingDashboard = () => {
           <div className="ett-time-duration">
             <div>
               <div className="ett-time-type d-flex gap-3">
-                {["Today", "This Week", "This Month", "Custom"].map((label) => (
-                  <a
-                    key={label}
-                    href="#"
-                    className={
-                      selectedFilter === label ? "ett-today active" : ""
-                    }
-                    onClick={() => setSelectedFilter(label)}
-                  >
-                    {label}
-                  </a>
-                ))}
+                {["All Time", "Today", "This Week", "This Month", "Custom"].map(
+                  (label) => (
+                    <a
+                      key={label}
+                      href="#"
+                      className={
+                        selectedFilter === label ? "ett-today active" : ""
+                      }
+                      onClick={() => setSelectedFilter(label)}
+                    >
+                      {label}
+                    </a>
+                  )
+                )}
               </div>
-
               {selectedFilter === "Custom" && (
                 <div className="d-flex gap-3 mt-2">
                   <input
@@ -189,11 +190,6 @@ const TimeTrackingDashboard = () => {
                 ))}
               </select>
             </div>
-
-            {/* <div className="filter">
-              <img src="/SVG/filter-vector.svg" alt="search" />
-              <span>Filters</span>
-            </div> */}
           </div>
         </div>
       </section>
@@ -206,11 +202,8 @@ const TimeTrackingDashboard = () => {
         </div>
 
         {projects.map((project) => {
-          const projectSubtasks = subtasks.filter(
-            (s) =>
-              s.project_id === project._id &&
-              (selectedEmployeeId === "All" ||
-                s.assign_to === selectedEmployeeId)
+          const projectSubtasks = filteredSubtasks.filter(
+            (s) => s.project_id === project._id
           );
 
           const totalTime = projectSubtasks.reduce((acc, sub) => {
@@ -221,6 +214,8 @@ const TimeTrackingDashboard = () => {
           }, 0);
           const duration = moment.duration(totalTime, "seconds");
           const formattedTime = `${duration.days()}d ${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
+
+          if (projectSubtasks.length === 0) return null;
 
           return (
             <React.Fragment key={project._id}>
@@ -339,8 +334,6 @@ const TimeTrackingDashboard = () => {
           <span>Total time tracked: {totalTimeTrackedFormatted}</span>
         </div>
       </section>
-
-      {/* <TeamSummary /> */}
     </div>
   );
 };

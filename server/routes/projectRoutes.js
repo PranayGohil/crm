@@ -18,9 +18,9 @@ const projectRouter = express.Router();
 
 projectRouter.get("/get-all", getProjects);
 projectRouter.get("/get/:id", getProjectInfo);
-projectRouter.post("/add", addProject);
+projectRouter.post("/add", upload.array("files"), addProject);
 projectRouter.delete("/delete/:id", deleteProject);
-projectRouter.put("/update/:id", updateProject);
+projectRouter.put("/update/:id", upload.array("files"), updateProject);
 projectRouter.put("/change-status/:projectId", changeProjectStatus);
 projectRouter.put("/change-priority/:projectId", changeProjectPriority);
 projectRouter.post(

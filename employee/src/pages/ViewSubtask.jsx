@@ -75,7 +75,9 @@ const ViewSubtask = () => {
         }
       } catch (error) {
         console.error("Failed to load subtask details:", error);
-        toast.error(error.response.data.message || "Failed to load subtask details.");
+        toast.error(
+          error.response.data.message || "Failed to load subtask details."
+        );
       } finally {
         setLoading(false);
       }
@@ -308,22 +310,16 @@ const ViewSubtask = () => {
         </div>
       </section>
 
-      <section className="pb-sec-5 pb-sec2">
-        <div className="pb-sec5-inner pb-sec3-inner">
-          <div className="pb-project-description">
-            <h3>Description</h3>
-            <p>{subtask.description || "No description available."}</p>
-          </div>
-        </div>
-      </section>
-
       <section className="pb-sec-6 pb-sec2">
         <div className="pb-sec6-inner pb-sec3-inner">
           <h1>Attached Media</h1>
           <div className="pb-attached-photo-sec">
             <div className="pb-project-gallary">
               {mediaItems.length === 0 ? (
-                <p>No media attached.</p>
+                <>
+                  <div>No media attached.</div>
+                  <br />
+                </>
               ) : (
                 mediaItems.map((item, index) => (
                   <div className="pb-gallary-img" key={index}>
@@ -361,23 +357,23 @@ const ViewSubtask = () => {
                   </div>
                 ))
               )}
-              <label
-                htmlFor="mediaUpload"
-                className="pb-add-img"
-                style={{ cursor: "pointer" }}
-              >
-                <img src="/SVG/plus-grey.svg" alt="add" />
-                <span>Add Media</span>
-                <input
-                  type="file"
-                  id="mediaUpload"
-                  multiple
-                  accept="image/*,application/pdf"
-                  className="d-none"
-                  onChange={(e) => handleUploadMedia(e.target.files)}
-                />
-              </label>
             </div>
+            <label
+              htmlFor="mediaUpload"
+              className="pb-add-img mt-3"
+              style={{ cursor: "pointer" }}
+            >
+              <img src="/SVG/plus-grey.svg" alt="add" />
+              <span>Add Media</span>
+              <input
+                type="file"
+                id="mediaUpload"
+                multiple
+                accept="image/*,application/pdf"
+                className="d-none"
+                onChange={(e) => handleUploadMedia(e.target.files)}
+              />
+            </label>
           </div>
         </div>
       </section>
@@ -398,11 +394,34 @@ const ViewSubtask = () => {
                   onChange={(e) => setNewComment(e.target.value)}
                 />
               </div>
-              <img
-                src={employee?.profile_pic || "/Image/default-profile.jpg"}
-                alt={employee?.full_name || "Employee"}
-                style={{ borderRadius: "50%" }}
-              />
+              {employee?.profile_pic ? (
+                <img
+                  src={employee?.profile_pic || "/Image/default-profile.jpg"}
+                  alt={employee?.full_name || "Employee"}
+                  style={{ borderRadius: "50%" }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "50px",
+                    height: "50px",
+                    borderRadius: "50%",
+                    backgroundColor: "#0a3749",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    border: "2px solid white",
+                  }}
+                >
+                  {employee?.full_name
+                    ? employee.full_name.charAt(0).toUpperCase()
+                    : "?"}
+                </div>
+              )}
             </div>
             <div className="pb-add-components">
               <div></div>

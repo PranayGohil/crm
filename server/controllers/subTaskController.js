@@ -218,9 +218,29 @@ export const changeSubTaskStatus = async (req, res) => {
       });
     }
 
-    // ✅ Update status
+    // ✅ Update subtask status
     subtask.status = status;
     await subtask.save();
+
+    // ✅ Update employee status based on subtask state
+    if (userRole === "employee" && subtask.assign_to) {
+      const assignedEmployee = await Employee.findById(subtask.assign_to);
+      if (assignedEmployee) {
+        if (status === "In Progress") {
+          assignedEmployee.status = "Active";
+        } else {
+          // Check if any other subtask is still in progress
+          const otherActiveTask = await SubTask.findOne({
+            assign_to: subtask.assign_to,
+            status: "In Progress",
+          });
+          if (!otherActiveTask) {
+            assignedEmployee.status = "Inactive";
+          }
+        }
+        await assignedEmployee.save();
+      }
+    }
 
     // ✅ Send notification
     const project = await Project.findById(subtask.project_id);
