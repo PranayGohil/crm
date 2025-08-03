@@ -19,7 +19,7 @@ const EditSubtask = () => {
 
   const singleSchema = Yup.object({
     task_name: Yup.string().required("Subtask name is required"),
-    stage: Yup.string().required("Stage is required"),
+    stage: Yup.array().min(1, "Select at least one stage"),
     priority: Yup.string().required("Priority is required"),
     assign_date: Yup.string().required("Start date is required"),
     due_date: Yup.string().required("Due date is required"),
@@ -56,7 +56,11 @@ const EditSubtask = () => {
           task_name: subtask.task_name || "",
           description: subtask.description || "",
           url: subtask.url || "",
-          stage: subtask.stage || "",
+          stage: Array.isArray(subtask.stage)
+            ? subtask.stage
+            : subtask.stage
+            ? [subtask.stage]
+            : [],
           priority: subtask.priority || "",
           assign_to: subtask.assign_to?._id || subtask.assign_to || "",
           assign_date: subtask.assign_date?.slice(0, 10) || "",
@@ -88,7 +92,7 @@ const EditSubtask = () => {
       formData.append("task_name", values.task_name);
       formData.append("description", values.description);
       formData.append("url", values.url);
-      formData.append("stage", values.stage);
+      formData.append("stage", JSON.stringify(values.stage));
       formData.append("priority", values.priority);
       formData.append("assign_date", values.assign_date);
       formData.append("due_date", values.due_date);
@@ -111,7 +115,7 @@ const EditSubtask = () => {
       setLoading(false);
     }
   };
-  
+
   if (loading) return <LoadingOverlay />;
 
   return (
@@ -181,11 +185,7 @@ const EditSubtask = () => {
                     <div className="sms-add_task-form">
                       <div className="sms-add_name sms-add_same">
                         <span>URL</span>
-                        <Field
-                          type="text"
-                          name="url"
-                          placeholder="URL"
-                        />
+                        <Field type="text" name="url" placeholder="URL" />
                         <ErrorMessage
                           name="url"
                           component="div"
@@ -197,18 +197,27 @@ const EditSubtask = () => {
                     <div className="sms-add_task-form">
                       <div className="sms-add_same">
                         <span>Stage</span>
-                        <Field
-                          as="select"
-                          name="stage"
-                          className="dropdown_toggle w-100 "
-                        >
-                          <option value="">Select Stage</option>
+                        <div className="d-flex flex-wrap gap-2">
                           {stageOptions.map((opt, idx) => (
-                            <option key={idx} value={opt}>
+                            <label
+                              key={idx}
+                              className="d-flex align-items-center justify-content-center"
+                              style={{ display: "block" }}
+                            >
+                              <Field
+                                type="checkbox"
+                                name="stage"
+                                style={{
+                                  marginRight: "10px",
+                                  width: "20px",
+                                  height: "20px",
+                                }}
+                                value={opt}
+                              />
                               {opt}
-                            </option>
+                            </label>
                           ))}
-                        </Field>
+                        </div>
                         <ErrorMessage
                           name="stage"
                           component="div"

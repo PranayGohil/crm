@@ -235,6 +235,7 @@ export const getAllProjectsWithTasks = async (req, res) => {
             id: s._id,
             task_name: s.task_name,
             stage: s.stage,
+            current_stage_index: s.current_stage_index,
             priority: s.priority,
             status: s.status,
             url: s.url,

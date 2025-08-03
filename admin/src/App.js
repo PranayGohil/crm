@@ -47,6 +47,8 @@ import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 import Designation from "./pages/admin-panel/Designation";
 
+import AdminProfile from "./pages/admin-panel/AdminProfile";
+
 function App() {
   return (
     <Router>
@@ -63,6 +65,7 @@ function App() {
           <Route path="/" element={<DashboardOverview />} />
           <Route index element={<DashboardOverview />} />
           <Route path="/dashboard" element={<DashboardOverview />} />
+          <Route path="/admin/profile" element={<AdminProfile />} />
 
           {/* client */}
           <Route path="/client/dashboard" element={<ClientDashboardPage />} />

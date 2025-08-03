@@ -20,7 +20,10 @@ const AddSubtask = () => {
   const singleSchema = Yup.object({
     task_name: Yup.string().required("Subtask name is required"),
     description: Yup.string().required("Description is required"),
-    stage: Yup.string().required("Stage is required"),
+    stage: Yup.array()
+      .of(Yup.string().oneOf(stageOptions))
+      .min(1, "Select at least one stage")
+      .required("Stage is required"),
     priority: Yup.string().required("Priority is required"),
     assign_to: Yup.string().required("Assign To is required"),
     due_date: Yup.string().required("Due date is required"),
@@ -32,7 +35,10 @@ const AddSubtask = () => {
     bulkEnd: Yup.number()
       .required("End number is required")
       .moreThan(Yup.ref("bulkStart"), "End must be greater than start"),
-    bulkStage: Yup.string().required("Stage is required"),
+    bulkStage: Yup.array()
+      .of(Yup.string().oneOf(stageOptions))
+      .min(1, "Select at least one stage")
+      .required("Stage is required"),
     bulkPriority: Yup.string().required("Priority is required"),
     bulkAssignDate: Yup.string().required("Start date is required"),
     bulkDueDate: Yup.string().required("Due date is required"),
@@ -63,7 +69,7 @@ const AddSubtask = () => {
       formData.append("task_name", values.task_name);
       formData.append("description", values.description);
       formData.append("url", values.url);
-      formData.append("stage", values.stage);
+      formData.append("stage", JSON.stringify(values.stage));
       formData.append("priority", values.priority);
       formData.append("assign_date", values.assign_date);
       formData.append("due_date", values.due_date);
@@ -152,7 +158,7 @@ const AddSubtask = () => {
                   task_name: "",
                   description: "",
                   url: "",
-                  stage: "",
+                  stage: [],
                   priority: "",
                   assign_to: "",
                   assign_date: "",
@@ -210,18 +216,27 @@ const AddSubtask = () => {
                     <div className="sms-add_task-form">
                       <div className="sms-add_same">
                         <span>Stage</span>
-                        <Field
-                          as="select"
-                          name="stage"
-                          className="dropdown_toggle w-100 "
-                        >
-                          <option value="">Select Stage</option>
-                          {stageOptions.map((opt, idx) => (
-                            <option key={idx} value={opt}>
+                        <div className="d-flex flex-wrap gap-2">
+                          {stageOptions.map((opt) => (
+                            <label
+                              key={opt}
+                              className="d-flex align-items-center justify-content-center"
+                              style={{ display: "block" }}
+                            >
+                              <Field
+                                type="checkbox"
+                                name="stage"
+                                style={{
+                                  marginRight: "10px",
+                                  width: "20px",
+                                  height: "20px",
+                                }}
+                                value={opt}
+                              />
                               {opt}
-                            </option>
+                            </label>
                           ))}
-                        </Field>
+                        </div>
                         <ErrorMessage
                           name="stage"
                           component="div"
@@ -381,7 +396,7 @@ const AddSubtask = () => {
                   bulkPrefix: "",
                   bulkStart: 1,
                   bulkEnd: 5,
-                  bulkStage: "",
+                  bulkStage: [],
                   bulkPriority: "",
                   bulkAssignTo: "",
                   bulkAssignDate: "",
@@ -446,20 +461,29 @@ const AddSubtask = () => {
 
                       <div className="sms-add_same">
                         <span>Stage</span>
-                        <Field
-                          as="select"
-                          name="bulkStage"
-                          className="dropdown_toggle w-100 "
-                        >
-                          <option value="">Select Stage</option>
-                          {stageOptions.map((opt, idx) => (
-                            <option key={idx} value={opt}>
+                        <div className="d-flex flex-wrap gap-2">
+                          {stageOptions.map((opt) => (
+                            <label
+                              key={opt}
+                              className="d-flex align-items-center justify-content-center"
+                              style={{ display: "block" }}
+                            >
+                              <Field
+                                type="checkbox"
+                                name="bulkStage"
+                                style={{
+                                  marginRight: "10px",
+                                  width: "20px",
+                                  height: "20px",
+                                }}
+                                value={opt}
+                              />
                               {opt}
-                            </option>
+                            </label>
                           ))}
-                        </Field>
+                        </div>
                         <ErrorMessage
-                          name="bulkStage"
+                          name="stage"
                           component="div"
                           className="error"
                         />

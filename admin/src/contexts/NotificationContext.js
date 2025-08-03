@@ -85,10 +85,20 @@ export const NotificationProvider = ({ children }) => {
   }, []);
 
   // Mark all as read (update UI only)
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
     setUnreadCount(0);
-    // optional: also tell backend to mark them as read
-    // axios.post('/api/notification/mark-all-read', { receiver_id: user._id });
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/notification/mark-all-read`,
+        {
+          receiver_id: "admin",
+        }
+      );
+    } catch (err) {
+      console.error("Failed to mark notifications as read:", err);
+    }
   };
 
   return (

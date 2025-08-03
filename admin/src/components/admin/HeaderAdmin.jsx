@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { Link } from "react-router-dom";
 import { NotificationContext } from "../../contexts/NotificationContext";
 
 const HeaderAdmin = () => {
@@ -24,14 +25,14 @@ const HeaderAdmin = () => {
                 </a>
               </div>
 
-              <div className="ha-header-img-admin_name d-flex align-items-center">
+              <Link to="/admin/profile" className="ha-header-img-admin_name d-flex align-items-center">
                 <img
                   src="/Image/Riya Sharma.png"
                   alt="riya sharma"
                   className="ha_admin_name"
                 />
                 <span>Admin</span>
-              </div>
+              </Link>
             </div>
           </div>
         </div>

@@ -297,7 +297,11 @@ const SubtaskDashboardContainer = () => {
                 <td>{formateDate(task.assign_date)}</td>
                 <td>{formateDate(task.due_date)}</td>
                 <td>{task.priority}</td>
-                <td>{task.stage}</td>
+                <td>
+                  {Array.isArray(task.stage)
+                    ? task.stage.join(" → ")
+                    : task.stage}
+                </td>
                 <td>{task.status}</td>
                 <td
                   style={{

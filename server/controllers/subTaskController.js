@@ -8,6 +8,13 @@ import cloudinary from "../config/cloudinary.js";
 import Notification from "../models/notificationModel.js";
 import { io } from "../utils/socket.js";
 
+const FIXED_STAGE_ORDER = ["CAD Design", "SET Design", "Render", "Delivery"];
+
+function sortStages(inputStages) {
+  const uniqueStages = [...new Set(inputStages)]; // remove duplicates
+  return FIXED_STAGE_ORDER.filter((stage) => uniqueStages.includes(stage));
+}
+
 // Add a single subtask
 export const addSubTask = async (req, res) => {
   try {
@@ -16,7 +23,6 @@ export const addSubTask = async (req, res) => {
       task_name,
       description,
       url,
-      stage,
       priority,
       assign_date,
       due_date,
@@ -24,6 +30,9 @@ export const addSubTask = async (req, res) => {
       path_to_files,
       status,
     } = req.body;
+
+    let stage = JSON.parse(req.body.stage);
+    stage = sortStages(stage);
 
     const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
 
@@ -52,15 +61,24 @@ export const addSubTask = async (req, res) => {
 // Add bulk subtasks
 export const addBulkSubTasks = async (req, res) => {
   try {
-    const tasks = req.body; // array
+    const tasks = req.body;
 
-    const tasksWithObjectIds = tasks.map((task) => ({
-      ...task,
-      project_id: new mongoose.Types.ObjectId(task.project_id),
-      assign_to: task.assign_to
-        ? new mongoose.Types.ObjectId(task.assign_to)
-        : null,
-    }));
+    const tasksWithObjectIds = tasks.map((task) => {
+      const parsedStage = Array.isArray(task.stage)
+        ? task.stage
+        : typeof task.stage === "string"
+        ? [task.stage]
+        : [];
+
+      return {
+        ...task,
+        project_id: new mongoose.Types.ObjectId(task.project_id),
+        assign_to: task.assign_to
+          ? new mongoose.Types.ObjectId(task.assign_to)
+          : null,
+        stage: sortStages(parsedStage),
+      };
+    });
 
     const result = await SubTask.insertMany(tasksWithObjectIds);
     res.status(200).json(result);
@@ -120,7 +138,6 @@ export const updateSubTask = async (req, res) => {
       task_name,
       description,
       url,
-      stage,
       priority,
       assign_to,
       assign_date,
@@ -129,11 +146,25 @@ export const updateSubTask = async (req, res) => {
       status,
     } = req.body;
 
+    let stageArray = [];
+
+    if (Array.isArray(req.body.stage)) {
+      stageArray = req.body.stage;
+    } else if (typeof req.body.stage === "string") {
+      try {
+        stageArray = JSON.parse(req.body.stage);
+      } catch (err) {
+        stageArray = [req.body.stage];
+      }
+    }
+
+    stageArray = sortStages(stageArray);
+
     let updateData = {
       task_name,
       description,
       url,
-      stage,
+      stage: stageArray,
       priority,
       assign_to: assign_to ? new mongoose.Types.ObjectId(assign_to) : null,
       assign_date,
@@ -142,7 +173,6 @@ export const updateSubTask = async (req, res) => {
       status,
     };
 
-    // update media files if uploaded
     if (req.files && req.files.length > 0) {
       updateData.media_files = req.files.map((file) => file.path);
     }

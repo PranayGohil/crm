@@ -31,38 +31,39 @@ export const Summary = async (req, res) => {
     const totalProjects = await Project.countDocuments();
     const totalClients = await Client.countDocuments();
     const totalEmployees = await Employee.countDocuments();
-
     const totalTasks = await SubTask.countDocuments();
 
-    // Only focus on the 3 main stages
-    const stages = ["CAD Design", "SET Design", "Render"];
-
-    // Count tasks by each stage
-    const stageCounts = {};
-    for (const stage of stages) {
-      stageCounts[stage] = await SubTask.countDocuments({ stage });
-    }
-
-    // Cumulative logic for remaining tasks
-    const tasksByStage = {
-      "CAD Design": stageCounts["CAD Design"],
-
-      "SET Design": stageCounts["CAD Design"] + stageCounts["SET Design"],
-
-      Render:
-        stageCounts["CAD Design"] +
-        stageCounts["SET Design"] +
-        stageCounts["Render"],
+    const stageCounts = {
+      "CAD Design": 0,
+      "SET Design": 0,
+      Render: 0,
     };
 
-    console.log("Tasks by stage:", tasksByStage);
+    const subtasks = await SubTask.find(
+      {},
+      { stage: 1, current_stage_index: 1 }
+    );
+
+    subtasks.forEach((task) => {
+      if (
+        Array.isArray(task.stage) &&
+        typeof task.current_stage_index === "number"
+      ) {
+        ["CAD Design", "SET Design", "Render"].forEach((stageName) => {
+          const stageIndex = task.stage.indexOf(stageName);
+          if (stageIndex !== -1 && task.current_stage_index <= stageIndex) {
+            stageCounts[stageName]++;
+          }
+        });
+      }
+    });
 
     res.json({
       totalProjects,
       totalClients,
       totalEmployees,
       totalTasks,
-      tasksByStage, // cumulative remaining tasks by stage
+      tasksByStage: stageCounts,
     });
   } catch (error) {
     console.error("Summary fetch error:", error);

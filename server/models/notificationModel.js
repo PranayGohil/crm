@@ -1,3 +1,4 @@
+// models/Notification.js
 import mongoose from "mongoose";
 
 const notificationSchema = new mongoose.Schema({
@@ -14,6 +15,10 @@ const notificationSchema = new mongoose.Schema({
     type: String,
     enum: ["admin", "employee", "client"],
     required: true,
+  },
+  read: {
+    type: Boolean,
+    default: false,
   },
   created_by: { type: mongoose.Schema.Types.ObjectId },
   created_by_role: String,

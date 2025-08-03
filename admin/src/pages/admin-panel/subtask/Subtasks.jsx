@@ -547,7 +547,12 @@ const Subtasks = () => {
                                     />
                                   </td>
                                   <td>{s.task_name}</td>
-                                  <td>{s.stage}</td>
+                                  <td>
+                                    {s.stage &&
+                                    s.current_stage_index !== undefined
+                                      ? s.stage[s.current_stage_index] || "N/A"
+                                      : "N/A"}
+                                  </td>
                                   <td>{s.priority}</td>
                                   <td>{s.status}</td>
                                   <td

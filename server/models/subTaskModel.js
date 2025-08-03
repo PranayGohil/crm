@@ -30,7 +30,11 @@ const subTaskSchema = mongoose.Schema(
       type: String,
     },
     stage: {
-      type: String,
+      type: [String],
+    },
+    current_stage_index: {
+      type: Number,
+      default: 0,
     },
     priority: {
       type: String,
