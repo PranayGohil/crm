@@ -11,11 +11,11 @@ import { AuthProvider } from "./contexts/AuthContext";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <AuthProvider>
-    <NotificationProvider>
+    {/* <NotificationProvider> */}
       <React.StrictMode>
         <App />
       </React.StrictMode>
-    </NotificationProvider>
+    {/* </NotificationProvider> */}
   </AuthProvider>
 );
 

@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { NotificationContext } from "../../contexts/NotificationContext";
+// import { NotificationContext } from "../../contexts/NotificationContext";
 
 const HeaderAdmin = () => {
-  const { unreadCount } = useContext(NotificationContext);
+  // const { unreadCount } = useContext(NotificationContext);
 
   return (
     <div className="ha-header_admin_main">
@@ -19,9 +19,9 @@ const HeaderAdmin = () => {
               <div className="ha_notification__header">
                 <a href="/notifications">
                   <img src="/SVG/notification.svg" alt="notification icon" />
-                  {unreadCount > 0 && (
+                  {/* {unreadCount > 0 && (
                     <span className="ha_notification_count">{unreadCount}</span>
-                  )}
+                  )} */}
                 </a>
               </div>
 
