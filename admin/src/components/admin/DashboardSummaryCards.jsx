@@ -29,16 +29,16 @@ const DashboardSummaryCards = () => {
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
 
-    // axios
-    //   .get(
-    //     `${process.env.REACT_APP_API_URL}/api/statistics/department-capacities`
-    //   )
-    //   .then((res) => {
-    //     console.log(res.data);
-    //     setDepartmentCapacities(res.data);
-    //   })
-    //   .catch((err) => console.error(err))
-    //   .finally(() => setLoading(false));
+    axios
+      .get(
+        `${process.env.REACT_APP_API_URL}/api/statistics/department-capacities`
+      )
+      .then((res) => {
+        console.log(res.data);
+        setDepartmentCapacities(res.data);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -170,7 +170,7 @@ const DashboardSummaryCards = () => {
             </div>
           </Link>
 
-          {/* <div className="md-common-total-card">
+          <div className="md-common-total-card">
             <div className="md-common-para-icon md-para-icon-tasks">
               <span>Department Capacity</span>
               <div>
@@ -180,7 +180,7 @@ const DashboardSummaryCards = () => {
             <div className="mb-4 d-flex justify-content-between align-items-center">
               <div className="flex gap-2 mb-2">
                 <button
-                  className={`btn btn-sm mx-2 ${
+                  className={`btn btn-sm m-2 ${
                     capacityMode === "time"
                       ? "btn-primary"
                       : "btn-outline-primary"
@@ -193,7 +193,7 @@ const DashboardSummaryCards = () => {
                   Time to Complete Tasks
                 </button>
                 <button
-                  className={`btn btn-sm mx-2 ${
+                  className={`btn btn-sm m-2 ${
                     capacityMode === "employee"
                       ? "btn-primary"
                       : "btn-outline-primary"
@@ -212,7 +212,7 @@ const DashboardSummaryCards = () => {
                 {capacityMode === "time" ? (
                   <>
                     <button
-                      className={`btn btn-sm mx-2 ${
+                      className={`btn btn-sm m-2 ${
                         viewOption === "withSundays"
                           ? "btn-success"
                           : "btn-outline-success"
@@ -222,7 +222,7 @@ const DashboardSummaryCards = () => {
                       With Sundays
                     </button>
                     <button
-                      className={`btn btn-sm mx-2 ${
+                      className={`btn btn-sm m-2 ${
                         viewOption === "withoutSundays"
                           ? "btn-success"
                           : "btn-outline-success"
@@ -235,7 +235,7 @@ const DashboardSummaryCards = () => {
                 ) : (
                   <>
                     <button
-                      className={`btn btn-sm mx-2 ${
+                      className={`btn btn-sm m-2 ${
                         viewOption === "daily"
                           ? "btn-success"
                           : "btn-outline-success"
@@ -255,7 +255,7 @@ const DashboardSummaryCards = () => {
                       Monthly (With Sundays)
                     </button>
                     <button
-                      className={`btn btn-sm mx-2 ${
+                      className={`btn btn-sm m-2 ${
                         viewOption === "monthlyWithoutSundays"
                           ? "btn-success"
                           : "btn-outline-success"
@@ -324,7 +324,7 @@ const DashboardSummaryCards = () => {
                   }
                 )}
             </div>
-          </div> */}
+          </div>
         </div>
       </section>
       <section className="md-total-card-main mt-6">
