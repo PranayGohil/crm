@@ -1,0 +1,445 @@
+[{
+  "_id": {
+    "$oid": "68887b36be7f49a517bc7dc2"
+  },
+  "project_name": "100 design abhishek vavadiya with render",
+  "client_id": "68887aedbe7f49a517bc7367",
+  "assign_to": [],
+  "assign_date": {
+    "$date": "2025-07-29T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-03T00:00:00.000Z"
+  },
+  "priority": "high",
+  "status": "Completed",
+  "content": [
+    {
+      "items": [
+        {
+          "name": "Ring",
+          "quantity": 1,
+          "price": 2,
+          "_id": {
+            "$oid": "688e9f0e22b958189c0abed8"
+          }
+        }
+      ],
+      "total_price": 0,
+      "uploaded_files": [],
+      "description": "Hello",
+      "currency": "INR",
+      "_id": {
+        "$oid": "688e9f0e22b958189c0abed7"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-07-29T07:41:42.146Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T09:17:55.665Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888b56abe7f49a517be7fe2"
+  },
+  "project_name": "Vahan new 200 rings ",
+  "client_id": "6885b951676bee41dc3552ab",
+  "assign_to": [],
+  "assign_date": {
+    "$date": "2025-07-31T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "priority": "medium",
+  "status": "To do",
+  "content": [
+    {
+      "items": [
+        {
+          "name": "ring ",
+          "quantity": 50,
+          "price": 20,
+          "_id": {
+            "$oid": "6888b7f2be7f49a517be8fa4"
+          }
+        },
+        {
+          "name": "er",
+          "quantity": 100,
+          "price": 20,
+          "_id": {
+            "$oid": "6888b7f2be7f49a517be8fa5"
+          }
+        }
+      ],
+      "total_price": 3000,
+      "uploaded_files": [],
+      "description": "",
+      "currency": "USD",
+      "_id": {
+        "$oid": "6888b7f2be7f49a517be8fa3"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-07-29T11:50:02.545Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-29T12:00:50.835Z"
+  },
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "6889a2379a78551981ed7302"
+  },
+  "project_name": "adasd",
+  "client_id": "6885b951676bee41dc3552ab",
+  "assign_to": [],
+  "assign_date": {
+    "$date": "2025-07-31T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "priority": "low",
+  "status": "To do",
+  "content": [],
+  "createdAt": {
+    "$date": "2025-07-30T04:40:23.054Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-30T04:40:23.054Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688ac538cb7b9eb044f5dd66"
+  },
+  "project_name": "Testingggg Desc",
+  "client_id": "6881e3030489d837e0162932",
+  "assign_to": [],
+  "assign_date": {
+    "$date": "2025-07-31T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "priority": "high",
+  "status": "To do",
+  "description": "Testing Desc New",
+  "content": [],
+  "createdAt": {
+    "$date": "2025-07-31T01:22:00.607Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-31T01:25:39.392Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688b4651e95476eb7d087fd4"
+  },
+  "project_name": "adasd",
+  "client_id": "6885b951676bee41dc3552ab",
+  "assign_to": [],
+  "assign_date": {
+    "$date": "2025-07-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-07-26T00:00:00.000Z"
+  },
+  "priority": "high",
+  "status": "To do",
+  "description": "dsfsdvf",
+  "content": [],
+  "createdAt": {
+    "$date": "2025-07-31T10:32:49.024Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-31T10:32:49.024Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e37cdddb8237ea1a67bc9"
+  },
+  "project_name": "New Test Project",
+  "client_id": "6881e3030489d837e0162932",
+  "assign_to": [],
+  "assign_date": {
+    "$date": "2025-08-01T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-16T00:00:00.000Z"
+  },
+  "priority": "Medium",
+  "status": "To do",
+  "content": [
+    {
+      "items": [
+        {
+          "name": "Tester 1",
+          "quantity": 10,
+          "price": 100,
+          "_id": {
+            "$oid": "688e37cdddb8237ea1a67bcb"
+          }
+        },
+        {
+          "name": "Tester 2",
+          "quantity": 5,
+          "price": 500,
+          "_id": {
+            "$oid": "688e37cdddb8237ea1a67bcc"
+          }
+        }
+      ],
+      "total_price": 4000,
+      "uploaded_files": [
+        "https://res.cloudinary.com/dzugqh19d/image/upload/v1754165840/crm/subtasks/1754165837706-files.jpg",
+        "https://res.cloudinary.com/dzugqh19d/image/upload/v1754167118/crm/subtasks/1754167115996-files.jpg"
+      ],
+      "description": "Hello Bachho 2",
+      "currency": "INR",
+      "_id": {
+        "$oid": "688e774d3137c2c78cbaa088"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-08-02T16:07:41.485Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-02T20:38:37.674Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68907c83a7a0ae615342c8c6"
+  },
+  "project_name": "Rohan bhai - Batch - 2 ",
+  "client_id": "68907bcaa7a0ae615342c4fb",
+  "assign_to": [],
+  "assign_date": {
+    "$date": "2025-08-01T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-06T00:00:00.000Z"
+  },
+  "priority": "Medium",
+  "status": "To do",
+  "content": [
+    {
+      "items": [
+        {
+          "name": "BR",
+          "quantity": 5,
+          "price": 1500,
+          "_id": {
+            "$oid": "68907c83a7a0ae615342c8c8"
+          }
+        }
+      ],
+      "total_price": 7500,
+      "uploaded_files": [],
+      "description": "9 photo\n3 video \n3 model ",
+      "currency": "INR",
+      "_id": {
+        "$oid": "68907cbba7a0ae615342c9ff"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-08-04T09:25:23.008Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T09:26:19.247Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "689081eca7a0ae615342e9b5"
+  },
+  "project_name": "New now by m..",
+  "client_id": "68907bcaa7a0ae615342c4fb",
+  "assign_to": [],
+  "assign_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "priority": "High",
+  "status": "To do",
+  "content": [
+    {
+      "items": [
+        {
+          "name": "",
+          "quantity": 0,
+          "price": 0,
+          "_id": {
+            "$oid": "689081eca7a0ae615342e9b7"
+          }
+        }
+      ],
+      "total_price": 0,
+      "uploaded_files": [],
+      "description": "asdfasdfasdfasf",
+      "currency": "INR",
+      "_id": {
+        "$oid": "689081eca7a0ae615342e9b6"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-08-04T09:48:28.043Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T11:44:44.090Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "project_name": "khushal (batch-2 )13 file",
+  "client_id": "6890ad7ea7a0ae6153447166",
+  "assign_to": [],
+  "assign_date": {
+    "$date": "2025-08-01T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "priority": "Medium",
+  "status": "To do",
+  "content": [
+    {
+      "items": [
+        {
+          "name": "BR",
+          "quantity": 13,
+          "price": 1800,
+          "_id": {
+            "$oid": "6890ae2ea7a0ae6153447652"
+          }
+        }
+      ],
+      "total_price": 23400,
+      "uploaded_files": [],
+      "description": "9 photo 3 model 3video ",
+      "currency": "INR",
+      "_id": {
+        "$oid": "6890ae2ea7a0ae6153447651"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-08-04T12:57:18.685Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:57:18.685Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68917f6aa7a0ae61534aaddd"
+  },
+  "project_name": "Azzure",
+  "client_id": "68917e41a7a0ae61534aa779",
+  "assign_to": [],
+  "assign_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "priority": "Medium",
+  "status": "To do",
+  "content": [
+    {
+      "items": [
+        {
+          "name": "",
+          "quantity": 0,
+          "price": 0,
+          "_id": {
+            "$oid": "68917f6aa7a0ae61534aaddf"
+          }
+        }
+      ],
+      "total_price": 0,
+      "uploaded_files": [],
+      "description": "",
+      "currency": "INR",
+      "_id": {
+        "$oid": "68917f89a7a0ae61534aae9a"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-08-05T03:50:02.052Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-05T03:50:33.080Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68918244a7a0ae61534abbf0"
+  },
+  "project_name": "LEO",
+  "client_id": "689181f7a7a0ae61534aba56",
+  "assign_to": [],
+  "assign_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "priority": "Medium",
+  "status": "To do",
+  "content": [
+    {
+      "items": [
+        {
+          "name": "",
+          "quantity": 0,
+          "price": 0,
+          "_id": {
+            "$oid": "68918244a7a0ae61534abbf2"
+          }
+        }
+      ],
+      "total_price": 0,
+      "uploaded_files": [],
+      "description": "same ring banavvi",
+      "currency": "INR",
+      "_id": {
+        "$oid": "68918244a7a0ae61534abbf1"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-08-05T04:02:12.923Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-05T04:02:12.923Z"
+  },
+  "__v": 0
+}]

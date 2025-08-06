@@ -1,0 +1,155 @@
+[{
+  "_id": {
+    "$oid": "68905ca4a7a0ae6153423012"
+  },
+  "username": "Dhruvi",
+  "password": "Dhruvi@123",
+  "full_name": "Dhruvi kalkani",
+  "designation": "Render Artist",
+  "status": "Active",
+  "profile_pic": null,
+  "phone": "7069112138",
+  "email": "sarojkalkani@gmail.com",
+  "home_address": "98-sai samrudhhi villa soc. umra gaam,velenja,surat",
+  "dob": {
+    "$date": "2006-02-09T00:00:00.000Z"
+  },
+  "emergency_contact": "7433910371",
+  "capacity": 1,
+  "department": "Render",
+  "date_of_joining": {
+    "$date": "2024-05-09T00:00:00.000Z"
+  },
+  "monthly_salary": 15000,
+  "employement_type": "Full-time",
+  "reporting_manager": "",
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-04T07:09:24.999Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68907a16a7a0ae615342b820"
+  },
+  "username": "Axay",
+  "password": "Axay@123",
+  "full_name": "Axay bhalala",
+  "designation": "CEO",
+  "status": "Active",
+  "profile_pic": null,
+  "phone": "8320972601",
+  "email": "bhalalaaxay@gmail.com",
+  "home_address": "20 man sarovar - 2 near yogichowk nana varacha surat ",
+  "dob": {
+    "$date": "2006-08-24T00:00:00.000Z"
+  },
+  "emergency_contact": "9499752315",
+  "capacity": 0,
+  "department": "CAD Design",
+  "date_of_joining": {
+    "$date": "2024-03-20T00:00:00.000Z"
+  },
+  "monthly_salary": 25000,
+  "employement_type": "Full-time",
+  "reporting_manager": "",
+  "is_manager": true,
+  "created_at": {
+    "$date": "2025-08-04T09:15:02.335Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "username": "Tamanna",
+  "password": "Tamanna@123",
+  "full_name": "Tamanna",
+  "designation": "Render Artist",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "9537754983",
+  "email": "tamannaukani@gmail.com",
+  "home_address": "B-404,sahjanand residency,valak patiya",
+  "dob": {
+    "$date": "2005-03-02T00:00:00.000Z"
+  },
+  "emergency_contact": "9924876577",
+  "capacity": null,
+  "department": "Render",
+  "date_of_joining": {
+    "$date": "2024-07-01T00:00:00.000Z"
+  },
+  "monthly_salary": 15000,
+  "employement_type": "Full-time",
+  "reporting_manager": "",
+  "is_manager": true,
+  "created_at": {
+    "$date": "2025-08-04T11:25:49.701Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68909a96a7a0ae615343e546"
+  },
+  "username": "Mohisha",
+  "password": "Mohisha@123",
+  "full_name": "Mohisha",
+  "designation": "CAD Designer",
+  "status": "Active",
+  "profile_pic": null,
+  "phone": "6352153529",
+  "email": "mohishazalavadiya98@gmail.com",
+  "home_address": "A-4, 203, om plaza ,kathodara,Surat",
+  "dob": {
+    "$date": "2005-02-24T00:00:00.000Z"
+  },
+  "emergency_contact": "9726650043",
+  "capacity": -5,
+  "department": "CAD Design",
+  "date_of_joining": {
+    "$date": "2023-04-15T00:00:00.000Z"
+  },
+  "monthly_salary": 17000,
+  "employement_type": "Full-time",
+  "reporting_manager": "",
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-04T11:33:42.176Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68909b8fa7a0ae615343ee7a"
+  },
+  "username": "janvee",
+  "password": "janvee@123",
+  "full_name": "Janvee",
+  "designation": "CAD Designer",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "7227847742",
+  "email": "janveenakrani@gmail.com",
+  "home_address": "A-303,Shashwat luxurya,swaminarayan mission road,surat",
+  "dob": {
+    "$date": "2004-03-15T00:00:00.000Z"
+  },
+  "emergency_contact": "9925724243",
+  "capacity": -16,
+  "department": "CAD Design",
+  "date_of_joining": {
+    "$date": "2025-03-11T00:00:00.000Z"
+  },
+  "monthly_salary": 30000,
+  "employement_type": "Full-time",
+  "reporting_manager": "",
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-04T11:37:51.096Z"
+  },
+  "__v": 0
+}]

@@ -28,7 +28,7 @@ import EmployeeProfileEdit from "./pages/admin-panel/employee/EmployeeProfileEdi
 import TeamMemberProfile from "./pages/admin-panel/employee/TeamMemberProfile";
 import EmployeeTimeTracking from "./pages/admin-panel/employee/EmployeeTimeTracking";
 import Subtasks from "./pages/admin-panel/subtask/Subtasks";
-// import NotificationAdmin from "./pages/admin-panel/NotificationAdmin";
+import NotificationAdmin from "./pages/admin-panel/NotificationAdmin";
 
 import EditClient from "./pages/admin-panel/client/EditClient";
 import EditProject from "./pages/admin-panel/project/EditProject";
@@ -114,7 +114,7 @@ function App() {
           />
           <Route path="/subtasks" element={<Subtasks />} />
           <Route path="/time-tracking" element={<TimeTrackingDashboard />} />
-          {/* <Route path="/notifications" element={<NotificationAdmin />} /> */}
+          <Route path="/notifications" element={<NotificationAdmin />} />
 
           {/* edit page */}
 

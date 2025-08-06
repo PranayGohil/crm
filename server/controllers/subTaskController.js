@@ -6,7 +6,6 @@ import mongoose from "mongoose";
 import cloudinary from "../config/cloudinary.js";
 
 import Notification from "../models/notificationModel.js";
-import { io } from "../utils/socket.js";
 
 const FIXED_STAGE_ORDER = ["CAD Design", "SET Design", "Render", "Delivery"];
 
@@ -36,20 +35,31 @@ export const addSubTask = async (req, res) => {
 
     const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
 
-    const subTask = await SubTask.create({
+    const subTaskData = {
       project_id: new mongoose.Types.ObjectId(project_id),
       task_name,
       description,
       url,
       stage,
       priority,
-      assign_to: new mongoose.Types.ObjectId(assign_to),
       assign_date,
       due_date,
       media_files: mediaFiles,
       path_to_files,
       status,
-    });
+    };
+
+    if (assign_to && mongoose.Types.ObjectId.isValid(assign_to)) {
+      subTaskData.assign_to = new mongoose.Types.ObjectId(assign_to);
+    }
+
+    const subTask = await SubTask.create(subTaskData);
+    const io = req.app.get("io");
+    const connectedUsers = req.app.get("connectedUsers");
+
+    if (assign_to && connectedUsers[assign_to]) {
+      io.to(connectedUsers[assign_to]).emit("new_subtask", subTask);
+    }
 
     res.status(200).json(subTask);
   } catch (error) {

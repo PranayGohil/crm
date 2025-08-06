@@ -1,0 +1,104 @@
+[{
+  "_id": {
+    "$oid": "68907bcaa7a0ae615342c4fb"
+  },
+  "full_name": "Rohan bhai ",
+  "email": "Rohan@gmail.com",
+  "phone": "9051515222",
+  "joining_date": {
+    "$date": "2025-07-17T00:00:00.000Z"
+  },
+  "address": "surat ",
+  "username": "Rohan",
+  "client_type": "Design + render ",
+  "password": "Rohan@123",
+  "company_name": "jewellery",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-04T09:22:18.081Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6890ad7ea7a0ae6153447166"
+  },
+  "full_name": "khushal bhai",
+  "email": "khushal@gmail.com",
+  "phone": "9909580666",
+  "joining_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "address": "surat ",
+  "username": "khushal",
+  "client_type": "Design + render ",
+  "password": "Khushal@123",
+  "company_name": "jewellery",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-04T12:54:22.003Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68917e41a7a0ae61534aa779"
+  },
+  "full_name": "Azzure diamond",
+  "email": "azzure@gmail.com",
+  "phone": "+1(732)5327595",
+  "joining_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "Azzure",
+  "client_type": "design",
+  "password": "Azzure@123",
+  "company_name": "Azzure",
+  "gst_number": "",
+  "business_phone": "+1(732)5327595",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-05T03:45:05.079Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "689181f7a7a0ae61534aba56"
+  },
+  "full_name": "LEO",
+  "email": "Leo@gmail.com",
+  "phone": "+1(917)709-4661",
+  "joining_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "address": "us",
+  "username": "Leo",
+  "client_type": "design",
+  "password": "LEO@1234",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-05T04:00:55.108Z"
+  },
+  "__v": 0
+}]

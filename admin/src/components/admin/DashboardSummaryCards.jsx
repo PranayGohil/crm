@@ -29,16 +29,16 @@ const DashboardSummaryCards = () => {
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
 
-    axios
-      .get(
-        `${process.env.REACT_APP_API_URL}/api/statistics/department-capacities`
-      )
-      .then((res) => {
-        console.log(res.data);
-        setDepartmentCapacities(res.data);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
+    // axios
+    //   .get(
+    //     `${process.env.REACT_APP_API_URL}/api/statistics/department-capacities`
+    //   )
+    //   .then((res) => {
+    //     console.log(res.data);
+    //     setDepartmentCapacities(res.data);
+    //   })
+    //   .catch((err) => console.error(err))
+    //   .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -170,7 +170,7 @@ const DashboardSummaryCards = () => {
             </div>
           </Link>
 
-          <div className="md-common-total-card">
+          {/* <div className="md-common-total-card">
             <div className="md-common-para-icon md-para-icon-tasks">
               <span>Department Capacity</span>
               <div>
@@ -178,7 +178,6 @@ const DashboardSummaryCards = () => {
               </div>
             </div>
             <div className="mb-4 d-flex justify-content-between align-items-center">
-              {/* Primary toggle */}
               <div className="flex gap-2 mb-2">
                 <button
                   className={`btn btn-sm mx-2 ${
@@ -208,7 +207,7 @@ const DashboardSummaryCards = () => {
                 </button>
               </div>
 
-              {/* Secondary toggle based on mode */}
+              
               <div className="flex gap-2">
                 {capacityMode === "time" ? (
                   <>
@@ -325,7 +324,7 @@ const DashboardSummaryCards = () => {
                   }
                 )}
             </div>
-          </div>
+          </div> */}
         </div>
       </section>
       <section className="md-total-card-main mt-6">

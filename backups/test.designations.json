@@ -1,0 +1,104 @@
+[{
+  "_id": {
+    "$oid": "6885b7c1676bee41dc354f77"
+  },
+  "name": "CEO",
+  "createdAt": {
+    "$date": "2025-07-27T05:23:13.426Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-27T05:23:13.426Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6885b7cd676bee41dc354f92"
+  },
+  "name": "HOD Render",
+  "createdAt": {
+    "$date": "2025-07-27T05:23:25.523Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-27T05:23:25.523Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6885b7d5676bee41dc354fa5"
+  },
+  "name": "HOD Design",
+  "createdAt": {
+    "$date": "2025-07-27T05:23:33.805Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-27T05:23:33.805Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6885b7de676bee41dc354fb9"
+  },
+  "name": "HR",
+  "createdAt": {
+    "$date": "2025-07-27T05:23:42.330Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-27T05:23:42.330Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6885b7f0676bee41dc354fdf"
+  },
+  "name": "HOD Breeliq",
+  "createdAt": {
+    "$date": "2025-07-27T05:24:00.016Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-27T05:24:00.016Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688876dfbe7f49a517bbea86"
+  },
+  "name": "Render Artist",
+  "createdAt": {
+    "$date": "2025-07-29T07:23:11.536Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-29T07:23:11.536Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688876e7be7f49a517bbeb97"
+  },
+  "name": "CAD Designer",
+  "createdAt": {
+    "$date": "2025-07-29T07:23:19.395Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-29T07:23:19.395Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68907a26a7a0ae615342b879"
+  },
+  "name": "Management",
+  "createdAt": {
+    "$date": "2025-08-04T09:15:18.425Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T09:15:18.425Z"
+  },
+  "__v": 0
+}]

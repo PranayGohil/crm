@@ -1,0 +1,2332 @@
+[{
+  "_id": {
+    "$oid": "6870719184425d3ef6ac1bbf"
+  },
+  "title": "Task Completed",
+  "description": "Riya Sharma completed subtask 3D Rendering Pass 1 on project Rose Gold Bridal Necklace Set.",
+  "type": "Task Updates",
+  "icon": "/SVG/task-com-vec.svg",
+  "time": {
+    "$date": "2025-07-04T10:00:00.000Z"
+  },
+  "media": [
+    "/Image/not-i1.png"
+  ],
+  "createdAt": {
+    "$date": "2025-07-11T02:06:09.946Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-11T02:06:09.946Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6870855e7050611b9ae117f6"
+  },
+  "title": "Task Completed 2",
+  "description": "Riya Sharma completed subtask 3D Rendering Pass 1 on project Rose Gold Bridal Necklace Set.",
+  "type": "Task Updates",
+  "icon": "/SVG/task-com-vec.svg",
+  "time": {
+    "$date": "2025-07-04T10:00:00.000Z"
+  },
+  "media": [
+    "/Image/not-i1.png"
+  ],
+  "createdAt": {
+    "$date": "2025-07-11T03:30:38.616Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-11T03:30:38.616Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "687087a942b9240a467f6e0d"
+  },
+  "title": "Task Completed 3",
+  "description": "Riya Sharma completed subtask 3D Rendering Pass 1 on project Rose Gold Bridal Necklace Set.",
+  "type": "Task Updates",
+  "icon": "/SVG/task-com-vec.svg",
+  "time": {
+    "$date": "2025-07-04T10:00:00.000Z"
+  },
+  "media": [
+    "/Image/not-i1.png"
+  ],
+  "createdAt": {
+    "$date": "2025-07-11T03:40:25.222Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-11T03:40:25.222Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68708a4f42b9240a467f6ff5"
+  },
+  "title": "Task Completed 4",
+  "description": "Riya Sharma completed subtask 3D Rendering Pass 1 on project Rose Gold Bridal Necklace Set.",
+  "type": "Task Updates",
+  "icon": "/SVG/task-com-vec.svg",
+  "time": {
+    "$date": "2025-07-04T10:00:00.000Z"
+  },
+  "media": [
+    "/Image/not-i1.png"
+  ],
+  "createdAt": {
+    "$date": "2025-07-11T03:51:43.174Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-11T03:51:43.174Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68751830baee11119fbdcf37"
+  },
+  "title": "test client updated status of subtask CAD Design 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-14T14:46:08.941Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68751858baee11119fbdcf9b"
+  },
+  "title": "test client updated status of subtask CAD Design 1 to Completed",
+  "description": "Status changed to Completed",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-14T14:46:48.592Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68752c33bb20b67ea8e6397d"
+  },
+  "title": "Mayur Gohil updated status of subtask aa to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "687098407159e49544f8b7ed",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "68752b4cbb20b67ea8e6385b"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-14T16:11:31.621Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68752c8cbb20b67ea8e639ec"
+  },
+  "title": "Mayur Gohil updated status of subtask aa to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "687098407159e49544f8b7ed",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "68752b4cbb20b67ea8e6385b"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-14T16:13:00.579Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d30d3173a74b72fe3993"
+  },
+  "title": "test client updated status of subtask CAD Design 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:03:25.772Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d32a3173a74b72fe39e8"
+  },
+  "title": "test client updated status of subtask CAD Design 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:03:54.425Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d3533173a74b72fe3a48"
+  },
+  "title": "test client updated status of subtask CAD Design 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:04:35.651Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d3533173a74b72fe3a4f"
+  },
+  "title": "test client updated status of subtask CAD Design 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:04:35.922Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d3543173a74b72fe3a66"
+  },
+  "title": "test client updated status of subtask CAD Design 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:04:36.911Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d3553173a74b72fe3a80"
+  },
+  "title": "test client updated status of subtask CAD Design 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:04:37.987Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d35e3173a74b72fe3ab2"
+  },
+  "title": "test client updated status of subtask CAD Design 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:04:46.645Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d37a3173a74b72fe3b15"
+  },
+  "title": "test client updated status of subtask CAD Design 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:05:14.971Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d3b63173a74b72fe3bad"
+  },
+  "title": "test client updated status of subtask CAD Design 1 to Blocked",
+  "description": "Status changed to Blocked",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:06:14.556Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d3ce3173a74b72fe3bf5"
+  },
+  "title": "test client updated status of subtask CAD Design 2 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedd",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:06:38.116Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d40c3173a74b72fe3c76"
+  },
+  "title": "test client updated status of subtask CAD Design 3 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcede",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:07:40.820Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d6203173a74b72fe4050"
+  },
+  "title": "test client updated status of subtask CAD Design 3 to Blocked",
+  "description": "Status changed to Blocked",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcede",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:16:32.556Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d6473173a74b72fe40cf"
+  },
+  "title": "test client updated status of subtask CAD Design 3 to Completed",
+  "description": "Status changed to Completed",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcede",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:17:11.099Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6875d6563173a74b72fe410c"
+  },
+  "title": "test client updated status of subtask CAD Design 2 to Completed",
+  "description": "Status changed to Completed",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68751811baee11119fbdcedd",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6875175dbaee11119fbdcdba"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-15T04:17:26.796Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6877f00060bb7ac1c39846d1"
+  },
+  "title": "rahul vaghasiyafgfg updated status of subtask sxdgvcdvf 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1752410991/crm/employees/1752410991161-profile_pic.jpg",
+  "related_id": "6877e34d60bb7ac1c39831bc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6873ab70d469fa38a06118f4"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-16T18:31:28.794Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6877f00260bb7ac1c39846dd"
+  },
+  "title": "rahul vaghasiyafgfg updated status of subtask sxdgvcdvf 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1752410991/crm/employees/1752410991161-profile_pic.jpg",
+  "related_id": "6877e34d60bb7ac1c39831bc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6873ab70d469fa38a06118f4"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-16T18:31:30.096Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6877f01460bb7ac1c3984708"
+  },
+  "title": "rahul vaghasiyafgfg updated status of subtask sxdgvcdvf 2 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1752410991/crm/employees/1752410991161-profile_pic.jpg",
+  "related_id": "6877e34d60bb7ac1c39831bd",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6873ab70d469fa38a06118f4"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-16T18:31:48.237Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6877f1b560bb7ac1c398496f"
+  },
+  "title": "rahul vaghasiyafgfg updated status of subtask sxdgvcdvf 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1752410991/crm/employees/1752410991161-profile_pic.jpg",
+  "related_id": "6877e34d60bb7ac1c39831bc",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6873ab70d469fa38a06118f4"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-16T18:38:45.960Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "687f3869729d86b61d8c4d42"
+  },
+  "title": "meet updated status of subtask ring to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "687f2c72729d86b61d8c3435",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "687f379e729d86b61d8c4a63"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-22T07:06:17.660Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "687f38f1729d86b61d8c4f62"
+  },
+  "title": "meet updated status of subtask ring to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "687f2c72729d86b61d8c3435",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "687f379e729d86b61d8c4a63"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-22T07:08:33.980Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "687f38f3729d86b61d8c4f73"
+  },
+  "title": "meet updated status of subtask ring to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "687f2c72729d86b61d8c3435",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "687f379e729d86b61d8c4a63"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-22T07:08:35.416Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "687f398b729d86b61d8c5225"
+  },
+  "title": "meet updated status of subtask CAD Design 4 to Completed",
+  "description": "Status changed to Completed",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "687f2c90729d86b61d8c3477",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "687f379e729d86b61d8c4a63"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-22T07:11:07.030Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "687f39b2729d86b61d8c52be"
+  },
+  "title": "meet updated status of subtask CAD Design 2 to Completed",
+  "description": "Status changed to Completed",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "687f2c90729d86b61d8c3475",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "687f379e729d86b61d8c4a63"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-22T07:11:46.218Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888532fbe7f49a517ba6304"
+  },
+  "title": "Axay updated status of subtask Necklace 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "688726fd9a72146c5a7235f1",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T04:50:55.998Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688853d1be7f49a517ba71a6"
+  },
+  "title": "Axay updated status of subtask Necklace 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "688726fd9a72146c5a7235f1",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T04:53:37.655Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68888fa7be7f49a517bd38dd"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T09:08:55.179Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68888fc5be7f49a517bd39ae"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T09:09:25.170Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688892f7be7f49a517bd4f50"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T09:23:03.648Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688892fcbe7f49a517bd4f7e"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T09:23:08.768Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68889f48be7f49a517bdc3fd"
+  },
+  "title": "Axay updated status of subtask Ring cad 2 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc8670",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T10:15:36.234Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68889f5ebe7f49a517bdc48f"
+  },
+  "title": "Axay updated status of subtask Ring cad 2 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc8670",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T10:15:58.220Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888a5cbbe7f49a517be0323"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T10:43:23.137Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888a5ddbe7f49a517be03f7"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Completed",
+  "description": "Status changed to Completed",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T10:43:41.490Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888b818be7f49a517be90bf"
+  },
+  "title": "Axay updated status of subtask pd 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "6888b58fbe7f49a517be80d0",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T12:01:28.995Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888b81abe7f49a517be90e0"
+  },
+  "title": "Axay updated status of subtask pd 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "6888b58fbe7f49a517be80d0",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T12:01:30.452Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888b81dbe7f49a517be910e"
+  },
+  "title": "Axay updated status of subtask pd 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "6888b58fbe7f49a517be80d0",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T12:01:33.983Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888b82bbe7f49a517be9177"
+  },
+  "title": "Axay updated status of subtask pd 1 to Completed",
+  "description": "Status changed to Completed",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "6888b58fbe7f49a517be80d0",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T12:01:47.106Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f33575601f63f2c96af7"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:13:41.084Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f33875601f63f2c96b25"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:13:44.587Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f53575601f63f2c97686"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:22:13.477Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f53975601f63f2c976b7"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:22:17.227Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f5dc51b341db3a68e930"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:25:00.059Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f5de51b341db3a68e95a"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:25:02.303Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f7759fdcf36549bc8197"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:31:49.049Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f7789fdcf36549bc81ca"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:31:52.558Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f8159fdcf36549bc853f"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:34:29.315Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f8189fdcf36549bc8570"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:34:32.309Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f8359fdcf36549bc8643"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:35:01.940Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f83e9fdcf36549bc86c5"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:35:10.418Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f8659fdcf36549bc87bf"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:35:49.984Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f8699fdcf36549bc87f4"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:35:53.136Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f89d9fdcf36549bc8962"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:36:45.401Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f8ab9fdcf36549bc89c9"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:36:59.222Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f8d59fdcf36549bc8b22"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:37:41.297Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f8da9fdcf36549bc8b62"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:37:46.434Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f91b9fdcf36549bc8cf1"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:38:51.018Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f91f9fdcf36549bc8d2c"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:38:55.038Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888f9fa9fdcf36549bc9f91"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:42:34.343Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888fa589fdcf36549bca15b"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:44:08.577Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888fa7a9fdcf36549bca254"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:44:42.838Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6888fa7d9fdcf36549bca28e"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-29T16:44:45.854Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688963340ba19a28aa8a767d"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-30T00:11:32.734Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6889633e0ba19a28aa8a76d4"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-30T00:11:42.684Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6889a1a29a78551981ed70ab"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-30T04:37:54.480Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6889a1dd9a78551981ed71b0"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-30T04:38:53.736Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688b424be95476eb7d0863cb"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-31T10:15:39.533Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688b4250e95476eb7d086422"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-31T10:15:44.443Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688b4252e95476eb7d086453"
+  },
+  "title": "Axay updated status of subtask Ring cad 4 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc8672",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-31T10:15:46.123Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688b42dee95476eb7d0867e1"
+  },
+  "title": "Axay updated status of subtask Ring cad 4 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc8672",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-31T10:18:06.629Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688b9868e95476eb7d0954cc"
+  },
+  "title": "dhruvi kalkani updated status of subtask ring 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "688b4790e95476eb7d088903",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "68887874be7f49a517bc1ed1"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-31T16:23:04.816Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688b986be95476eb7d0954e1"
+  },
+  "title": "dhruvi kalkani updated status of subtask ring 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "688b4790e95476eb7d088903",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "68887874be7f49a517bc1ed1"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-07-31T16:23:07.914Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e79843137c2c78cbaa733"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-02T20:48:04.655Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e79993137c2c78cbaa7e0"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-02T20:48:25.190Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e8053668674647cafd16f"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-02T21:17:07.330Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e805e668674647cafd1ce"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-02T21:17:18.069Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e80b87e2f658bc92de933"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-02T21:18:48.199Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e812b22500af85d14c1d9"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-02T21:20:43.575Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e81c17ca4c4d75b6bd6f8"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-02T21:23:13.300Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e81e67ca4c4d75b6bd7ab"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-02T21:23:50.868Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e826fa35ee951c6dcb94e"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-02T21:26:07.836Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e8277a35ee951c6dcb9a7"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-02T21:26:15.098Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e8281a35ee951c6dcba07"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-02T21:26:25.435Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688e84d6a35ee951c6dcc595"
+  },
+  "title": "Axay updated status of subtask Ring cad 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68887b7abe7f49a517bc866f",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "created_by": {
+    "$oid": "6885b6be676bee41dc354d5d"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-02T21:36:22.041Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688f8d1ca7a0ae6153417f58"
+  },
+  "title": "Default updated status of subtask Ring cad 12 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1754170205/crm/employees/1754170202664-profile_pic.jpg",
+  "related_id": "68887b7abe7f49a517bc867a",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "688e835ca35ee951c6dcbcb7"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-03T16:23:56.596Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688f8d32a7a0ae6153417fad"
+  },
+  "title": "Default updated status of subtask Ring cad 12 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1754170205/crm/employees/1754170202664-profile_pic.jpg",
+  "related_id": "68887b7abe7f49a517bc867a",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "688e835ca35ee951c6dcbcb7"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-03T16:24:18.291Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688f8f6ca7a0ae615341891c"
+  },
+  "title": "Default updated status of subtask pd 4 to Completed",
+  "description": "Status changed to Completed",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1754170205/crm/employees/1754170202664-profile_pic.jpg",
+  "related_id": "6888b58fbe7f49a517be80d3",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "688e835ca35ee951c6dcbcb7"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-03T16:33:48.113Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688f9584a7a0ae6153418e26"
+  },
+  "title": "Default updated status of subtask pd 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1754170205/crm/employees/1754170202664-profile_pic.jpg",
+  "related_id": "6888b58fbe7f49a517be80d0",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "688e835ca35ee951c6dcbcb7"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-03T16:59:48.705Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688f958fa7a0ae6153418e7c"
+  },
+  "title": "Default updated status of subtask pd 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1754170205/crm/employees/1754170202664-profile_pic.jpg",
+  "related_id": "6888b58fbe7f49a517be80d0",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "688e835ca35ee951c6dcbcb7"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-03T16:59:59.860Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688f9591a7a0ae6153418e9f"
+  },
+  "title": "Default updated status of subtask pd 6 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1754170205/crm/employees/1754170202664-profile_pic.jpg",
+  "related_id": "6888b58fbe7f49a517be80d5",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "688e835ca35ee951c6dcbcb7"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-03T17:00:01.557Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688f95b8a7a0ae6153418f3c"
+  },
+  "title": "Default updated status of subtask pd 6 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1754170205/crm/employees/1754170202664-profile_pic.jpg",
+  "related_id": "6888b58fbe7f49a517be80d5",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "688e835ca35ee951c6dcbcb7"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-03T17:00:40.303Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688f95d1a7a0ae6153418fc6"
+  },
+  "title": "Default updated status of subtask pd 8 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1754170205/crm/employees/1754170202664-profile_pic.jpg",
+  "related_id": "6888b58fbe7f49a517be80d7",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "688e835ca35ee951c6dcbcb7"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-03T17:01:05.579Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "688f95dea7a0ae615341900c"
+  },
+  "title": "Default updated status of subtask pd 8 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": "https://res.cloudinary.com/dzugqh19d/image/upload/v1754170205/crm/employees/1754170202664-profile_pic.jpg",
+  "related_id": "6888b58fbe7f49a517be80d7",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "688e835ca35ee951c6dcbcb7"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-03T17:01:18.835Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68906104a7a0ae6153423bce"
+  },
+  "title": "Dhruvi kalkani updated status of subtask pd 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "6888b58fbe7f49a517be80d0",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68905ca4a7a0ae6153423012"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-04T07:28:04.011Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6890612ca7a0ae6153423c54"
+  },
+  "title": "Dhruvi kalkani updated status of subtask pd 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "6888b58fbe7f49a517be80d0",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68905ca4a7a0ae6153423012"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-04T07:28:44.698Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68906144a7a0ae6153423cb9"
+  },
+  "title": "Dhruvi kalkani updated status of subtask pd 1 to Completed",
+  "description": "Status changed to Completed",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "6888b58fbe7f49a517be80d0",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68905ca4a7a0ae6153423012"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-04T07:29:08.713Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68907dc7a7a0ae615342cf95"
+  },
+  "title": "Dhruvi kalkani updated status of subtask Bracelet  1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68907d47a7a0ae615342cce0",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68905ca4a7a0ae6153423012"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-04T09:30:47.825Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68907de0a7a0ae615342d02c"
+  },
+  "title": "Dhruvi kalkani updated status of subtask Bracelet  1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68907d47a7a0ae615342cce0",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68905ca4a7a0ae6153423012"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-04T09:31:12.886Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68907e06a7a0ae615342d0fe"
+  },
+  "title": "Dhruvi kalkani updated status of subtask Bracelet  1 to Completed",
+  "description": "Status changed to Completed",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68907d47a7a0ae615342cce0",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68905ca4a7a0ae6153423012"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-04T09:31:50.952Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68918311a7a0ae61534ac01c"
+  },
+  "title": "Janvee updated status of subtask ring  1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68918289a7a0ae61534abd5b",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68909b8fa7a0ae615343ee7a"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-05T04:05:37.205Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68918325a7a0ae61534ac08e"
+  },
+  "title": "Janvee updated status of subtask ring  1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68918289a7a0ae61534abd5b",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68909b8fa7a0ae615343ee7a"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-05T04:05:57.132Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68918326a7a0ae61534ac0a9"
+  },
+  "title": "Janvee updated status of subtask ring  1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68918289a7a0ae61534abd5b",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68909b8fa7a0ae615343ee7a"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-05T04:05:58.696Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "689184d4a7a0ae61534ac864"
+  },
+  "title": "Mohisha updated status of subtask Ring 1 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "6891800ba7a0ae61534ab123",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68909a96a7a0ae615343e546"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-05T04:13:08.312Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68918d2da7a0ae61534aee1b"
+  },
+  "title": "Janvee updated status of subtask ring  1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "68918289a7a0ae61534abd5b",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68909b8fa7a0ae615343ee7a"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-05T04:48:45.427Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "689190b6a7a0ae61534afe17"
+  },
+  "title": "Mohisha updated status of subtask Ring 1 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "6891800ba7a0ae61534ab123",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68909a96a7a0ae615343e546"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-05T05:03:50.734Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68919241a7a0ae61534b050f"
+  },
+  "title": "Mohisha updated status of subtask Ring 2 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "6891800ba7a0ae61534ab124",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68909a96a7a0ae615343e546"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-05T05:10:25.917Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "689199c6a7a0ae61534b265c"
+  },
+  "title": "Mohisha updated status of subtask Ring 2 to Paused",
+  "description": "Status changed to Paused",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "6891800ba7a0ae61534ab124",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68909a96a7a0ae615343e546"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-05T05:42:30.964Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "689199e6a7a0ae61534b26fa"
+  },
+  "title": "Mohisha updated status of subtask Ring 3 to In Progress",
+  "description": "Status changed to In Progress",
+  "type": "task_update",
+  "icon": null,
+  "related_id": "6891800ba7a0ae61534ab125",
+  "receiver_id": "admin",
+  "receiver_type": "admin",
+  "read": true,
+  "created_by": {
+    "$oid": "68909a96a7a0ae615343e546"
+  },
+  "created_by_role": "employee",
+  "createdAt": {
+    "$date": "2025-08-05T05:43:02.825Z"
+  },
+  "__v": 0
+}]

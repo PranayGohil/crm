@@ -25,7 +25,6 @@ const AddSubtask = () => {
       .min(1, "Select at least one stage")
       .required("Stage is required"),
     priority: Yup.string().required("Priority is required"),
-    assign_to: Yup.string().required("Assign To is required"),
     due_date: Yup.string().required("Due date is required"),
   });
 
@@ -66,14 +65,14 @@ const AddSubtask = () => {
     try {
       const formData = new FormData();
       formData.append("project_id", projectId);
-      formData.append("task_name", values.task_name);
-      formData.append("description", values.description);
-      formData.append("url", values.url);
+      formData.append("task_name", values.task_name || "");
+      formData.append("description", values.description || "");
+      formData.append("url", values.url || "");
       formData.append("stage", JSON.stringify(values.stage));
-      formData.append("priority", values.priority);
+      formData.append("priority", values.priority || "");
       formData.append("assign_date", values.assign_date);
       formData.append("due_date", values.due_date);
-      formData.append("assign_to", values.assign_to);
+      formData.append("assign_to", values.assign_to || "");
       formData.append("status", "To Do");
       mediaFiles.forEach((file) => formData.append("media_files", file));
 

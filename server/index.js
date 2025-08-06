@@ -3,8 +3,7 @@ import "dotenv/config";
 import connectDB from "./config/db.js";
 import cors from "cors";
 import http from "http";
-
-import { setupSocket } from "./utils/socket.js"; // import socket setup
+import { Server } from "socket.io";
 
 import clientRouter from "./routes/clientRoutes.js";
 import employeeRouter from "./routes/employeeRoutes.js";
@@ -20,6 +19,39 @@ const port = 3001;
 
 // create HTTP server and pass to socket
 const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Replace with frontend domain in production
+    methods: ["GET", "POST"],
+  },
+});
+
+const connectedUsers = {}; // Track employees
+
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+
+  socket.on("register", (employeeId) => {
+    connectedUsers[employeeId] = socket.id;
+    console.log(
+      `Employee ${employeeId} registered with socket ID ${socket.id}`
+    );
+  });
+
+  socket.on("disconnect", () => {
+    for (let id in connectedUsers) {
+      if (connectedUsers[id] === socket.id) {
+        delete connectedUsers[id];
+        break;
+      }
+    }
+    console.log("Socket disconnected:", socket.id);
+  });
+});
+
+app.set("io", io);
+app.set("connectedUsers", connectedUsers);
 
 app.use(cors());
 app.use(express.json());
@@ -38,4 +70,3 @@ app.use("/api/designation", designationRouter);
 
 // Start server
 server.listen(port, () => console.log(`App listening on port ${port}!`));
-setupSocket(server);

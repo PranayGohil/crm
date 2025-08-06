@@ -1,0 +1,669 @@
+[{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478b5"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  4",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.549Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478b9"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  8",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.550Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478bb"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  10",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.550Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478bc"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  11",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.550Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478bd"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  12",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.550Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478b8"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  7",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.550Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478ba"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  9",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.550Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478b3"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  2",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.549Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478b4"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  3",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.549Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478be"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  13",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.550Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478b2"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  1",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.549Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478b6"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  5",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.550Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6890ae84a7a0ae61534478b7"
+  },
+  "project_id": {
+    "$oid": "6890ae2ea7a0ae6153447650"
+  },
+  "task_name": "Bracelet  6",
+  "description": "",
+  "url": "T:\\khushal bhai velis",
+  "stage": [
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689098bda7a0ae615343d454"
+  },
+  "assign_date": {
+    "$date": "2025-08-02T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-09T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-04T12:58:44.550Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-04T12:59:38.887Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6891800ba7a0ae61534ab123"
+  },
+  "project_id": {
+    "$oid": "68917f6aa7a0ae61534aaddd"
+  },
+  "task_name": "Ring 1",
+  "description": "",
+  "url": "T:\\AZZURE\\CAD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68909a96a7a0ae615343e546"
+  },
+  "assign_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Paused",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-05T04:13:08.216Z"
+      },
+      "end_time": {
+        "$date": "2025-08-05T05:03:50.628Z"
+      },
+      "_id": {
+        "$oid": "689184d4a7a0ae61534ac85c"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-05T03:52:43.010Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-05T05:03:50.629Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6891800ba7a0ae61534ab124"
+  },
+  "project_id": {
+    "$oid": "68917f6aa7a0ae61534aaddd"
+  },
+  "task_name": "Ring 2",
+  "description": "",
+  "url": "T:\\AZZURE\\CAD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68909a96a7a0ae615343e546"
+  },
+  "assign_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Paused",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-05T05:10:25.818Z"
+      },
+      "end_time": {
+        "$date": "2025-08-05T05:42:30.855Z"
+      },
+      "_id": {
+        "$oid": "68919241a7a0ae61534b0506"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-05T03:52:43.010Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-05T05:42:30.857Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6891800ba7a0ae61534ab125"
+  },
+  "project_id": {
+    "$oid": "68917f6aa7a0ae61534aaddd"
+  },
+  "task_name": "Ring 3",
+  "description": "",
+  "url": "T:\\AZZURE\\CAD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68909a96a7a0ae615343e546"
+  },
+  "assign_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "In Progress",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-05T05:43:02.662Z"
+      },
+      "end_time": null,
+      "_id": {
+        "$oid": "689199e6a7a0ae61534b26f2"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-05T03:52:43.010Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-05T05:43:02.664Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68918289a7a0ae61534abd5b"
+  },
+  "project_id": {
+    "$oid": "68918244a7a0ae61534abbf0"
+  },
+  "task_name": "ring  1",
+  "description": "same banavvi",
+  "url": "T:\\Leo\\U1142",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68909b8fa7a0ae615343ee7a"
+  },
+  "assign_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Paused",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-05T04:05:37.102Z"
+      },
+      "end_time": {
+        "$date": "2025-08-05T04:05:57.032Z"
+      },
+      "_id": {
+        "$oid": "68918311a7a0ae61534ac013"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-05T04:05:58.608Z"
+      },
+      "end_time": {
+        "$date": "2025-08-05T04:48:45.315Z"
+      },
+      "_id": {
+        "$oid": "68918326a7a0ae61534ac0a1"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-08-05T04:03:21.164Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-05T04:48:45.319Z"
+  },
+  "__v": 2
+}]

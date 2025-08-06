@@ -1,6 +1,7 @@
 import Client from "../models/clientModel.js";
 import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
+import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
 export const addClient = async (req, res) => {
@@ -171,8 +172,24 @@ export const updateClientByUsername = async (req, res) => {
 
 export const deleteClient = async (req, res) => {
   try {
+    console.log("deleteClient called");
     const { id } = req.params;
+
+    // 1. Delete the client
     const client = await Client.findByIdAndDelete(id);
+
+    // 2. Find all projects of that client
+    const projects = await Project.find({ client_id: id });
+
+    // 3. Get project ObjectIds properly
+    const projectIds = projects.map((p) => new mongoose.Types.ObjectId(p._id));
+
+    // 4. Delete the projects
+    await Project.deleteMany({ client_id: id });
+
+    // 5. Delete subtasks linked to those projects
+    await SubTask.deleteMany({ project_id: { $in: projectIds } });
+
     res.status(200).json(client);
   } catch (error) {
     console.error("Error in deleteClient:", error);
@@ -223,6 +240,7 @@ export const getClientProjectsWithUsername = async (req, res) => {
 
 export const getClientsWithSubtasks = async (req, res) => {
   try {
+    console.log("getClientsWithSubtasks called");
     const clients = await Client.find().lean();
 
     const clientData = await Promise.all(

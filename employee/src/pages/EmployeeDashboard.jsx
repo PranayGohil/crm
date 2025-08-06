@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import { useSocket } from "../contexts/SocketContext";
 
 // Extend dayjs with duration
 dayjs.extend(duration);
@@ -34,6 +35,7 @@ const EmployeeDashboard = () => {
       link: "EmployeeTimeTracking",
     },
   ]);
+  const socket = useSocket();
   const [projects, setProjects] = useState([]);
   const [subtasks, setSubtasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -48,6 +50,18 @@ const EmployeeDashboard = () => {
   ];
   const [selectedFilter, setSelectedFilter] = useState("This Week");
   const [customRange, setCustomRange] = useState({ start: "", end: "" });
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("new_subtask", (task) => {
+      console.log("New subtask received:", task);
+      fetchDashboardData(task.assign_to);
+      toast.success("You have a new task assigned!");
+    });
+
+    return () => socket.off("new_subtask");
+  }, [socket]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("employeeUser");
