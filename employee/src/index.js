@@ -7,16 +7,20 @@ import "bootstrap/dist/css/bootstrap.css";
 
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { SocketProvider } from "./contexts/SocketContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+const employeeUser = JSON.parse(localStorage.getItem("employeeUser"));
 root.render(
-  <AuthProvider>
-    <NotificationProvider>
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    </NotificationProvider>
-  </AuthProvider>
+  <SocketProvider employeeId={employeeUser?._id}>
+    <AuthProvider>
+      <NotificationProvider>
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      </NotificationProvider>
+    </AuthProvider>
+  </SocketProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

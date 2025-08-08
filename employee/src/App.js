@@ -23,53 +23,50 @@ import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  const employeeUser = JSON.parse(localStorage.getItem("employeeUser"));
   return (
-    <SocketProvider employeeId={employeeUser?._id}>
-      <Router>
-        <Routes>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout_employee />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/" element={<EmployeeDashboard />} />
+          <Route path="/dashboard" element={<EmployeeDashboard />} />
+          <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
           <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <Layout_employee />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/" element={<EmployeeDashboard />} />
-            <Route path="/dashboard" element={<EmployeeDashboard />} />
-            <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
-            <Route
-              path="/project/details/:projectId"
-              element={<ProjectDetails />}
-            />
-            <Route
-              path="employeetimetracking"
-              element={<EmployeeTimeTracking />}
-            />
-            <Route
-              path="employeenotificationpage"
-              element={<EmployeeNotificationPage />}
-            />
-          </Route>
+            path="/project/details/:projectId"
+            element={<ProjectDetails />}
+          />
+          <Route
+            path="employeetimetracking"
+            element={<EmployeeTimeTracking />}
+          />
+          <Route
+            path="employeenotificationpage"
+            element={<EmployeeNotificationPage />}
+          />
+        </Route>
 
-          <Route path="/" element={<Plain_layout />}>
-            <Route path="/login" element={<LoginPage />} />
-          </Route>
-        </Routes>
+        <Route path="/" element={<Plain_layout />}>
+          <Route path="/login" element={<LoginPage />} />
+        </Route>
+      </Routes>
 
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          pauseOnHover
-          draggable
-          theme="colored"
-        />
-      </Router>
-    </SocketProvider>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
+    </Router>
   );
 }
 

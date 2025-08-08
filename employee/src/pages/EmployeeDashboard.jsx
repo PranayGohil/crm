@@ -54,13 +54,21 @@ const EmployeeDashboard = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("new_subtask", (task) => {
-      console.log("New subtask received:", task);
-      fetchDashboardData(task.assign_to);
-      toast.success("You have a new task assigned!");
-    });
+    const handleNewTask = (task) => {
+      const storedUser = localStorage.getItem("employeeUser");
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        fetchDashboardData(user._id);
+      }
+    };
 
-    return () => socket.off("new_subtask");
+    socket.on("new_subtask", handleNewTask);
+    socket.on("subtask_updated", handleNewTask);
+
+    return () => {
+      socket.off("new_subtask", handleNewTask);
+      socket.off("subtask_updated", handleNewTask);
+    };
   }, [socket]);
 
   useEffect(() => {

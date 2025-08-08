@@ -54,11 +54,24 @@ export const addSubTask = async (req, res) => {
     }
 
     const subTask = await SubTask.create(subTaskData);
+
+    const notification = await Notification.create({
+      title: "New Task Assigned",
+      description: `You have been assigned a new task: ${subTask.task_name}`,
+      type: "Task Updates",
+      icon: "",
+      related_id: "new_subtask",
+      receiver_id: receiverId,
+      receiver_type: "employee",
+      created_by: req.user._id,
+      created_by_role: req.user.role,
+    });
+
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
 
     if (assign_to && connectedUsers[assign_to]) {
-      io.to(connectedUsers[assign_to]).emit("new_subtask", subTask);
+      io.to(connectedUsers[assign_to]).emit("new_subtask", notification);
     }
 
     res.status(200).json(subTask);
@@ -91,6 +104,31 @@ export const addBulkSubTasks = async (req, res) => {
     });
 
     const result = await SubTask.insertMany(tasksWithObjectIds);
+
+    // 🔹 Realtime: Notify assigned employees
+    const io = req.app.get("io");
+    const connectedUsers = req.app.get("connectedUsers");
+
+    result.forEach(async (subtask) => {
+      const notification = await Notification.create({
+        title: "New Task Assigned",
+        description: `You have been assigned a new task: ${subtask.task_name}`,
+        type: "Task Updates",
+        icon: "",
+        related_id: "new_subtask",
+        receiver_id: receiverId,
+        receiver_type: "employee",
+        created_by: req.user._id,
+        created_by_role: req.user.role,
+      });
+      if (subtask.assign_to && connectedUsers[subtask.assign_to]) {
+        io.to(connectedUsers[subtask.assign_to]).emit(
+          "new_subtask",
+          notification
+        );
+      }
+    });
+
     res.status(200).json(result);
   } catch (error) {
     console.error("Error adding bulk subtasks:", error);
@@ -157,17 +195,15 @@ export const updateSubTask = async (req, res) => {
     } = req.body;
 
     let stageArray = [];
-
     if (Array.isArray(req.body.stage)) {
       stageArray = req.body.stage;
     } else if (typeof req.body.stage === "string") {
       try {
         stageArray = JSON.parse(req.body.stage);
-      } catch (err) {
+      } catch {
         stageArray = [req.body.stage];
       }
     }
-
     stageArray = sortStages(stageArray);
 
     let updateData = {
@@ -183,15 +219,58 @@ export const updateSubTask = async (req, res) => {
       status,
     };
 
-    if (req.files && req.files.length > 0) {
+    if (req.files?.length) {
       updateData.media_files = req.files.map((file) => file.path);
     }
+
+    const subTask = await SubTask.findById(id);
 
     const updated = await SubTask.findByIdAndUpdate(id, updateData, {
       new: true,
     });
-    if (!updated) {
-      return res.status(404).json({ message: "Subtask not found" });
+    if (!updated) return res.status(404).json({ message: "Subtask not found" });
+
+    if (subTask.assign_to != updated.assign_to) {
+      const notification_to_previous_assignee = await Notification.create({
+        title: `Subtask Updated - ${subTask.task_name}`,
+        description: `Your subtask has been updated: ${subTask.task_name}`,
+        type: "Task Updates",
+        icon: "",
+        related_id: "subtask_updated",
+        receiver_id: subTask.assign_to,
+        receiver_type: "employee",
+      });
+
+      const io = req.app.get("io");
+      const connectedUsers = req.app.get("connectedUsers");
+
+      if (subTask.assign_to && connectedUsers[subTask.assign_to]) {
+        io.to(connectedUsers[subTask.assign_to]).emit(
+          "subtask_updated",
+          notification_to_previous_assignee
+        );
+      }
+    }
+
+    const notification = await Notification.create({
+      title: `Subtask Updated - ${updated.task_name}`,
+      description: `Your subtask has been updated: ${updated.task_name}`,
+      type: "Task Updates",
+      icon: "",
+      related_id: "subtask_updated",
+      receiver_id: updated.assign_to,
+      receiver_type: "employee",
+    });
+
+    // 🔹 Realtime: Notify assigned employee
+    const io = req.app.get("io");
+    const connectedUsers = req.app.get("connectedUsers");
+
+    if (updated.assign_to && connectedUsers[updated.assign_to]) {
+      io.to(connectedUsers[updated.assign_to]).emit(
+        "subtask_updated",
+        notification
+      );
     }
 
     res.json({
@@ -351,11 +430,65 @@ export const changeSubTaskPriority = async (req, res) => {
 export const bulkUpdateSubtasks = async (req, res) => {
   try {
     const { ids, update } = req.body;
-    const result = await SubTask.updateMany(
-      { _id: { $in: ids } },
-      { $set: update }
-    );
-    res.json(result);
+    console.log("Bulk updating subtasks:", ids, update);
+
+    // 1️⃣ Get subtasks before update
+    const updatedTasks = await SubTask.find({ _id: { $in: ids } });
+    console.log("Found subtasks to update:", updatedTasks);
+
+    // 2️⃣ Update them
+    await SubTask.updateMany({ _id: { $in: ids } }, { $set: update });
+
+    const io = req.app.get("io");
+    const connectedUsers = req.app.get("connectedUsers");
+
+    // 3️⃣ Loop through each task to send notifications
+    for (const task of updatedTasks) {
+      const oldAssigneeId = task.assign_to ? task.assign_to.toString() : null;
+      const newAssigneeId = update.assign_to
+        ? update.assign_to.toString()
+        : null;
+
+      // 📢 Notify old assignee (if exists)
+      if (oldAssigneeId && connectedUsers[oldAssigneeId]) {
+        const oldNotification = await Notification.create({
+          title: `Subtask Updated - ${task.task_name}`,
+          description: `You are no longer assigned to subtask: ${task.task_name}`,
+          type: "Task Updates",
+          icon: "/SVG/task-com-vec.svg",
+          related_id: task._id,
+          receiver_id: oldAssigneeId,
+          receiver_type: "employee",
+        });
+        io.to(connectedUsers[oldAssigneeId]).emit(
+          "subtask_updated",
+          oldNotification
+        );
+      }
+
+      // 📢 Notify new assignee (if different from old)
+      if (
+        newAssigneeId &&
+        newAssigneeId !== oldAssigneeId &&
+        connectedUsers[newAssigneeId]
+      ) {
+        const newNotification = await Notification.create({
+          title: `Subtask Updated - ${task.task_name}`,
+          description: `You have been assigned a new subtask: ${task.task_name}`,
+          type: "Task Updates",
+          icon: "/SVG/task-com-vec.svg",
+          related_id: task._id,
+          receiver_id: newAssigneeId,
+          receiver_type: "employee",
+        });
+        io.to(connectedUsers[newAssigneeId]).emit(
+          "subtask_updated",
+          newNotification
+        );
+      }
+    }
+
+    res.json({ success: true });
   } catch (error) {
     console.error("Error bulk updating subtasks:", error);
     res.status(500).json({ error: "Bulk update failed" });
