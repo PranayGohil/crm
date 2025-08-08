@@ -297,6 +297,7 @@ const EmployeeDashboard = () => {
                 <th>Priority</th>
                 <th>Start Date</th>
                 <th>End Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -401,6 +402,11 @@ const EmployeeDashboard = () => {
                         {project.due_date
                           ? dayjs(project.due_date).format("DD/MM/YYYY")
                           : "-"}
+                      </td>
+                      <td>
+                        <Link to={`/project/details/${project._id}`}>
+                          <img src="/SVG/eye-view.svg" alt="eye-view button" />
+                        </Link>
                       </td>
                     </tr>
                     <tr
