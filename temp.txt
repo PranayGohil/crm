@@ -2,3 +2,7 @@ Socket Notification Filters
 
 new_subtask
 subtask_updated
+
+comment
+overdue
+media_upload

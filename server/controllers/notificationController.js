@@ -1,9 +1,10 @@
 import Notification from "../models/notificationModel.js";
 import { io, emitToUser } from "../utils/socket.js";
 
-export const getAllNotifications = async (req, res) => {
+export const getNotifications = async (req, res) => {
   try {
     const { receiver_id, receiver_type } = req.query;
+    console.log("Fetching notifications for:", receiver_id, receiver_type);
     if (!receiver_id || !receiver_type) {
       return res.status(400).json({
         success: false,

@@ -1,11 +1,11 @@
 import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
 import Employee from "../models/employeeModel.js";
-import mongoose from "mongoose";
-
-import cloudinary from "../config/cloudinary.js";
-
+import Admin from "../models/adminModel.js";
 import Notification from "../models/notificationModel.js";
+
+import mongoose from "mongoose";
+import cloudinary from "../config/cloudinary.js";
 
 const FIXED_STAGE_ORDER = ["CAD Design", "SET Design", "Render", "Delivery"];
 
@@ -367,33 +367,56 @@ export const changeSubTaskStatus = async (req, res) => {
       ? Admin.findById(userId)
       : Employee.findById(userId));
 
-    const userName = userWhoChanged?.full_name || "Someone";
+    const userName =
+      userWhoChanged?.full_name || userWhoChanged?.username || "Someone";
 
     if (userRole === "employee") {
-      await Notification.create({
+      const admin = await Admin.findOne(); // Get the first admin in the collection
+      if (admin) {
+        console.log("Admin found:", admin._id);
+      } else {
+        console.log("No admin found in the database");
+      }
+      const notification = await Notification.create({
         title: `${userName} updated status of subtask ${subtask.task_name} to ${status}`,
         description: `Status changed to ${status}`,
-        type: "task_update",
+        type: "subtask_updated",
         icon: userWhoChanged?.profile_pic || null,
         related_id: subtask._id,
-        receiver_id: "admin",
+        receiver_id: admin._id,
         receiver_type: "admin",
         created_by: userId,
         created_by_role: userRole,
       });
+      const io = req.app.get("io");
+      const connectedUsers = req.app.get("connectedUsers");
+
+      if (admin._id && connectedUsers[admin._id]) {
+        io.to(connectedUsers[admin._id]).emit("subtask_updated", notification);
+      }
     }
 
     if (userRole === "admin" && subtask.assign_to) {
-      await Notification.create({
-        title: `Status changed to ${status}`,
+      const notification = await Notification.create({
+        title: `${subtask.task_name} status changed to ${status} by Admin`,
         description: `${userName} updated status of your subtask '${subtask.task_name}' to ${status}`,
-        type: "task_update",
+        type: "subtask_updated",
         related_id: subtask._id,
         receiver_id: subtask.assign_to,
         receiver_type: "employee",
         created_by: userId,
         created_by_role: userRole,
       });
+
+      const io = req.app.get("io");
+      const connectedUsers = req.app.get("connectedUsers");
+
+      if (subtask.assign_to && connectedUsers[subtask.assign_to]) {
+        io.to(connectedUsers[subtask.assign_to]).emit(
+          "subtask_updated",
+          notification
+        );
+      }
     }
 
     console.log("Notification sent successfully");

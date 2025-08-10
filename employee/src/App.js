@@ -46,7 +46,7 @@ function App() {
             element={<EmployeeTimeTracking />}
           />
           <Route
-            path="employeenotificationpage"
+            path="/notifications"
             element={<EmployeeNotificationPage />}
           />
         </Route>

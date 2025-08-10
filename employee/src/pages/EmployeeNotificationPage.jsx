@@ -1,230 +1,81 @@
-import React, { useState } from "react";
-const NotificationItem = ({
-  icon,
-  title,
-  description,
-  linkText,
-  linkHref = "#",
-  time,
-  media = [],
-}) => (
-  <div className="not-completed-tasks">
-    <div className="not-completed-img-txt">
-      <img src={icon} alt={title} />
-      <div className="not-completed-text">
-        <div id="p1">{title}</div>
-        <div id="p2">{description}</div>
-        {media.length > 0 && (
-          <div className="not-media">
-            {media.map((src, index) => (
-              <img key={index} src={src} alt={`media-${index}`} />
-            ))}
-          </div>
-        )}
-        <a href={linkHref}>{linkText}</a>
-      </div>
-    </div>
-    <div className="not-notification-hours">
-      <img src="/SVG/dot.svg" alt="dot" />
-      <span>{time}</span>
-    </div>
-  </div>
-);
+import React, { useEffect, useState } from "react";
+import { useSocket } from "../contexts/SocketContext";
+import axios from "axios";
+import NotificationItem from "../components/NotificationItem";
 
 const EmployeeNotificationPage = () => {
+  const { notifications, setNotifications } = useSocket();
   const [filter, setFilter] = useState("all");
 
-  const allNotifications = [
-    {
-      section: "Today",
-      items: [
-        {
-          icon: "/SVG/task-com-vec.svg",
-          title: "Task Completed",
-          description:
-            "Riya Sharma completed subtask 3D Rendering Pass 1 on project Rose Gold Bridal Necklace Set.",
-          linkText: "View Task",
-          linkHref: "today.html",
-          time: "2 hours ago",
-          type: "Task Updates",
-        },
-        {
-          icon: "/SVG/comment-vec.svg",
-          title: "New Comment",
-          description:
-            'Arjun Patel commented on Stone Placement Planning: "Can we adjust the spacing between the stones?"',
-          linkText: "View Comment",
-          time: "3 hours ago",
-          type: "Comments",
-        },
-        {
-          icon: "/SVG/due-time-vec.svg",
-          title: "Due Date Today",
-          description:
-            "Task Final Polish and Quality Check for project Diamond Studded Earrings is due today.",
-          linkText: "View Task",
-          time: "3 hours ago",
-          type: "Due Dates",
-        },
-      ],
-    },
-    {
-      section: "Yesterday",
-      items: [
-        {
-          icon: "/SVG/overdue-vec.svg",
-          title: "Overdue Task",
-          description:
-            "Task CAD Model Review for project Sapphire Pendant Set is overdue by 1 day.",
-          linkText: "View Comment",
-          linkHref: "yesterday.html",
-          time: "Yesterday, 14:35",
-          type: "Due Dates",
-        },
-        {
-          icon: "/SVG/media-vec.svg",
-          title: "Media Uploaded",
-          description:
-            "Vikram Singh uploaded 3 images to Gold Chain Manufacturing task.",
-          linkText: "View Comment",
-          time: "Yesterday, 14:35",
-          type: "Media Uploads",
-          media: [
-            "/Image/not-i1.png",
-            "/Image/not-i2.png",
-            "/Image/not-i1.png",
-          ],
-        },
-      ],
-    },
-    {
-      section: "Previous Week",
-      items: [
-        {
-          icon: "/SVG/task-edit-vec.svg",
-          title: "Task Edited",
-          description:
-            "Neha Gupta updated the deadline for task Client Approval Meeting from May 25 to May 28.",
-          linkText: "View Task",
-          linkHref: "previous-week.html",
-          time: "Yesterday, 14:35",
-          type: "Task Updates",
-        },
-        {
-          icon: "/SVG/task-com-vec.svg",
-          title: "Task Completed",
-          description:
-            "Rajesh Kumar completed task Initial Sketches for project Custom Wedding Band Set.",
-          linkText: "View Task",
-          time: "Yesterday, 14:35",
-          type: "Task Updates",
-        },
-      ],
-    },
-  ];
+  const employeeUser = JSON.parse(localStorage.getItem("employeeUser"));
+  const employeeId = employeeUser?._id;
+  const receiverType = "employee";
+
+  useEffect(() => {
+    const fetchAndMarkNotifications = async () => {
+      try {
+        // 1. Fetch notifications
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/notification/get`,
+          {
+            params: {
+              receiver_id: employeeId,
+              receiver_type: receiverType,
+            },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("employeeToken")}`,
+            },
+          }
+        );
+
+        setNotifications(res.data.notifications);
+
+        // 2. Mark all as read in the backend
+        await axios.put(
+          `${process.env.REACT_APP_API_URL}/api/notification/mark-all-read`,
+          {
+            receiver_id: employeeId,
+            receiver_type: receiverType,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("employeeToken")}`,
+            },
+          }
+        );
+
+        // 3. Update local state so unread count is zero immediately
+        setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      } catch (error) {
+        console.error("Error fetching/marking notifications:", error);
+      }
+    };
+
+    if (employeeId) {
+      fetchAndMarkNotifications();
+    }
+  }, [employeeId, setNotifications]);
 
   const filteredNotifications =
     filter === "all"
-      ? allNotifications
-      : allNotifications
-          .map((section) => ({
-            ...section,
-            items: section.items.filter((item) => item.type === filter),
-          }))
-          .filter((section) => section.items.length > 0);
+      ? notifications
+      : notifications.filter((n) => n.type === filter);
+
   return (
     <div className="employee-notification-page">
-      <section className="not-notification-header">
-        <div className="not-notification-header-txt">
-          <span>Notification Center</span>
-          <div className="not-header-menu">
-            <a href="#" className="not-header-filter">
-              <img src="/SVG/filter-vector.svg" alt="filter" /> Filter
-            </a>
-            <a href="#" className="not-header-setting">
-              <img src="/SVG/setting-vec.svg" alt="setting" /> Notification
-              Settings
-            </a>
-          </div>
-        </div>
-        {/* <div className="not-header-navbar">
-        <a href="#" className="not-all-notification not-inner-nav">All Notifications</a>
-        <a href="#" className="not-Task-Updates">Task Updates</a>
-        <a href="#" className="not-Comments">Comments</a>
-        <a href="#" className="not-Due-Dates">Due Dates</a>
-        <a href="#" className="not-Media-Uploads">Media Uploads</a>
-      </div> */}
-      </section>
-      <section className="not-sec-2">
-        <div className="not-header-navbar">
-          <a
-            onClick={() => setFilter("all")}
-            className="not-all-notification not-inner-nav"
-            href="#"
-          >
-            All Notifications
-          </a>
-          <a
-            onClick={() => setFilter("Task Updates")}
-            className="not-Task-Updates"
-            href="#"
-          >
-            Task Updates
-          </a>
-          <a
-            onClick={() => setFilter("Comments")}
-            className="not-Comments"
-            href="#"
-          >
-            Comments
-          </a>
-          <a
-            onClick={() => setFilter("Due Dates")}
-            className="not-Due-Dates"
-            href="#"
-          >
-            Due Dates
-          </a>
-          <a
-            onClick={() => setFilter("Media Uploads")}
-            className="not-Media-Uploads"
-            href="#"
-          >
-            Media Uploads
-          </a>
-        </div>
-
-        <div className="not-tasks-information">
-          {filteredNotifications.map((section, idx) => (
-            <div
-              className={`not-${section.section
-                .toLowerCase()
-                .replace(/\s/g, "-")}-tasks tasks-inner`}
-              key={idx}
-            >
-              <span>{section.section}</span>
-              {section.items.map((item, i) => (
-                <NotificationItem key={i} {...item} />
-              ))}
-            </div>
-          ))}
-
-          <div className="not-showing-notification">
-            <div className="not-showing-notification-txt">
-              Showing <span>1</span> to <span>7</span> of <span>28</span>{" "}
-              notifications
-            </div>
-            <div className="not-showing-noti-btn">
-              <a href="#" className="not-previous-btn not-btn">
-                Previous
-              </a>
-              <a href="#" className="not-next-btn not-btn">
-                Next
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Filter buttons here */}
+      <div className="not-tasks-information">
+        {filteredNotifications.map((item, i) => (
+          <NotificationItem
+            key={i}
+            icon={item.icon}
+            title={item.title}
+            description={item.description}
+            linkText="View"
+            time={new Date(item.createdAt).toLocaleString()}
+          />
+        ))}
+      </div>
     </div>
   );
 };

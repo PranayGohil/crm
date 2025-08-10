@@ -5,7 +5,6 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "bootstrap/dist/css/bootstrap.css";
 
-import { NotificationProvider } from "./contexts/NotificationContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { SocketProvider } from "./contexts/SocketContext";
 
@@ -14,11 +13,9 @@ const employeeUser = JSON.parse(localStorage.getItem("employeeUser"));
 root.render(
   <SocketProvider employeeId={employeeUser?._id}>
     <AuthProvider>
-      <NotificationProvider>
-        <React.StrictMode>
-          <App />
-        </React.StrictMode>
-      </NotificationProvider>
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
     </AuthProvider>
   </SocketProvider>
 );

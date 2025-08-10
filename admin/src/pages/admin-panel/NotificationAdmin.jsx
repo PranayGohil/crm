@@ -1,10 +1,11 @@
 import { useEffect, useState, useContext } from "react";
+import axios from "axios";
 import NotificationItem from "../../components/admin/NotificationItem";
-import { NotificationContext } from "../../contexts/NotificationContext";
+import { useSocket } from "../../contexts/SocketContext";
 
 const NotificationAdmin = () => {
   const [loading, setLoading] = useState(false);
-  const { notifications, markAllAsRead } = useContext(NotificationContext);
+  const { notifications, setNotifications } = useSocket();
 
   const [activeFilter, setActiveFilter] = useState("All");
 
@@ -16,20 +17,65 @@ const NotificationAdmin = () => {
     "Media Uploads",
   ];
 
+  const adminUser = JSON.parse(localStorage.getItem("adminUser"));
+  const adminId = adminUser?._id;
+  const receiverType = "admin";
+
+  useEffect(() => {
+    const fetchAndMarkNotifications = async () => {
+      try {
+        // 1. Fetch notifications
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/notification/get`,
+          {
+            params: {
+              receiver_id: adminId,
+              receiver_type: receiverType,
+            },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("employeeToken")}`,
+            },
+          }
+        );
+
+        setNotifications(res.data.notifications);
+
+        // 2. Mark all as read in the backend
+        await axios.put(
+          `${process.env.REACT_APP_API_URL}/api/notification/mark-all-read`,
+          {
+            receiver_id: adminId,
+            receiver_type: receiverType,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("employeeToken")}`,
+            },
+          }
+        );
+
+        // 3. Update local state so unread count is zero immediately
+        setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      } catch (error) {
+        console.error("Error fetching/marking notifications:", error);
+      }
+    };
+
+    if (adminId) {
+      fetchAndMarkNotifications();
+    }
+  }, [adminId, setNotifications]);
+
   const filteredNotifications = notifications.filter((n) => {
     if (activeFilter === "All") return true;
     if (activeFilter === "Task Updates")
-      return n.type === "subtask_update" || n.type === "task_update";
+      return n.type === "subtask_updated" || n.type === "task_update";
     if (activeFilter === "Comments") return n.type === "comment";
     if (activeFilter === "Due Dates")
       return n.type === "overdue" || n.type === "deadline";
     if (activeFilter === "Media Uploads") return n.type === "media_upload";
     return true;
   });
-
-  useEffect(() => {
-    markAllAsRead();
-  }, []);
 
   if (loading) return <p>Loading...</p>;
 
@@ -49,7 +95,7 @@ const NotificationAdmin = () => {
                 setActiveFilter(filter);
               }}
               className={`not-inner-nav ${
-                activeFilter === filter ? "active-filter" : ""
+                activeFilter === filter ? "active-link" : ""
               }`}
             >
               {filter}
@@ -61,7 +107,9 @@ const NotificationAdmin = () => {
       <section className="not-sec-2">
         <div className="not-tasks-information">
           {filteredNotifications.length === 0 ? (
-            <div className="d-flex justify-content-center mt-5">No notifications yet in this category.</div>
+            <div className="d-flex justify-content-center mt-5">
+              No notifications yet in this category.
+            </div>
           ) : (
             filteredNotifications.map((n) => (
               <NotificationItem

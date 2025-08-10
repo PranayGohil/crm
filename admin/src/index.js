@@ -5,17 +5,18 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "bootstrap/dist/css/bootstrap.css";
 
-import { NotificationProvider } from "./contexts/NotificationContext";
+import { SocketProvider } from "./contexts/SocketContext";
 import { AuthProvider } from "./contexts/AuthContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+const adminUser = JSON.parse(localStorage.getItem("adminUser"));
 root.render(
   <AuthProvider>
-    <NotificationProvider>
+    <SocketProvider adminId={adminUser?._id}>
       <React.StrictMode>
         <App />
       </React.StrictMode>
-    </NotificationProvider>
+    </SocketProvider>
   </AuthProvider>
 );
 

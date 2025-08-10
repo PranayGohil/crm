@@ -1,9 +1,39 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { NotificationContext } from "../../contexts/NotificationContext";
+import axios from "axios";
+import { useSocket } from "../../contexts/SocketContext";
 
 const HeaderAdmin = () => {
-  const { unreadCount } = useContext(NotificationContext);
+  const { notifications, setNotifications } = useSocket();
+  const user = JSON.parse(localStorage.getItem("adminUser"));
+
+  const fetchNotifications = async (adminId) => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/notification/get`,
+        {
+          params: {
+            receiver_id: adminId,
+            receiver_type: "admin",
+          },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setNotifications(res.data.notifications);
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications(user._id);
+    }
+  }, []);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <div className="ha-header_admin_main">
@@ -25,13 +55,17 @@ const HeaderAdmin = () => {
                 </a>
               </div>
 
-              <Link to="/admin/profile" className="ha-header-img-admin_name d-flex align-items-center">
+              <Link
+                to="/admin/profile"
+                className="ha-header-img-admin_name d-flex align-items-center"
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
                 <img
-                  src="/Image/Riya Sharma.png"
+                  src={user?.profile_pic || "/SVG/default-profile.svg"}
                   alt="riya sharma"
                   className="ha_admin_name"
                 />
-                <span>Admin</span>
+                <span>{user?.username || "Admin"}</span>
               </Link>
             </div>
           </div>

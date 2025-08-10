@@ -1,11 +1,12 @@
 import { useEffect, useState, useContext } from "react";
+import axios from "axios";
 import NotificationItem from "../../components/admin/NotificationItem";
-import { NotificationContext } from "../../contexts/NotificationContext";
 import { Link } from "react-router-dom";
+import { useSocket } from "../../contexts/SocketContext";
 
 const NotificationAdmin = () => {
   const [loading, setLoading] = useState(false);
-  const { notifications, markAllAsRead } = useContext(NotificationContext);
+  const { notifications, setNotifications } = useSocket();
 
   const [activeFilter, setActiveFilter] = useState("All");
   const visibleNotifications = 5;
@@ -18,12 +19,16 @@ const NotificationAdmin = () => {
     "Media Uploads",
   ];
 
+  const adminUser = JSON.parse(localStorage.getItem("adminUser"));
+  const adminId = adminUser?._id;
+  const receiverType = "admin";
+
   const filteredNotifications = notifications
     .slice(0, visibleNotifications)
     .filter((n) => {
       if (activeFilter === "All") return true;
       if (activeFilter === "Task Updates")
-        return n.type === "subtask_update" || n.type === "task_update";
+        return n.type === "subtask_updated" || n.type === "task_update";
       if (activeFilter === "Comments") return n.type === "comment";
       if (activeFilter === "Due Dates")
         return n.type === "overdue" || n.type === "deadline";
@@ -32,8 +37,32 @@ const NotificationAdmin = () => {
     });
 
   useEffect(() => {
-    markAllAsRead();
-  }, []);
+    const fetchAndMarkNotifications = async () => {
+      try {
+        // 1. Fetch notifications
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/notification/get`,
+          {
+            params: {
+              receiver_id: adminId,
+              receiver_type: receiverType,
+            },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("employeeToken")}`,
+            },
+          }
+        );
+
+        setNotifications(res.data.notifications);
+      } catch (error) {
+        console.error("Error fetching/marking notifications:", error);
+      }
+    };
+
+    if (adminId) {
+      fetchAndMarkNotifications();
+    }
+  }, [adminId, setNotifications]);
 
   if (loading) return <p>Loading...</p>;
 

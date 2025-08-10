@@ -12,20 +12,13 @@ export const SocketProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("employeeUser"));
+    const storedUser = JSON.parse(localStorage.getItem("adminUser"));
     const s = io(process.env.REACT_APP_API_URL);
     setSocket(s);
 
     if (storedUser) {
       s.emit("register", storedUser._id);
     }
-
-
-    // Listen for new task
-    s.on("new_subtask", (notification) => {
-      toast.success(`${notification.title}`);
-      setNotifications((prev) => [notification, ...prev]);
-    });
 
     // Listen for updated task
     s.on("subtask_updated", (notification) => {

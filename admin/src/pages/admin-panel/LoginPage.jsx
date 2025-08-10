@@ -14,7 +14,7 @@ const LoginPage = () => {
   const [error, setError] = useState(""); // store error message
 
   const validate = () => {
-    if (!email.trim()) return "Email is required";
+    if (!email.trim()) return "Email or username is required";
     if (!password.trim()) return "Password is required";
     return "";
   };
@@ -58,12 +58,12 @@ const LoginPage = () => {
       </div>
       <div className="fd-stucture">
         <div className="fd-enter-email">
-          <p>Email</p>
+          <p>Email or Username</p>
           <input
-            type="email"
+            type="text" // <-- was "email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
+            placeholder="Enter your email or username"
           />
         </div>
         <div className="fd-enter-password fd-enter-email">

@@ -89,7 +89,7 @@ const ViewSubtask = () => {
       // update status
       await axios.put(
         `${process.env.REACT_APP_API_URL}/api/subtask/change-status/${subtaskId}`,
-        { status: editingStatus }
+        { status: editingStatus, userId: subtask.assign_to, userRole: "admin" }
       );
       // update priority
       await axios.put(

@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
+import { useSocket } from "../contexts/SocketContext";
+import axios from "axios";
 
 const HeaderEmployee = () => {
+  const { notifications, setNotifications } = useSocket();
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [profilePic, setProfilePic] = useState("");
@@ -14,8 +17,33 @@ const HeaderEmployee = () => {
       setUsername(user.username);
       setFullName(user.full_name);
       setProfilePic(user.profile_pic || "");
+      fetchNotifications(user._id);
     }
   }, []);
+
+  const fetchNotifications = async (employeeId) => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/notification/get`,
+        {
+          params: {
+            receiver_id: employeeId,
+            receiver_type: "employee",
+          },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("employeeToken")}`,
+          },
+        }
+      );
+      setNotifications(res.data.notifications);
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+    }
+  };
+
+  // Count unread in real-time
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
   return (
     <div className="ha-header_admin_main">
       <div className="ha-header_admin_main_inner">
@@ -27,12 +55,14 @@ const HeaderEmployee = () => {
             </div>
 
             <div className="header-notification">
-              {/* <div className="ha_notification__header">
-                <a href="employeenotificationpage">
+              <div className="ha_notification__header">
+                <a href="/notifications">
                   <img src="SVG/notification.svg" alt="notification icon" />
-                  <span className="ha_notification_count">10</span>
+                  {unreadCount > 0 && (
+                    <span className="ha_notification_count">{unreadCount}</span>
+                  )}
                 </a>
-              </div> */}
+              </div>
 
               <div className="ha-header-img-admin_name">
                 {profilePic ? (

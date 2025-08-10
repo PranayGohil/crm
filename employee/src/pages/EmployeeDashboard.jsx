@@ -35,7 +35,7 @@ const EmployeeDashboard = () => {
       link: "EmployeeTimeTracking",
     },
   ]);
-  const socket = useSocket();
+  const { socket } = useSocket();
   const [projects, setProjects] = useState([]);
   const [subtasks, setSubtasks] = useState([]);
   const [loading, setLoading] = useState(true);

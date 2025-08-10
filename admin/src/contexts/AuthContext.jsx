@@ -8,9 +8,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(storedUser ? JSON.parse(storedUser) : null);
 
   const login = (userData) => {
-    localStorage.setItem("adminUser", JSON.stringify(userData));
+    localStorage.setItem("adminUser", JSON.stringify(userData?.admin));
+    localStorage.setItem("token", JSON.stringify(userData?.token));
     console.log("User logged in:", userData);
-    setUser(userData); // userData now has token, email, and role
+    setUser(userData); 
   };
 
   const logout = () => {
