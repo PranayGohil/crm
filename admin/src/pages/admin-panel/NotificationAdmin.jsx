@@ -118,7 +118,17 @@ const NotificationAdmin = () => {
                 title={n.title}
                 description={n.description}
                 linkText="View"
-                linkHref="#"
+                linkHref={`${
+                  n.type === "task_update" || n.type === "subtask_update"
+                    ? "/subtask/view/" + n.related_id
+                    : n.type === "comment"
+                    ? "/task/view/" + n.related_id
+                    : n.type === "overdue" || n.type === "deadline"
+                    ? "/task/view/" + n.related_id
+                    : n.type === "media_upload"
+                    ? "/task/view/" + n.related_id
+                    : "#"
+                }`}
                 time={new Date(n.createdAt).toLocaleString()}
                 media={n.media}
               />

@@ -5,7 +5,15 @@ import NotificationItem from "../components/NotificationItem";
 
 const EmployeeNotificationPage = () => {
   const { notifications, setNotifications } = useSocket();
-  const [filter, setFilter] = useState("all");
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  const filters = [
+    "All",
+    "Task Updates",
+    "Comments",
+    "Due Dates",
+    "Media Uploads",
+  ];
 
   const employeeUser = JSON.parse(localStorage.getItem("employeeUser"));
   const employeeId = employeeUser?._id;
@@ -56,26 +64,74 @@ const EmployeeNotificationPage = () => {
     }
   }, [employeeId, setNotifications]);
 
-  const filteredNotifications =
-    filter === "all"
-      ? notifications
-      : notifications.filter((n) => n.type === filter);
+  const filteredNotifications = notifications.filter((n) => {
+    if (activeFilter === "All") return true;
+    if (activeFilter === "Task Updates")
+      return n.type === "subtask_updated" || n.type === "task_update";
+    if (activeFilter === "Comments") return n.type === "comment";
+    if (activeFilter === "Due Dates")
+      return n.type === "overdue" || n.type === "deadline";
+    if (activeFilter === "Media Uploads") return n.type === "media_upload";
+    return true;
+  });
 
   return (
-    <div className="employee-notification-page">
-      {/* Filter buttons here */}
-      <div className="not-tasks-information">
-        {filteredNotifications.map((item, i) => (
-          <NotificationItem
-            key={i}
-            icon={item.icon}
-            title={item.title}
-            description={item.description}
-            linkText="View"
-            time={new Date(item.createdAt).toLocaleString()}
-          />
-        ))}
-      </div>
+    <div className="notification-admin">
+      <section className="not-notification-header">
+        <div className="not-notification-header-txt">
+          <span>Notification Center</span>
+        </div>
+        <div className="not-header-navbar">
+          {filters.map((filter) => (
+            <a
+              key={filter}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveFilter(filter);
+              }}
+              className={`not-inner-nav ${
+                activeFilter === filter ? "active-link" : ""
+              }`}
+            >
+              {filter}
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="not-sec-2">
+        <div className="not-tasks-information">
+          {filteredNotifications.length === 0 ? (
+            <div className="d-flex justify-content-center mt-5">
+              No notifications yet in this category.
+            </div>
+          ) : (
+            filteredNotifications.map((n) => (
+              <NotificationItem
+                key={n._id}
+                icon={n.icon}
+                title={n.title}
+                description={n.description}
+                linkText="View"
+                linkHref={`${
+                  n.type === "task_update" || n.type === "subtask_update"
+                    ? "/subtask/view/" + n.related_id
+                    : n.type === "comment"
+                    ? "/task/view/" + n.related_id
+                    : n.type === "overdue" || n.type === "deadline"
+                    ? "/task/view/" + n.related_id
+                    : n.type === "media_upload"
+                    ? "/task/view/" + n.related_id
+                    : "#"
+                }`}
+                time={new Date(n.createdAt).toLocaleString()}
+                media={n.media}
+              />
+            ))
+          )}
+        </div>
+      </section>
     </div>
   );
 };

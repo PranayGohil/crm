@@ -8087,7 +8087,8 @@ a {
 .active-link {
   border-radius: 8px;
   background-color: #0c4559;
-  color: #ffffff;
+  color: #ffffff !important;
+  padding: 11px 16px;
 }
 
 .highlight-running {
