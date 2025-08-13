@@ -1,9 +1,11 @@
 // EmployeeTimeTracking.jsx
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 
 const EmployeeTimeTracking = () => {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [subtasks, setSubtasks] = useState([]);
   const [openTable, setOpenTable] = useState(null);
@@ -123,10 +125,29 @@ const EmployeeTimeTracking = () => {
     <div className="time-tracking-dashboard-page p-3">
       <section className="ett-main-sec">
         <div className="tt-time-tracking ett-emp-tracking-time">
-          <div className="ett-tracking-time-heading">
-            <div className="ett-tracking-inner">
-              <h1>My Time Tracking</h1>
-              <p>Track your time spent on tasks and projects.</p>
+          <div className="d-flex justify-content-between align-items-center">
+            <div className="anp-heading-main">
+              <div
+                className="anp-back-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(-1);
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <img
+                  src="/SVG/arrow-pc.svg"
+                  alt="back"
+                  className="mx-2"
+                  style={{ scale: "1.3" }}
+                />
+              </div>
+              <div className="head-menu">
+                <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+                  My Time Tracking{" "}
+                </h1>
+                <p>Track your time spent on tasks and projects.</p>
+              </div>
             </div>
           </div>
           <div className="ett-time-duration">

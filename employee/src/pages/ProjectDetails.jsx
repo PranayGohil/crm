@@ -54,15 +54,29 @@ const ProjectDetails = () => {
   return (
     <div className="preview-page p-5">
       <section className="pb-sec1 d-flex justify-content-between">
-        <div>
-          <a
-            onClick={() => navigate(-1)}
-            style={{ cursor: "pointer" }}
-            className="me-2"
-          >
-            <img src="/SVG/arrow-pc.svg" alt="arrow-pc" />
-          </a>
-          <span>Back</span>
+        <div className="d-flex align-items-center gap-3 mb-3">
+          <div className="anp-heading-main">
+            <div
+              className="anp-back-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/");
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <img
+                src="/SVG/arrow-pc.svg"
+                alt="back"
+                className="mx-2"
+                style={{ scale: "1.3" }}
+              />
+            </div>
+            <div className="head-menu">
+              <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+                Project Details{" "}
+              </h1>
+            </div>
+          </div>
         </div>
       </section>
 

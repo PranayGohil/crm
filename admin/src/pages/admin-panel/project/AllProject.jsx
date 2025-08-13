@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import ProjectCard from "../../../components/admin/ProjectCard";
 
 const AllProject = () => {
+  const navigate = useNavigate();
   const [selectedClient, setSelectedClient] = useState({
     id: "All Client",
     name: "All Client",
@@ -136,7 +138,30 @@ const AllProject = () => {
     <div className="all-project-page">
       <section className="header">
         <div className="head-menu">
-          <h1>All Projects</h1>
+          <div className="anp-header-inner">
+            <div className="anp-heading-main">
+              <div
+                className="anp-back-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <img
+                  src="/SVG/arrow-pc.svg"
+                  alt="back"
+                  className="mx-2"
+                  style={{ scale: "1.3" }}
+                />
+              </div>
+              <div className="head-menu">
+                <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+                  All Projects{" "}
+                </h1>
+              </div>
+            </div>
+          </div>
           <div className="menu-bar">
             <div className="btn_main" ref={clientDropdownRef}>
               <div

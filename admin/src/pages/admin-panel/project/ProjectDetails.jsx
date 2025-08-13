@@ -107,20 +107,34 @@ const ProjectDetails = () => {
   if (!project) return <p>Project not found!</p>;
 
   return (
-    <div className="preview-page p-5">
+    <div className="preview-page p-3">
       <section className="pb-sec1 d-flex justify-content-between">
-        <div>
-          <a
-            onClick={() => navigate(-1)}
-            style={{ cursor: "pointer" }}
-            className="me-2"
-          >
-            <img src="/SVG/arrow-pc.svg" alt="arrow-pc" />
-          </a>
-          <span>Back</span>
+        <div className="anp-header-inner">
+          <div className="anp-heading-main">
+            <div
+              className="anp-back-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(-1);
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <img
+                src="/SVG/arrow-pc.svg"
+                alt="back"
+                className="mx-2"
+                style={{ scale: "1.3" }}
+              />
+            </div>
+            <div className="head-menu">
+              <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+                Project Details{" "}
+              </h1>
+            </div>
+          </div>
         </div>
-        <div className="d-flex">
-          <Link to={`/project/edit/${project._id}`} className="theme_btn ms-2">
+        <div width="165px">
+          <Link to={`/project/edit/${project._id}`} className="theme_btn d-flex align-items-center">
             <img
               src="/SVG/edit.svg"
               alt="edit"

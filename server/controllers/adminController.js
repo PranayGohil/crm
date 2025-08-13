@@ -94,3 +94,26 @@ export const updateAdminProfile = async (req, res) => {
     res.status(500).json({ success: false, message: "Update failed" });
   }
 };
+
+export const adminProfileForEmployee = async (req, res) => {
+  try {
+    const fetchAdmin = await Admin.findOne();
+    if (!fetchAdmin)
+      return res
+        .status(404)
+        .json({ success: false, message: "Admin not found" });
+
+    // Return only necessary fields for employee view
+    const admin = {
+      _id: fetchAdmin._id,
+      username: fetchAdmin.username,
+      email: fetchAdmin.email,
+      profile_pic: fetchAdmin.profile_pic,
+    };
+
+    res.status(200).json({ success: true, admin });
+  } catch (err) {
+    console.error("Get admin profile error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

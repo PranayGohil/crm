@@ -7,12 +7,17 @@ import { statusOptions, priorityOptions } from "../options";
 
 import { Modal, Button } from "react-bootstrap";
 
+import { useSocket } from "../contexts/SocketContext";
+
 const ViewSubtask = () => {
   const { subtaskId } = useParams();
   const navigate = useNavigate();
+  const { socket } = useSocket();
 
   const employee = JSON.parse(localStorage.getItem("employeeUser"));
   const employeeId = employee ? employee._id : null;
+
+  const [admin, setAdmin] = useState(null);
 
   const [subtask, setSubtask] = useState(null);
   const [project, setProject] = useState(null);
@@ -33,58 +38,107 @@ const ViewSubtask = () => {
   const [newComment, setNewComment] = useState("");
   const [visibleCommentsCount, setVisibleCommentsCount] = useState(7);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
 
-        const { data: subtaskData } = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/subtask/get/${subtaskId}`
+      const { data: subtaskData } = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/subtask/get/${subtaskId}`
+      );
+      setSubtask(subtaskData);
+      setComments(subtaskData.comments || []);
+      setEditingStatus(subtaskData.status || "");
+
+      const items = (subtaskData.media_files || []).map((file) => ({
+        src: `${file}`,
+        alt: file,
+      }));
+      setMediaItems(items);
+      console.log("Subtask Data:", subtaskData);
+
+      const { data: projectData } = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/project/get/${subtaskData.project_id}`
+      );
+      setProject(projectData.project);
+      console.log("Project Data:", projectData);
+
+      if (subtaskData.assign_to) {
+        const { data: employeeData } = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/employee/get/${subtaskData.assign_to}`
         );
-        setSubtask(subtaskData);
-        setComments(subtaskData.comments || []);
-        setEditingStatus(subtaskData.status || "");
-
-        const items = (subtaskData.media_files || []).map((file) => ({
-          src: `${file}`,
-          alt: file,
-        }));
-        setMediaItems(items);
-        console.log("Subtask Data:", subtaskData);
-
-        const { data: projectData } = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/project/get/${subtaskData.project_id}`
-        );
-        setProject(projectData.project);
-        console.log("Project Data:", projectData);
-
-        if (subtaskData.assign_to) {
-          const { data: employeeData } = await axios.get(
-            `${process.env.REACT_APP_API_URL}/api/employee/get/${subtaskData.assign_to}`
-          );
-          setAssignedEmployee(employeeData);
-          console.log("Assigned Employee Data:", employeeData);
-        }
-
-        if (projectData.project.client_id) {
-          const { data: clientData } = await axios.get(
-            `${process.env.REACT_APP_API_URL}/api/client/get/${projectData.project.client_id}`
-          );
-          setClient(clientData);
-          console.log("Client Data:", clientData);
-        }
-      } catch (error) {
-        console.error("Failed to load subtask details:", error);
-        toast.error(
-          error.response.data.message || "Failed to load subtask details."
-        );
-      } finally {
-        setLoading(false);
+        setAssignedEmployee(employeeData);
+        console.log("Assigned Employee Data:", employeeData);
       }
-    };
 
+      if (projectData.project.client_id) {
+        const { data: clientData } = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/client/get/${projectData.project.client_id}`
+        );
+        setClient(clientData);
+        console.log("Client Data:", clientData);
+      }
+    } catch (error) {
+      console.error("Failed to load subtask details:", error);
+      toast.error(
+        error.response.data.message || "Failed to load subtask details."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAdminProfile = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/admin/profile-for-employee`
+      );
+      console.log("Admin Profile Data:", res.data.admin);
+      setAdmin(res.data.admin);
+    } catch (error) {
+      console.error("Failed to fetch admin profile:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdminProfile();
     fetchData();
   }, [subtaskId]);
+
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("subtask_updated", (data) => {
+      if (data._id === subtaskId) {
+        setSubtask((prev) => ({
+          ...prev,
+          status: data.status,
+          priority: data.priority,
+        }));
+      }
+    });
+
+    socket.on("comment", (data) => {
+      console.log("New comment received:", data);
+      if (data.related_id === subtaskId) {
+        fetchData();
+      }
+    });
+
+    socket.on("media_upload", (data) => {
+      console.log("New media uploaded:", data);
+      if (data.related_id === subtaskId) {
+        fetchData();
+      }
+    });
+
+    return () => {
+      socket.off("subtask_updated");
+      socket.off("comment");
+      socket.off("media_upload");
+    };
+  }, [socket, subtaskId]);
 
   const handleUpdate = async () => {
     try {
@@ -113,8 +167,10 @@ const ViewSubtask = () => {
   };
 
   const handleUploadMedia = async (files) => {
+    setLoading(true);
     try {
       const formData = new FormData();
+      formData.append("user_type", "employee");
       for (const file of files) {
         console.log("File Data:", file);
         formData.append("media_files", file); // must match .array("media_files")
@@ -131,16 +187,19 @@ const ViewSubtask = () => {
     } catch (error) {
       console.error("Upload failed:", error);
       toast.error("Upload failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleRemoveConfirmed = async () => {
     if (!mediaToRemove) return;
+    setLoading(true);
 
     try {
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/remove-media/${subtaskId}`,
-        { mediaUrl: mediaToRemove }
+        { mediaUrl: mediaToRemove, user_type: "employee", user_id: employeeId }
       );
       setMediaItems(
         data.media_files.map((url) => ({ src: url, alt: "Uploaded file" }))
@@ -152,11 +211,13 @@ const ViewSubtask = () => {
     } finally {
       setShowRemoveModal(false);
       setMediaToRemove(null);
+      setLoading(false);
     }
   };
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
+    setLoading(true);
     try {
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/add-comment/${subtaskId}`,
@@ -167,6 +228,9 @@ const ViewSubtask = () => {
     } catch (error) {
       console.error("Failed to add comment:", error);
       toast.error("Failed to add comment");
+    } finally {
+      setLoading(false);
+      setVisibleCommentsCount(7); // Reset to show only 7 comments after adding
     }
   };
 
@@ -185,11 +249,29 @@ const ViewSubtask = () => {
   return (
     <div className="preview-page">
       <section className="pb-sec1">
-        <div className="pb-sec1-inner">
-          <a onClick={() => navigate(-1)} style={{ cursor: "pointer" }}>
-            <img src="/SVG/arrow-pc.svg" alt="arrow-pc" />
-          </a>
-          <span>Back</span>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <div className="anp-heading-main">
+            <div
+              className="anp-back-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/");
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <img
+                src="/SVG/arrow-pc.svg"
+                alt="back"
+                className="mx-2"
+                style={{ scale: "1.3" }}
+              />
+            </div>
+            <div className="head-menu">
+              <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+                Add New Project{" "}
+              </h1>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -308,6 +390,23 @@ const ViewSubtask = () => {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="pb-sec-5 pb-sec2">
+        <div className="pb-sec5-inner pb-sec3-inner">
+          <div className="pb-project-description">
+            <h3>Description</h3>
+            <p>{subtask.description || "No description available."}</p>
+          </div>
+        </div>
+        {subtask.url && (
+          <div className="pb-sec5-inner pb-sec3-inner">
+            <div className="pb-project-description">
+              <h3>Url</h3>
+              <p>{subtask.url || "No description available."}</p>
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="pb-sec-6 pb-sec2">
@@ -453,11 +552,34 @@ const ViewSubtask = () => {
                 <div className="pb-client-comment" key={comment._id}>
                   {comment.user_type === "admin" ? (
                     <>
-                      <img
-                        src="/Image/admin.jpg"
-                        alt="Admin"
-                        style={{ borderRadius: "50%" }}
-                      />
+                      {admin?.profile_pic ? (
+                        <img
+                          src={admin.profile_pic}
+                          alt="Admin"
+                          style={{ borderRadius: "50%" }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            borderRadius: "50%",
+                            backgroundColor: "#0a3749",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "18px",
+                            fontWeight: "bold",
+                            textTransform: "uppercase",
+                            border: "2px solid white",
+                          }}
+                        >
+                          {admin.username
+                            ? admin.username.charAt(0).toUpperCase()
+                            : "?"}
+                        </div>
+                      )}
                       <div className="pb-comment-description">
                         <div
                           className="pb-comment-cilent-name"
@@ -485,81 +607,8 @@ const ViewSubtask = () => {
                       </div>
                     </>
                   ) : comment.user_id._id === employeeId ? (
-                    comment.user_id?.profile_pic ? (
-                      <>
-                        <div className="pb-comment-description d-flex justify-content-end">
-                          <div
-                            className="pb-comment-cilent-name"
-                            style={{ width: "90%" }}
-                          >
-                            <div className="pb-name-time">
-                              <div className="pb-cilent-name">
-                                <h4>
-                                  {comment.user_type === "admin"
-                                    ? "Admin"
-                                    : comment.user_id?.full_name ||
-                                      "Unknown User"}
-                                </h4>
-                                {/* Optional: add user_type badge */}
-                                <span>{comment.user_type}</span>
-                              </div>
-                              <p>
-                                <span style={{ paddingRight: "6px" }}>
-                                  {formatDate(comment.created_at)}
-                                </span>
-                              </p>
-                            </div>
-                            <p>{comment.text}</p>
-                          </div>
-                        </div>
-                        <img
-                          src={comment.user_id.profile_pic}
-                          alt={comment.user_id.full_name}
-                          style={{ borderRadius: "50%" }}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <div
-                          className="profile-letter"
-                          style={{ borderRadius: "50%" }}
-                        >
-                          {comment.user_id?.full_name
-                            ?.charAt(0)
-                            .toUpperCase() || "U"}
-                        </div>
-                        <div className="pb-comment-description">
-                          <div className="pb-comment-cilent-name">
-                            <div className="pb-name-time">
-                              <div className="pb-cilent-name">
-                                <h4>
-                                  {comment.user_type === "admin"
-                                    ? "Admin"
-                                    : comment.user_id?.full_name ||
-                                      "Unknown User"}
-                                </h4>
-                                {/* Optional: add user_type badge */}
-                                <span>{comment.user_type}</span>
-                              </div>
-                              <p>
-                                <span style={{ paddingRight: "6px" }}>
-                                  {formatDate(comment.created_at)}
-                                </span>
-                              </p>
-                            </div>
-                            <p>{comment.text}</p>
-                          </div>
-                        </div>
-                      </>
-                    )
-                  ) : comment.user_id?.profile_pic ? (
                     <>
-                      <img
-                        src={comment.user_id.profile_pic}
-                        alt={comment.user_id.full_name}
-                        style={{ borderRadius: "50%" }}
-                      />
-                      <div className="pb-comment-description">
+                      <div className="pb-comment-description d-flex justify-content-end">
                         <div
                           className="pb-comment-cilent-name"
                           style={{ width: "90%" }}
@@ -584,15 +633,56 @@ const ViewSubtask = () => {
                           <p>{comment.text}</p>
                         </div>
                       </div>
+                      {comment.user_id.profile_pic ? (
+                        <img
+                          src={comment.user_id.profile_pic}
+                          alt={comment.user_id.full_name}
+                          style={{ borderRadius: "50%" }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            borderRadius: "50%",
+                            backgroundColor: "#0a3749",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "18px",
+                            fontWeight: "bold",
+                            textTransform: "uppercase",
+                            border: "2px solid white",
+                          }}
+                        >
+                          {comment.user_id?.full_name
+                            ? comment.user_id.full_name.charAt(0).toUpperCase()
+                            : "?"}
+                        </div>
+                      )}
                     </>
                   ) : (
                     <>
                       <div
-                        className="profile-letter"
-                        style={{ borderRadius: "50%" }}
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          borderRadius: "50%",
+                          backgroundColor: "#0a3749",
+                          color: "#fff",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "18px",
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                          border: "2px solid white",
+                        }}
                       >
-                        {comment.user_id?.full_name?.charAt(0).toUpperCase() ||
-                          "U"}
+                        {comment.user_id?.full_name
+                          ? comment.user_id.full_name.charAt(0).toUpperCase()
+                          : "?"}
                       </div>
                       <div className="pb-comment-description">
                         <div className="pb-comment-cilent-name">

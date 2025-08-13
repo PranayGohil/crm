@@ -4,7 +4,7 @@ import Employee from "../models/employeeModel.js";
 import Admin from "../models/adminModel.js";
 import Notification from "../models/notificationModel.js";
 
-import mongoose from "mongoose";
+import mongoose, { connect } from "mongoose";
 import cloudinary from "../config/cloudinary.js";
 
 const FIXED_STAGE_ORDER = ["CAD Design", "SET Design", "Render", "Delivery"];
@@ -606,6 +606,55 @@ export const addComment = async (req, res) => {
       select: "full_name profile_pic",
     });
 
+    console.log("Updated subtask with new comment:", updated);
+
+    const io = req.app.get("io");
+    const connectedUsers = req.app.get("connectedUsers");
+
+    if (user_type === "employee") {
+      const admin = await Admin.findOne();
+      if (admin) {
+        console.log("Admin found:", admin._id);
+      } else {
+        console.log("No admin found in the database");
+      }
+      const adminNotification = await Notification.create({
+        title: `New Comment on Subtask ${updated.task_name}`,
+        description: `${
+          updated.comments[updated.comments.length - 1].user_id.full_name
+        } commented: ${text}`,
+        type: "comment",
+        icon: "/SVG/comment-vec.svg",
+        related_id: subtaskId,
+        receiver_id: admin._id,
+        receiver_type: "admin",
+        created_by: user_id,
+        created_by_role: "employee",
+      });
+      if (admin._id && connectedUsers[admin._id]) {
+        io.to(connectedUsers[admin._id]).emit("comment", adminNotification);
+      }
+    } else {
+      // Notify the employee about the new comment
+      const employeeNotification = await Notification.create({
+        title: `New Comment on Subtask ${updated.task_name}`,
+        description: `Admin commented: ${text}`,
+        type: "comment",
+        icon: "/SVG/comment-vec.svg",
+        related_id: subtaskId,
+        receiver_id: updated.assign_to,
+        receiver_type: "employee",
+        created_by: user_id,
+        created_by_role: "admin",
+      });
+      if (updated.assign_to && connectedUsers[updated.assign_to]) {
+        io.to(connectedUsers[updated.assign_to]).emit(
+          "comment",
+          employeeNotification
+        );
+      }
+    }
+
     res.json({ success: true, comments: updated.comments });
   } catch (error) {
     console.error("Add comment error:", error);
@@ -616,7 +665,8 @@ export const addComment = async (req, res) => {
 export const addMedia = async (req, res) => {
   try {
     const { subtaskId } = req.params;
-    const files = req.files; // array of uploaded files
+    const files = req.files;
+    const userType = req.body.user_type; // "admin" or "employee"
 
     if (!files || files.length === 0) {
       return res.status(400).json({ message: "No files uploaded" });
@@ -628,11 +678,61 @@ export const addMedia = async (req, res) => {
       return res.status(404).json({ message: "Subtask not found" });
     }
 
+    const Assignee = await Employee.findById(subtask.assign_to);
+
     // Add all uploaded file URLs
     const newUrls = files.map((file) => file.path); // file.path is Cloudinary URL
     subtask.media_files.push(...newUrls);
 
     await subtask.save();
+
+    const admin = await Admin.findOne();
+    if (admin) {
+      console.log("Admin found:", admin._id);
+    } else {
+      console.log("No admin found in the database");
+    }
+
+    const io = req.app.get("io");
+    const connectedUsers = req.app.get("connectedUsers");
+
+    if (userType === "employee") {
+      const adminNotification = await Notification.create({
+        title: `New Media File Added on Subtask ${subtask.task_name}`,
+        description: `${Assignee?.full_name} added media files`,
+        type: "media_upload",
+        icon: "/SVG/media-vec.svg",
+        related_id: subtaskId,
+        receiver_id: admin._id,
+        receiver_type: "admin",
+        created_by: subtask.assign_to,
+        created_by_role: "employee",
+      });
+      if (admin._id && connectedUsers[admin._id]) {
+        io.to(connectedUsers[admin._id]).emit(
+          "media_upload",
+          adminNotification
+        );
+      }
+    } else {
+      const employeeNotification = await Notification.create({
+        title: `New Media File Added on Subtask ${subtask.task_name}`,
+        description: `Admin added media files`,
+        type: "media_upload",
+        icon: "/SVG/media-vec.svg",
+        related_id: subtaskId,
+        receiver_id: Assignee._id,
+        receiver_type: "employee",
+        created_by: admin._id,
+        created_by_role: "admin",
+      });
+      if (Assignee._id && connectedUsers[Assignee._id]) {
+        io.to(connectedUsers[Assignee._id]).emit(
+          "media_upload",
+          employeeNotification
+        );
+      }
+    }
 
     return res.status(200).json({
       message: "Media added successfully",
@@ -647,7 +747,7 @@ export const addMedia = async (req, res) => {
 export const removeMedia = async (req, res) => {
   try {
     const { subtaskId } = req.params;
-    const { mediaUrl } = req.body;
+    const { mediaUrl, user_type, user_id } = req.body;
 
     const subtask = await SubTask.findById(subtaskId);
     if (!subtask) {
@@ -669,6 +769,57 @@ export const removeMedia = async (req, res) => {
     // Remove from subtask media_files
     subtask.media_files = subtask.media_files.filter((url) => url !== mediaUrl);
     await subtask.save();
+
+    const Assignee = await Employee.findById(subtask.assign_to);
+
+    const admin = await Admin.findOne();
+    if (admin) {
+      console.log("Admin found:", admin._id);
+    } else {
+      console.log("No admin found in the database");
+    }
+
+    const io = req.app.get("io");
+    const connectedUsers = req.app.get("connectedUsers");
+
+    if (user_type === "employee") {
+      const adminNotification = await Notification.create({
+        title: `Media File Deleted on Subtask ${subtask.task_name}`,
+        description: `${Assignee?.full_name} delete media files`,
+        type: "media_upload",
+        icon: "/SVG/media-vec.svg",
+        related_id: subtaskId,
+        receiver_id: admin._id,
+        receiver_type: "admin",
+        created_by: subtask.assign_to,
+        created_by_role: "employee",
+      });
+      if (admin._id && connectedUsers[admin._id]) {
+        io.to(connectedUsers[admin._id]).emit(
+          "media_upload",
+          adminNotification
+        );
+      }
+    } else {
+      const employeeNotification = await Notification.create({
+        title: `Media File Deleted on Subtask ${subtask.task_name}`,
+        description: `Admin delete media files`,
+        description: `Admin delete media files`,
+        type: "media_upload",
+        icon: "/SVG/media-vec.svg",
+        related_id: subtaskId,
+        receiver_id: Assignee._id,
+        receiver_type: "employee",
+        created_by: admin._id,
+        created_by_role: "admin",
+      });
+      if (Assignee._id && connectedUsers[Assignee._id]) {
+        io.to(connectedUsers[Assignee._id]).emit(
+          "media_upload",
+          employeeNotification
+        );
+      }
+    }
 
     res.status(200).json({
       message: "Media removed successfully",

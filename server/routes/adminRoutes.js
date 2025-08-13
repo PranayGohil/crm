@@ -3,6 +3,7 @@ import {
   adminLogin,
   getAdminProfile,
   updateAdminProfile,
+  adminProfileForEmployee,
 } from "../controllers/adminController.js";
 import upload from "../middlewares/upload.js";
 const adminRouter = express.Router();
@@ -13,6 +14,10 @@ adminRouter.put(
   "/update-profile",
   upload.single("profile_pic"),
   updateAdminProfile
+);
+adminRouter.get(
+  "/profile-for-employee",
+  adminProfileForEmployee
 );
 
 export default adminRouter;

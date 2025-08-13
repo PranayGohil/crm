@@ -67,7 +67,7 @@ const TeamMemberProfile = () => {
       icon: "/SVG/menu-css.svg",
       label: "Capacity",
       value: employee.capacity || "N/A",
-    }
+    },
   ];
 
   const professionalDetails = [
@@ -129,23 +129,39 @@ const TeamMemberProfile = () => {
     <>
       <section className="page2-main1">
         <div className="member-profile">
-          <div className="mem-pro-vec">
-            <img
-              src="/SVG/vec-mem-pro.svg"
-              alt="vec"
-              onClick={() => navigate(-1)}
-              style={{ cursor: "pointer" }}
-            />
-            <span>Team Member Profile</span>
+          <div className="anp-header-inner">
+            <div className="anp-heading-main">
+              <div
+                className="anp-back-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(-1);
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <img
+                  src="/SVG/arrow-pc.svg"
+                  alt="back"
+                  className="mx-2"
+                  style={{ scale: "1.3" }}
+                />
+              </div>
+              <div className="head-menu">
+                <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+                  Employee Profile{" "}
+                </h1>
+              </div>
+            </div>
           </div>
-          <div className="d-flex gap-3">
-            <Link to={`/employee/edit/${employee._id}`} className="theme_btn">
+          <div className="d-flex align-items-center gap-3">
+            <Link to={`/employee/edit/${employee._id}`} className="theme_btn" style={{ width: "100px" }}>
               <img src="/SVG/edit-white.svg" alt="edit" className="me-2" />
               Edit
             </Link>
             <button
               className="theme_btn bg-danger"
               onClick={() => setShowDeleteModal(true)}
+              style={{ width: "120px" }}
             >
               <img
                 src="/SVG/delete.svg"

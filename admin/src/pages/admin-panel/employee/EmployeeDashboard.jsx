@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
@@ -46,6 +47,7 @@ const Dropdown = ({ label, options, selected, onChange }) => {
 };
 
 const EmployeeDashboard = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const [employees, setEmployees] = useState([]);
@@ -85,7 +87,7 @@ const EmployeeDashboard = () => {
         setFilteredEmployees(data);
 
         const total = data.length;
-        const inActive = data.filter((e) => (e.status === "Inactive")).length;
+        const inActive = data.filter((e) => e.status === "Inactive").length;
         const active = data.filter(
           (e) => e.status === "active" || e.status === "Active"
         ).length;
@@ -174,7 +176,30 @@ const EmployeeDashboard = () => {
       {/* Header */}
       <section className="header">
         <div className="head-menu">
-          <h1>Team Members</h1>
+          <div className="anp-header-inner">
+            <div className="anp-heading-main">
+              <div
+                className="anp-back-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/");
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <img
+                  src="/SVG/arrow-pc.svg"
+                  alt="back"
+                  className="mx-2"
+                  style={{ scale: "1.3" }}
+                />
+              </div>
+              <div className="head-menu">
+                <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+                  All Employees{" "}
+                </h1>
+              </div>
+            </div>
+          </div>
           <div className="nav-search">
             <div className="searchbar">
               <div className="input-type">

@@ -26,6 +26,18 @@ export const SocketProvider = ({ children }) => {
       setNotifications((prev) => [notification, ...prev]);
     });
 
+    // Listen for new comment
+    s.on("comment", (notification) => {
+      toast.info(`${notification.title}`);
+      setNotifications((prev) => [notification, ...prev]);
+    });
+
+    // Listen for new media upload
+    s.on("media_upload", (notification) => {
+      toast.info(`${notification.title}`);
+      setNotifications((prev) => [notification, ...prev]);
+    });
+
     return () => {
       s.disconnect();
     };

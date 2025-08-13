@@ -186,22 +186,29 @@ const EditProject = () => {
     <div className="add_new_project_page">
       <section className="anp-add_new_project-header">
         <div className="anp-header-inner">
-          <div className="anp-heading-main">
-            <Link
-              to="/project/dashboard"
-              className="anp-back-btn"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate(-1);
-              }}
-            >
-              <img src="/SVG/arrow-pc.svg" alt="back" />
-            </Link>
-            <div className="head-menu">
-              <h1>Edit Project</h1>
+            <div className="anp-heading-main">
+              <div
+                className="anp-back-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(-1);
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <img
+                  src="/SVG/arrow-pc.svg"
+                  alt="back"
+                  className="mx-2"
+                  style={{ scale: "1.3" }}
+                />
+              </div>
+              <div className="head-menu">
+                <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+                  Edit Project{" "}
+                </h1>
+              </div>
             </div>
           </div>
-        </div>
       </section>
       <form onSubmit={handleSubmit}>
         <section className="anp-add_new_project_form">

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSocket } from "../contexts/SocketContext";
 import axios from "axios";
 import NotificationItem from "../components/NotificationItem";
 
 const EmployeeNotificationPage = () => {
+  const navigate = useNavigate();
   const { notifications, setNotifications } = useSocket();
   const [activeFilter, setActiveFilter] = useState("All");
 
@@ -11,7 +13,7 @@ const EmployeeNotificationPage = () => {
     "All",
     "Task Updates",
     "Comments",
-    "Due Dates",
+    // "Due Dates",
     "Media Uploads",
   ];
 
@@ -78,8 +80,29 @@ const EmployeeNotificationPage = () => {
   return (
     <div className="notification-admin">
       <section className="not-notification-header">
-        <div className="not-notification-header-txt">
-          <span>Notification Center</span>
+        <div className="anp-header-inner">
+          <div className="anp-heading-main">
+            <div
+              className="anp-back-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(-1);
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <img
+                src="/SVG/arrow-pc.svg"
+                alt="back"
+                className="mx-2"
+                style={{ scale: "1.3" }}
+              />
+            </div>
+            <div className="head-menu">
+              <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+                Notification Center{" "}
+              </h1>
+            </div>
+          </div>
         </div>
         <div className="not-header-navbar">
           {filters.map((filter) => (
@@ -115,14 +138,14 @@ const EmployeeNotificationPage = () => {
                 description={n.description}
                 linkText="View"
                 linkHref={`${
-                  n.type === "task_update" || n.type === "subtask_update"
+                  n.type === "task_update" || n.type === "subtask_updated"
                     ? "/subtask/view/" + n.related_id
                     : n.type === "comment"
-                    ? "/task/view/" + n.related_id
+                    ? "/subtask/view/" + n.related_id
                     : n.type === "overdue" || n.type === "deadline"
-                    ? "/task/view/" + n.related_id
+                    ? "/subtask/view/" + n.related_id
                     : n.type === "media_upload"
-                    ? "/task/view/" + n.related_id
+                    ? "/subtask/view/" + n.related_id
                     : "#"
                 }`}
                 time={new Date(n.createdAt).toLocaleString()}

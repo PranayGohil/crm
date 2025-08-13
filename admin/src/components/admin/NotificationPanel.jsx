@@ -15,7 +15,7 @@ const NotificationAdmin = () => {
     "All",
     "Task Updates",
     "Comments",
-    "Due Dates",
+    // "Due Dates",
     "Media Uploads",
   ];
 

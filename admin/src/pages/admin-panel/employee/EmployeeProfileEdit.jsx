@@ -6,7 +6,7 @@ import * as Yup from "yup";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-const dropdownOptions = ["Active", "Inactive",  "Blocked"];
+const dropdownOptions = ["Active", "Inactive", "Blocked"];
 const departmentOptions = ["SET Design", "CAD Design", "Render"];
 const employmentTypes = ["Full-time", "Part-time"];
 const EmployeeProfileEdit = () => {
@@ -214,14 +214,29 @@ const EmployeeProfileEdit = () => {
             {/* Top section */}
             <section className="page3-main1">
               <div className="member-profile-edit">
-                <div className="pro-edit-vec">
-                  <img
-                    src="/SVG/vec-mem-pro.svg"
-                    alt="vec"
-                    onClick={() => navigate(-1)}
-                    style={{ cursor: "pointer" }}
-                  />
-                  <span>Edit Team Member Profile</span>
+                <div className="anp-header-inner">
+                  <div className="anp-heading-main">
+                    <div
+                      className="anp-back-btn"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate(-1);
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <img
+                        src="/SVG/arrow-pc.svg"
+                        alt="back"
+                        className="mx-2"
+                        style={{ scale: "1.3" }}
+                      />
+                    </div>
+                    <div className="head-menu">
+                      <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+                        Edit Employee Profile{" "}
+                      </h1>
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>
@@ -465,7 +480,10 @@ const EmployeeProfileEdit = () => {
                 )}
 
                 {["date_of_joining", "monthly_salary"].map((field) => (
-                  <div key={field} className="profile-edit-detail eng-cnt-txt mb-3">
+                  <div
+                    key={field}
+                    className="profile-edit-detail eng-cnt-txt mb-3"
+                  >
                     <span>{field.replace(/_/g, " ").toUpperCase()}</span>
                     <Field
                       type={field === "monthly_salary" ? "number" : "date"}

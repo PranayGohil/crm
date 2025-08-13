@@ -1,10 +1,14 @@
 import React from "react";
+import "./LoadingOverlay.css"; 
 
-const LoadingOverlay = ({ show }) => {
-  if (!show) return null;
+const LoadingOverlay = () => {
   return (
-    <div className="global-loading-overlay">
-      <div className="loader"></div>
+    <div className="loading-overlay">
+      <img
+        src="/loader.gif" 
+        alt="Loading..."
+        className="loading-gif"
+      />
     </div>
   );
 };
