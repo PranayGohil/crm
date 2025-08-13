@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ProjectCard from "../../../components/admin/ProjectCard.jsx";
 import { statusOptions, stageOptions } from "../../../options.js";
@@ -7,6 +7,7 @@ import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const ClientProjectDetails = () => {
   const { username } = useParams();
+  const navigate = useNavigate();
 
   const [projects, setProjects] = useState([]);
   const [projectSubtasks, setProjectSubtasks] = useState({});
@@ -107,9 +108,9 @@ const ClientProjectDetails = () => {
       {/* Header */}
       <section className="cd-client_dashboard header">
         <div className="cd-head-menu head-menu cpd_header">
-          <a href="#">
-            <img alt="" className="back_arrow" src="/SVG/arrow-pc.svg" />
-          </a>
+          <div className="anp-back-btn" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
+            <img alt="" className="back_arrow mx-3" src="/SVG/arrow-pc.svg" style={{ scale: "1.3" }} />
+          </div>
           <h1>Client: {username}</h1>
         </div>
       </section>

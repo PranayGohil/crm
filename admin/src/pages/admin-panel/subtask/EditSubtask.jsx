@@ -121,15 +121,27 @@ const EditSubtask = () => {
   return (
     <div className="subtask_management">
       <ToastContainer position="top-center" />
-      <section className="sms-subtask-mng-header mg-auto">
-        <div className="sms-header-inner">
-          <div className="sms-heading-main">
-            <a href="#" onClick={() => navigate(-1)}>
-              <img src="/SVG/arrow-pc.svg" alt="" />
-            </a>
-            <div className="sms-heading-txt">
-              <h1>Edit Subtask</h1>
-            </div>
+      <section className="d-flex justify-content-between align-items-center mx-5 mt-4 mb-2">
+        <div className="anp-heading-main ps-3">
+          <div
+            className="anp-back-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(-1);
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <img
+              src="/SVG/arrow-pc.svg"
+              alt="back"
+              className="mx-2"
+              style={{ scale: "1.3" }}
+            />
+          </div>
+          <div className="head-menu">
+            <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+              Edit Subtask{" "}
+            </h1>
           </div>
         </div>
       </section>
@@ -138,9 +150,9 @@ const EditSubtask = () => {
         <div className="sm-add-task-inner sms-add_and_generatoe_inner">
           <div className="sms-add_new-task sms-add_gen-task">
             <div className="sms-add_task-inner">
-              <div className="sms-add_task-heading">
+              {/* <div className="sms-add_task-heading">
                 <h2>Edit Subtask</h2>
-              </div>
+              </div> */}
 
               <Formik
                 enableReinitialize

@@ -130,14 +130,14 @@ export const getDepartmentCapacities = async (req, res) => {
     employees.forEach((emp) => {
       const dept = emp.department || "Unknown";
       if (!allowedDepartments.includes(dept)) return;
-
+      console.log("Processing employee:", emp.department);
       if (!departmentData[dept]) {
         departmentData[dept] = {
           totalDailyCapacity: 0,
           totalRemainingMonthlyCapacityWithSundays: 0,
           totalRemainingMonthlyCapacityWithoutSundays: 0,
-          estimatedCompletionDateWithSundays: null,
-          estimatedCompletionDateWithoutSundays: null,
+          estimatedCompletionDateWithSundays: "No Employees",
+          estimatedCompletionDateWithoutSundays: "No Employees",
         };
       }
 

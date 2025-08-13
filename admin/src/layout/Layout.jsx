@@ -4,17 +4,21 @@ import HeaderAdmin from "../components/admin/HeaderAdmin";
 import Footer from "../components/admin/Footer";
 import { Outlet } from "react-router-dom"; // For React Router v6+
 
-
 const Layout = () => {
   return (
     <div className="layout">
       {/* Sidebar */}
-      <aside className="sidebar">
-        <DashboardMenu />
+      <aside className="sidebar" style={{ height: "100vh", overflowY: "auto" }}>
+        <div>
+          <DashboardMenu />
+        </div>
       </aside>
 
       {/* Main Section */}
-      <div className="main-section">
+      <div
+        className="main-section"
+        style={{ height: "100vh", overflowY: "auto" }}
+      >
         {/* Header */}
         <header>
           <HeaderAdmin />

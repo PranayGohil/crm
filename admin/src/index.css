@@ -8010,3 +8010,9 @@ a {
   color: #ffffff !important;
   padding: 11px 16px;
 }
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+

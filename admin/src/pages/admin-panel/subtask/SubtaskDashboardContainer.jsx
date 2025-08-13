@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -7,6 +8,7 @@ import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import { stageOptions, priorityOptions } from "../../../options";
 
 const SubtaskDashboardContainer = () => {
+  const navigate = useNavigate();
   const { projectId } = useParams();
   const [loading, setLoading] = useState(false);
 
@@ -171,13 +173,36 @@ const SubtaskDashboardContainer = () => {
   if (loading) return <LoadingOverlay />;
 
   return (
-    <>
+    <div className="px-3">
       {/* Header */}
-      <section className="sv-sec1 header">
-        <div className="sv-sec1-inner">
+      <section className="d-flex justify-content-between align-items-center my-3 mb-3">
+        <div className="anp-heading-main ps-3">
+          <div
+            className="anp-back-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/project/dashboard");
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <img
+              src="/SVG/arrow-pc.svg"
+              alt="back"
+              className="mx-2"
+              style={{ scale: "1.3" }}
+            />
+          </div>
+          <div className="head-menu">
+            <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+              Project Subtasks{" "}
+            </h1>
+          </div>
+        </div>
+        <p>{project?.project_name}</p>
+        {/* <div className="sv-sec1-inner">
           <h3>Subtask View</h3>
           <p>{project?.project_name}</p>
-        </div>
+        </div> */}
       </section>
 
       {/* Top buttons */}
@@ -366,7 +391,7 @@ const SubtaskDashboardContainer = () => {
                     const assignedEmp = employees.find(
                       (emp) => emp._id === task.assign_to
                     );
-                    if (!assignedEmp) return "N/A";
+                    if (!assignedEmp) return "Not Assigned";
 
                     const firstLetter = assignedEmp.full_name
                       ? assignedEmp.full_name.charAt(0).toUpperCase()
@@ -549,7 +574,7 @@ const SubtaskDashboardContainer = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </>
+    </div>
   );
 };
 

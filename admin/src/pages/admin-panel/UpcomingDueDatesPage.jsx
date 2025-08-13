@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingOverlay from "../../components/admin/LoadingOverlay";
 import { Link } from "react-router-dom";
 
 const UpcomingDueDatesPage = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [dueTasks, setDueTasks] = useState([]);
 
@@ -29,8 +31,27 @@ const UpcomingDueDatesPage = () => {
   return (
     <section className="md-overview-upcoming-due-date">
       <div className="md-overview-upcoming-due-date-inner">
-        <div className="md-upcomoing-header-btn">
-          <h2>Upcoming Due Dates</h2>
+        <div className="d-flex align-items-center mb-5">
+          <div
+            className="anp-back-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/");
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <img
+              src="/SVG/arrow-pc.svg"
+              alt="back"
+              className="mx-3"
+              style={{ scale: "1.3" }}
+            />
+          </div>
+          <div className="head-menu ms-3">
+            <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+              Upcoming Due Dates
+            </h1>
+          </div>
         </div>
         <div className="md-overview-upcoming-table">
           <table className="md-table-container">

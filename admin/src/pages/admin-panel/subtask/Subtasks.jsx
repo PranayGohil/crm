@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
@@ -10,6 +11,7 @@ import { stageOptions, priorityOptions, statusOptions } from "../../../options";
 dayjs.extend(duration);
 
 const Subtasks = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState([]);
   const [openRow, setOpenRow] = useState(null);
@@ -273,9 +275,27 @@ const Subtasks = () => {
   return (
     <section className="task_timeboard_wrapper">
       <section className="header ttb-header">
-        <div className="head-menu ttb-header-menu">
-          <h1>Task Time board</h1>
-          <p>Manage your jewelry production workflow</p>
+        <div className="d-flex align-items-top ps-3 pt-4">
+          <div
+            className="anp-back-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(-1);
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <img
+              src="/SVG/arrow-pc.svg"
+              alt="back"
+              className="mx-3"
+              style={{ scale: "1.3" }}
+            />
+          </div>
+          <div className="head-menu">
+            <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+              All Subtasks{" "}
+            </h1>
+          </div>
         </div>
         <Link to="/subtasks" className="md-common-total-card">
           <div className="md-common-para-icon md-para-icon-tasks">
@@ -622,7 +642,7 @@ const Subtasks = () => {
                                       const assignedEmp = employees.find(
                                         (emp) => emp._id === s.assign_to
                                       );
-                                      if (!assignedEmp) return "N/A";
+                                      if (!assignedEmp) return "Not Assigned";
                                       const firstLetter = assignedEmp.full_name
                                         ? assignedEmp.full_name
                                             .charAt(0)

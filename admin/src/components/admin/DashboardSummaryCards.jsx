@@ -186,8 +186,8 @@ const DashboardSummaryCards = () => {
                       : "btn-outline-primary"
                   }`}
                   onClick={() => {
-                    setCapacityMode("mx-2");
-                    setViewOption("withSundays");
+                    setCapacityMode("time");
+                    setViewOption("withoutSundays");
                   }}
                 >
                   Time to Complete Tasks
@@ -207,7 +207,6 @@ const DashboardSummaryCards = () => {
                 </button>
               </div>
 
-              
               <div className="flex gap-2">
                 {capacityMode === "time" ? (
                   <>
@@ -295,14 +294,14 @@ const DashboardSummaryCards = () => {
                           : data.estimatedDaysToCompleteWithoutSundays; // You could implement an "estimatedDaysToCompleteWithoutSundays" if needed
 
                       value = days;
-                      label =
-                        days !== null
-                          ? `~${days} ${
-                              viewOption === "withSundays"
-                                ? "calendar"
-                                : "working"
-                            } days to complete tasks`
-                          : "Insufficient capacity";
+                      console.log("Estimated days for", dept, ":", days);
+                      label = days
+                        ? `~${days} ${
+                            viewOption === "withSundays"
+                              ? "calendar"
+                              : "working"
+                          } days to complete tasks`
+                        : "Insufficient capacity";
                     }
 
                     return (
@@ -315,8 +314,16 @@ const DashboardSummaryCards = () => {
                             <span className="fw-bold"> {dept} </span>
                           </small>
                           <small className="text-sm text-gray-700">
-                            {label}:{" "}
-                            <strong>{value !== null ? value : "N/A"}</strong>
+                            {label === "Insufficient capacity" ? (
+                              <span className="text-red-500">{label}</span>
+                            ) : (
+                              <>
+                                {label}:{" "}
+                                <strong>
+                                  {value !== null ? value : "N/A"}
+                                </strong>
+                              </>
+                            )}
                           </small>
                         </div>
                       </div>

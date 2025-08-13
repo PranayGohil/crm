@@ -158,7 +158,7 @@ const ViewSubtask = () => {
       const formData = new FormData();
       formData.append("user_type", "admin");
       for (const file of files) {
-        formData.append("media_files", file); 
+        formData.append("media_files", file);
       }
 
       const { data } = await axios.post(
@@ -231,13 +231,29 @@ const ViewSubtask = () => {
   if (!subtask) return <p>Subtask not found!</p>;
 
   return (
-    <div className="preview-page">
-      <section className="pb-sec1">
+    <div className="preview-page px-3">
+      <section className="d-flex justify-content-between align-items-center px-3 pt-4 pb-3">
         <div className="pb-sec1-inner">
-          <a onClick={() => navigate(-1)} style={{ cursor: "pointer" }}>
-            <img src="/SVG/arrow-pc.svg" alt="arrow-pc" />
-          </a>
-          <span>Back</span>
+          <div
+            className="anp-back-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(-1);
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <img
+              src="/SVG/arrow-pc.svg"
+              alt="back"
+              className="mx-2"
+              style={{ scale: "1.3" }}
+            />
+          </div>
+          <div className="head-menu">
+            <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+              Subtask Details{" "}
+            </h1>
+          </div>
         </div>
       </section>
 

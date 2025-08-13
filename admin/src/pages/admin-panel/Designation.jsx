@@ -1,8 +1,10 @@
 // Designation.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Designation = () => {
+  const navigate = useNavigate();
   const [designations, setDesignations] = useState([]);
   const [newDesignation, setNewDesignation] = useState("");
   const [loading, setLoading] = useState(false);
@@ -10,7 +12,9 @@ const Designation = () => {
   const fetchDesignations = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`);
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/designation/get-all`
+      );
       setDesignations(res.data.designations);
     } catch (err) {
       console.error("Failed to fetch designations", err);
@@ -23,9 +27,12 @@ const Designation = () => {
     if (!newDesignation.trim()) return;
     console.log(newDesignation);
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/designation/add`, {
-        name: newDesignation,
-      });
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/designation/add`,
+        {
+          name: newDesignation,
+        }
+      );
       setDesignations([...designations, res.data]);
       setNewDesignation("");
     } catch (err) {
@@ -35,7 +42,9 @@ const Designation = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/api/designation/delete/${id}`);
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}/api/designation/delete/${id}`
+      );
       setDesignations(designations.filter((d) => d._id !== id));
     } catch (err) {
       console.error("Failed to delete designation", err);
@@ -48,7 +57,28 @@ const Designation = () => {
 
   return (
     <div className="container mt-4">
-      <h4>Manage Designations</h4>
+      <div className="d-flex align-items-center mb-5">
+        <div
+          className="anp-back-btn"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate("/");
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          <img
+            src="/SVG/arrow-pc.svg"
+            alt="back"
+            className="mx-3"
+            style={{ scale: "1.3" }}
+          />
+        </div>
+        <div className="head-menu ms-3">
+          <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+            Manage Designations
+          </h1>
+        </div>
+      </div>
       <div className="d-flex gap-2 mb-3">
         <input
           type="text"

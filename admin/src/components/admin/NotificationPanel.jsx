@@ -24,7 +24,6 @@ const NotificationAdmin = () => {
   const receiverType = "admin";
 
   const filteredNotifications = notifications
-    .slice(0, visibleNotifications)
     .filter((n) => {
       if (activeFilter === "All") return true;
       if (activeFilter === "Task Updates")
@@ -34,7 +33,8 @@ const NotificationAdmin = () => {
         return n.type === "overdue" || n.type === "deadline";
       if (activeFilter === "Media Uploads") return n.type === "media_upload";
       return true;
-    });
+    })
+    .slice(0, visibleNotifications);
 
   useEffect(() => {
     const fetchAndMarkNotifications = async () => {

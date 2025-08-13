@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
 const ClientDashboardPage = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -41,9 +43,27 @@ const ClientDashboardPage = () => {
   return (
     <>
       <section className="cd-client_dashboard header">
-        <div className="cd-head-menu head-menu">
-          <h1>Client Dashboard</h1>
-          <p>Manage your clients and monitor their task progress</p>
+        <div className="d-flex align-items-center mb-3">
+          <div
+            className="anp-back-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/");
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <img
+              src="/SVG/arrow-pc.svg"
+              alt="back"
+              className="mx-3"
+              style={{ scale: "1.3" }}
+            />
+          </div>
+          <div className="head-menu ms-3">
+            <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+              Client Dashboard{" "}
+            </h1>
+          </div>
         </div>
 
         <div className="cd-nav-bar nav-bar">

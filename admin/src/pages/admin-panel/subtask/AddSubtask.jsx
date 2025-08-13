@@ -128,18 +128,27 @@ const AddSubtask = () => {
   return (
     <div className="subtask-management-bulk-page">
       <ToastContainer position="top-center" />
-      <section className="sms-subtask-mng-header mg-auto">
-        <div className="sms-header-inner">
-          <div className="sms-heading-main">
-            <Link
-              to={`/project/subtask-dashboard/${projectId}`}
-              className="sms-back-link"
-            >
-              <img src="/SVG/arrow-pc.svg" alt="" />
-            </Link>
-            <div className="sms-heading-txt">
-              <h1>Add Subtask</h1>
-            </div>
+      <section className="d-flex align-items-center justify-content-between px-3 pt-5 pb-2">
+        <div className="anp-heading-main ps-3">
+          <div
+            className="anp-back-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/project/subtask-dashboard/" + projectId);
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            <img
+              src="/SVG/arrow-pc.svg"
+              alt="back"
+              className="mx-2"
+              style={{ scale: "1.3" }}
+            />
+          </div>
+          <div className="head-menu">
+            <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+              Add Subtask{" "}
+            </h1>
           </div>
         </div>
       </section>

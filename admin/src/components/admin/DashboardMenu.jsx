@@ -38,7 +38,11 @@ const DashboardMenu = () => {
         </div>
       </div>
 
-      <div className="dashboard-menu-main" ref={menuRef}>
+      <div
+        className="dashboard-menu-main"
+        ref={menuRef}
+        style={{ height: "100vh" }}
+      >
         <div className="dashboard-menu-main-inner-first">
           <div className="main-dashboard-para-icon">
             <div className="main-dashboard-icon">
@@ -153,13 +157,6 @@ const DashboardMenu = () => {
         </div>
 
         <div className="dashboard-menu-main-inner-second">
-          <div className="user-profile-view">
-            <img src="/Image/user.jpg" alt="user" />
-            <div className="user-info-main">
-              <span>John Doe</span>
-              <p>Administrator</p>
-            </div>
-          </div>
           <div>
             <Link to="/login" className="logout-bar">
               <img src="/SVG/logout.svg" alt="logout" />

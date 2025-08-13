@@ -92,7 +92,7 @@ const CreateNewClient = () => {
     <>
       <section className="cnc-first cd-client_dashboard header header_back_arrow">
         <Link to="/client/dashboard" className="back_arrow_link mx-3">
-          <img src="/SVG/arrow-pc.svg" alt="Back" className="back_arrow" />
+          <img src="/SVG/arrow-pc.svg" alt="Back" className="back_arrow" style={{ scale: "1.3" }} />
         </Link>
         <div className="cnc-first-inner cd-head-menu head-menu">
           <h1>Create New Client</h1>
