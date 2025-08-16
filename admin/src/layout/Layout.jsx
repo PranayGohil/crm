@@ -2,35 +2,30 @@ import React from "react";
 import DashboardMenu from "../components/admin/DashboardMenu";
 import HeaderAdmin from "../components/admin/HeaderAdmin";
 import Footer from "../components/admin/Footer";
-import { Outlet } from "react-router-dom"; // For React Router v6+
+import { Outlet } from "react-router-dom";
 
 const Layout = () => {
   return (
-    <div className="layout">
+    <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <aside className="sidebar" style={{ height: "100vh", overflowY: "auto" }}>
-        <div>
-          <DashboardMenu />
-        </div>
+      <aside className="bg-white shadow-md">
+        <DashboardMenu />
       </aside>
 
       {/* Main Section */}
-      <div
-        className="main-section"
-        style={{ height: "100vh", overflowY: "auto" }}
-      >
+      <div className="w-100 flex flex-col overflow-auto">
         {/* Header */}
-        <header>
+        <header className="shadow bg-white sticky top-0 z-10">
           <HeaderAdmin />
         </header>
 
-        {/* Dynamic Page Content */}
-        <main className="content">
+        {/* Page Content */}
+        <main className="flex-1 overflow-y-auto bg-gray-50 p-4">
           <Outlet />
         </main>
 
         {/* Footer */}
-        <footer>
+        <footer className="bg-white shadow-inner">
           <Footer />
         </footer>
       </div>

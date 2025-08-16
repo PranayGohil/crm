@@ -27,11 +27,16 @@ const io = new Server(server, {
   },
 });
 
+export const emitToUser = (userId, event, data) => {
+  const socketId = connectedUsers[userId];
+  if (socketId && io) {
+    io.to(socketId).emit(event, data);
+  }
+};
+
 const connectedUsers = {}; // Track employees
 
 io.on("connection", (socket) => {
-  console.log("Socket connected:", socket.id);
-
   socket.on("register", (employeeId) => {
     connectedUsers[employeeId] = socket.id;
     console.log(
@@ -46,7 +51,6 @@ io.on("connection", (socket) => {
         break;
       }
     }
-    console.log("Socket disconnected:", socket.id);
   });
 });
 

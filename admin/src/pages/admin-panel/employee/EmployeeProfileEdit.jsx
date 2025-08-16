@@ -4,19 +4,16 @@ import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
-
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-const dropdownOptions = ["Active", "Inactive", "Blocked"];
+
 const departmentOptions = ["SET Design", "CAD Design", "Render"];
 const employmentTypes = ["Full-time", "Part-time"];
+
 const EmployeeProfileEdit = () => {
   const { employeeId } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-
-  const dropdownRefs = useRef({});
   const [profilePreview, setProfilePreview] = useState(null);
-  const [openDropdown, setOpenDropdown] = useState(null);
   const [managers, setManagers] = useState([]);
   const [designations, setDesignations] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
@@ -31,9 +28,8 @@ const EmployeeProfileEdit = () => {
     dob: "",
     department: "",
     designation: "",
-    status: "Active",
     employment_type: "Select Employment Type",
-    reportingManager: "Select Manager",
+    reporting_manager: "Select Manager",
     date_of_joining: "",
     monthly_salary: "",
     emergency_contact: "",
@@ -47,14 +43,13 @@ const EmployeeProfileEdit = () => {
       .matches(/^[a-zA-Z0-9_-]+$/, {
         message:
           "Username can only contain letters, numbers, underscores (_) and dashes (-).",
-        excludeEmptyString: true,
       })
       .required("Username is required"),
     password: Yup.string()
       .required("Password is required")
       .matches(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/,
-        "Password must be at least 8 characters, include an uppercase letter, a lowercase letter, a number, and a special character."
+        "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
       ),
     email: Yup.string().email("Invalid email").required("Email is required"),
     phone: Yup.string().required("Phone number is required"),
@@ -62,9 +57,8 @@ const EmployeeProfileEdit = () => {
     dob: Yup.string().required("Date of birth is required"),
     department: Yup.string().required("Department is required"),
     designation: Yup.string().required("Designation is required"),
-    status: Yup.string().required("Status is required"),
     employment_type: Yup.string().required("Employment type is required"),
-    reportingManager: Yup.string().required("Reporting manager is required"),
+    reporting_manager: Yup.string().required("Reporting manager is required"),
     date_of_joining: Yup.string().required("Date of joining is required"),
     monthly_salary: Yup.number()
       .typeError("Must be a number")
@@ -72,6 +66,7 @@ const EmployeeProfileEdit = () => {
     is_manager: Yup.boolean(),
   });
 
+  // Fetch employee data
   useEffect(() => {
     const fetchEmployee = async () => {
       setLoading(true);
@@ -81,25 +76,12 @@ const EmployeeProfileEdit = () => {
         );
         const data = res.data;
         setInitialValues({
-          full_name: data.full_name || "",
-          username: data.username || "",
-          password: data.password || "",
-          email: data.email || "",
-          phone: data.phone || "",
-          home_address: data.home_address || "",
+          ...initialValues,
+          ...data,
           dob: data.dob ? data.dob.split("T")[0] : "",
-          department: data.department || "",
-          designation: data.designation || "",
-          status: data.status || "Active",
-          employment_type: data.employment_type || employmentTypes[0],
-          reportingManager: data.reportingManager || "Select Manager",
           date_of_joining: data.date_of_joining
             ? data.date_of_joining.split("T")[0]
             : "",
-          monthly_salary: data.monthly_salary || "",
-          emergency_contact: data.emergency_contact || "",
-          capacity: data.capacity || "",
-          is_manager: data.is_manager || false,
         });
         setProfilePreview(data.profile_pic || null);
       } catch (err) {
@@ -109,16 +91,14 @@ const EmployeeProfileEdit = () => {
       }
     };
     fetchEmployee();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [employeeId]);
 
   useEffect(() => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/api/employee/managers`)
       .then((res) => {
-        if (res.data.success) {
-          console.log("Managers:", res.data.data);
-          setManagers(res.data.data);
-        }
+        if (res.data.success) setManagers(res.data.data);
       })
       .catch((err) => console.error("Error fetching managers", err));
   }, []);
@@ -127,24 +107,10 @@ const EmployeeProfileEdit = () => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`)
       .then((res) => {
-        if (res.data.success) {
-          console.log("get all designations", res.data.designations);
-          setDesignations(res.data.designations);
-        } else {
-          console.error("Failed to fetch designations");
-        }
+        if (res.data.success) setDesignations(res.data.designations);
       })
       .catch((err) => console.error("Error fetching designations", err));
   }, []);
-
-  const toggleDropdown = (field) => {
-    setOpenDropdown((prev) => (prev === field ? null : field));
-  };
-
-  const handleSelect = (field, value, setFieldValue) => {
-    setFieldValue(field, value);
-    setOpenDropdown(null);
-  };
 
   const handleFileChange = (e, setFieldValue) => {
     if (e.target.files[0]) {
@@ -153,28 +119,10 @@ const EmployeeProfileEdit = () => {
     }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      const dropdownElements = Object.values(dropdownRefs.current);
-      const clickedOutside = dropdownElements.every((ref) => {
-        return ref?.contains instanceof Function && !ref.contains(event.target);
-      });
-
-      if (clickedOutside) {
-        setOpenDropdown(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   if (loading) return <LoadingOverlay />;
 
   return (
-    <section className="employee_profile_edit_container container-fluide p-3">
+    <section className="container mx-auto p-3">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -184,15 +132,12 @@ const EmployeeProfileEdit = () => {
           try {
             const formData = new FormData();
             Object.entries(values).forEach(([key, val]) => {
-              if (typeof val === "boolean") {
-                formData.append(key, val.toString()); // Convert boolean to string
-              } else {
-                formData.append(key, val);
-              }
+              formData.append(
+                key,
+                typeof val === "boolean" ? val.toString() : val
+              );
             });
-
             if (profilePreview && typeof profilePreview !== "string") {
-              console.log("Appending profile pic to formData", profilePreview);
               formData.append("profile_pic", profilePreview);
             }
             await axios.post(
@@ -210,164 +155,69 @@ const EmployeeProfileEdit = () => {
         }}
       >
         {({ setFieldValue, values }) => (
-          <Form>
-            {/* Top section */}
-            <section className="page3-main1">
-              <div className="member-profile-edit">
-                <div className="anp-header-inner">
-                  <div className="anp-heading-main">
-                    <div
-                      className="anp-back-btn"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigate(-1);
-                      }}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <img
-                        src="/SVG/arrow-pc.svg"
-                        alt="back"
-                        className="mx-2"
-                        style={{ scale: "1.3" }}
-                      />
-                    </div>
-                    <div className="head-menu">
-                      <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
-                        Edit Employee Profile{" "}
-                      </h1>
-                    </div>
-                  </div>
-                </div>
+          <Form className="space-y-6">
+            {/* Header */}
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="p-2 rounded-full hover:bg-gray-200"
+              >
+                <img src="/SVG/arrow-pc.svg" alt="back" className="w-5 h-5" />
+              </button>
+              <h1 className="text-2xl font-semibold">Edit Employee Profile</h1>
+            </div>
+
+            {/* Profile Section */}
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <label
+                htmlFor="profilePic"
+                className="cursor-pointer w-24 h-24 rounded-full border overflow-hidden flex items-center justify-center bg-gray-100"
+              >
+                {profilePreview ? (
+                  <img
+                    src={
+                      typeof profilePreview === "string"
+                        ? profilePreview
+                        : URL.createObjectURL(profilePreview)
+                    }
+                    alt="profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={"/SVG/upload-vec.svg"}
+                    alt="upload"
+                    className="w-10 h-10"
+                  />
+                )}
+              </label>
+              <input
+                type="file"
+                id="profilePic"
+                hidden
+                onChange={(e) => handleFileChange(e, setFieldValue)}
+              />
+
+              <div className="flex-1 w-full">
+                <label className="block text-sm font-medium">Full Name</label>
+                <Field
+                  name="full_name"
+                  type="text"
+                  className="w-full mt-1 p-2 border rounded"
+                />
+                <ErrorMessage
+                  name="full_name"
+                  component="div"
+                  className="text-red-500 text-sm"
+                />
               </div>
-            </section>
+            </div>
 
-            {/* Profile pic */}
-            <section className="pe page3-main2">
-              <div className="update-upload-profile">
-                <div className="update-your-pro">
-                  <div className="upadate-profile-img">
-                    <label
-                      htmlFor="profilePic"
-                      className="update-img"
-                      style={{
-                        cursor: "pointer",
-                        width: "70px",
-                        height: "70px",
-                        borderRadius: "50%",
-                        overflow: "hidden",
-                        border: "1px solid #d1d5db",
-                      }}
-                    >
-                      {profilePreview ? (
-                        <img
-                          src={
-                            typeof profilePreview === "string"
-                              ? profilePreview
-                              : URL.createObjectURL(profilePreview)
-                          }
-                          style={{
-                            width: "100%",
-                            objectFit: "cover",
-                            height: "100%",
-                          }}
-                          alt="profile"
-                        />
-                      ) : (
-                        <img
-                          src={"/SVG/upload-vec.svg"}
-                          alt="upload"
-                          style={{
-                            width: "100%",
-                            objectFit: "cover",
-                            height: "100%",
-                          }}
-                        />
-                      )}
-                    </label>
-                    <input
-                      type="file"
-                      id="profilePic"
-                      hidden
-                      onChange={(e) => handleFileChange(e, setFieldValue)}
-                    />
-                  </div>
-                  <div className="update-profile-detail">
-                    <div className="full-name">
-                      <span>Full Name</span>
-                      <Field type="text" name="full_name" />
-                      <ErrorMessage
-                        name="full_name"
-                        component="div"
-                        className="error"
-                      />
-                    </div>
-
-                    {/* Dropdowns */}
-                    <div className="update-dropdown" ref={dropdownRefs}>
-                      {["designation", "status"].map((field) => {
-                        const options =
-                          field === "designation"
-                            ? designations.map((d) => d.name)
-                            : dropdownOptions;
-
-                        return (
-                          <div
-                            key={field}
-                            className={`btn_main1 ${
-                              openDropdown === field ? "open" : ""
-                            }`}
-                          >
-                            <p>
-                              {field.charAt(0).toUpperCase() + field.slice(1)}
-                            </p>
-                            <div
-                              className="dropdown_toggle1"
-                              onClick={() =>
-                                toggleDropdown(field, setFieldValue)
-                              }
-                            >
-                              <div className="t-b-inner">
-                                <span className="text_btn1">
-                                  {values[field]}
-                                </span>
-                                <img
-                                  src="/SVG/header-vector.svg"
-                                  alt="vec"
-                                  className="arrow_icon1"
-                                />
-                              </div>
-                            </div>
-                            {openDropdown === field && (
-                              <ul className="dropdown_menu1">
-                                {options.map((option, idx) => (
-                                  <li
-                                    key={idx}
-                                    onClick={() =>
-                                      handleSelect(field, option, setFieldValue)
-                                    }
-                                  >
-                                    {option}
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                            <ErrorMessage
-                              name={field}
-                              component="div"
-                              className="error"
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Personal Details */}
-            <section className="row py-3 px-5">
-              <div className="col-md-6">
+            {/* Two Column Form */}
+            <div className="row">
+              {/* Left column */}
+              <div className="col-md-6 space-y-4">
                 {[
                   "email",
                   "phone",
@@ -377,152 +227,152 @@ const EmployeeProfileEdit = () => {
                   "capacity",
                   "username",
                 ].map((field) => (
-                  <div className="profile-edit-inner mb-3" key={field}>
-                    <div className="profile-edit-detail">
-                      <span>{field.replace("_", " ").toUpperCase()}</span>
-                      <Field
-                        type={field === "dob" ? "date" : "text"}
-                        name={field}
-                      />
-                      <ErrorMessage
-                        name={field}
-                        component="div"
-                        className="error"
-                      />
-                    </div>
+                  <div key={field}>
+                    <label className="block text-sm font-medium">
+                      {field.replace("_", " ").toUpperCase()}
+                    </label>
+                    <Field
+                      type={field === "dob" ? "date" : "text"}
+                      name={field}
+                      className="w-full mt-1 p-2 border rounded"
+                    />
+                    <ErrorMessage
+                      name={field}
+                      component="div"
+                      className="text-red-500 text-sm"
+                    />
                   </div>
                 ))}
-                <div className="profile-edit-inner">
-                  <div className="profile-edit-detail">
-                    <span>Password</span>
-                    <div style={{ position: "relative", width: "fit-content" }}>
-                      <Field
-                        type={showPassword ? "text" : "password"}
-                        name="password"
-                        className="form-control"
-                        placeholder="Enter password"
-                      />
 
-                      <span
-                        onClick={() => setShowPassword(!showPassword)}
-                        style={{
-                          position: "absolute",
-                          right: "10px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          cursor: "pointer",
-                        }}
-                      >
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                      </span>
-                    </div>
+                {/* Password */}
+                <div>
+                  <label className="block text-sm font-medium">Password</label>
+                  <div className="relative">
+                    <Field
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      className="w-full mt-1 p-2 border rounded"
+                      placeholder="Enter password"
+                    />
+                    <span
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </span>
                   </div>
                   <ErrorMessage
                     name="password"
                     component="div"
-                    className="error"
-                    style={{ width: "494px" }}
+                    className="text-red-500 text-sm"
                   />
                 </div>
               </div>
 
-              {/* Professional Details with dropdowns */}
-              <div className="col-md-6">
-                {["department", "reportingManager", "employment_type"].map(
+              {/* Right column */}
+              <div className="col-md-6 space-y-4">
+                {/* Dropdown fields */}
+                {["department", "employment_type", "designation"].map(
                   (field) => (
-                    <div
-                      key={field}
-                      className="profile-edit-inner mb-3"
-                      ref={(el) => {
-                        if (el) dropdownRefs.current[field] = el;
-                      }}
-                    >
-                      <div className="Department emp-detail mail-txt">
-                        <p>{field.replace("_", " ").toUpperCase()}</p>
-                        <div
-                          className="dropdown_toggle2"
-                          onClick={() => toggleDropdown(field)}
-                        >
-                          <span className="text_btn2">{values[field]}</span>
-                          <img
-                            src="/SVG/header-vector.svg"
-                            alt="vec"
-                            className="arrow_icon2"
-                          />
-                        </div>
-                        {openDropdown === field && (
-                          <ul className="dropdown_menu2">
-                            {(field === "department"
-                              ? departmentOptions
-                              : field === "reportingManager"
-                              ? managers.map((m) => m.full_name)
-                              : employmentTypes
-                            ).map((option, idx) => (
-                              <li
-                                key={idx}
-                                onClick={() =>
-                                  handleSelect(field, option, setFieldValue)
-                                }
-                              >
-                                {option}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                        <ErrorMessage
-                          name={field}
-                          component="div"
-                          className="error"
-                        />
-                      </div>
+                    <div key={field}>
+                      <label className="block text-sm font-medium">
+                        {field.replace("_", " ").toUpperCase()}
+                      </label>
+                      <select
+                        name={field}
+                        value={values[field]}
+                        onChange={(e) => setFieldValue(field, e.target.value)}
+                        className="w-full mt-1 p-2 border rounded"
+                      >
+                        <option value="">
+                          Select {field.replace("_", " ")}
+                        </option>
+                        {(field === "department"
+                          ? departmentOptions
+                          : field === "designation"
+                          ? designations.map((d) => d.name)
+                          : employmentTypes
+                        ).map((option, idx) => (
+                          <option key={idx} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                      <ErrorMessage
+                        name={field}
+                        component="div"
+                        className="text-red-500 text-sm"
+                      />
                     </div>
                   )
                 )}
 
-                {["date_of_joining", "monthly_salary"].map((field) => (
-                  <div
-                    key={field}
-                    className="profile-edit-detail eng-cnt-txt mb-3"
+                <div>
+                  <label className="block text-sm font-medium">
+                    Reporting Manager
+                  </label>
+                  <select
+                    name={"reporting_manager"}
+                    value={values["reporting_manager"]}
+                    onChange={(e) =>
+                      setFieldValue("reporting_manager", e.target.value)
+                    }
+                    className="w-full mt-1 p-2 border rounded"
                   >
-                    <span>{field.replace(/_/g, " ").toUpperCase()}</span>
+                    <option value="">Select Reporting Manager</option>
+                    {managers.map(
+                      (m) =>
+                        m._id !== employeeId && (
+                          <option value={m._id}>{m.full_name}</option>
+                        )
+                    )}
+                  </select>
+                  <ErrorMessage
+                    name={"reporting_manager"}
+                    component="div"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+
+                {["date_of_joining", "monthly_salary"].map((field) => (
+                  <div key={field}>
+                    <label className="block text-sm font-medium">
+                      {field.replace(/_/g, " ").toUpperCase()}
+                    </label>
                     <Field
                       type={field === "monthly_salary" ? "number" : "date"}
                       name={field}
+                      className="w-full mt-1 p-2 border rounded"
                     />
                     <ErrorMessage
                       name={field}
                       component="div"
-                      className="error"
+                      className="text-red-500 text-sm"
                     />
                   </div>
                 ))}
-                <div className="profile-edit-inner is-manager-checkbox mb-3">
-                  <div className="checkbox-field">
-                    <label>
-                      <Field type="checkbox" name="is_manager" />
-                      <span style={{ marginLeft: "8px" }}>
-                        Is Reporting Manager
-                      </span>
-                    </label>
-                    <ErrorMessage
-                      name="is_manager"
-                      component="div"
-                      className="error"
-                    />
-                  </div>
+
+                {/* Checkbox */}
+                <div className="flex items-center gap-2">
+                  <Field
+                    type="checkbox"
+                    name="is_manager"
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm">Is Reporting Manager</span>
                 </div>
               </div>
-            </section>
-
-            <div className="d-flex justify-content-end mt-3 mx-5">
-              <button type="submit" className="theme_btn">
-                Save changes
-              </button>
             </div>
 
-            {/* Example: */}
-
-            {/* Repeat similarly for email, phone, etc. */}
+            {/* Submit */}
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className="bg-teal-600 text-white px-5 py-2 rounded hover:bg-teal-700"
+              >
+                Save Changes
+              </button>
+            </div>
           </Form>
         )}
       </Formik>

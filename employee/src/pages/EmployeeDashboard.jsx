@@ -5,6 +5,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { useSocket } from "../contexts/SocketContext";
+import { statusOptions, priorityOptions } from "../options";
 
 // Extend dayjs with duration
 dayjs.extend(duration);
@@ -36,6 +37,7 @@ const EmployeeDashboard = () => {
     },
   ]);
   const { socket } = useSocket();
+  const [user, setUser] = useState(null);
   const [projects, setProjects] = useState([]);
   const [subtasks, setSubtasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +52,9 @@ const EmployeeDashboard = () => {
   ];
   const [selectedFilter, setSelectedFilter] = useState("This Week");
   const [customRange, setCustomRange] = useState({ start: "", end: "" });
+
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [priorityFilter, setPriorityFilter] = useState("All");
 
   useEffect(() => {
     if (!socket) return;
@@ -98,8 +103,91 @@ const EmployeeDashboard = () => {
     if (storedUser) {
       const user = JSON.parse(storedUser);
       fetchDashboardData(user._id);
+      fetchUser(user._id);
     }
-  }, [selectedFilter, customRange]);
+  }, [selectedFilter, customRange, statusFilter, priorityFilter]);
+
+  const fetchUser = async (id) => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/employee/get/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      console.log(res.data);
+      setUser(res.data.employee);
+    } catch (err) {
+      console.error("Error fetching user:", err);
+    }
+  };
+
+  const fetchDashboardData = async (employeeId) => {
+    try {
+      setLoading(true);
+      const filter = getFilterDates();
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/employee/dashboard/${employeeId}`,
+        { params: filter }
+      );
+
+      // Step 1: Filter subtasks first (date already applied from backend via params)
+      let filteredSubtasks = res.data.subtasks || [];
+
+      if (statusFilter !== "All") {
+        filteredSubtasks = filteredSubtasks.filter(
+          (t) => (t.status || "").toLowerCase() === statusFilter.toLowerCase()
+        );
+      }
+
+      if (priorityFilter !== "All") {
+        filteredSubtasks = filteredSubtasks.filter(
+          (t) =>
+            (t.priority || "").toLowerCase() === priorityFilter.toLowerCase()
+        );
+      }
+
+      // Step 2: Filter projects to only keep ones that have at least 1 filtered subtask
+      let filteredProjects = (res.data.projects || []).filter((project) =>
+        filteredSubtasks.some(
+          (s) =>
+            s.project_id === project._id || s.project_id?._id === project._id
+        )
+      );
+
+      setProjects(filteredProjects);
+      setSubtasks(filteredSubtasks);
+
+      // Step 3: Update stats
+      setTaskStats((prev) => [
+        { ...prev[0], value: filteredSubtasks.length || "0" },
+        { ...prev[1], value: res.data.completed || "0" },
+        { ...prev[2], value: res.data.timeLogged || "0h 0m" },
+      ]);
+
+      // Step 4: Handle running timers
+      const timers = {};
+      filteredSubtasks.forEach((task) => {
+        if (task.status === "In Progress") {
+          const lastLog = task.time_logs?.[task.time_logs.length - 1];
+          if (lastLog && !lastLog.end_time) {
+            const elapsed = dayjs().diff(dayjs(lastLog.start_time));
+            timers[task._id] = elapsed;
+          }
+        }
+      });
+      setRunningTimers(timers);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to fetch dashboard data."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getFilterDates = () => {
     const now = dayjs();
@@ -126,50 +214,6 @@ const EmployeeDashboard = () => {
         };
       default:
         return {};
-    }
-  };
-
-  const fetchDashboardData = async (employeeId) => {
-    try {
-      setLoading(true);
-      const filter = getFilterDates();
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/employee/dashboard/${employeeId}`,
-        {
-          params: filter,
-        }
-      );
-
-      const filteredProjects = (res.data.projects || []).filter(
-        (project) => project.status !== "Completed"
-      );
-
-      setProjects(filteredProjects);
-      setSubtasks(res.data.subtasks || []);
-      setTaskStats((prev) => [
-        { ...prev[0], value: res.data.subtasks?.length || "0" },
-        { ...prev[1], value: res.data.completed || "0" },
-        { ...prev[2], value: res.data.timeLogged || "0h 0m" },
-      ]);
-
-      const timers = {};
-      (res.data.subtasks || []).forEach((task) => {
-        if (task.status === "In Progress") {
-          const lastLog = task.time_logs?.[task.time_logs.length - 1];
-          if (lastLog && !lastLog.end_time) {
-            const elapsed = dayjs().diff(dayjs(lastLog.start_time));
-            timers[task._id] = elapsed;
-          }
-        }
-      });
-      setRunningTimers(timers);
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to fetch dashboard data."
-      );
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -224,6 +268,7 @@ const EmployeeDashboard = () => {
           <h1>Task board</h1>
           <p>Manage your jewelry production workflow</p>
         </div>
+        <div>{user?.reporting_manager && <>{user.reporting_manager}</>}</div>
       </section>
       <section className="ett-main-sec">
         <div className="tt-time-tracking ett-emp-tracking-time">
@@ -285,6 +330,41 @@ const EmployeeDashboard = () => {
       </section>
 
       <section className="ttb-table-main">
+        <div className="d-flex gap-3 align-items-center mt-3 px-5">
+          {/* Status Filter */}
+          <div style={{ width: "300px" }}>
+            <label className="form-label">Filter Subtasks by Status:</label>
+            <select
+              className="form-control"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="All">All Status</option>
+              {statusOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Priority Filter */}
+          <div style={{ width: "300px" }}>
+            <label className="form-label">Filter Subtasks by Priority:</label>
+            <select
+              className="form-control"
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+            >
+              <option value="All">All Priority</option>
+              {priorityOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
         <div className="time-table-wrapper empan-time-table-wrapper">
           <table className="time-table-table">
             <thead className="ttb-table-row">

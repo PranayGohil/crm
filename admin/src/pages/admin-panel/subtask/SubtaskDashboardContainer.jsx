@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { Modal, Button } from "react-bootstrap"; // ✅ import modal
+import { Modal, Button } from "react-bootstrap"; 
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
-import { stageOptions, priorityOptions } from "../../../options";
+import { stageOptions, priorityOptions, statusOptions } from "../../../options";
 
 const SubtaskDashboardContainer = () => {
   const navigate = useNavigate();
@@ -19,6 +19,7 @@ const SubtaskDashboardContainer = () => {
   const [filters, setFilters] = useState({
     assignTo: "",
     priority: "",
+    status: "",
     stage: "",
   });
 
@@ -72,6 +73,7 @@ const SubtaskDashboardContainer = () => {
     (task) =>
       (!filters.assignTo || String(task.assign_to) === filters.assignTo) &&
       (!filters.priority || task.priority === filters.priority) &&
+      (!filters.status || task.status === filters.status) &&
       (!filters.stage || task.stage === filters.stage)
   );
 
@@ -244,6 +246,21 @@ const SubtaskDashboardContainer = () => {
           >
             <option value="">Filter by Priority</option>
             {priorityOptions.map((opt, idx) => (
+              <option key={idx} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={filters.status}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, status: e.target.value }))
+            }
+            className="dropdown_toggle"
+          >
+            <option value="">Filter by Status</option>
+            {statusOptions.map((opt, idx) => (
               <option key={idx} value={opt}>
                 {opt}
               </option>

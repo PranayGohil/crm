@@ -4,6 +4,24 @@ import Project from "../models/projectModel.js";
 import Designation from "../models/designationModel.js";
 import jwt from "jsonwebtoken";
 
+import mongoose from "mongoose";
+
+export const checkUsernameAvailability = async (req, res) => {
+  try {
+    console.log("req.body", req.body);
+    const username = req.body.username;
+    console.log("username", username);
+    const existingUser = await Employee.findOne({ username });
+    if (existingUser) {
+      return res.json({ available: false });
+    }
+    res.json({ available: true });
+  } catch (err) {
+    console.error("Error checking username", err);
+    res.status(500).json({ available: false });
+  }
+};
+
 export const addEmployee = async (req, res) => {
   try {
     const {
@@ -11,7 +29,6 @@ export const addEmployee = async (req, res) => {
       password,
       full_name,
       designation,
-      status,
       phone,
       email,
       home_address,
@@ -21,12 +38,12 @@ export const addEmployee = async (req, res) => {
       department,
       date_of_joining,
       monthly_salary,
-      employement_type,
+      employment_type,
       reporting_manager,
       is_manager,
     } = req.body;
 
-    // ✅ Check if username already exists
+    // check if username already exists
     const existingUser = await Employee.findOne({ username });
     if (existingUser) {
       return res.json({
@@ -35,13 +52,12 @@ export const addEmployee = async (req, res) => {
       });
     }
 
-    // ✅ Create new employee
     const newEmployee = new Employee({
-      username, // fixed typo (was 'username')
+      username,
       password,
       full_name,
       designation,
-      status,
+      status: "Inactive",
       profile_pic: req.file ? req.file.path : null,
       phone,
       email,
@@ -52,8 +68,10 @@ export const addEmployee = async (req, res) => {
       department,
       date_of_joining,
       monthly_salary,
-      employement_type,
-      reporting_manager,
+      employment_type,
+      reporting_manager: reporting_manager
+        ? new mongoose.Types.ObjectId(reporting_manager) // 👈 ensure it’s saved as ObjectId
+        : null,
       is_manager,
     });
 
@@ -145,7 +163,10 @@ export const getMultipleEmployees = async (req, res) => {
 
 export const getEmployeeInfo = async (req, res) => {
   const { id } = req.params;
-  const employee = await Employee.findById(id);
+  const employee = await Employee.findById(req.params.id).populate(
+    "reporting_manager",
+    "full_name"
+  );
   res.status(200).json(employee);
 };
 
@@ -167,7 +188,7 @@ export const editEmployee = async (req, res) => {
       department,
       date_of_joining,
       monthly_salary,
-      employement_type,
+      employment_type,
       reporting_manager,
       is_manager,
     } = req.body;
@@ -179,7 +200,7 @@ export const editEmployee = async (req, res) => {
         .json({ success: false, message: "Employee not found" });
     }
 
-    // Check if username is changed & already exists
+    // Check username uniqueness
     if (username && username !== employee.username) {
       const existingUser = await Employee.findOne({ username });
       if (existingUser) {
@@ -199,19 +220,29 @@ export const editEmployee = async (req, res) => {
     employee.phone = phone || employee.phone;
     employee.email = email || employee.email;
     employee.home_address = home_address || employee.home_address;
-    employee.dob = dob || employee.dob;
+    employee.dob = dob ? new Date(dob) : employee.dob;
     employee.emergency_contact =
       emergency_contact || employee.emergency_contact;
     employee.capacity = capacity || employee.capacity;
     employee.department = department || employee.department;
-    employee.date_of_joining = date_of_joining || employee.date_of_joining;
+    employee.date_of_joining = date_of_joining
+      ? new Date(date_of_joining)
+      : employee.date_of_joining;
     employee.monthly_salary = monthly_salary || employee.monthly_salary;
-    employee.employement_type = employement_type || employee.employement_type;
-    employee.reporting_manager =
-      reporting_manager || employee.reporting_manager;
-    employee.is_manager = is_manager || employee.is_manager;
+    employee.employment_type = employment_type || employee.employment_type;
 
-    // Update profile_pic if uploaded
+    // Reporting manager (expects ObjectId)
+    if (reporting_manager) {
+      employee.reporting_manager = reporting_manager;
+    }
+
+    // is_manager conversion
+    if (typeof is_manager !== "undefined") {
+      employee.is_manager =
+        typeof is_manager === "string" ? is_manager === "true" : !!is_manager;
+    }
+
+    // Profile pic
     if (req.file) {
       employee.profile_pic = req.file.path;
     }

@@ -52,6 +52,8 @@ const EmployeeDashboard = () => {
 
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [designations, setDesignations] = useState([]);
 
   const [filters, setFilters] = useState({
     department: "",
@@ -67,11 +69,9 @@ const EmployeeDashboard = () => {
     departments: 0,
   });
 
-  const [designations, setDesignations] = useState([]);
-
   const dropdownData = {
-    departments: ["HR", "Development", "Design", "Sales"], // customize to match your real departments
-    designations: designations.map((d) => d.name),
+    departments: departments, // customize to match your real departments
+    designations: designations,
     statuses: ["Active", "Inactive", "Blocked"],
   };
 
@@ -86,31 +86,35 @@ const EmployeeDashboard = () => {
         setEmployees(data);
         setFilteredEmployees(data);
 
-        const total = data.length;
-        const inActive = data.filter((e) => e.status === "Inactive").length;
-        const active = data.filter(
+        const departments = new Set(data.map((e) => e.department));
+        const designations = new Set(data.map((e) => e.designation));
+
+        setDepartments([...departments]);
+        setDesignations([...designations]);
+        console.log([...designations]);
+
+        const totalEmployees = data.length;
+        const totalInActive = data.filter(
+          (e) => e.status === "Inactive"
+        ).length;
+        const totalActive = data.filter(
           (e) => e.status === "active" || e.status === "Active"
         ).length;
-        const departments = new Set(data.map((e) => e.department)).size;
-        setStats({ total, inActive, active, departments });
+        const departmentSize = new Set(data.map((e) => e.department)).size;
+        setStats({
+          total: totalEmployees,
+          inActive: totalInActive,
+          active: totalActive,
+          departments: departmentSize,
+        });
       } catch (err) {
         console.error("Failed to fetch employees:", err);
       } finally {
         setLoading(false);
       }
     };
-    const fetchDesignations = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/designation/get-all`
-        );
-        setDesignations(res.data.designations);
-      } catch (err) {
-        console.error("Failed to fetch designations:", err);
-      }
-    };
+
     fetchEmployees();
-    fetchDesignations();
   }, []);
 
   // Apply filters when filters change

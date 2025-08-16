@@ -137,9 +137,13 @@ const Subtasks = () => {
 
     const matchStage =
       filters.stage === "Stage" ||
-      p.subtasks?.some(
-        (s) => s.stage?.toLowerCase() === filters.stage.toLowerCase()
-      );
+      p.subtasks?.some((s) => {
+        console.log(s.stage[s.current_stage_index || 0], filters.stage);
+        return (
+          s.stage[s.current_stage_index || 0].toLowerCase() ===
+          filters.stage.toLowerCase()
+        );
+      });
 
     const matchEmployee =
       filters.employee === "Employee" ||
@@ -473,8 +477,38 @@ const Subtasks = () => {
                     <td>
                       <span className="time-table-badge">{project.status}</span>
                     </td>
-                    <td>{project.subtasks?.length}</td>
-                    <td>{calculateProjectTotalTime(project.subtasks)}</td>
+                    {(() => {
+                      // Apply subtask-level filters (same logic you use inside expanded row)
+                      const filteredSubtasks =
+                        project.subtasks?.filter((s) => {
+                          const stageMatch =
+                            filters.stage === "Stage" ||
+                            s.stage[s.current_stage_index]?.toLowerCase() ===
+                              filters.stage.toLowerCase();
+
+                          const statusMatch =
+                            filters.status === "Status" ||
+                            s.status?.toLowerCase() ===
+                              filters.status.toLowerCase();
+
+                          const employeeMatch =
+                            filters.employee === "Employee" ||
+                            employees.find((e) => e._id === s.assign_to)
+                              ?.full_name === filters.employee;
+
+                          return stageMatch && statusMatch && employeeMatch;
+                        }) || [];
+
+                      return (
+                        <>
+                          {/* ✅ Subtask count according to filters */}
+                          <td>{filteredSubtasks.length}</td>
+
+                          {/* ✅ Total time according to filtered subtasks */}
+                          <td>{calculateProjectTotalTime(filteredSubtasks)}</td>
+                        </>
+                      );
+                    })()}
                     <td>
                       <span className="time-table-badge">
                         {project.priority}
@@ -525,7 +559,9 @@ const Subtasks = () => {
                               ?.filter((s) => {
                                 const stageMatch =
                                   filters.stage === "Stage" ||
-                                  s.stage?.toLowerCase() ===
+                                  s.stage[
+                                    s.current_stage_index
+                                  ]?.toLowerCase() ===
                                     filters.stage.toLowerCase();
 
                                 const statusMatch =

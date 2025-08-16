@@ -46,11 +46,12 @@ const employeeSchema = mongoose.Schema({
   monthly_salary: {
     type: Number,
   },
-  employement_type: {
+  employment_type: {
     type: String,
   },
   reporting_manager: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Employee",
   },
   is_manager: { type: Boolean, default: false },
   created_at: {

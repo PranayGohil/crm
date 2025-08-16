@@ -191,8 +191,12 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
                 onClick={() => toggleDropdown("reporting_manager")}
               >
                 <span className="text_btn2">
-                  {form.reporting_manager || "Select Manager"}
+                  {form.reporting_manager
+                    ? managers.find((m) => m._id === form.reporting_manager)
+                        ?.full_name
+                    : "Select Manager"}
                 </span>
+
                 <img
                   src="/SVG/header-vector.svg"
                   alt="vec"
@@ -207,8 +211,8 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
                   {managers.map((option, idx) => (
                     <li
                       key={idx}
-                      onClick={() =>
-                        handleSelect("reporting_manager", option.full_name)
+                      onClick={
+                        () => handleSelect("reporting_manager", option._id) // 👈 save ObjectId instead of name
                       }
                     >
                       {option.full_name}
@@ -257,10 +261,10 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
               <p>Employment Type</p>
               <div
                 className="dropdown_toggle2"
-                onClick={() => toggleDropdown("employement_type")}
+                onClick={() => toggleDropdown("employment_type")}
               >
                 <span className="text_btn2">
-                  {form.employement_type || "Select Employment Type"}
+                  {form.employment_type || "Select Employment Type"}
                 </span>
                 <img
                   src="/SVG/header-vector.svg"
@@ -268,20 +272,20 @@ const CreatePersonalProfessionalDetails = ({ form, onChange, errors }) => {
                   className="arrow_icon2"
                 />
               </div>
-              {openDropdown === "employement_type" && (
+              {openDropdown === "employment_type" && (
                 <ul className="dropdown_menu2">
                   {employmentTypes.map((type, idx) => (
                     <li
                       key={idx}
-                      onClick={() => handleSelect("employement_type", type)}
+                      onClick={() => handleSelect("employment_type", type)}
                     >
                       {type}
                     </li>
                   ))}
                 </ul>
               )}
-              {errors?.employement_type && (
-                <div className="error">{errors.employement_type}</div>
+              {errors?.employment_type && (
+                <div className="error">{errors.employment_type}</div>
               )}
             </div>
           </div>

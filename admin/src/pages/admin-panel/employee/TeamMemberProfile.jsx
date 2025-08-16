@@ -104,7 +104,7 @@ const TeamMemberProfile = () => {
     {
       icon: "/SVG/man-vec.svg",
       label: "Reporting Manager",
-      value: employee.reporting_manager || "N/A",
+      value: employee.reporting_manager?.full_name || "N/A",
     },
   ];
 
@@ -179,7 +179,7 @@ const TeamMemberProfile = () => {
         <div className="member-detail">
           <div className="sec1-color"></div>
           <div className="member1-data">
-            <div className="mem-img" style={{ height: "100px" }}>
+            <div className="mem-img relative" style={{ height: "100px" }}>
               {employee.profile_pic ? (
                 <img
                   src={employee.profile_pic}
@@ -189,6 +189,9 @@ const TeamMemberProfile = () => {
                     height: "100px",
                     objectFit: "cover",
                     borderRadius: "50%",
+                    marginTop: "-64px",
+                    position: "absolute",
+                    border: "5px solid white",
                   }}
                 />
               ) : (

@@ -74,7 +74,7 @@ const AdminProfile = () => {
       );
       if (res.data.success) {
         alert("Profile updated!");
-        fetchProfile();
+        window.location.reload();
       } else {
         setErrors({ general: res.data.message });
       }

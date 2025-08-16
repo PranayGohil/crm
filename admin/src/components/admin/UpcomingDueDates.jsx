@@ -11,7 +11,14 @@ const UpcomingDueDates = () => {
     setLoading(true);
     axios
       .get(`${process.env.REACT_APP_API_URL}/api/statistics/upcoming-due-dates`)
-      .then((res) => setDueTasks(res.data))
+      .then((res) => {
+        const sortedData = [...res.data].sort((a, b) => {
+        const dateA = a.project_id?.due_date ? new Date(a.project_id.due_date) : new Date(0);
+        const dateB = b.project_id?.due_date ? new Date(b.project_id.due_date) : new Date(0);
+        return dateA - dateB; // ascending order
+      });
+        setDueTasks(sortedData)
+      })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, []);
@@ -37,8 +44,8 @@ const UpcomingDueDates = () => {
           <table className="md-table-container">
             <thead>
               <tr>
-                <th>Task Name</th>
                 <th>Project</th>
+                <th>Task Name</th>
                 <th>Task Due Date</th>
                 <th>Project Due Date</th>
                 <th>Assigned To</th>
@@ -74,8 +81,8 @@ const UpcomingDueDates = () => {
 
                   return (
                     <tr key={index}>
-                      <td>{task.task_name || "N/A"}</td>
                       <td>{task.project_id?.project_name || "N/A"}</td>
+                      <td>{task.task_name || "N/A"}</td>
                       <td>{formatDate(task.due_date)}</td>
                       <td>{formatDate(task.project_id?.due_date)}</td>
                       <td>

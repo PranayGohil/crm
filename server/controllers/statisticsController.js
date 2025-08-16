@@ -1,9 +1,7 @@
 import {
   addDays,
   eachDayOfInterval,
-  endOfMonth,
   getDaysInMonth,
-  isSameDay,
   isSunday,
   startOfTomorrow,
 } from "date-fns";
@@ -181,7 +179,7 @@ export const getDepartmentCapacities = async (req, res) => {
       dept.estimatedDaysToComplete = eachDayOfInterval({
         start: startDate,
         end: calendarDate,
-      }).length;
+      }).length - 1;
 
       // === Without Sundays (Working Days Only) ===
       let remainingWorkingTasks = totalTasks;
@@ -198,7 +196,7 @@ export const getDepartmentCapacities = async (req, res) => {
       dept.estimatedDaysToCompleteWithoutSundays = eachDayOfInterval({
         start: startDate,
         end: workingDate,
-      }).length;
+      }).length - 1;
     }
 
     console.log("Department Data:", departmentData);

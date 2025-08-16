@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  checkUsernameAvailability,
   addEmployee,
   loginEmployee,
   getEmployees,
@@ -15,6 +16,7 @@ import upload from "../middlewares/upload.js";
 
 const employeeRouter = express.Router();
 
+employeeRouter.post("/check-username", checkUsernameAvailability);
 employeeRouter.post("/add", upload.single("profile_pic"), addEmployee);
 employeeRouter.get("/get-all", getEmployees);
 employeeRouter.get("/get-multiple", getMultipleEmployees);

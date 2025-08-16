@@ -108,7 +108,7 @@ const ClientProjectDetails = () => {
       {/* Header */}
       <section className="cd-client_dashboard header">
         <div className="cd-head-menu head-menu cpd_header">
-          <div className="anp-back-btn" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
+          <div className="anp-back-btn" onClick={() => navigate(-1)} style={{ cursor: "pointer" }}>
             <img alt="" className="back_arrow mx-3" src="/SVG/arrow-pc.svg" style={{ scale: "1.3" }} />
           </div>
           <h1>Client: {username}</h1>

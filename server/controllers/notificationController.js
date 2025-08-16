@@ -1,5 +1,5 @@
 import Notification from "../models/notificationModel.js";
-import { io, emitToUser } from "../utils/socket.js";
+import { emitToUser } from "../index.js";
 
 export const getNotifications = async (req, res) => {
   try {
@@ -20,23 +20,6 @@ export const getNotifications = async (req, res) => {
     res.json({ success: true, notifications });
   } catch (err) {
     console.error("Error fetching notifications:", err);
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-export const addNotification = async (req, res) => {
-  try {
-    const notification = new Notification(req.body);
-    await notification.save();
-
-    // broadcast new notification to all connected clients
-    // io.emit("new_notification", notification);
-    emitToUser(receiver_id, "new_notification", notification);
-
-    emitToUser(notification.receiver_id, "new_notification", notification);
-
-    res.json({ success: true, notification });
-  } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };

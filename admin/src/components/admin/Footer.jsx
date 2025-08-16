@@ -9,10 +9,10 @@ const Footer = () => {
   }, []);
 
   return (
-    <div className="footer_box">
-      <p className="copyright_text">
+    <div className="w-100 px-4 py-3 flex justify-center items-center">
+      <div className="">
         &copy; <span>{year}</span> Pixel Orbit. All rights reserved.
-      </p>
+      </div>
     </div>
   );
 };
