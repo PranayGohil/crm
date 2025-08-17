@@ -33,7 +33,7 @@ const EmployeeDashboard = () => {
       bgClass: "empan-bg-purple",
       label: "Time Logged (This Week)",
       value: "0h 0m",
-      link: "EmployeeTimeTracking",
+      link: "/time-tracking",
     },
   ]);
   const { socket } = useSocket();
@@ -51,7 +51,10 @@ const EmployeeDashboard = () => {
     "Custom",
   ];
   const [selectedFilter, setSelectedFilter] = useState("This Week");
-  const [customRange, setCustomRange] = useState({ start: "", end: "" });
+  const [customRange, setCustomRange] = useState({
+    start: new Date(),
+    end: new Date(),
+  });
 
   const [statusFilter, setStatusFilter] = useState("All");
   const [priorityFilter, setPriorityFilter] = useState("All");
@@ -118,7 +121,7 @@ const EmployeeDashboard = () => {
         }
       );
       console.log(res.data);
-      setUser(res.data.employee);
+      setUser(res.data);
     } catch (err) {
       console.error("Error fetching user:", err);
     }
@@ -220,16 +223,14 @@ const EmployeeDashboard = () => {
   const toggleTable = (projectId) =>
     setExpandedProjectId(expandedProjectId === projectId ? null : projectId);
 
-  const handleStartStop = async (task) => {
+  const handleChangeStatus = async (task, status) => {
     try {
       const user = JSON.parse(localStorage.getItem("employeeUser"));
-      const newStatus =
-        task.status === "In Progress" ? "Paused" : "In Progress";
 
       await axios.put(
         `${process.env.REACT_APP_API_URL}/api/subtask/change-status/${task._id}`,
         {
-          status: newStatus,
+          status: status,
           userId: user._id,
           userRole: "employee",
         }
@@ -268,7 +269,14 @@ const EmployeeDashboard = () => {
           <h1>Task board</h1>
           <p>Manage your jewelry production workflow</p>
         </div>
-        <div>{user?.reporting_manager && <>{user.reporting_manager}</>}</div>
+        <div className="text-end">
+          {user?.reporting_manager?.full_name && (
+            <>
+              <h5 className="fw-bold">Reported By</h5>
+              <small>{user.reporting_manager?.full_name}</small>
+            </>
+          )}
+        </div>
       </section>
       <section className="ett-main-sec">
         <div className="tt-time-tracking ett-emp-tracking-time">
@@ -290,13 +298,16 @@ const EmployeeDashboard = () => {
                 <input
                   type="date"
                   className="form-control"
-                  onChange={(e) =>
-                    setCustomRange({ ...customRange, start: e.target.value })
-                  }
+                  value={customRange.start}
+                  onChange={(e) => {
+                    console.log(e.target.value);
+                    setCustomRange({ ...customRange, start: e.target.value });
+                  }}
                 />
                 <input
                   type="date"
                   className="form-control"
+                  value={customRange.end}
                   onChange={(e) =>
                     setCustomRange({ ...customRange, end: e.target.value })
                   }
@@ -420,7 +431,7 @@ const EmployeeDashboard = () => {
                             project.status || ""
                           )
                             .toLowerCase()
-                            .replace(" ", "-")}`}
+                            .replace(" ", "")}`}
                         >
                           {project.status}
                         </span>
@@ -586,16 +597,38 @@ const EmployeeDashboard = () => {
                                     </span>
                                   </td>
                                   <td>
-                                    <span
+                                    <select
                                       className={`time-table-badge md-status-${(
                                         task.status || ""
                                       )
                                         .toLowerCase()
-                                        .replace(" ", "-")}`}
+                                        .replace(" ", "")}`}
+                                      value={task.status}
+                                      onChange={(e) =>
+                                        handleChangeStatus(task, e.target.value)
+                                      }
+                                      style={{
+                                        minWidth: "100px",
+                                        padding: "4px 6px",
+                                        borderRadius: "6px",
+                                      }}
                                     >
-                                      {task.status}
-                                    </span>
+                                      {statusOptions.map((status) => (
+                                        <option
+                                          key={status}
+                                          value={status}
+                                          className={`md-status-${(
+                                            status || ""
+                                          )
+                                            .toLowerCase()
+                                            .replace(" ", "")}`}
+                                        >
+                                          {status}
+                                        </option>
+                                      ))}
+                                    </select>
                                   </td>
+
                                   <td
                                     style={{
                                       width: "200px",
@@ -669,7 +702,14 @@ const EmployeeDashboard = () => {
                                             ? "ttb-stop-bg-color"
                                             : "ttb-start-bg-color"
                                         }`}
-                                        onClick={() => handleStartStop(task)}
+                                        onClick={() =>
+                                          handleChangeStatus(
+                                            task,
+                                            task.status === "In Progress"
+                                              ? "Paused"
+                                              : "In Progress"
+                                          )
+                                        }
                                         style={{ cursor: "pointer" }}
                                       >
                                         <span className="ttb-table-pasuse-btn-containter">

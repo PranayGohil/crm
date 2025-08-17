@@ -3,16 +3,17 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
-import { Modal, Button } from "react-bootstrap";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import { stageOptions, priorityOptions, statusOptions } from "../../../options";
+import { stageOptions, priorityOptions, statusOptions } from "../options";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 dayjs.extend(duration);
 
 const Subtasks = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const user = JSON.parse(localStorage.getItem("employeeUser"));
   const [projects, setProjects] = useState([]);
   const [openRow, setOpenRow] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,13 +21,6 @@ const Subtasks = () => {
   const [employees, setEmployees] = useState([]);
 
   const [selectedTaskIds, setSelectedTaskIds] = useState([]);
-  const [bulkAssignTo, setBulkAssignTo] = useState("");
-  const [bulkPriority, setBulkPriority] = useState("");
-  const [bulkStage, setBulkStage] = useState("");
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
-
   const [headerDropdownOpen, setHeaderDropdownOpen] = useState(null);
 
   const [summary, setSummary] = useState(null);
@@ -52,14 +46,19 @@ const Subtasks = () => {
     try {
       const [projectsRes, clientsRes, employeesRes] = await Promise.all([
         axios.get(
-          `${process.env.REACT_APP_API_URL}/api/project/all-tasks-projects`
+          `${process.env.REACT_APP_API_URL}/api/project/manager/${user._id}`
         ),
         axios.get(`${process.env.REACT_APP_API_URL}/api/client/get-all`),
         axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`),
       ]);
+
+      const myEmployees = employeesRes.data.filter(
+        (emp) => emp.reporting_manager === user._id
+      );
+
       setProjects(projectsRes.data);
       setClients(clientsRes.data);
-      setEmployees(employeesRes.data);
+      setEmployees(myEmployees);
     } catch (err) {
       console.error(err);
     }
@@ -120,7 +119,6 @@ const Subtasks = () => {
   const filteredProjects = projects.filter((p) => {
     const clientName = clientIdToName[p.client_id];
 
-    // ✅ Match Project-level filters
     const matchClient =
       filters.client === "All Client" ||
       clientName?.toLowerCase() === filters.client.toLowerCase();
@@ -177,62 +175,6 @@ const Subtasks = () => {
     return diffDays >= 0 ? `${diffDays} days` : "Overdue";
   };
 
-  const handleBulkUpdateAll = async () => {
-    if (selectedTaskIds.length === 0) return;
-
-    const update = {};
-    if (bulkAssignTo) update.assign_to = bulkAssignTo;
-    if (bulkPriority) update.priority = bulkPriority;
-    if (bulkStage) update.stage = bulkStage;
-
-    if (Object.keys(update).length === 0) {
-      toast.info("No changes selected.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/subtask/bulk-update`,
-        {
-          ids: selectedTaskIds,
-          update,
-        }
-      );
-      toast.success("Changes applied!");
-      setBulkAssignTo("");
-      setBulkPriority("");
-      setBulkStage("");
-      setSelectedTaskIds([]);
-      fetchAll(); // re-fetch data
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to apply changes.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBulkConfirmDelete = async () => {
-    if (selectedTaskIds.length === 0) return;
-    setLoading(true);
-    try {
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/subtask/bulk-delete`,
-        { ids: selectedTaskIds }
-      );
-      toast.success("Deleted!");
-      fetchAll();
-      setSelectedTaskIds([]);
-      setShowBulkDeleteModal(false);
-    } catch (err) {
-      console.error(err);
-      toast.error("Delete failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const calculateProjectTotalTime = (subtasks = []) => {
     let totalMs = 0;
     subtasks.forEach((s) => {
@@ -257,7 +199,6 @@ const Subtasks = () => {
     });
 
     const dur = dayjs.duration(totalMs);
-    console.log("oooooooooooooooooooooooooo", { dur });
     return `${dur.hours()}h ${dur.minutes()}m ${dur.seconds()}s`;
   };
 
@@ -276,6 +217,7 @@ const Subtasks = () => {
       .catch(() => toast.error("Failed to copy URL."));
   };
 
+  if (loading) return <LoadingOverlay />;
   return (
     <section className="task_timeboard_wrapper">
       <section className="header ttb-header">
@@ -301,39 +243,6 @@ const Subtasks = () => {
             </h1>
           </div>
         </div>
-        <Link to="/subtasks" className="md-common-total-card">
-          <div className="md-common-para-icon md-para-icon-tasks">
-            <span>Subtasks</span>
-            <div className="md-common-icon">
-              <img src="SVG/true-green.svg" alt="total tasks" />
-            </div>
-          </div>
-          <div className="md-total-project-number">
-            <span className="md-total-card-number">{summary?.totalTasks}</span>
-            <span className="md-total-card-text">Total</span>
-          </div>
-          <div className="mt-8 md-btn-cio">
-            {summary?.tasksByStage &&
-              Object.entries(summary.tasksByStage).map(([stage, count]) => (
-                <div
-                  key={stage}
-                  className={`${
-                    stage === "CAD Design"
-                      ? "badge bg-primary"
-                      : stage === "SET Design"
-                      ? "badge bg-warning"
-                      : stage === "Delivery"
-                      ? "badge bg-success"
-                      : stage === "Render"
-                      ? "badge bg-info"
-                      : ""
-                  } `}
-                >
-                  {count} {stage}
-                </div>
-              ))}
-          </div>
-        </Link>
       </section>
 
       <section className="ttb-search-btn-bar-main">
@@ -354,38 +263,7 @@ const Subtasks = () => {
           </div>
 
           <div className="ttb-all-btn-main" ref={headerRef}>
-            <div
-              className={`btn_main ttb-btn ${
-                headerDropdownOpen === "client" ? "open" : ""
-              }`}
-              style={{ marginLeft: "10px", width: "150px" }}
-            >
-              <div
-                className="dropdown_toggle"
-                onClick={() => handleHeaderToggle("client")}
-              >
-                <span className="text_btn">{filters.client}</span>
-                <img src="/SVG/arrow.svg" alt="arrow" />
-              </div>
-              {headerDropdownOpen === "client" && (
-                <ul className="dropdown_menu">
-                  <li
-                    onClick={() => handleFilterSelect("client", "All Client")}
-                  >
-                    All Client
-                  </li>
-                  {clients.map((c) => (
-                    <li
-                      key={c._id}
-                      onClick={() => handleFilterSelect("client", c.full_name)}
-                    >
-                      {c.full_name}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            {["status", "priority", "stage", "employee"].map((key) => (
+            {["status", "stage", "employee"].map((key) => (
               <div
                 key={key}
                 className={`btn_main ttb-btn ${
@@ -425,30 +303,13 @@ const Subtasks = () => {
             <thead>
               <tr>
                 <th></th>
-                {/* <th>
-                  <input
-                    type="checkbox"
-                    checked={
-                      selectedIds.length === filteredProjects.length &&
-                      filteredProjects.length > 0
-                    }
-                    onChange={(e) =>
-                      e.target.checked
-                        ? setSelectedIds(filteredProjects.map((p) => p.id))
-                        : setSelectedIds([])
-                    }
-                  />
-                </th> */}
                 <th>Project Name</th>
-                <th>Client</th>
                 <th>Status</th>
                 <th>Subtasks</th>
                 <th>Total Time</th>
-                <th>Priority</th>
                 <th>Start Date</th>
                 <th>End Date</th>
                 <th>Remaining Time</th> {/* ✅ added */}
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -473,7 +334,6 @@ const Subtasks = () => {
                       />
                     </td> */}
                     <td>{project.project_name}</td>
-                    <td>{clientIdToName[project.client_id] || "N/A"}</td>
                     <td>
                       <span
                         className={`time-table-badge md-status-${(
@@ -518,13 +378,6 @@ const Subtasks = () => {
                       );
                     })()}
                     <td>
-                      <span
-                        className={`time-table-badge md-status-${project.priority.toLowerCase()}`}
-                      >
-                        {project.priority}
-                      </span>
-                    </td>
-                    <td>
                       {project.assign_date
                         ? new Date(project.assign_date).toLocaleDateString()
                         : ""}
@@ -535,15 +388,6 @@ const Subtasks = () => {
                         : ""}
                     </td>
                     <td>{getRemainingDays(project.due_date)}</td>{" "}
-                    {/* ✅ added */}
-                    <td className="time-table-icons">
-                      <Link to={`/project/edit/${project.id}`}>
-                        <img src="/SVG/edit.svg" alt="edit" />
-                      </Link>
-                      <Link to={`/project/details/${project.id}`}>
-                        <img src="/SVG/eye-view.svg" alt="view" />
-                      </Link>
-                    </td>
                   </tr>
                   {openRow === idx && (
                     <tr className="time-table-subtask-row">
@@ -758,12 +602,6 @@ const Subtasks = () => {
                                   <td>{getRemainingDays(s.due_date)}</td>
                                   <td>
                                     <Link
-                                      to={`/project/subtask/edit/${s.id}`}
-                                      className="mx-1"
-                                    >
-                                      <img src="/SVG/edit.svg" alt="edit" />
-                                    </Link>
-                                    <Link
                                       to={`/subtask/view/${s.id}`}
                                       className="mx-1"
                                     >
@@ -781,97 +619,8 @@ const Subtasks = () => {
               ))}
             </tbody>
           </table>
-
-          <section className="sv-last-sec css-sec-last mt-3">
-            <p>
-              <span>{selectedTaskIds.length}</span> items selected
-            </p>
-            <div className="cpd-menu-bar">
-              <select
-                value={bulkAssignTo}
-                onChange={(e) => setBulkAssignTo(e.target.value)}
-                className="dropdown_toggle"
-              >
-                <option value="">Set Assign To</option>
-                {employees.map((emp) => (
-                  <option key={emp._id} value={emp._id}>
-                    {emp.full_name}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                value={bulkPriority}
-                onChange={(e) => setBulkPriority(e.target.value)}
-                className="dropdown_toggle"
-              >
-                <option value="">Set Priority</option>
-                {priorityOptions.map((opt, idx) => (
-                  <option key={idx} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                value={bulkStage}
-                onChange={(e) => setBulkStage(e.target.value)}
-                className="dropdown_toggle"
-              >
-                <option value="">Change Stage</option>
-                {stageOptions.map((opt, idx) => (
-                  <option key={idx} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-
-              <button
-                onClick={handleBulkUpdateAll}
-                className="theme_btn"
-                disabled={
-                  selectedTaskIds.length === 0 ||
-                  (!bulkAssignTo && !bulkPriority && !bulkStage)
-                }
-              >
-                Apply Changes
-              </button>
-              <button
-                className="css-high css-delete"
-                onClick={() => setShowBulkDeleteModal(true)}
-                disabled={selectedTaskIds.length === 0}
-              >
-                <img src="/SVG/delete-vec.svg" alt="del" /> Delete Selected
-              </button>
-            </div>
-          </section>
         </div>
       </section>
-
-      <Modal
-        show={showBulkDeleteModal}
-        onHide={() => setShowBulkDeleteModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete <b>{selectedTaskIds.length}</b>{" "}
-          selected subtask(s)?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowBulkDeleteModal(false)}
-          >
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={handleBulkConfirmDelete}>
-            Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </section>
   );
 };

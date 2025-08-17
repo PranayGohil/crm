@@ -1,6 +1,7 @@
 import e from "express";
 import Project from "../models/projectModel.js";
 import SubTask from "../models/subTaskModel.js";
+import Employee from "../models/employeeModel.js";
 
 export const addProject = async (req, res) => {
   try {
@@ -249,6 +250,63 @@ export const getAllProjectsWithTasks = async (req, res) => {
       })
     );
     res.status(200).json(projectsWithSubtasks);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const getProjectsForReportingManager = async (req, res) => {
+  try {
+    const { managerId } = req.params; // pass reporting manager ID from frontend or JWT
+
+    // 1. Find employees under this reporting manager
+    const employees = await Employee.find({ reporting_manager: managerId });
+    const employeeIds = employees.map((emp) => emp._id.toString());
+
+    // 2. Get all projects
+    const projects = await Project.find({});
+
+    // 3. Filter projects by subtasks assigned to manager's employees
+    const projectsWithSubtasks = await Promise.all(
+      projects.map(async (proj) => {
+        const subtasks = await SubTask.find({
+          project_id: proj._id.toString(),
+          assign_to: { $in: employeeIds }, // ✅ only subtasks of manager’s employees
+        });
+
+        // Skip project if no subtasks matched
+        if (subtasks.length === 0) return null;
+
+        return {
+          id: proj._id,
+          project_name: proj.project_name,
+          client_id: proj.client_id,
+          assign_date: proj.assign_date,
+          due_date: proj.due_date,
+          priority: proj.priority,
+          status: proj.status,
+          subtasks: subtasks.map((s) => ({
+            id: s._id,
+            task_name: s.task_name,
+            stage: s.stage,
+            current_stage_index: s.current_stage_index,
+            priority: s.priority,
+            status: s.status,
+            url: s.url,
+            assign_to: s.assign_to || null,
+            assign_date: s.assign_date,
+            due_date: s.due_date,
+            time_logs: s.time_logs,
+          })),
+        };
+      })
+    );
+
+    // 4. Remove nulls (projects without matching subtasks)
+    const filteredProjects = projectsWithSubtasks.filter(Boolean);
+    console.log("Filrtered projects:", filteredProjects);
+    res.status(200).json(filteredProjects);
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Server error" });

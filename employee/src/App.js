@@ -13,10 +13,13 @@ import EmployeeTimeTracking from "./pages/EmployeeTimeTracking";
 import EmployeeNotificationPage from "./pages/EmployeeNotificationPage";
 
 //employee
-
+import EmployeeProfile from "./pages/EmployeeProfile";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import ViewSubtask from "./pages/ViewSubtask";
 import ProjectDetails from "./pages/ProjectDetails";
+
+import Subtasks from "./pages/Subtasks";
+import TimeTrackingDashboard from "./pages/TimeTrackingDashboard";
 
 import LoginPage from "./pages/LoginPage";
 
@@ -36,18 +39,20 @@ function App() {
         >
           <Route path="/" element={<EmployeeDashboard />} />
           <Route path="/dashboard" element={<EmployeeDashboard />} />
+          <Route path="/profile" element={<EmployeeProfile />} />
+
           <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
           <Route
             path="/project/details/:projectId"
             element={<ProjectDetails />}
           />
+          <Route path="/time-tracking" element={<EmployeeTimeTracking />} />
+          <Route path="/notifications" element={<EmployeeNotificationPage />} />
+
+          <Route path="/subtasks" element={<Subtasks />} />
           <Route
-            path="employeetimetracking"
-            element={<EmployeeTimeTracking />}
-          />
-          <Route
-            path="/notifications"
-            element={<EmployeeNotificationPage />}
+            path="/team-time-tracking"
+            element={<TimeTrackingDashboard />}
           />
         </Route>
 

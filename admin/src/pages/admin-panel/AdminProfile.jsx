@@ -3,13 +3,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingOverlay from "../../components/admin/LoadingOverlay";
-
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const AdminProfile = () => {
   const navigate = useNavigate();
 
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     email: "",
     username: "",
@@ -88,130 +87,130 @@ const AdminProfile = () => {
   if (loading) return <LoadingOverlay />;
 
   return (
-    <section className="employee_profile_edit_container p-3">
-      <section className="page3-main1">
-        <div className="member-profile-edit">
-          <div className="pro-edit-vec">
-            <img
-              src="/SVG/vec-mem-pro.svg"
-              alt="vec"
-              onClick={() => navigate(-1)}
-              style={{ cursor: "pointer" }}
-            />
-            <span>Admin Profile</span>
-          </div>
-        </div>
-      </section>
+    <section className="container mx-auto p-4">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <img
+          src="/SVG/vec-mem-pro.svg"
+          alt="back"
+          className="w-6 h-6 cursor-pointer"
+          onClick={() => navigate(-1)}
+        />
+        <h1 className="text-2xl font-semibold">Admin Profile</h1>
+      </div>
+
       {errors.general && (
-        <div style={{ color: "red", marginLeft: "20px", marginTop: "10px" }}>
-          {errors.general}
-        </div>
+        <div className="text-red-500 mb-4">{errors.general}</div>
       )}
 
-      <section className="pe page3-main2">
-        <div className="update-upload-profile">
-          <div className="update-your-pro d-flex flex-column align-items-center">
-            <div className="upload-profile">
-              <label
-                htmlFor="profilePic"
-                className="upload-img"
-                style={{
-                  cursor: "pointer",
-                  width: "70px",
-                  height: "70px",
-                  borderRadius: "50%",
-                  overflow: "hidden",
-                  border: "1px solid #d1d5db",
-                }}
-              >
-                <img
-                  src={form.profile_pic_preview || "/SVG/upload-vec.svg"}
-                  alt="upload"
-                  style={{ width: "100%", objectFit: "cover", height: "100%" }}
-                />
-              </label>
-              <input
-                type="file"
-                id="profilePic"
-                style={{ display: "none" }}
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setProfilePic(file);
-                    const previewUrl = URL.createObjectURL(file);
-                    handleChange("profile_pic_preview", previewUrl);
-                  }
-                }}
-              />
-            </div>
+      {/* Profile Section */}
+      <div className="flex flex-col items-center bg-white shadow rounded-xl p-6 mx-auto">
+        {/* Profile Picture */}
+        <div className="mb-4">
+          <label
+            htmlFor="profilePic"
+            className="cursor-pointer w-24 h-24 rounded-full border flex items-center justify-center overflow-hidden bg-gray-100"
+          >
+            <img
+              src={form.profile_pic_preview || "/SVG/upload-vec.svg"}
+              alt="upload"
+              className="w-full h-full object-cover"
+            />
+          </label>
+          <input
+            type="file"
+            id="profilePic"
+            hidden
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                setProfilePic(file);
+                const previewUrl = URL.createObjectURL(file);
+                handleChange("profile_pic_preview", previewUrl);
+              }
+            }}
+          />
+        </div>
+
+        {/* Form Fields */}
+        <div className="w-full space-y-4">
+          {/* Username + Password */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <div className="d-flex gap-3 mb-3">
-                <div className="full-name">
-                  <span>Username</span>
-                  <input
-                    type="text"
-                    value={form.username}
-                    onChange={(e) => handleChange("username", e.target.value)}
-                  />
-                  {errors.username && (
-                    <div className="error">{errors.username}</div>
-                  )}
-                </div>
-                <div className="full-name">
-                  <span>Password</span>
-                  <div style={{ position: "relative" }}>
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      value={form.password}
-                      onChange={(e) => handleChange("password", e.target.value)}
-                    />
-                    <span
-                      onClick={() => setShowPassword(!showPassword)}
-                      style={{
-                        cursor: "pointer",
-                        position: "absolute",
-                        right: "10px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                      }}
-                    >
-                      {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
-                  </div>
-                  {errors.password && (
-                    <div className="error">{errors.password}</div>
-                  )}
-                </div>
+              <label className="block text-sm font-medium mb-1">Username</label>
+              <input
+                type="text"
+                value={form.username}
+                onChange={(e) => handleChange("username", e.target.value)}
+                className="w-full p-2 border rounded"
+              />
+              {errors.username && (
+                <div className="text-red-500 text-sm">{errors.username}</div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={form.password}
+                  onChange={(e) => handleChange("password", e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
+                <span
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
               </div>
-              <div className="d-flex gap-3">
-                <div className="full-name">
-                  <span>Email</span>
-                  <input
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => handleChange("email", e.target.value)}
-                  />
-                  {errors.email && <div className="error">{errors.email}</div>}
-                </div>
-                <div className="full-name">
-                  <span>Phone</span>
-                  <input
-                    type="text"
-                    value={form.phone}
-                    onChange={(e) => handleChange("phone", e.target.value)}
-                  />
-                  {errors.phone && <div className="error">{errors.phone}</div>}
-                </div>
-              </div>
+              {errors.password && (
+                <div className="text-red-500 text-sm">{errors.password}</div>
+              )}
             </div>
           </div>
-          <div className="text-center mt-2">
-            <button className="btn btn-primary px-4" onClick={handleSubmit}>
-              Save Changes
-            </button>
+
+          {/* Email + Phone */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                className="w-full p-2 border rounded"
+              />
+              {errors.email && (
+                <div className="text-red-500 text-sm">{errors.email}</div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Phone</label>
+              <input
+                type="text"
+                value={form.phone}
+                onChange={(e) => handleChange("phone", e.target.value)}
+                className="w-full p-2 border rounded"
+              />
+              {errors.phone && (
+                <div className="text-red-500 text-sm">{errors.phone}</div>
+              )}
+            </div>
           </div>
         </div>
-      </section>
+
+        {/* Save Button */}
+        <div className="mt-6">
+          <button
+            onClick={handleSubmit}
+            className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 transition"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
     </section>
   );
 };

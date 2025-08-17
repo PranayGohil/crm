@@ -55,22 +55,28 @@ export const addSubTask = async (req, res) => {
 
     const subTask = await SubTask.create(subTaskData);
 
-    const notification = await Notification.create({
-      title: "New Task Assigned",
-      description: `You have been assigned a new task: ${subTask.task_name}`,
-      type: "Task Updates",
-      icon: "",
-      related_id: "new_subtask",
-      receiver_id: receiverId,
-      receiver_type: "employee",
-      created_by: req.user._id,
-      created_by_role: req.user.role,
-    });
+    const admin = await Admin.findOne({});
+    if (admin) {
+      console.log("Admin found:", admin._id);
+    } else {
+      console.log("No admin found in the database");
+    }
 
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
 
     if (assign_to && connectedUsers[assign_to]) {
+      const notification = await Notification.create({
+        title: "New Task Assigned",
+        description: `You have been assigned a new task: ${subTask.task_name}`,
+        type: "Task Updates",
+        icon: "",
+        related_id: "new_subtask",
+        receiver_id: assign_to.toString(),
+        receiver_type: "employee",
+        created_by: admin._id,
+        created_by_role: "admin",
+      });
       io.to(connectedUsers[assign_to]).emit("new_subtask", notification);
     }
 
@@ -105,6 +111,13 @@ export const addBulkSubTasks = async (req, res) => {
 
     const result = await SubTask.insertMany(tasksWithObjectIds);
 
+    const admin = await Admin.findOne({});
+    if (admin) {
+      console.log("Admin found:", admin._id);
+    } else {
+      console.log("No admin found in the database");
+    }
+
     // 🔹 Realtime: Notify assigned employees
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
@@ -116,10 +129,10 @@ export const addBulkSubTasks = async (req, res) => {
         type: "Task Updates",
         icon: "",
         related_id: "new_subtask",
-        receiver_id: receiverId,
+        receiver_id: subtask.assign_to.toString(),
         receiver_type: "employee",
-        created_by: req.user._id,
-        created_by_role: req.user.role,
+        created_by: admin._id,
+        created_by_role: "admin",
       });
       if (subtask.assign_to && connectedUsers[subtask.assign_to]) {
         io.to(connectedUsers[subtask.assign_to]).emit(

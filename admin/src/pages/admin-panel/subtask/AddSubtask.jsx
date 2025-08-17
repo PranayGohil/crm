@@ -19,7 +19,6 @@ const AddSubtask = () => {
 
   const singleSchema = Yup.object({
     task_name: Yup.string().required("Subtask name is required"),
-    description: Yup.string().required("Description is required"),
     stage: Yup.array()
       .of(Yup.string().oneOf(stageOptions))
       .min(1, "Select at least one stage")
@@ -79,7 +78,12 @@ const AddSubtask = () => {
       await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/add`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       toast.success("Subtask added successfully!");
       navigate(`/project/subtask-dashboard/${projectId}`);

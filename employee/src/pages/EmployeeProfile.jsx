@@ -1,38 +1,39 @@
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import LoadingOverlay from "../../../components/admin/LoadingOverlay";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-const TeamMemberProfile = () => {
-  const { id } = useParams();
+const EmployeeProfile = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const [employee, setEmployee] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const fetchEmployee = async (id) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/employee/get/${id}`
+      );
+      setEmployee(res.data);
+    } catch (err) {
+      console.error("Failed to fetch employee:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchEmployee = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/employee/get/${id}`
-        );
-        setEmployee(res.data);
-      } catch (err) {
-        console.error("Failed to fetch employee:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEmployee();
-  }, [id]);
+    const storedUser = localStorage.getItem("employeeUser");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      fetchEmployee(user._id);
+    }
+  }, []);
 
   const dateFormat = (dateString) => {
     if (!dateString) return "N/A";
@@ -103,29 +104,14 @@ const TeamMemberProfile = () => {
     {
       icon: "/SVG/emp-typr-vec.svg",
       label: "Employment Type",
-      value: employee.employment_type || "N/A",
+      value: employee.employment_type || employee.employement_type || "N/A",
     },
     {
       icon: "/SVG/man-vec.svg",
       label: "Reporting Manager",
-      value: employee.reporting_manager?.full_name || "N/A",
+      value: employee.reporting_manager?.full_name || "Not Assigned",
     },
   ];
-
-  const handleDeleteEmployee = async () => {
-    try {
-      await axios.delete(
-        `${process.env.REACT_APP_API_URL}/api/employee/delete/${employee._id}`
-      );
-      toast.success("Employee deleted successfully!");
-      window.location.href = "/employee/dashboard";
-    } catch (err) {
-      console.error(err);
-      toast.error("Delete failed!");
-    } finally {
-      setShowDeleteModal(false);
-    }
-  };
 
   if (loading) return <LoadingOverlay />;
 
@@ -157,29 +143,6 @@ const TeamMemberProfile = () => {
               </div>
             </div>
           </div>
-          <div className="d-flex align-items-center gap-3">
-            <Link
-              to={`/employee/edit/${employee._id}`}
-              className="theme_btn"
-              style={{ width: "100px" }}
-            >
-              <img src="/SVG/edit-white.svg" alt="edit" className="me-2" />
-              Edit
-            </Link>
-            <button
-              className="theme_btn bg-danger"
-              onClick={() => setShowDeleteModal(true)}
-              style={{ width: "120px" }}
-            >
-              <img
-                src="/SVG/delete.svg"
-                alt="edit"
-                style={{ filter: "invert(1)" }}
-                className="me-2"
-              />
-              Delete
-            </button>
-          </div>
         </div>
       </section>
 
@@ -208,7 +171,7 @@ const TeamMemberProfile = () => {
                     width: "100px",
                     height: "100px",
                     borderRadius: "50%",
-                    backgroundColor: "#007bff", // choose any color you like
+                    backgroundColor: "rgb(10 55 73)",
                     color: "white",
                     display: "flex",
                     alignItems: "center",
@@ -248,11 +211,11 @@ const TeamMemberProfile = () => {
                     : "Blocked"}
                 </div>
               </div>
-              <div className="time-tracker">
-                <img src="/SVG/time.svg" alt="time" />
-                <Link to={`/employee/timetracking/${employee._id}`}>
-                  View Time Tracking
-                </Link>
+              <div>
+                <div className="time-tracker">
+                  <img src="/SVG/time.svg" alt="time" />
+                  <Link to={`/time-tracking`}>View Time Tracking</Link>
+                </div>
               </div>
             </div>
           </div>
@@ -293,64 +256,9 @@ const TeamMemberProfile = () => {
             ))}
           </div>
         </div>
-
-        <div className="tmp-login-last">
-          <div className="tmp-login-security login-security">
-            <div className="login-img">
-              <img src="/SVG/login-vec.svg" alt="prn" />
-              <span>Login & Security Settings</span>
-            </div>
-            <div className="enter-field">
-              <div className="enter-pass">
-                <span>Username</span>
-                <input type="text" value={employee.username || ""} readOnly />
-              </div>
-              <div className="enter-pass" style={{ position: "relative" }}>
-                <span>Current Password</span>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={employee.password || ""}
-                  style={{ paddingRight: "30px" }}
-                />
-                <span
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: "absolute",
-                    right: "10px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                  }}
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="tmp-50"></div>
-        </div>
       </section>
-      {showDeleteModal && (
-        <div className="custom-modal-overlay">
-          <div className="custom-modal">
-            <h3>Are you sure you want to delete this employee?</h3>
-            <div className="modal-buttons">
-              <button className="confirm-btn" onClick={handleDeleteEmployee}>
-                Yes, Delete
-              </button>
-              <button
-                className="cancel-btn"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };
 
-export default TeamMemberProfile;
+export default EmployeeProfile;

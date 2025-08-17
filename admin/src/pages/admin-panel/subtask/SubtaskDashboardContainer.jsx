@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { Modal, Button } from "react-bootstrap"; 
+import { Modal, Button } from "react-bootstrap";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import { stageOptions, priorityOptions, statusOptions } from "../../../options";
 
@@ -219,332 +219,349 @@ const SubtaskDashboardContainer = () => {
         </div>
       </section>
 
-      {/* Filters */}
-      <section className="sv-sec3 cpd-filters_section">
-        <div className="cpd-menu-bar">
-          <select
-            value={filters.assignTo}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, assignTo: e.target.value }))
-            }
-            className="dropdown_toggle"
-          >
-            <option value="">Filter by Assign To</option>
-            {employees.map((emp) => (
-              <option key={emp._id} value={emp._id}>
-                {emp.full_name}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={filters.priority}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, priority: e.target.value }))
-            }
-            className="dropdown_toggle"
-          >
-            <option value="">Filter by Priority</option>
-            {priorityOptions.map((opt, idx) => (
-              <option key={idx} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={filters.status}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, status: e.target.value }))
-            }
-            className="dropdown_toggle"
-          >
-            <option value="">Filter by Status</option>
-            {statusOptions.map((opt, idx) => (
-              <option key={idx} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={filters.stage}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, stage: e.target.value }))
-            }
-            className="dropdown_toggle"
-          >
-            <option value="">Filter by Stage</option>
-            {stageOptions.map((opt, idx) => (
-              <option key={idx} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-
-          <span
-            className="css-filter"
-            onClick={() =>
-              setFilters({ assignTo: "", priority: "", stage: "" })
-            }
-          >
-            <img src="/SVG/filter-vector.svg" alt="filter icon" /> Reset Filters
-          </span>
-        </div>
-      </section>
-
       {/* Table */}
-      <section className="sv-sec-table">
-        <table className="subtask-table">
-          <thead>
-            <tr>
-              <th>
-                <input
-                  type="checkbox"
-                  onChange={(e) =>
-                    setSelectedTaskIds(
-                      e.target.checked ? filteredSubtasks.map((t) => t._id) : []
-                    )
-                  }
-                />
-              </th>
-              <th>Subtask Name</th>
-              <th>Assign Date</th>
-              <th>Due Date</th>
-              <th>Priority</th>
-              <th>Stage</th>
-              <th>Status</th>
-              <th>URL</th>
-              <th>Assigned</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredSubtasks.map((task) => (
-              <tr key={task._id}>
-                <td>
+      <section className="ttb-table-main">
+        <div className="time-table-wrapper">
+          {/* Filters */}
+          <section className="sv-sec3 cpd-filters_section p-3">
+            <div className="cpd-menu-bar">
+              <select
+                value={filters.assignTo}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, assignTo: e.target.value }))
+                }
+                className="dropdown_toggle"
+              >
+                <option value="">Filter by Assign To</option>
+                {employees.map((emp) => (
+                  <option key={emp._id} value={emp._id}>
+                    {emp.full_name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={filters.priority}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, priority: e.target.value }))
+                }
+                className="dropdown_toggle"
+              >
+                <option value="">Filter by Priority</option>
+                {priorityOptions.map((opt, idx) => (
+                  <option key={idx} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={filters.status}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, status: e.target.value }))
+                }
+                className="dropdown_toggle"
+              >
+                <option value="">Filter by Status</option>
+                {statusOptions.map((opt, idx) => (
+                  <option key={idx} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={filters.stage}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, stage: e.target.value }))
+                }
+                className="dropdown_toggle"
+              >
+                <option value="">Filter by Stage</option>
+                {stageOptions.map((opt, idx) => (
+                  <option key={idx} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+
+              <span
+                className="css-filter"
+                onClick={() =>
+                  setFilters({ assignTo: "", priority: "", stage: "" })
+                }
+              >
+                <img src="/SVG/filter-vector.svg" alt="filter icon" /> Reset
+                Filters
+              </span>
+            </div>
+          </section>
+          <table className="time-table-table">
+            <thead>
+              <tr>
+                <th>
                   <input
                     type="checkbox"
-                    checked={selectedTaskIds.includes(task._id)}
                     onChange={(e) =>
-                      setSelectedTaskIds((prev) =>
+                      setSelectedTaskIds(
                         e.target.checked
-                          ? [...prev, task._id]
-                          : prev.filter((id) => id !== task._id)
+                          ? filteredSubtasks.map((t) => t._id)
+                          : []
                       )
                     }
                   />
-                </td>
-                <td>{task.task_name}</td>
-                <td>{formateDate(task.assign_date)}</td>
-                <td>{formateDate(task.due_date)}</td>
-                <td>{task.priority}</td>
-                <td>
-                  {Array.isArray(task.stage)
-                    ? task.stage.join(" → ")
-                    : task.stage}
-                </td>
-                <td>{task.status}</td>
-                <td
-                  style={{
-                    width: "200px",
-                    position: "relative",
-                  }}
-                >
-                  <div
+                </th>
+                <th>Subtask Name</th>
+                <th>Assign Date</th>
+                <th>Due Date</th>
+                <th>Priority</th>
+                <th>Stage</th>
+                <th>Status</th>
+                <th>URL</th>
+                <th>Assigned</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredSubtasks.map((task) => (
+                <tr key={task._id}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedTaskIds.includes(task._id)}
+                      onChange={(e) =>
+                        setSelectedTaskIds((prev) =>
+                          e.target.checked
+                            ? [...prev, task._id]
+                            : prev.filter((id) => id !== task._id)
+                        )
+                      }
+                    />
+                  </td>
+                  <td>{task.task_name}</td>
+                  <td>{formateDate(task.assign_date)}</td>
+                  <td>{formateDate(task.due_date)}</td>
+                  <td>{task.priority}</td>
+                  <td>
+                    {Array.isArray(task.stage)
+                      ? task.stage.join(" → ")
+                      : task.stage}
+                  </td>
+                  <td>
+                    <span
+                      className={`time-table-badge md-status-${(
+                        task.status || ""
+                      )
+                        .toLowerCase()
+                        .replace(" ", "")}`}
+                    >
+                      {task.status}
+                    </span>
+                  </td>
+                  <td
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
                       width: "200px",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      cursor: "pointer",
-                      color: "#007bff",
-                      paddingRight: "20px", // To give space for the icon
                       position: "relative",
                     }}
-                    onClick={(e) => handleCopyToClipboard(task.url, e)}
-                    title="Click to copy. Ctrl+Click to open."
                   >
-                    <span
+                    <div
                       style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        width: "200px",
+                        whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
-                      }}
-                    >
-                      {task.url}
-                    </span>
-
-                    <span
-                      onClick={(e) => handleCopyToClipboard(task.url, e)}
-                      style={{
-                        position: "absolute",
-                        right: "2px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        fontSize: "14px",
-                        color: "#555",
                         cursor: "pointer",
+                        color: "#007bff",
+                        paddingRight: "20px", // To give space for the icon
+                        position: "relative",
                       }}
-                      title="Copy URL"
+                      onClick={(e) => handleCopyToClipboard(task.url, e)}
+                      title="Click to copy. Ctrl+Click to open."
                     >
-                      <img
-                        src="/SVG/clipboard.svg"
-                        alt="copy icon"
+                      <span
                         style={{
-                          width: "16px",
-                          height: "16px",
-                          filter: "hue-rotate(310deg)",
-                          opacity: 0.8,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
                         }}
-                      />
-                    </span>
-                  </div>
-                </td>
-                <td className="d-flex justify-content-start align-items-center">
-                  {(() => {
-                    const assignedEmp = employees.find(
-                      (emp) => emp._id === task.assign_to
-                    );
-                    if (!assignedEmp) return "Not Assigned";
-
-                    const firstLetter = assignedEmp.full_name
-                      ? assignedEmp.full_name.charAt(0).toUpperCase()
-                      : "?";
-
-                    return (
-                      <span className="css-ankit d-flex align-items-center">
-                        {assignedEmp.profile_pic ? (
-                          <img
-                            src={assignedEmp.profile_pic}
-                            alt={assignedEmp.full_name}
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                              borderRadius: "50%",
-                              marginRight: "4px",
-                              objectFit: "cover",
-                            }}
-                          />
-                        ) : (
-                          <div
-                            style={{
-                              width: "24px",
-                              height: "24px",
-                              borderRadius: "50%",
-                              backgroundColor: "rgb(10 55 73)",
-                              color: "#fff",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontSize: "12px",
-                              marginRight: "4px",
-                              textTransform: "uppercase",
-                            }}
-                          >
-                            {firstLetter}
-                          </div>
-                        )}
-                        {assignedEmp.full_name}
+                      >
+                        {task.url}
                       </span>
-                    );
-                  })()}
-                </td>
 
-                <td>
-                  <Link
-                    to={`/project/subtask/edit/${task._id}`}
-                    className="mx-1"
-                  >
-                    <img src="/SVG/edit.svg" alt="edit" />
-                  </Link>
-                  <span
-                    onClick={() => {
-                      setSelectedSubtask(task._id);
-                      setShowDeleteModal(true);
-                    }}
-                    className="mx-1"
-                    style={{ cursor: "pointer", color: "red" }}
-                  >
-                    <img src="/SVG/delete.svg" alt="delete" />
-                  </span>
-                  <Link to={`/subtask/view/${task._id}`} className="mx-1">
-                    <img src="/SVG/eye-view.svg" alt="view" />
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+                      <span
+                        onClick={(e) => handleCopyToClipboard(task.url, e)}
+                        style={{
+                          position: "absolute",
+                          right: "2px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          fontSize: "14px",
+                          color: "#555",
+                          cursor: "pointer",
+                        }}
+                        title="Copy URL"
+                      >
+                        <img
+                          src="/SVG/clipboard.svg"
+                          alt="copy icon"
+                          style={{
+                            width: "16px",
+                            height: "16px",
+                            filter: "hue-rotate(310deg)",
+                            opacity: 0.8,
+                          }}
+                        />
+                      </span>
+                    </div>
+                  </td>
+                  <td className="d-flex justify-content-start align-items-center">
+                    {(() => {
+                      const assignedEmp = employees.find(
+                        (emp) => emp._id === task.assign_to
+                      );
+                      if (!assignedEmp) return "Not Assigned";
 
-      {/* Bulk actions */}
-      <section className="sv-last-sec css-sec-last">
-        <p>
-          <span>{selectedTaskIds.length}</span> items selected
-        </p>
-        <div className="cpd-menu-bar">
-          <select
-            value={bulkAssignTo}
-            onChange={(e) => setBulkAssignTo(e.target.value)}
-            className="dropdown_toggle"
-          >
-            <option value="">Set Assign To</option>
-            {employees.map((emp) => (
-              <option key={emp._id} value={emp._id}>
-                {emp.full_name}
-              </option>
-            ))}
-          </select>
+                      const firstLetter = assignedEmp.full_name
+                        ? assignedEmp.full_name.charAt(0).toUpperCase()
+                        : "?";
 
-          <select
-            value={bulkPriority}
-            onChange={(e) => setBulkPriority(e.target.value)}
-            className="dropdown_toggle"
-          >
-            <option value="">Set Priority</option>
-            {priorityOptions.map((opt, idx) => (
-              <option key={idx} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
+                      return (
+                        <span className="css-ankit d-flex align-items-center">
+                          {assignedEmp.profile_pic ? (
+                            <img
+                              src={assignedEmp.profile_pic}
+                              alt={assignedEmp.full_name}
+                              style={{
+                                width: "24px",
+                                height: "24px",
+                                borderRadius: "50%",
+                                marginRight: "4px",
+                                objectFit: "cover",
+                              }}
+                            />
+                          ) : (
+                            <div
+                              style={{
+                                width: "24px",
+                                height: "24px",
+                                borderRadius: "50%",
+                                backgroundColor: "rgb(10 55 73)",
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontSize: "12px",
+                                marginRight: "4px",
+                                textTransform: "uppercase",
+                              }}
+                            >
+                              {firstLetter}
+                            </div>
+                          )}
+                          {assignedEmp.full_name}
+                        </span>
+                      );
+                    })()}
+                  </td>
 
-          <select
-            value={bulkStage}
-            onChange={(e) => setBulkStage(e.target.value)}
-            className="dropdown_toggle"
-          >
-            <option value="">Change Stage</option>
-            {stageOptions.map((opt, idx) => (
-              <option key={idx} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
+                  <td>
+                    <div className="d-flex">
+                      <Link
+                        to={`/project/subtask/edit/${task._id}`}
+                        className="mx-1"
+                      >
+                        <img src="/SVG/edit.svg" alt="edit" />
+                      </Link>
+                      <span
+                        onClick={() => {
+                          setSelectedSubtask(task._id);
+                          setShowDeleteModal(true);
+                        }}
+                        className="mx-1"
+                        style={{ cursor: "pointer", color: "red" }}
+                      >
+                        <img src="/SVG/delete.svg" alt="delete" />
+                      </span>
+                      <Link to={`/subtask/view/${task._id}`} className="mx-1">
+                        <img src="/SVG/eye-view.svg" alt="view" />
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-          <button
-            onClick={handleBulkUpdateAll}
-            className="theme_btn"
-            disabled={
-              selectedTaskIds.length === 0 ||
-              (!bulkAssignTo && !bulkPriority && !bulkStage)
-            }
-          >
-            Apply Changes
-          </button>
+          {/* Bulk actions */}
+          <section className="sv-last-sec css-sec-last">
+            <p>
+              <span>{selectedTaskIds.length}</span> items selected
+            </p>
+            <div className="cpd-menu-bar">
+              <select
+                value={bulkAssignTo}
+                onChange={(e) => setBulkAssignTo(e.target.value)}
+                className="dropdown_toggle"
+              >
+                <option value="">Set Assign To</option>
+                {employees.map((emp) => (
+                  <option key={emp._id} value={emp._id}>
+                    {emp.full_name}
+                  </option>
+                ))}
+              </select>
 
-          <button
-            className="css-high css-delete"
-            onClick={() => setShowBulkDeleteModal(true)}
-            disabled={selectedTaskIds.length === 0}
-          >
-            <img src="/SVG/delete-vec.svg" alt="del" /> Delete Selected
-          </button>
+              <select
+                value={bulkPriority}
+                onChange={(e) => setBulkPriority(e.target.value)}
+                className="dropdown_toggle"
+              >
+                <option value="">Set Priority</option>
+                {priorityOptions.map((opt, idx) => (
+                  <option key={idx} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={bulkStage}
+                onChange={(e) => setBulkStage(e.target.value)}
+                className="dropdown_toggle"
+              >
+                <option value="">Change Stage</option>
+                {stageOptions.map((opt, idx) => (
+                  <option key={idx} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                onClick={handleBulkUpdateAll}
+                className="theme_btn"
+                disabled={
+                  selectedTaskIds.length === 0 ||
+                  (!bulkAssignTo && !bulkPriority && !bulkStage)
+                }
+              >
+                Apply Changes
+              </button>
+
+              <button
+                className="css-high css-delete"
+                onClick={() => setShowBulkDeleteModal(true)}
+                disabled={selectedTaskIds.length === 0}
+              >
+                <img src="/SVG/delete-vec.svg" alt="del" /> Delete Selected
+              </button>
+            </div>
+          </section>
         </div>
       </section>
+
       {/* ✅ Confirmation Modal */}
       <Modal
         show={showDeleteModal}

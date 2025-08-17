@@ -268,7 +268,7 @@ const ViewSubtask = () => {
             </div>
             <div className="head-menu">
               <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
-                Add New Project{" "}
+                Subtask Details{" "}
               </h1>
             </div>
           </div>
@@ -593,8 +593,6 @@ const ViewSubtask = () => {
                                   : comment.user_id?.full_name ||
                                     "Unknown User"}
                               </h4>
-                              {/* Optional: add user_type badge */}
-                              <span>{comment.user_type}</span>
                             </div>
                             <p>
                               <span style={{ paddingRight: "6px" }}>
@@ -621,8 +619,6 @@ const ViewSubtask = () => {
                                   : comment.user_id?.full_name ||
                                     "Unknown User"}
                               </h4>
-                              {/* Optional: add user_type badge */}
-                              <span>{comment.user_type}</span>
                             </div>
                             <p>
                               <span style={{ paddingRight: "6px" }}>
@@ -664,28 +660,39 @@ const ViewSubtask = () => {
                     </>
                   ) : (
                     <>
-                      <div
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          borderRadius: "50%",
-                          backgroundColor: "#0a3749",
-                          color: "#fff",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "18px",
-                          fontWeight: "bold",
-                          textTransform: "uppercase",
-                          border: "2px solid white",
-                        }}
-                      >
-                        {comment.user_id?.full_name
-                          ? comment.user_id.full_name.charAt(0).toUpperCase()
-                          : "?"}
-                      </div>
+                      {comment.user_id.profile_pic ? (
+                        <img
+                          src={comment.user_id.profile_pic}
+                          alt={comment.user_id.full_name}
+                          style={{ borderRadius: "50%" }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            borderRadius: "50%",
+                            backgroundColor: "#0a3749",
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "18px",
+                            fontWeight: "bold",
+                            textTransform: "uppercase",
+                            border: "2px solid white",
+                          }}
+                        >
+                          {comment.user_id?.full_name
+                            ? comment.user_id.full_name.charAt(0).toUpperCase()
+                            : "?"}
+                        </div>
+                      )}
                       <div className="pb-comment-description">
-                        <div className="pb-comment-cilent-name">
+                        <div
+                          className="pb-comment-cilent-name"
+                          style={{ width: "90%" }}
+                        >
                           <div className="pb-name-time">
                             <div className="pb-cilent-name">
                               <h4>
@@ -694,8 +701,6 @@ const ViewSubtask = () => {
                                   : comment.user_id?.full_name ||
                                     "Unknown User"}
                               </h4>
-                              {/* Optional: add user_type badge */}
-                              <span>{comment.user_type}</span>
                             </div>
                             <p>
                               <span style={{ paddingRight: "6px" }}>

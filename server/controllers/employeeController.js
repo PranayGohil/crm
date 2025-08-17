@@ -122,11 +122,8 @@ export const loginEmployee = async (req, res) => {
       username: employee.username,
       full_name: employee.full_name,
       email: employee.email,
-      designation: employee.designation,
-      profile_pic: employee.profile_pic,
-      department: employee.department,
-      date_of_joining: employee.date_of_joining,
-      status: employee.status,
+      is_manager: employee.is_manager,
+
       token,
       role: "employee",
     });
@@ -140,7 +137,7 @@ export const getEmployees = async (req, res) => {
   try {
     const employees = await Employee.find(
       {},
-      "_id full_name email status designation department phone monthly_salary profile_pic"
+      "_id full_name email status designation department phone monthly_salary profile_pic is_manager reporting_manager"
     );
     res.status(200).json(employees);
   } catch (error) {
@@ -278,7 +275,11 @@ export const getEmployeeDashboardData = async (req, res) => {
     const { startDate, endDate } = req.query;
 
     const start = startDate ? new Date(startDate) : null;
-    const end = endDate ? new Date(endDate) : null;
+    let end = endDate ? new Date(endDate) : null;
+
+    if (end) {
+      end.setHours(23, 59, 59, 999);
+    }
 
     const subtasks = await SubTask.find({ assign_to: employeeId }).populate(
       "project_id"

@@ -75,6 +75,7 @@ const EmployeeProfileEdit = () => {
           `${process.env.REACT_APP_API_URL}/api/employee/get/${employeeId}`
         );
         const data = res.data;
+        console.log(data);
         setInitialValues({
           ...initialValues,
           ...data,
@@ -82,6 +83,7 @@ const EmployeeProfileEdit = () => {
           date_of_joining: data.date_of_joining
             ? data.date_of_joining.split("T")[0]
             : "",
+          reporting_manager: data.reporting_manager._id || "Select Manager",
         });
         setProfilePreview(data.profile_pic || null);
       } catch (err) {

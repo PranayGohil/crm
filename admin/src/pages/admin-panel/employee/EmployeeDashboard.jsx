@@ -204,33 +204,53 @@ const EmployeeDashboard = () => {
               </div>
             </div>
           </div>
-          <div className="nav-search">
-            <div className="searchbar">
-              <div className="input-type">
-                <img src="/SVG/search-icon.svg" alt="search" className="mx-2" />
-                <input
-                  type="text"
-                  placeholder="Search by name, email..."
-                  value={filters.search}
-                  onChange={(e) =>
-                    setFilters((prev) => ({ ...prev, search: e.target.value }))
-                  }
-                  className="cd-input-type-txt input-type-txt p-2"
-                  style={{ border: "none" }}
-                />
+        </div>
+        <div className="add-mbr">
+          <a href="/employee/create-profile" className="plus-icon">
+            <img src="/SVG/plus.svg" alt="add" /> <span>Add Member</span>
+          </a>
+        </div>
+      </section>
+
+      {/* Stats cards */}
+      <section className="main-1">
+        <div className="member-inf">
+          {statsData.map((item, idx) => (
+            <div className={`${item.className} inf-sec`} key={idx}>
+              <div className="name1">
+                <p>{item.label}</p>
+                <span>{item.value}</span>
+              </div>
+              <div className="inf-icon">
+                <img src={item.icon} alt={item.label} />
               </div>
             </div>
-            <div className="add-mbr">
-              <a href="/employee/create-profile" className="plus-icon">
-                <img src="/SVG/plus.svg" alt="add" /> <span>Add Member</span>
-              </a>
+          ))}
+        </div>
+      </section>
+
+      <div className="flex justify-between px-4">
+        <div className="flex gap-2">
+          <div className="searchbar">
+            <div className="input-type">
+              <img src="/SVG/search-icon.svg" alt="search" className="mx-2" />
+              <input
+                type="text"
+                placeholder="Search by name, email..."
+                value={filters.search}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, search: e.target.value }))
+                }
+                className="cd-input-type-txt input-type-txt p-2"
+                style={{ border: "none" }}
+              />
             </div>
           </div>
         </div>
-
+        
         {/* Filter bar */}
-        <div className="tm-menubar">
-          <div className="menu-bar">
+        <div className="flex items-end">
+          <div className="flex gap-4 items-center">
             <Dropdown
               label="All Departments"
               options={dropdownData.departments}
@@ -253,9 +273,8 @@ const EmployeeDashboard = () => {
                 setFilters((prev) => ({ ...prev, status: val }))
               }
             />
-          </div>
-          <div className="tm-filter filter">
             <div
+              className="flex justify-center items-center h-full"
               onClick={(e) => {
                 e.preventDefault();
                 setFilters({
@@ -271,24 +290,7 @@ const EmployeeDashboard = () => {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Stats cards */}
-      <section className="main-1">
-        <div className="member-inf">
-          {statsData.map((item, idx) => (
-            <div className={`${item.className} inf-sec`} key={idx}>
-              <div className="name1">
-                <p>{item.label}</p>
-                <span>{item.value}</span>
-              </div>
-              <div className="inf-icon">
-                <img src={item.icon} alt={item.label} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      </div>
 
       {/* Member cards */}
       <section className="main-2">

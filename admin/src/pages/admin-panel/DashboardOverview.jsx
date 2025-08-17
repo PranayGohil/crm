@@ -5,12 +5,12 @@ import NotificationPanel from "../../components/admin/NotificationPanel";
 
 const DashboardOverview = () => {
   return (
-    <>
+    <div className="p-4">
       <TotalCardOverview />
       <UpcomingDueDatesTable />
       <RecentProjects />
       <NotificationPanel />
-    </>
+    </div>
   );
 };
 

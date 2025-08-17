@@ -326,10 +326,22 @@ const ViewSubtask = () => {
               </div>
             ) : (
               <>
-                <span className="cdn-bg-color-yellow color_yellow mx-2  rounded p-2">
+                <span
+                  className={`mx-2  rounded p-2 md-status-${(
+                    subtask.status || ""
+                  )
+                    .toLowerCase()
+                    .replace(" ", "")}`}
+                >
                   {subtask.status || "Status Unknown"}
                 </span>
-                <span className="cdn-bg-color-red color_red mx-2 rounded p-2">
+                <span
+                  className={`mx-2 rounded p-2 md-status-${(
+                    subtask.priority || ""
+                  )
+                    .toLowerCase()
+                    .replace(" ", "")}`}
+                >
                   {subtask.priority || "Priority Unknown"}
                 </span>
                 <button
@@ -534,8 +546,6 @@ const ViewSubtask = () => {
                                   : comment.user_id?.full_name ||
                                     "Unknown User"}
                               </h4>
-                              {/* Optional: add user_type badge */}
-                              <span>{comment.user_type}</span>
                             </div>
                             <p>
                               <span style={{ paddingRight: "6px" }}>
@@ -599,8 +609,6 @@ const ViewSubtask = () => {
                                     : comment.user_id?.full_name ||
                                       "Unknown User"}
                                 </h4>
-                                {/* Optional: add user_type badge */}
-                                <span>{comment.user_type}</span>
                               </div>
                               <p>
                                 <span style={{ paddingRight: "6px" }}>

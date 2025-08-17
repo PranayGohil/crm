@@ -188,29 +188,29 @@ const ClientDashboardPage = () => {
                 <div className="cd-progress_data">
                   <div className="prog-data cd-inprogress">
                     <p>In Progress</p>
-                    <span className="cdn-bg-color-yellow color_yellow">
+                    <span className="cdn-bg-color-yellow color_yellow flex justify-center items-center rounded-full w-7 h-7">
                       {inProgress}
                     </span>
                   </div>
                   <div className="prog-data cd-done">
                     <p>Completed</p>
-                    <span className="cdn-bg-color-green color_green">
+                    <span className="cdn-bg-color-green color_green flex justify-center items-center rounded-full w-7 h-7">
                       {done}
                     </span>
                   </div>
                   <div className="prog-data cd-to_do">
                     <p>To Do</p>
-                    <span className="cdn-bg-color-blue color_blue">{todo}</span>
+                    <span className="cdn-bg-color-blue color_blue flex justify-center items-center rounded-full w-7 h-7">{todo}</span>
                   </div>
                   <div className="prog-data cd-blocked">
                     <p>Blocked</p>
-                    <span className="cdn-bg-color-red color_red">
+                    <span className="cdn-bg-color-red color_red flex justify-center items-center rounded-full w-7 h-7">
                       {blocked}
                     </span>
                   </div>
                   <div className="prog-data cd-paused">
                     <p>Paused</p>
-                    <span className="cdn-bg-color-purple color_purple">
+                    <span className="cdn-bg-color-purple color_purple flex justify-center items-center rounded-full w-7 h-7">
                       {paused}
                     </span>
                   </div>

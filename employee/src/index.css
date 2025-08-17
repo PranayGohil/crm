@@ -1,4 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --black: #000000;
@@ -1035,10 +1038,10 @@ input:focus-visible {
   font-weight: 500;
 }
 
-.md-status-progress,
+.md-status-inprogress,
 .md-status-medium {
-  color: var(--yellow);
-  background-color: #fff4d6;
+  color: var(--blue);
+  background-color: var(--blue-shadow);
 }
 
 .md-status-blocked,
@@ -1054,8 +1057,8 @@ input:focus-visible {
 
 .md-status-todo,
 .md-status-low {
-  color: var(--blue);
-  background-color: var(--blue-shadow);
+  color: var(--gray);
+  background-color: var(--gray-shadow);
 }
 
 .md-status-paused {
@@ -8094,4 +8097,9 @@ a {
 .highlight-running {
   border: 2px solid #28a745 !important; /* Bootstrap green */
   box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }

@@ -9,6 +9,7 @@ import {
   changeProjectPriority,
   addProjectContent,
   getAllProjectsWithTasks,
+  getProjectsForReportingManager,
   bulkUpdate,
   bulkDelete,
 } from "../controllers/projectController.js";
@@ -30,6 +31,7 @@ projectRouter.post(
 );
 
 projectRouter.get("/all-tasks-projects", getAllProjectsWithTasks);
+projectRouter.get("/manager/:managerId", getProjectsForReportingManager);
 projectRouter.patch("/bulk-update", bulkUpdate);
 projectRouter.delete("/bulk-delete", bulkDelete);
 
