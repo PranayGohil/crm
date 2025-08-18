@@ -11,19 +11,6 @@ import Employee from "../models/employeeModel.js";
 import Project from "../models/projectModel.js";
 import SubTask from "../models/subTaskModel.js";
 
-const stageOptions = ["CAD Design", "SET Design", "Render", "Delivery"];
-
-// Count number of Sundays in a month
-const countSundays = (year, month) => {
-  let sundays = 0;
-  const date = new Date(year, month, 1);
-  while (date.getMonth() === month) {
-    if (date.getDay() === 0) sundays++; // 0 = Sunday
-    date.setDate(date.getDate() + 1);
-  }
-  return sundays;
-};
-
 export const Summary = async (req, res) => {
   try {
     const totalProjects = await Project.countDocuments();
@@ -39,16 +26,16 @@ export const Summary = async (req, res) => {
 
     const subtasks = await SubTask.find(
       {},
-      { stage: 1, current_stage_index: 1 }
+      { stages: 1, current_stage_index: 1 }
     );
 
     subtasks.forEach((task) => {
       if (
-        Array.isArray(task.stage) &&
+        Array.isArray(task.stages) &&
         typeof task.current_stage_index === "number"
       ) {
         ["CAD Design", "SET Design", "Render"].forEach((stageName) => {
-          const stageIndex = task.stage.indexOf(stageName);
+          const stageIndex = task.stages.findIndex((s) => s.name === stageName);
           if (stageIndex !== -1 && task.current_stage_index <= stageIndex) {
             stageCounts[stageName]++;
           }
@@ -147,21 +134,20 @@ export const getDepartmentCapacities = async (req, res) => {
         cap * workingDaysInMonth.length;
     });
 
-    // STEP 2: Count SubTasks by stage
+    // STEP 2: Count SubTasks by stages
     const stageCounts = {
-      "CAD Design": await SubTask.countDocuments({ stage: "CAD Design" }),
+      "CAD Design": await SubTask.countDocuments({
+        "stages.name": "CAD Design",
+      }),
       "SET Design":
-        (await SubTask.countDocuments({ stage: "CAD Design" })) +
-        (await SubTask.countDocuments({ stage: "SET Design" })),
-      Render:
-        (await SubTask.countDocuments({ stage: "CAD Design" })) +
-        (await SubTask.countDocuments({ stage: "SET Design" })) +
-        (await SubTask.countDocuments({ stage: "Render" })),
+        (await SubTask.countDocuments({ "stages.name": "SET Design" })),
+      "Render":
+        (await SubTask.countDocuments({ "stages.name": "Render" })),
     };
 
     // STEP 3: Estimate only completion dates (not days count)
-    for (const [stage, totalTasks] of Object.entries(stageCounts)) {
-      const dept = departmentData[stage];
+    for (const [stages, totalTasks] of Object.entries(stageCounts)) {
+      const dept = departmentData[stages];
       if (!dept || totalTasks === 0 || dept.totalDailyCapacity === 0) continue;
 
       const dailyCap = dept.totalDailyCapacity;
@@ -176,10 +162,11 @@ export const getDepartmentCapacities = async (req, res) => {
       }
 
       dept.estimatedCompletionDateWithSundays = calendarDate;
-      dept.estimatedDaysToComplete = eachDayOfInterval({
-        start: startDate,
-        end: calendarDate,
-      }).length - 1;
+      dept.estimatedDaysToComplete =
+        eachDayOfInterval({
+          start: startDate,
+          end: calendarDate,
+        }).length - 1;
 
       // === Without Sundays (Working Days Only) ===
       let remainingWorkingTasks = totalTasks;
@@ -193,10 +180,11 @@ export const getDepartmentCapacities = async (req, res) => {
       }
 
       dept.estimatedCompletionDateWithoutSundays = workingDate;
-      dept.estimatedDaysToCompleteWithoutSundays = eachDayOfInterval({
-        start: startDate,
-        end: workingDate,
-      }).length - 1;
+      dept.estimatedDaysToCompleteWithoutSundays =
+        eachDayOfInterval({
+          start: startDate,
+          end: workingDate,
+        }).length - 1;
     }
 
     console.log("Department Data:", departmentData);

@@ -57,6 +57,7 @@ const Subtasks = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/api/client/get-all`),
         axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`),
       ]);
+      console.log(projectsRes.data);
       setProjects(projectsRes.data);
       setClients(clientsRes.data);
       setEmployees(employeesRes.data);
@@ -554,9 +555,9 @@ const Subtasks = () => {
                             <tr>
                               <th></th>
                               <th>Subtask Name</th>
-                              <th>Stage</th>
+                              <th className="flex justify-center">Status</th>
                               <th>Priority</th>
-                              <th>Status</th>
+                              <th>Stage</th>
                               <th>URL</th>
                               <th>Assigned To</th>
                               <th>Time Tracked</th>
@@ -613,11 +614,16 @@ const Subtasks = () => {
                                     />
                                   </td>
                                   <td>{s.task_name}</td>
-                                  <td>
-                                    {s.stage &&
-                                    s.current_stage_index !== undefined
-                                      ? s.stage[s.current_stage_index] || "N/A"
-                                      : "N/A"}
+                                  <td className="flex justify-center">
+                                    <span
+                                      className={`time-table-badge md-status-${(
+                                        s.status || ""
+                                      )
+                                        .toLowerCase()
+                                        .replace(" ", "")}`}
+                                    >
+                                      {s.status}
+                                    </span>
                                   </td>
                                   <td>
                                     <span
@@ -631,15 +637,55 @@ const Subtasks = () => {
                                     </span>
                                   </td>
                                   <td>
-                                    <span
-                                      className={`time-table-badge md-status-${(
-                                        s.status || ""
-                                      )
-                                        .toLowerCase()
-                                        .replace(" ", "")}`}
-                                    >
-                                      {s.status}
-                                    </span>
+                                    {Array.isArray(s.stages) &&
+                                    s.stages.length > 0 ? (
+                                      <div className="flex justify-center items-center gap-2">
+                                        {s.stages.map((stg, i) => {
+                                          const name =
+                                            typeof stg === "string" ? stg : stg.name;
+                                          const completed = stg?.completed;
+                                          return (
+                                            <span
+                                              key={i}
+                                              style={{
+                                                display: "inline-flex",
+                                                alignItems: "center",
+                                                gap: "6px",
+                                              }}
+                                            >
+                                              <small
+                                                style={{
+                                                  padding: "4px 8px",
+                                                  borderRadius: "12px",
+                                                  background: completed
+                                                    ? "#e6ffed"
+                                                    : "#f3f4f6",
+                                                  color: completed
+                                                    ? "#097a3f"
+                                                    : "#444",
+                                                  border: completed
+                                                    ? "1px solid #b7f0c6"
+                                                    : "1px solid #e0e0e0",
+                                                  fontSize: "12px",
+                                                }}
+                                              >
+                                                {completed ? "✓ " : ""}
+                                                {name}
+                                              </small>
+                                              {i < s.stages.length - 1 && (
+                                                <span
+                                                  style={{ margin: "0 6px" }}
+                                                >
+                                                  →
+                                                </span>
+                                              )}
+                                            </span>
+                                          );
+                                        })}
+                                      </div>
+                                    ) : (
+                                      "No stages"
+                                    )}
                                   </td>
                                   <td
                                     style={{
@@ -756,7 +802,7 @@ const Subtasks = () => {
                                   </td>
                                   <td>{calculateTimeTracked(s.time_logs)}</td>{" "}
                                   <td>{getRemainingDays(s.due_date)}</td>
-                                  <td>
+                                  <td className="d-flex justify-content-center">
                                     <Link
                                       to={`/project/subtask/edit/${s.id}`}
                                       className="mx-1"

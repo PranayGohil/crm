@@ -10,11 +10,10 @@ import cloudinary from "../config/cloudinary.js";
 const FIXED_STAGE_ORDER = ["CAD Design", "SET Design", "Render", "Delivery"];
 
 function sortStages(inputStages) {
-  const uniqueStages = [...new Set(inputStages)]; // remove duplicates
+  const uniqueStages = [...new Set(inputStages)];
   return FIXED_STAGE_ORDER.filter((stage) => uniqueStages.includes(stage));
 }
 
-// Add a single subtask
 export const addSubTask = async (req, res) => {
   try {
     const {
@@ -30,8 +29,13 @@ export const addSubTask = async (req, res) => {
       status,
     } = req.body;
 
-    let stage = JSON.parse(req.body.stage);
-    stage = sortStages(stage);
+    let stages = JSON.parse(req.body.stages || "[]");
+    stages = sortStages(stages.map((s) => s.name)).map((s) => ({
+      name: s,
+      completed: false,
+      completed_by: null,
+      completed_at: null,
+    }));
 
     const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
 
@@ -40,7 +44,7 @@ export const addSubTask = async (req, res) => {
       task_name,
       description,
       url,
-      stage,
+      stages,
       priority,
       assign_date,
       due_date,
@@ -91,21 +95,20 @@ export const addSubTask = async (req, res) => {
 export const addBulkSubTasks = async (req, res) => {
   try {
     const tasks = req.body;
-
     const tasksWithObjectIds = tasks.map((task) => {
-      const parsedStage = Array.isArray(task.stage)
-        ? task.stage
-        : typeof task.stage === "string"
-        ? [task.stage]
-        : [];
-
+      const parsedStages = Array.isArray(task.stages) ? task.stages : [];
       return {
         ...task,
         project_id: new mongoose.Types.ObjectId(task.project_id),
         assign_to: task.assign_to
           ? new mongoose.Types.ObjectId(task.assign_to)
           : null,
-        stage: sortStages(parsedStage),
+        stages: sortStages(parsedStages.map((s) => s.name)).map((s) => ({
+          name: s,
+          completed: false,
+          completed_by: null,
+          completed_at: null,
+        })),
       };
     });
 
@@ -131,7 +134,7 @@ export const addBulkSubTasks = async (req, res) => {
         related_id: "new_subtask",
         receiver_id: subtask.assign_to.toString(),
         receiver_type: "employee",
-        created_by: admin._id,
+        created_by: admin?._id,
         created_by_role: "admin",
       });
       if (subtask.assign_to && connectedUsers[subtask.assign_to]) {
@@ -207,16 +210,39 @@ export const updateSubTask = async (req, res) => {
       status,
     } = req.body;
 
+    console.log("req.body", req.body);
+
     let stageArray = [];
     if (Array.isArray(req.body.stage)) {
-      stageArray = req.body.stage;
+      stageArray = req.body.stage.map((s) => {
+        if (typeof s === "string") {
+          return { name: s, is_completed: false };
+        }
+        if (typeof s === "object" && s.name) {
+          return {
+            name: s.name,
+            is_completed: s.is_completed || false,
+            completed_by: s.completed_by || null,
+            completed_at: s.completed_at || null,
+          };
+        }
+      });
     } else if (typeof req.body.stage === "string") {
       try {
-        stageArray = JSON.parse(req.body.stage);
+        const parsed = JSON.parse(req.body.stage);
+        if (Array.isArray(parsed)) {
+          stageArray = parsed.map((s) => ({
+            name: s.name || s,
+            is_completed: s.is_completed || false,
+            completed_by: s.completed_by || null,
+            completed_at: s.completed_at || null,
+          }));
+        }
       } catch {
-        stageArray = [req.body.stage];
+        stageArray = [{ name: req.body.stage, is_completed: false }];
       }
     }
+
     stageArray = sortStages(stageArray);
 
     let updateData = {
@@ -250,7 +276,7 @@ export const updateSubTask = async (req, res) => {
         type: "Task Updates",
         icon: "",
         related_id: "subtask_updated",
-        receiver_id: subTask.assign_to,
+        receiver_id: subTask.assign_to || null,
         receiver_type: "employee",
       });
 
@@ -294,6 +320,40 @@ export const updateSubTask = async (req, res) => {
   } catch (error) {
     console.error("Error updating subtask:", error);
     res.status(500).json({ success: false, message: "Update failed." });
+  }
+};
+
+export const completeStage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("Completing stage for subtask:", id);
+    const subtask = await SubTask.findById(id);
+    if (!subtask) return res.status(404).json({ message: "Subtask not found" });
+
+    const stageIndex = subtask.current_stage_index;
+    if (stageIndex >= subtask.stages.length)
+      return res.status(400).json({ message: "All stages already completed" });
+
+    // Mark current stage completed
+    subtask.stages[stageIndex].completed = true;
+    subtask.stages[stageIndex].completed_by = subtask.assign_to;
+    subtask.stages[stageIndex].completed_at = new Date();
+
+    // Move to next stage or finish
+    if (stageIndex + 1 < subtask.stages.length) {
+      subtask.current_stage_index = stageIndex + 1;
+      subtask.status = "To Do";
+      subtask.assign_to = null;
+    } else {
+      subtask.status = "Completed";
+      subtask.assign_to = null;
+    }
+
+    await subtask.save();
+    res.json(subtask);
+  } catch (err) {
+    console.error("Error completing stage:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

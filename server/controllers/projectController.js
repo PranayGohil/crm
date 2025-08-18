@@ -235,7 +235,7 @@ export const getAllProjectsWithTasks = async (req, res) => {
           subtasks: subtasks.map((s) => ({
             id: s._id,
             task_name: s.task_name,
-            stage: s.stage,
+            stages: s.stages,
             current_stage_index: s.current_stage_index,
             priority: s.priority,
             status: s.status,
@@ -289,7 +289,7 @@ export const getProjectsForReportingManager = async (req, res) => {
           subtasks: subtasks.map((s) => ({
             id: s._id,
             task_name: s.task_name,
-            stage: s.stage,
+            stages: s.stages,
             current_stage_index: s.current_stage_index,
             priority: s.priority,
             status: s.status,

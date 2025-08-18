@@ -8103,3 +8103,15 @@ a {
   width: 0;
   height: 0;
 }
+
+.custom-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background: url("data:image/svg+xml;utf8,<svg fill='black' height='48' viewBox='0 0 24 24' width='48' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>")
+    no-repeat right 0.75rem center;
+  background-size: 1.5rem; 
+  padding-right: 2.5rem;
+}
+

@@ -1,0 +1,6200 @@
+[{
+  "_id": {
+    "$oid": "68946e608c338a6ab926365a"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 1",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689474e18c338a6ab926ea50"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T09:59:39.851Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T11:27:28.680Z"
+      },
+      "_id": {
+        "$oid": "6894790b8c338a6ab9276899"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T12:21:53.234Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab926365b"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 2",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689474e18c338a6ab926ea50"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T11:27:31.649Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T11:44:04.868Z"
+      },
+      "_id": {
+        "$oid": "68948da38c338a6ab9292c9b"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-07T12:05:38.278Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T12:24:59.008Z"
+      },
+      "_id": {
+        "$oid": "689496928c338a6ab929e26d"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-07T12:35:34.056Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T12:41:07.551Z"
+      },
+      "_id": {
+        "$oid": "68949d968c338a6ab92a5a56"
+      }
+    }
+  ],
+  "__v": 3,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T12:22:27.651Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab926365c"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 3",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689474e18c338a6ab926ea50"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T04:41:20.188Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T04:42:46.160Z"
+      },
+      "_id": {
+        "$oid": "68957ff08c338a6ab92c590d"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T04:52:35.339Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T05:01:37.862Z"
+      },
+      "_id": {
+        "$oid": "689582938c338a6ab92c6b0d"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T06:33:41.799Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T06:45:38.914Z"
+      },
+      "_id": {
+        "$oid": "68959a458c338a6ab92cb56c"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:30:08.793Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:43:46.300Z"
+      },
+      "_id": {
+        "$oid": "6895d1b08c338a6ab92d71f4"
+      }
+    }
+  ],
+  "__v": 4,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T12:22:43.805Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab926365d"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 4",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689474e18c338a6ab926ea50"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:49:23.485Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:58:27.865Z"
+      },
+      "_id": {
+        "$oid": "6895d6338c338a6ab92d84e2"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T12:22:57.894Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab926365e"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 5",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689479708c338a6ab92773c2"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T04:51:04.747Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T05:21:52.658Z"
+      },
+      "_id": {
+        "$oid": "689582388c338a6ab92c69a6"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T05:30:42.333Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T05:30:58.775Z"
+      },
+      "_id": {
+        "$oid": "68958b828c338a6ab92c87ff"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T05:33:33.617Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T06:42:48.925Z"
+      },
+      "_id": {
+        "$oid": "68958c2d8c338a6ab92c8dc6"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:07:01.616Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:09:55.453Z"
+      },
+      "_id": {
+        "$oid": "6895cc458c338a6ab92d5a93"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:10:54.516Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:17:20.382Z"
+      },
+      "_id": {
+        "$oid": "6895cd2e8c338a6ab92d5dab"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:18:38.876Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:21:35.364Z"
+      },
+      "_id": {
+        "$oid": "6895cefe8c338a6ab92d6501"
+      }
+    }
+  ],
+  "__v": 6,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:21:45.689Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab926365f"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 6",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689479708c338a6ab92773c2"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T12:38:30.084Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T12:55:41.759Z"
+      },
+      "_id": {
+        "$oid": "68949e468c338a6ab92a6514"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T03:48:40.226Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T04:48:17.987Z"
+      },
+      "_id": {
+        "$oid": "689573988c338a6ab92c0733"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:22:33.026Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:27:53.575Z"
+      },
+      "_id": {
+        "$oid": "6895cfe98c338a6ab92d694e"
+      }
+    }
+  ],
+  "__v": 3,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:28:07.518Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab9263660"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 7",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689479708c338a6ab92773c2"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T06:12:54.353Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T06:46:05.350Z"
+      },
+      "_id": {
+        "$oid": "689595668c338a6ab92ca859"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T06:48:32.777Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T06:57:36.233Z"
+      },
+      "_id": {
+        "$oid": "68959dc08c338a6ab92cbe27"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T08:59:05.197Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T09:26:29.187Z"
+      },
+      "_id": {
+        "$oid": "6895bc598c338a6ab92d10c5"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T09:36:56.884Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T09:55:29.544Z"
+      },
+      "_id": {
+        "$oid": "6895c5388c338a6ab92d40be"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:28:41.725Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:36:00.314Z"
+      },
+      "_id": {
+        "$oid": "6895d1598c338a6ab92d707d"
+      }
+    }
+  ],
+  "__v": 5,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:36:32.366Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab9263661"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 8",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689479708c338a6ab92773c2"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T10:31:32.264Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T11:15:29.195Z"
+      },
+      "_id": {
+        "$oid": "689480848c338a6ab9282b05"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T04:52:19.095Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T05:36:46.980Z"
+      },
+      "_id": {
+        "$oid": "689582838c338a6ab92c6ab9"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T05:39:29.798Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T05:42:15.187Z"
+      },
+      "_id": {
+        "$oid": "68958d918c338a6ab92c919a"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T05:53:46.530Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T06:11:00.041Z"
+      },
+      "_id": {
+        "$oid": "689590ea8c338a6ab92c9d0c"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:38:42.273Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:38:44.870Z"
+      },
+      "_id": {
+        "$oid": "6895d3b28c338a6ab92d7d3a"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:39:21.936Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:51:39.967Z"
+      },
+      "_id": {
+        "$oid": "6895d3d98c338a6ab92d7f0c"
+      }
+    }
+  ],
+  "__v": 6,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:51:49.714Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab9263662"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 9",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "6894709d8c338a6ab9267a06"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T10:02:13.928Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T10:29:25.319Z"
+      },
+      "_id": {
+        "$oid": "689479a58c338a6ab9277a6a"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T06:46:49.043Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab9263663"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 10",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "6894709d8c338a6ab9267a06"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T11:16:27.075Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T12:36:54.538Z"
+      },
+      "_id": {
+        "$oid": "68948b0b8c338a6ab928fdf1"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T06:46:49.043Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab9263664"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 11",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "6894709d8c338a6ab9267a06"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T10:26:48.215Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T12:24:55.944Z"
+      },
+      "_id": {
+        "$oid": "68947f688c338a6ab9280fce"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T06:46:49.043Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab9263665"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 12",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947acf8c338a6ab9279872"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:29:32.405Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T11:46:17.523Z"
+      },
+      "_id": {
+        "$oid": "6895d18c8c338a6ab92d7144"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T11:46:57.395Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab9263666"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 13",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689473d68c338a6ab926cb76"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:30:17.912Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T11:47:07.158Z"
+      },
+      "_id": {
+        "$oid": "6895d1b98c338a6ab92d722c"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T11:47:19.995Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab9263667"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 14",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689472238c338a6ab926a5c1"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T12:27:55.032Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T12:56:38.352Z"
+      },
+      "_id": {
+        "$oid": "68949bcb8c338a6ab92a3e15"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T03:50:30.218Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T04:13:59.574Z"
+      },
+      "_id": {
+        "$oid": "689574068c338a6ab92c09c8"
+      }
+    }
+  ],
+  "__v": 2,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T11:25:16.287Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab9263668"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 15",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689473d68c338a6ab926cb76"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Paused",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T11:58:13.302Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T03:36:10.577Z"
+      },
+      "_id": {
+        "$oid": "6895e6558c338a6ab92db002"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T03:36:42.752Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T03:52:42.980Z"
+      },
+      "_id": {
+        "$oid": "6899654a4dfb81c1e07f4133"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T03:52:46.781Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T04:56:40.185Z"
+      },
+      "_id": {
+        "$oid": "6899690e4dfb81c1e07f42be"
+      }
+    }
+  ],
+  "__v": 3,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-11T04:56:40.186Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab9263669"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 16",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947acf8c338a6ab9279872"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T10:10:55.668Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T11:03:10.549Z"
+      },
+      "_id": {
+        "$oid": "68947baf8c338a6ab927b04f"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T05:31:40.689Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab926366a"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 17",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689479708c338a6ab92773c2"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T11:06:01.691Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T11:29:37.442Z"
+      },
+      "_id": {
+        "$oid": "689488998c338a6ab928cfa4"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:52:50.965Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T11:02:49.482Z"
+      },
+      "_id": {
+        "$oid": "6895d7028c338a6ab92d878a"
+      }
+    }
+  ],
+  "__v": 2,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T11:02:57.721Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab926366b"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 18",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689479708c338a6ab92773c2"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T11:33:11.949Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T11:52:56.621Z"
+      },
+      "_id": {
+        "$oid": "68948ef78c338a6ab9294057"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T05:32:22.219Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T05:32:26.205Z"
+      },
+      "_id": {
+        "$oid": "68958be68c338a6ab92c8bb4"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T11:04:04.631Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T11:12:46.734Z"
+      },
+      "_id": {
+        "$oid": "6895d9a48c338a6ab92d8e8f"
+      }
+    }
+  ],
+  "__v": 3,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T11:12:52.615Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab926366c"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 19",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689479708c338a6ab92773c2"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T11:59:20.059Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T12:44:55.622Z"
+      },
+      "_id": {
+        "$oid": "689495188c338a6ab929c5e5"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T05:32:51.701Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T05:32:53.612Z"
+      },
+      "_id": {
+        "$oid": "68958c038c338a6ab92c8c89"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T11:13:42.461Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T11:20:22.243Z"
+      },
+      "_id": {
+        "$oid": "6895dbe68c338a6ab92d9511"
+      }
+    }
+  ],
+  "__v": 3,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T11:20:27.715Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab926366d"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 20",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689479708c338a6ab92773c2"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T03:53:36.780Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T04:09:35.353Z"
+      },
+      "_id": {
+        "$oid": "689574c08c338a6ab92c0d81"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T04:10:29.826Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T04:13:21.587Z"
+      },
+      "_id": {
+        "$oid": "689578b58c338a6ab92c1f6a"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T11:27:23.373Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T11:28:39.923Z"
+      },
+      "_id": {
+        "$oid": "6895df1b8c338a6ab92d9e2d"
+      }
+    }
+  ],
+  "__v": 3,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.615Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T11:28:45.121Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68946e608c338a6ab926366e"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "Ring 21",
+  "description": "diamond stone 12 ct no levo",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "6894709d8c338a6ab9267a06"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T03:55:24.154Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T05:42:22.690Z"
+      },
+      "_id": {
+        "$oid": "6895752c8c338a6ab92c0f76"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T05:58:54.294Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T05:59:53.909Z"
+      },
+      "_id": {
+        "$oid": "6895921e8c338a6ab92ca048"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T06:02:50.130Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T06:23:32.474Z"
+      },
+      "_id": {
+        "$oid": "6895930a8c338a6ab92ca298"
+      }
+    }
+  ],
+  "__v": 3,
+  "createdAt": {
+    "$date": "2025-08-07T09:14:08.616Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T06:23:47.044Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68947c6e8c338a6ab927c3c4"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "pendent 22",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689472238c338a6ab926a5c1"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-07T10:14:06.725Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T06:23:46.610Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68947c6e8c338a6ab927c3c5"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "pendent 23",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689472238c338a6ab926a5c1"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-07T10:14:06.726Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T04:41:33.550Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68947c6e8c338a6ab927c3c6"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "pendent 24",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947d3d8c338a6ab927d891"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T10:31:47.326Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T11:23:29.495Z"
+      },
+      "_id": {
+        "$oid": "689480938c338a6ab9282c8d"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:05:48.356Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:05:50.874Z"
+      },
+      "_id": {
+        "$oid": "6895cbfc8c338a6ab92d58ad"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:06:10.727Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:06:14.352Z"
+      },
+      "_id": {
+        "$oid": "6895cc128c338a6ab92d594c"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:06:35.598Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:06:38.010Z"
+      },
+      "_id": {
+        "$oid": "6895cc2b8c338a6ab92d59e5"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:12:57.126Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:13:16.847Z"
+      },
+      "_id": {
+        "$oid": "6895cda98c338a6ab92d6082"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:19:05.897Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:20:37.327Z"
+      },
+      "_id": {
+        "$oid": "6895cf198c338a6ab92d6585"
+      }
+    }
+  ],
+  "__v": 6,
+  "createdAt": {
+    "$date": "2025-08-07T10:14:06.726Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:31:36.189Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68947c6e8c338a6ab927c3c7"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "pendent 25",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947d3d8c338a6ab927d891"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T11:24:55.742Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T11:59:48.545Z"
+      },
+      "_id": {
+        "$oid": "68948d078c338a6ab92922ae"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-07T11:59:48.919Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T11:59:49.819Z"
+      },
+      "_id": {
+        "$oid": "689495348c338a6ab929c882"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-07T11:59:50.217Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T11:59:50.874Z"
+      },
+      "_id": {
+        "$oid": "689495368c338a6ab929c8d7"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:20:39.506Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:23:03.953Z"
+      },
+      "_id": {
+        "$oid": "6895cf778c338a6ab92d66fb"
+      }
+    }
+  ],
+  "__v": 4,
+  "createdAt": {
+    "$date": "2025-08-07T10:14:06.726Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:31:47.450Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68947c6e8c338a6ab927c3c8"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "pendent 26",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947d3d8c338a6ab927d891"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T12:07:39.372Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T12:31:38.435Z"
+      },
+      "_id": {
+        "$oid": "6894970b8c338a6ab929eb5c"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:23:04.970Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:23:51.221Z"
+      },
+      "_id": {
+        "$oid": "6895d0088c338a6ab92d6a0d"
+      }
+    }
+  ],
+  "__v": 2,
+  "createdAt": {
+    "$date": "2025-08-07T10:14:06.726Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:32:16.204Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68947c6e8c338a6ab927c3c9"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "pendent 27",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947d3d8c338a6ab927d891"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T12:41:05.092Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T12:55:52.495Z"
+      },
+      "_id": {
+        "$oid": "68949ee18c338a6ab92a6e75"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T03:50:03.247Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T04:20:35.210Z"
+      },
+      "_id": {
+        "$oid": "689573eb8c338a6ab92c0929"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T04:30:19.982Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T04:42:12.736Z"
+      },
+      "_id": {
+        "$oid": "68957d5b8c338a6ab92c46cc"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:23:52.458Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:24:49.654Z"
+      },
+      "_id": {
+        "$oid": "6895d0388c338a6ab92d6af8"
+      }
+    }
+  ],
+  "__v": 4,
+  "createdAt": {
+    "$date": "2025-08-07T10:14:06.726Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:32:27.614Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68947c6e8c338a6ab927c3ca"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "pendent 28",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947d3d8c338a6ab927d891"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T05:12:09.519Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T05:42:19.814Z"
+      },
+      "_id": {
+        "$oid": "689587298c338a6ab92c79ae"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:27:49.076Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:30:21.534Z"
+      },
+      "_id": {
+        "$oid": "6895d1258c338a6ab92d6f17"
+      }
+    }
+  ],
+  "__v": 2,
+  "createdAt": {
+    "$date": "2025-08-07T10:14:06.726Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:32:36.492Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68947c6e8c338a6ab927c3cb"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "pendent 29",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947d3d8c338a6ab927d891"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T05:53:44.752Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T05:57:39.818Z"
+      },
+      "_id": {
+        "$oid": "689590e88c338a6ab92c9ce1"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T06:14:28.034Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T06:31:32.911Z"
+      },
+      "_id": {
+        "$oid": "689595c48c338a6ab92ca948"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T06:31:33.339Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T06:31:34.167Z"
+      },
+      "_id": {
+        "$oid": "689599c58c338a6ab92cb417"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T06:46:07.367Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T06:46:08.535Z"
+      },
+      "_id": {
+        "$oid": "68959d2f8c338a6ab92cbc1f"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:24:56.622Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:26:15.487Z"
+      },
+      "_id": {
+        "$oid": "6895d0788c338a6ab92d6c07"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:27:46.751Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:27:48.069Z"
+      },
+      "_id": {
+        "$oid": "6895d1228c338a6ab92d6ea4"
+      }
+    }
+  ],
+  "__v": 6,
+  "createdAt": {
+    "$date": "2025-08-07T10:14:06.726Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:32:46.605Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68947c6e8c338a6ab927c3cc"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "pendent 30",
+  "description": "",
+  "url": "R:\\Umair bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947d3d8c338a6ab927d891"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T06:46:09.647Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T06:58:26.275Z"
+      },
+      "_id": {
+        "$oid": "68959d318c338a6ab92cbc73"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T08:51:55.155Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T09:00:08.366Z"
+      },
+      "_id": {
+        "$oid": "6895baab8c338a6ab92d097e"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T09:01:04.540Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T09:13:34.615Z"
+      },
+      "_id": {
+        "$oid": "6895bcd08c338a6ab92d133d"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T10:26:17.002Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T10:27:45.237Z"
+      },
+      "_id": {
+        "$oid": "6895d0c98c338a6ab92d6d50"
+      }
+    }
+  ],
+  "__v": 4,
+  "createdAt": {
+    "$date": "2025-08-07T10:14:06.726Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:32:55.294Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68947f0a8c338a6ab9280685"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "ER 31",
+  "description": "",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689472238c338a6ab926a5c1"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T10:40:56.224Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T11:41:00.735Z"
+      },
+      "_id": {
+        "$oid": "689482b88c338a6ab928598c"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-07T10:25:14.530Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:11:54.019Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68947f0a8c338a6ab9280686"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "ER 32",
+  "description": "",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689472238c338a6ab926a5c1"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T11:42:20.505Z"
+      },
+      "end_time": {
+        "$date": "2025-08-07T12:25:42.131Z"
+      },
+      "_id": {
+        "$oid": "6894911c8c338a6ab9296fa4"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-07T10:25:14.530Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:12:23.497Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68947f0a8c338a6ab9280687"
+  },
+  "project_id": {
+    "$oid": "68946e248c338a6ab9262f6b"
+  },
+  "task_name": "ER 33",
+  "description": "",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689472238c338a6ab926a5c1"
+  },
+  "assign_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-07T12:27:47.230Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T04:32:12.883Z"
+      },
+      "_id": {
+        "$oid": "68949bc38c338a6ab92a3d76"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-07T10:25:14.530Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T10:12:38.197Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c8d"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 1",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "SET Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689474e18c338a6ab926ea50"
+  },
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Paused",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-08T11:05:52.874Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T11:07:17.803Z"
+      },
+      "_id": {
+        "$oid": "6895da108c338a6ab92d8ff0"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T11:11:10.555Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T11:17:30.324Z"
+      },
+      "_id": {
+        "$oid": "6895db4e8c338a6ab92d92fb"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T12:04:52.891Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T12:09:19.115Z"
+      },
+      "_id": {
+        "$oid": "6895e7e48c338a6ab92db355"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T12:17:16.878Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T12:21:27.563Z"
+      },
+      "_id": {
+        "$oid": "6895eacc8c338a6ab92db9bb"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-08T12:23:25.128Z"
+      },
+      "end_time": {
+        "$date": "2025-08-08T12:34:57.955Z"
+      },
+      "_id": {
+        "$oid": "6895ec3d8c338a6ab92dbfa2"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T03:47:03.382Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T03:52:53.986Z"
+      },
+      "_id": {
+        "$oid": "689967b74dfb81c1e07f4273"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T04:07:18.121Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T04:18:21.059Z"
+      },
+      "_id": {
+        "$oid": "68996c764dfb81c1e07f4312"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T13:31:22.220Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T13:31:23.627Z"
+      },
+      "_id": {
+        "$oid": "6899f0aa4dfb81c1e07f611d"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T13:32:18.939Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T13:32:45.384Z"
+      },
+      "_id": {
+        "$oid": "6899f0e24dfb81c1e07f6246"
+      }
+    }
+  ],
+  "__v": 9,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.140Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-11T13:32:45.385Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c8e"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 2",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689474e18c338a6ab926ea50"
+  },
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-11T06:09:10.113Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T06:34:56.328Z"
+      },
+      "_id": {
+        "$oid": "689989064dfb81c1e07f46f0"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T06:35:19.525Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T06:56:09.454Z"
+      },
+      "_id": {
+        "$oid": "68998f274dfb81c1e07f47d9"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T06:57:52.602Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T07:04:47.772Z"
+      },
+      "_id": {
+        "$oid": "689994704dfb81c1e07f4838"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T07:19:42.665Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T07:24:25.049Z"
+      },
+      "_id": {
+        "$oid": "6899998e4dfb81c1e07f4997"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T07:26:02.364Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T07:29:51.294Z"
+      },
+      "_id": {
+        "$oid": "68999b0a4dfb81c1e07f4a4a"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T10:04:04.324Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T11:53:14.236Z"
+      },
+      "_id": {
+        "$oid": "6899c0144dfb81c1e07f4d8f"
+      }
+    }
+  ],
+  "__v": 6,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.140Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-11T11:54:11.965Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c8f"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 3",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689479708c338a6ab92773c2"
+  },
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-11T03:44:55.123Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T04:46:46.928Z"
+      },
+      "_id": {
+        "$oid": "689967374dfb81c1e07f41f6"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T05:01:05.608Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T05:08:06.587Z"
+      },
+      "_id": {
+        "$oid": "689979114dfb81c1e07f43cd"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T05:08:51.726Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T05:29:13.623Z"
+      },
+      "_id": {
+        "$oid": "68997ae34dfb81c1e07f444a"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T05:32:25.947Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T05:50:23.109Z"
+      },
+      "_id": {
+        "$oid": "689980694dfb81c1e07f44cb"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T05:52:12.002Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T06:00:17.503Z"
+      },
+      "_id": {
+        "$oid": "6899850c4dfb81c1e07f45c8"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T06:05:40.454Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T06:34:53.052Z"
+      },
+      "_id": {
+        "$oid": "689988344dfb81c1e07f4651"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T06:34:56.977Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T07:11:18.534Z"
+      },
+      "_id": {
+        "$oid": "68998f104dfb81c1e07f4796"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T07:11:20.982Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T07:16:57.350Z"
+      },
+      "_id": {
+        "$oid": "689997984dfb81c1e07f48e7"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T07:21:33.317Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T08:31:00.515Z"
+      },
+      "_id": {
+        "$oid": "689999fd4dfb81c1e07f49cf"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T09:13:10.670Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T09:14:06.229Z"
+      },
+      "_id": {
+        "$oid": "6899b4264dfb81c1e07f4bbd"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T09:31:58.675Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T10:03:29.195Z"
+      },
+      "_id": {
+        "$oid": "6899b88e4dfb81c1e07f4c5a"
+      }
+    }
+  ],
+  "__v": 11,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.140Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-11T10:03:40.477Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c90"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 4",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689479708c338a6ab92773c2"
+  },
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-11T10:11:08.448Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T10:17:50.235Z"
+      },
+      "_id": {
+        "$oid": "6899c1bc4dfb81c1e07f4e34"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T10:28:05.610Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T11:29:16.401Z"
+      },
+      "_id": {
+        "$oid": "6899c5b54dfb81c1e07f4ec3"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T11:29:18.364Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T11:55:22.866Z"
+      },
+      "_id": {
+        "$oid": "6899d40e4dfb81c1e07f4f9e"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-11T11:56:53.615Z"
+      },
+      "end_time": {
+        "$date": "2025-08-11T12:58:34.555Z"
+      },
+      "_id": {
+        "$oid": "6899da854dfb81c1e07f50d4"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T04:06:05.233Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T06:30:12.272Z"
+      },
+      "_id": {
+        "$oid": "689abdad4dfb81c1e07f79c1"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T06:33:32.629Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T06:57:17.135Z"
+      },
+      "_id": {
+        "$oid": "689ae03c4dfb81c1e07f8430"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T06:57:23.188Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T07:17:16.003Z"
+      },
+      "_id": {
+        "$oid": "689ae5d34dfb81c1e07f84d3"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T07:17:21.197Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T07:39:50.695Z"
+      },
+      "_id": {
+        "$oid": "689aea814dfb81c1e07f8645"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T07:41:33.338Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T07:45:09.622Z"
+      },
+      "_id": {
+        "$oid": "689af02d4dfb81c1e07f86f0"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T08:34:18.738Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T09:09:38.795Z"
+      },
+      "_id": {
+        "$oid": "689afc8a4dfb81c1e07f8864"
+      }
+    }
+  ],
+  "__v": 10,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.140Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T09:09:44.359Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c91"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 5",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689473d68c338a6ab926cb76"
+  },
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-13T04:05:06.715Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T05:38:03.965Z"
+      },
+      "_id": {
+        "$oid": "689c0ef24dfb81c1e07f9b5b"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-13T05:38:27.633Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T06:04:09.517Z"
+      },
+      "_id": {
+        "$oid": "689c24d34dfb81c1e07fa06b"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-13T06:05:46.632Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T06:20:18.775Z"
+      },
+      "_id": {
+        "$oid": "689c2b3a4dfb81c1e07fa0b2"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-13T06:21:38.745Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T07:39:28.159Z"
+      },
+      "_id": {
+        "$oid": "689c2ef24dfb81c1e07fa0fd"
+      }
+    }
+  ],
+  "__v": 4,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.140Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-13T10:43:51.148Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c92"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 6",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689473d68c338a6ab926cb76"
+  },
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-13T09:05:34.875Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T10:43:08.480Z"
+      },
+      "_id": {
+        "$oid": "689c555eeb6a3de3e95d9d99"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-13T10:43:11.722Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T10:43:29.763Z"
+      },
+      "_id": {
+        "$oid": "689c6c3feb6a3de3e95d9fa6"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-13T10:44:16.952Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T12:12:09.247Z"
+      },
+      "_id": {
+        "$oid": "689c6c80eb6a3de3e95da042"
+      }
+    }
+  ],
+  "__v": 3,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.140Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-13T12:12:30.593Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c93"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 7",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.140Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T05:53:18.140Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c94"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 8",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689473d68c338a6ab926cb76"
+  },
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.140Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-13T04:04:13.344Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c95"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 9",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689479708c338a6ab92773c2"
+  },
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.140Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-13T05:02:40.768Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c96"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 10",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.141Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T05:53:18.141Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c97"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 11",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.141Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T05:53:18.141Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c98"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 12",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689479708c338a6ab92773c2"
+  },
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.141Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-13T05:02:40.768Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689590ce8c338a6ab92c9c99"
+  },
+  "project_id": {
+    "$oid": "6895901b8c338a6ab92c9a13"
+  },
+  "task_name": "Ring 13",
+  "description": "",
+  "url": "R:\\khushal bhai",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-08T05:53:18.141Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-08T05:53:18.141Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7ba1"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 2",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bb0"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 17",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bb9"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 26",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7ba5"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 6",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7ba6"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 7",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7ba7"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 8",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bac"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 13",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bb1"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 18",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bb4"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 21",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bb5"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 22",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bba"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 27",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7ba4"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 5",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7ba8"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 9",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7baa"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 11",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bab"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 12",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bb2"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 19",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bb6"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 23",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bb8"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 25",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7ba0"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 1",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7ba2"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 3",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7ba3"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 4",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.166Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7ba9"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 10",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bad"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 14",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bae"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 15",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7baf"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 16",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bb3"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 20",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bb7"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 24",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bbb"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 28",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac0d84dfb81c1e07f7bbc"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Ring 29",
+  "description": "",
+  "url": "R:\\Aron\\RING",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:19:36.167Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1154dfb81c1e07f7bcc"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Bracelet  6",
+  "description": "",
+  "url": "R:\\Aron\\BR",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1154dfb81c1e07f7bce"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Bracelet  8",
+  "description": "",
+  "url": "R:\\Aron\\BR",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1154dfb81c1e07f7bcb"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Bracelet  5",
+  "description": "",
+  "url": "R:\\Aron\\BR",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1154dfb81c1e07f7bc7"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Bracelet  1",
+  "description": "",
+  "url": "R:\\Aron\\BR",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:20:37.388Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:20:37.388Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1154dfb81c1e07f7bca"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Bracelet  4",
+  "description": "",
+  "url": "R:\\Aron\\BR",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1154dfb81c1e07f7bcd"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Bracelet  7",
+  "description": "",
+  "url": "R:\\Aron\\BR",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1154dfb81c1e07f7bc8"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Bracelet  2",
+  "description": "",
+  "url": "R:\\Aron\\BR",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:20:37.388Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:20:37.388Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1154dfb81c1e07f7bc9"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Bracelet  3",
+  "description": "",
+  "url": "R:\\Aron\\BR",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1154dfb81c1e07f7bcf"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "Bracelet  9",
+  "description": "",
+  "url": "R:\\Aron\\BR",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:20:37.389Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1594dfb81c1e07f7bdc"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "ER 3",
+  "description": "",
+  "url": "R:\\Aron\\ER",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689472238c338a6ab926a5c1"
+  },
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:21:45.868Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:23:11.485Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1594dfb81c1e07f7bde"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "ER 5",
+  "description": "",
+  "url": "R:\\Aron\\ER",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689472238c338a6ab926a5c1"
+  },
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-12T07:11:59.321Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T07:45:21.011Z"
+      },
+      "_id": {
+        "$oid": "689ae93f4dfb81c1e07f85b6"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T08:32:23.905Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T08:42:50.092Z"
+      },
+      "_id": {
+        "$oid": "689afc174dfb81c1e07f8825"
+      }
+    }
+  ],
+  "__v": 2,
+  "createdAt": {
+    "$date": "2025-08-12T04:21:45.868Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T08:43:06.521Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1594dfb81c1e07f7bdf"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "ER 6",
+  "description": "",
+  "url": "R:\\Aron\\ER",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689472238c338a6ab926a5c1"
+  },
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:21:45.868Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:23:11.485Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1594dfb81c1e07f7bda"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "ER 1",
+  "description": "",
+  "url": "R:\\Aron\\ER",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:21:45.867Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:21:45.867Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1594dfb81c1e07f7bdb"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "ER 2",
+  "description": "",
+  "url": "R:\\Aron\\ER",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689472238c338a6ab926a5c1"
+  },
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-12T04:23:54.030Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T05:19:18.396Z"
+      },
+      "_id": {
+        "$oid": "689ac1da4dfb81c1e07f7ce1"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-12T04:21:45.868Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T05:19:26.690Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1594dfb81c1e07f7bdd"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "ER 4",
+  "description": "",
+  "url": "R:\\Aron\\ER",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689472238c338a6ab926a5c1"
+  },
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-12T06:12:24.402Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T07:01:59.526Z"
+      },
+      "_id": {
+        "$oid": "689adb484dfb81c1e07f835f"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-12T04:21:45.868Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T07:02:07.542Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac1594dfb81c1e07f7be0"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "ER 7",
+  "description": "",
+  "url": "R:\\Aron\\ER",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "689472238c338a6ab926a5c1"
+  },
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Paused",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-12T08:50:42.796Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T09:54:47.187Z"
+      },
+      "_id": {
+        "$oid": "689b00624dfb81c1e07f8a36"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-12T04:21:45.869Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T09:54:47.188Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac18f4dfb81c1e07f7bed"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "pendent 3",
+  "description": "",
+  "url": "R:\\Aron\\PD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947d3d8c338a6ab927d891"
+  },
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-12T10:13:12.902Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T10:24:32.954Z"
+      },
+      "_id": {
+        "$oid": "689b13b84dfb81c1e07f8cf9"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T10:24:40.274Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T10:49:44.538Z"
+      },
+      "_id": {
+        "$oid": "689b16684dfb81c1e07f8d92"
+      }
+    }
+  ],
+  "__v": 2,
+  "createdAt": {
+    "$date": "2025-08-12T04:22:39.504Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T10:50:09.788Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac18f4dfb81c1e07f7bf3"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "pendent 9",
+  "description": "",
+  "url": "R:\\Aron\\PD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947d3d8c338a6ab927d891"
+  },
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-12T10:50:28.358Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T10:52:54.401Z"
+      },
+      "_id": {
+        "$oid": "689b1c744dfb81c1e07f908c"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T12:38:46.519Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T12:58:08.220Z"
+      },
+      "_id": {
+        "$oid": "689b35d64dfb81c1e07f9345"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-13T03:55:10.013Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T04:44:39.490Z"
+      },
+      "_id": {
+        "$oid": "689c0c9e4dfb81c1e07f9a00"
+      }
+    }
+  ],
+  "__v": 3,
+  "createdAt": {
+    "$date": "2025-08-12T04:22:39.504Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-13T04:44:44.916Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac18f4dfb81c1e07f7bee"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "pendent 4",
+  "description": "",
+  "url": "R:\\Aron\\PD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:22:39.504Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:22:39.504Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac18f4dfb81c1e07f7bf0"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "pendent 6",
+  "description": "",
+  "url": "R:\\Aron\\PD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:22:39.504Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:22:39.504Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac18f4dfb81c1e07f7bf1"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "pendent 7",
+  "description": "",
+  "url": "R:\\Aron\\PD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947d3d8c338a6ab927d891"
+  },
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-12T05:34:00.475Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T05:52:04.543Z"
+      },
+      "_id": {
+        "$oid": "689ad2484dfb81c1e07f8121"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T05:52:06.331Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T06:02:20.958Z"
+      },
+      "_id": {
+        "$oid": "689ad6864dfb81c1e07f81ae"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T06:03:18.794Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T06:08:21.007Z"
+      },
+      "_id": {
+        "$oid": "689ad9264dfb81c1e07f823f"
+      }
+    }
+  ],
+  "__v": 3,
+  "createdAt": {
+    "$date": "2025-08-12T04:22:39.504Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T06:08:27.139Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac18f4dfb81c1e07f7bf2"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "pendent 8",
+  "description": "",
+  "url": "R:\\Aron\\PD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947d3d8c338a6ab927d891"
+  },
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-12T04:35:11.591Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T04:36:51.396Z"
+      },
+      "_id": {
+        "$oid": "689ac47f4dfb81c1e07f7d83"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T04:37:22.784Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T04:42:03.556Z"
+      },
+      "_id": {
+        "$oid": "689ac5024dfb81c1e07f7e61"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T04:49:12.823Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T05:18:12.394Z"
+      },
+      "_id": {
+        "$oid": "689ac7c84dfb81c1e07f7eea"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T05:18:13.709Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T05:32:34.908Z"
+      },
+      "_id": {
+        "$oid": "689ace954dfb81c1e07f7f77"
+      }
+    }
+  ],
+  "__v": 4,
+  "createdAt": {
+    "$date": "2025-08-12T04:22:39.504Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T05:33:51.279Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac18f4dfb81c1e07f7bf4"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "pendent 10",
+  "description": "",
+  "url": "R:\\Aron\\PD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68947d3d8c338a6ab927d891"
+  },
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-12T06:30:36.547Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T07:45:22.588Z"
+      },
+      "_id": {
+        "$oid": "689adf8c4dfb81c1e07f83e2"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T08:44:27.314Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T08:44:29.556Z"
+      },
+      "_id": {
+        "$oid": "689afeeb4dfb81c1e07f8954"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T08:44:30.376Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T08:52:57.223Z"
+      },
+      "_id": {
+        "$oid": "689afeee4dfb81c1e07f89eb"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-12T10:49:46.508Z"
+      },
+      "end_time": {
+        "$date": "2025-08-12T10:49:47.583Z"
+      },
+      "_id": {
+        "$oid": "689b1c4a4dfb81c1e07f8e30"
+      }
+    }
+  ],
+  "__v": 4,
+  "createdAt": {
+    "$date": "2025-08-12T04:22:39.504Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T10:50:20.444Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac18f4dfb81c1e07f7beb"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "pendent 1",
+  "description": "",
+  "url": "R:\\Aron\\PD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:22:39.503Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:22:39.503Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac18f4dfb81c1e07f7bef"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "pendent 5",
+  "description": "",
+  "url": "R:\\Aron\\PD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:22:39.504Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:22:39.504Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689ac18f4dfb81c1e07f7bec"
+  },
+  "project_id": {
+    "$oid": "689ac04c4dfb81c1e07f7a0a"
+  },
+  "task_name": "pendent 2",
+  "description": "",
+  "url": "R:\\Aron\\PD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": null,
+  "assign_date": {
+    "$date": "2025-08-12T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-14T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-12T04:22:39.503Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-12T04:22:39.503Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689c0b0e4dfb81c1e07f95d9"
+  },
+  "project_id": {
+    "$oid": "689424028c338a6ab91d1305"
+  },
+  "task_name": "ring  65",
+  "description": "",
+  "url": "S:\\AZZURE\\CAD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689472d58c338a6ab926b9e6"
+  },
+  "assign_date": {
+    "$date": "2025-08-13T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-13T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Paused",
+  "comments": [
+    {
+      "user_type": "employee",
+      "user_id": {
+        "$oid": "68a0aac6e8063813a1d6dcbb"
+      },
+      "text": "Hii",
+      "created_at": {
+        "$date": "2025-08-17T15:48:31.909Z"
+      },
+      "_id": {
+        "$oid": "68a1f9cf8afe9697df001121"
+      }
+    },
+    {
+      "user_type": "employee",
+      "user_id": {
+        "$oid": "689472d58c338a6ab926b9e6"
+      },
+      "text": "Hii",
+      "created_at": {
+        "$date": "2025-08-17T15:49:10.334Z"
+      },
+      "_id": {
+        "$oid": "68a1f9f68afe9697df00113f"
+      }
+    },
+    {
+      "user_type": "admin",
+      "user_id": null,
+      "text": "Hii",
+      "created_at": {
+        "$date": "2025-08-17T15:49:38.880Z"
+      },
+      "_id": {
+        "$oid": "68a1fa128afe9697df001160"
+      }
+    }
+  ],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-13T09:05:33.359Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T09:19:34.657Z"
+      },
+      "_id": {
+        "$oid": "689c555deb6a3de3e95d9d79"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-17T17:05:47.055Z"
+      },
+      "end_time": {
+        "$date": "2025-08-17T17:05:48.577Z"
+      },
+      "_id": {
+        "$oid": "68a20beb965641fd244555ad"
+      }
+    }
+  ],
+  "__v": 2,
+  "createdAt": {
+    "$date": "2025-08-13T03:48:30.154Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T17:29:12.818Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689c0b0e4dfb81c1e07f95da"
+  },
+  "project_id": {
+    "$oid": "689424028c338a6ab91d1305"
+  },
+  "task_name": "ring  66",
+  "description": "",
+  "url": "S:\\AZZURE\\CAD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "689472d58c338a6ab926b9e6"
+  },
+  "assign_date": {
+    "$date": "2025-08-13T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-13T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Paused",
+  "comments": [
+    {
+      "user_type": "admin",
+      "user_id": null,
+      "text": "Hii",
+      "created_at": {
+        "$date": "2025-08-16T15:05:54.697Z"
+      },
+      "_id": {
+        "$oid": "68a09e52d5daa409007baac5"
+      }
+    }
+  ],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-13T09:29:12.888Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T09:39:19.157Z"
+      },
+      "_id": {
+        "$oid": "689c5ae8eb6a3de3e95d9dde"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-13T09:53:27.337Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T10:19:23.394Z"
+      },
+      "_id": {
+        "$oid": "689c6097eb6a3de3e95d9e21"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-13T10:28:35.042Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T10:30:08.316Z"
+      },
+      "_id": {
+        "$oid": "689c68d3eb6a3de3e95d9e68"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-13T11:49:19.630Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T12:01:14.271Z"
+      },
+      "_id": {
+        "$oid": "689c7bbfeb6a3de3e95da06c"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-16T15:02:34.072Z"
+      },
+      "end_time": {
+        "$date": "2025-08-16T15:03:06.429Z"
+      },
+      "_id": {
+        "$oid": "68a09d8ad5daa409007ba8c9"
+      }
+    }
+  ],
+  "__v": 5,
+  "createdAt": {
+    "$date": "2025-08-13T03:48:30.154Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-16T15:05:54.697Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "689c0b0e4dfb81c1e07f95d8"
+  },
+  "project_id": {
+    "$oid": "689424028c338a6ab91d1305"
+  },
+  "task_name": "ring  64",
+  "description": "",
+  "url": "S:\\AZZURE\\CAD",
+  "stage": [
+    "CAD Design"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68947acf8c338a6ab9279872"
+  },
+  "assign_date": {
+    "$date": "2025-08-13T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-13T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Completed",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-13T08:43:26.820Z"
+      },
+      "end_time": {
+        "$date": "2025-08-13T09:05:29.905Z"
+      },
+      "_id": {
+        "$oid": "689c502eeb6a3de3e95d9c5c"
+      }
+    }
+  ],
+  "__v": 1,
+  "createdAt": {
+    "$date": "2025-08-13T03:48:30.153Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-13T12:01:24.395Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a1ebd513f3cf1737e4ee2d"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Ring 1",
+  "description": "",
+  "stage": [
+    "SET Design",
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-17T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-22T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Paused",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-17T17:03:23.363Z"
+      },
+      "end_time": {
+        "$date": "2025-08-17T17:03:26.111Z"
+      },
+      "_id": {
+        "$oid": "68a20b5b965641fd24455540"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-17T17:11:58.983Z"
+      },
+      "end_time": {
+        "$date": "2025-08-17T17:12:08.619Z"
+      },
+      "_id": {
+        "$oid": "68a20d5e965641fd2445564e"
+      }
+    }
+  ],
+  "__v": 2,
+  "createdAt": {
+    "$date": "2025-08-17T14:48:53.524Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T20:22:55.644Z"
+  },
+  "stages": [
+    {
+      "name": "SET Design",
+      "completed": false,
+      "completed_by": null,
+      "completed_at": null,
+      "_id": {
+        "$oid": "68a23a1f5265c02e42309489"
+      }
+    },
+    {
+      "name": "Render",
+      "completed": false,
+      "completed_by": null,
+      "completed_at": null,
+      "_id": {
+        "$oid": "68a23a1f5265c02e4230948a"
+      }
+    }
+  ],
+  "url": ""
+},
+{
+  "_id": {
+    "$oid": "68a1ebd513f3cf1737e4ee2e"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Ring 2",
+  "description": "",
+  "stage": [
+    "SET Design",
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-17T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-22T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "Paused",
+  "comments": [],
+  "time_logs": [
+    {
+      "start_time": {
+        "$date": "2025-08-17T17:05:33.385Z"
+      },
+      "end_time": {
+        "$date": "2025-08-17T17:05:35.809Z"
+      },
+      "_id": {
+        "$oid": "68a20bdd965641fd2445557d"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-17T17:07:05.562Z"
+      },
+      "end_time": {
+        "$date": "2025-08-17T17:11:55.551Z"
+      },
+      "_id": {
+        "$oid": "68a20c39965641fd2445561a"
+      }
+    },
+    {
+      "start_time": {
+        "$date": "2025-08-17T17:12:17.153Z"
+      },
+      "end_time": {
+        "$date": "2025-08-17T21:22:07.753Z"
+      },
+      "_id": {
+        "$oid": "68a20d71965641fd2445569a"
+      }
+    }
+  ],
+  "__v": 3,
+  "createdAt": {
+    "$date": "2025-08-17T14:48:53.524Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T21:22:07.756Z"
+  },
+  "stages": [
+    {
+      "name": "Render",
+      "completed": false,
+      "completed_by": null,
+      "completed_at": null,
+      "_id": {
+        "$oid": "68a23a285265c02e423094ca"
+      }
+    }
+  ],
+  "url": ""
+},
+{
+  "_id": {
+    "$oid": "68a1ebd513f3cf1737e4ee2f"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Ring 3",
+  "description": "",
+  "stage": [
+    "SET Design",
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-17T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-22T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T14:48:53.525Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T14:48:53.525Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a1ebd513f3cf1737e4ee30"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Ring 4",
+  "description": "",
+  "stage": [
+    "SET Design",
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-17T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-22T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T14:48:53.525Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T14:48:53.525Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a1ebd513f3cf1737e4ee31"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Ring 5",
+  "description": "",
+  "stage": [
+    "SET Design",
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-17T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-22T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T14:48:53.525Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T14:48:53.525Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a1ec2713f3cf1737e4ee69"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Ring 6",
+  "description": "",
+  "url": "",
+  "stage": [
+    "SET Design",
+    "Render"
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-17T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-22T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To Do",
+  "comments": [],
+  "time_logs": [],
+  "createdAt": {
+    "$date": "2025-08-17T14:50:15.603Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T14:50:15.603Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68a234ce7c6f54bea5d1605a"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Bracelet",
+  "description": "",
+  "url": "",
+  "stages": [
+    {
+      "name": "CAD Design",
+      "completed": false,
+      "completed_by": null,
+      "completed_at": null,
+      "_id": {
+        "$oid": "68a234ce7c6f54bea5d1605b"
+      }
+    },
+    {
+      "name": "SET Design",
+      "completed": false,
+      "completed_by": null,
+      "completed_at": null,
+      "_id": {
+        "$oid": "68a234ce7c6f54bea5d1605c"
+      }
+    }
+  ],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-18T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-21T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To Do",
+  "comments": [],
+  "time_logs": [],
+  "createdAt": {
+    "$date": "2025-08-17T20:00:14.166Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T20:00:14.166Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68a235f90d2bda4d8ed1fe8c"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Bracelet 1",
+  "description": "",
+  "stages": [],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-18T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-22T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T20:05:13.699Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T20:05:13.699Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a235f90d2bda4d8ed1fe8d"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Bracelet 2",
+  "description": "",
+  "stages": [],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-18T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-22T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T20:05:13.699Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T20:05:13.699Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a235f90d2bda4d8ed1fe8e"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Bracelet 3",
+  "description": "",
+  "stages": [],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-18T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-22T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T20:05:13.700Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T20:05:13.700Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a2369d9c4dc38d2c7fb8d0"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Bracelet 1",
+  "description": "",
+  "stages": [],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-18T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-21T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T20:07:57.248Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T20:07:57.248Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a2369d9c4dc38d2c7fb8d1"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Bracelet 2",
+  "description": "",
+  "stages": [],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-18T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-21T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T20:07:57.248Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T20:07:57.248Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a2369d9c4dc38d2c7fb8d2"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Bracelet 3",
+  "description": "",
+  "stages": [],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-18T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-21T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T20:07:57.249Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T20:07:57.249Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a237131da57aa186839c6d"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Bracelet 1",
+  "description": "",
+  "stages": [],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-18T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-22T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T20:09:55.228Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T20:09:55.228Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a237131da57aa186839c6e"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "Bracelet 2",
+  "description": "",
+  "stages": [],
+  "current_stage_index": 0,
+  "priority": "Medium",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-18T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-22T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T20:09:55.228Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T20:09:55.228Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a2378c1da57aa186839c8f"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "test 1",
+  "description": "",
+  "stages": [
+    {
+      "name": "SET Design",
+      "completed": false,
+      "completed_by": null,
+      "completed_at": null,
+      "_id": {
+        "$oid": "68a2378c1da57aa186839c90"
+      }
+    },
+    {
+      "name": "Render",
+      "completed": false,
+      "completed_by": null,
+      "completed_at": null,
+      "_id": {
+        "$oid": "68a2378c1da57aa186839c91"
+      }
+    }
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-18T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-21T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T20:11:56.295Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T20:11:56.295Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "68a2378c1da57aa186839c92"
+  },
+  "project_id": {
+    "$oid": "68a1a7c0b7a8d3c98e5a42bb"
+  },
+  "task_name": "test 2",
+  "description": "",
+  "stages": [
+    {
+      "name": "SET Design",
+      "completed": false,
+      "completed_by": null,
+      "completed_at": null,
+      "_id": {
+        "$oid": "68a2378c1da57aa186839c93"
+      }
+    },
+    {
+      "name": "Render",
+      "completed": false,
+      "completed_by": null,
+      "completed_at": null,
+      "_id": {
+        "$oid": "68a2378c1da57aa186839c94"
+      }
+    }
+  ],
+  "current_stage_index": 0,
+  "priority": "High",
+  "assign_to": {
+    "$oid": "68a0aac6e8063813a1d6dcbb"
+  },
+  "assign_date": {
+    "$date": "2025-08-18T00:00:00.000Z"
+  },
+  "due_date": {
+    "$date": "2025-08-21T00:00:00.000Z"
+  },
+  "media_files": [],
+  "status": "To do",
+  "comments": [],
+  "time_logs": [],
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-08-17T20:11:56.295Z"
+  },
+  "updatedAt": {
+    "$date": "2025-08-17T20:43:10.921Z"
+  },
+  "url": ""
+}]

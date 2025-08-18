@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Modal, Button } from "react-bootstrap";
 import { toast } from "react-toastify";
 import axios from "axios";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { useSocket } from "../contexts/SocketContext";
 import { statusOptions, priorityOptions } from "../options";
+import { IoMdArrowDropdown } from "react-icons/io";
 
 // Extend dayjs with duration
 dayjs.extend(duration);
@@ -58,6 +60,9 @@ const EmployeeDashboard = () => {
 
   const [statusFilter, setStatusFilter] = useState("All");
   const [priorityFilter, setPriorityFilter] = useState("All");
+
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
 
   useEffect(() => {
     if (!socket) return;
@@ -224,24 +229,45 @@ const EmployeeDashboard = () => {
     setExpandedProjectId(expandedProjectId === projectId ? null : projectId);
 
   const handleChangeStatus = async (task, status) => {
+    if (status === "Completed") {
+      setSelectedTask(task);
+      setShowCompleteModal(true);
+    } else {
+      setSelectedTask(null);
+      try {
+        const user = JSON.parse(localStorage.getItem("employeeUser"));
+        await axios.put(
+          `${process.env.REACT_APP_API_URL}/api/subtask/change-status/${task._id}`,
+          {
+            status: status,
+            userId: user._id,
+            userRole: "employee",
+          }
+        );
+
+        fetchDashboardData(user._id);
+      } catch (error) {
+        console.error("Failed to change subtask status:", error);
+        toast.error(
+          error.response.data.message || "Failed to change subtask status."
+        );
+      }
+    }
+  };
+
+  const completeStage = async (task) => {
+    console.log(task);
     try {
       const user = JSON.parse(localStorage.getItem("employeeUser"));
-
       await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/subtask/change-status/${task._id}`,
-        {
-          status: status,
-          userId: user._id,
-          userRole: "employee",
-        }
+        `${process.env.REACT_APP_API_URL}/api/subtask/complete-stage/${task._id}`
       );
-
+      toast.success("Stage marked as completed!");
       fetchDashboardData(user._id);
-    } catch (error) {
-      console.error("Failed to change subtask status:", error);
-      toast.error(
-        error.response.data.message || "Failed to change subtask status."
-      );
+    } catch (err) {
+      toast.error("Failed to complete stage");
+    } finally {
+      setShowCompleteModal(false);
     }
   };
 
@@ -345,25 +371,28 @@ const EmployeeDashboard = () => {
           {/* Status Filter */}
           <div style={{ width: "300px" }}>
             <label className="form-label">Filter Subtasks by Status:</label>
-            <select
-              className="form-control"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="All">All Status</option>
-              {statusOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+            <div className="flex">
+              <select
+                id="statusFilter"
+                className="form-control custom-select"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option value="All">All Status</option>
+                {statusOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Priority Filter */}
           <div style={{ width: "300px" }}>
             <label className="form-label">Filter Subtasks by Priority:</label>
             <select
-              className="form-control"
+              className="form-control custom-select"
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
             >
@@ -517,8 +546,8 @@ const EmployeeDashboard = () => {
                               <th>End</th>
                               <th>Priority</th>
                               <th>Status</th>
-                              <th>URL</th>
                               <th>Stage</th>
+                              <th>URL</th>
                               <th>Timer</th>
                               <th>Time Tracked</th>
                               <th>Actions</th>
@@ -617,9 +646,7 @@ const EmployeeDashboard = () => {
                                         <option
                                           key={status}
                                           value={status}
-                                          className={`md-status-${(
-                                            status || ""
-                                          )
+                                          className={`md-status-${(status || "")
                                             .toLowerCase()
                                             .replace(" ", "")}`}
                                         >
@@ -628,6 +655,46 @@ const EmployeeDashboard = () => {
                                       ))}
                                     </select>
                                   </td>
+                                  <td>
+                                    {Array.isArray(task.stages) &&
+                                    task.stages.length > 0 &&
+                                    task.current_stage_index !== undefined
+                                      ? (() => {
+                                          const currentStage =
+                                            task.stages[
+                                              task.current_stage_index
+                                            ];
+                                          const name =
+                                            typeof currentStage === "string"
+                                              ? currentStage
+                                              : currentStage.name;
+                                          const completed =
+                                            currentStage?.completed;
+
+                                          return (
+                                            <small
+                                              style={{
+                                                padding: "6px 12px",
+                                                borderRadius: "12px",
+                                                background: completed
+                                                  ? "#e6ffed"
+                                                  : "#f3f4f6",
+                                                color: completed
+                                                  ? "#097a3f"
+                                                  : "#444",
+                                                border: completed
+                                                  ? "1px solid #b7f0c6"
+                                                  : "1px solid #e0e0e0",
+                                                fontSize: "12px",
+                                              }}
+                                            >
+                                              {completed ? "✓ " : ""}
+                                              {name}
+                                            </small>
+                                          );
+                                        })()
+                                      : "No current stage"}
+                                  </td>
 
                                   <td
                                     style={{
@@ -635,64 +702,66 @@ const EmployeeDashboard = () => {
                                       position: "relative",
                                     }}
                                   >
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "space-between",
-                                        width: "200px",
-                                        whiteSpace: "nowrap",
-                                        overflow: "hidden",
-                                        textOverflow: "ellipsis",
-                                        cursor: "pointer",
-                                        color: "#007bff",
-                                        paddingRight: "20px", // To give space for the icon
-                                        position: "relative",
-                                      }}
-                                      onClick={(e) =>
-                                        handleCopyToClipboard(task.url, e)
-                                      }
-                                      title="Click to copy. Ctrl+Click to open."
-                                    >
-                                      <span
+                                    {task.url ? (
+                                      <div
                                         style={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "space-between",
+                                          width: "200px",
+                                          whiteSpace: "nowrap",
                                           overflow: "hidden",
                                           textOverflow: "ellipsis",
+                                          cursor: "pointer",
+                                          color: "#007bff",
+                                          paddingRight: "20px", // To give space for the icon
+                                          position: "relative",
                                         }}
-                                      >
-                                        {task.url}
-                                      </span>
-
-                                      <span
                                         onClick={(e) =>
                                           handleCopyToClipboard(task.url, e)
                                         }
-                                        style={{
-                                          position: "absolute",
-                                          right: "2px",
-                                          top: "50%",
-                                          transform: "translateY(-50%)",
-                                          fontSize: "14px",
-                                          color: "#555",
-                                          cursor: "pointer",
-                                        }}
-                                        title="Copy URL"
+                                        title="Click to copy. Ctrl+Click to open."
                                       >
-                                        <img
-                                          src="/SVG/clipboard.svg"
-                                          alt="copy icon"
+                                        <span
                                           style={{
-                                            width: "16px",
-                                            height: "16px",
-                                            filter: "hue-rotate(310deg)",
-                                            opacity: 0.8,
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
                                           }}
-                                        />
-                                      </span>
-                                    </div>
-                                  </td>
+                                        >
+                                          {task.url}
+                                        </span>
 
-                                  <td>{task.stage}</td>
+                                        <span
+                                          onClick={(e) =>
+                                            handleCopyToClipboard(task.url, e)
+                                          }
+                                          style={{
+                                            position: "absolute",
+                                            right: "2px",
+                                            top: "50%",
+                                            transform: "translateY(-50%)",
+                                            fontSize: "14px",
+                                            color: "#555",
+                                            cursor: "pointer",
+                                          }}
+                                          title="Copy URL"
+                                        >
+                                          <img
+                                            src="/SVG/clipboard.svg"
+                                            alt="copy icon"
+                                            style={{
+                                              width: "16px",
+                                              height: "16px",
+                                              filter: "hue-rotate(310deg)",
+                                              opacity: 0.8,
+                                            }}
+                                          />
+                                        </span>
+                                      </div>
+                                    ) : (
+                                      <small>No URL</small>
+                                    )}
+                                  </td>
                                   <td className="ttb-table-pause">
                                     {task.status === "In Progress" ||
                                     !anotherTaskRunning ? (
@@ -755,6 +824,33 @@ const EmployeeDashboard = () => {
           </table>
         </div>
       </section>
+      <Modal
+        show={showCompleteModal}
+        onHide={() => {
+          setSelectedTask(null);
+          setShowCompleteModal(false);
+        }}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Complete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Confirm that you completed the task?</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setSelectedTask(null);
+              setShowCompleteModal(false);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button variant="success" onClick={() => completeStage(selectedTask)}>
+            Complete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

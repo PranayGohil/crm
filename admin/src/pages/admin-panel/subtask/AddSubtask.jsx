@@ -19,7 +19,7 @@ const AddSubtask = () => {
 
   const singleSchema = Yup.object({
     task_name: Yup.string().required("Subtask name is required"),
-    stage: Yup.array()
+    stages: Yup.array()
       .of(Yup.string().oneOf(stageOptions))
       .min(1, "Select at least one stage")
       .required("Stage is required"),
@@ -67,7 +67,6 @@ const AddSubtask = () => {
       formData.append("task_name", values.task_name || "");
       formData.append("description", values.description || "");
       formData.append("url", values.url || "");
-      formData.append("stage", JSON.stringify(values.stage));
       formData.append("priority", values.priority || "");
       formData.append("assign_date", values.assign_date);
       formData.append("due_date", values.due_date);
@@ -75,6 +74,13 @@ const AddSubtask = () => {
       formData.append("status", "To Do");
       mediaFiles.forEach((file) => formData.append("media_files", file));
 
+      const stages = values.stages.map((name) => ({
+        name,
+        completed: false,
+        completed_by: null,
+        completed_at: null,
+      }));
+      formData.append("stages", JSON.stringify(stages));
       await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/add`,
         formData,
@@ -105,7 +111,12 @@ const AddSubtask = () => {
           task_name: `${values.bulkPrefix} ${i}`,
           description: "",
           url: values.bulkUrl,
-          stage: values.bulkStage,
+          stages: values.bulkStage.map((name) => ({
+            name,
+            completed: false,
+            completed_by: null,
+            completed_at: null,
+          })),
           priority: values.bulkPriority,
           assign_to: values.bulkAssignTo,
           assign_date: values.bulkAssignDate,
@@ -113,7 +124,7 @@ const AddSubtask = () => {
           status: "To do",
         });
       }
-
+      console.log(newSubtasks);
       await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/add-bulk`,
         newSubtasks
@@ -170,7 +181,7 @@ const AddSubtask = () => {
                   task_name: "",
                   description: "",
                   url: "",
-                  stage: [],
+                  stages: [],
                   priority: "",
                   assign_to: "",
                   assign_date: "",
@@ -237,7 +248,7 @@ const AddSubtask = () => {
                             >
                               <Field
                                 type="checkbox"
-                                name="stage"
+                                name="stages"
                                 style={{
                                   marginRight: "10px",
                                   width: "20px",
@@ -250,7 +261,7 @@ const AddSubtask = () => {
                           ))}
                         </div>
                         <ErrorMessage
-                          name="stage"
+                          name="stages"
                           component="div"
                           className="error"
                         />
@@ -495,7 +506,7 @@ const AddSubtask = () => {
                           ))}
                         </div>
                         <ErrorMessage
-                          name="stage"
+                          name="bulkStage"
                           component="div"
                           className="error"
                         />

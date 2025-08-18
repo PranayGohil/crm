@@ -19,7 +19,7 @@ const EditSubtask = () => {
 
   const singleSchema = Yup.object({
     task_name: Yup.string().required("Subtask name is required"),
-    stage: Yup.array().min(1, "Select at least one stage"),
+    stages: Yup.array().min(1, "Select at least one stages"),
     priority: Yup.string().required("Priority is required"),
     assign_date: Yup.string().required("Start date is required"),
     due_date: Yup.string().required("Due date is required"),
@@ -29,7 +29,7 @@ const EditSubtask = () => {
     task_name: "",
     description: "",
     url: "",
-    stage: "",
+    stages: [],
     priority: "",
     assign_to: "",
     assign_date: "",
@@ -56,11 +56,17 @@ const EditSubtask = () => {
           task_name: subtask.task_name || "",
           description: subtask.description || "",
           url: subtask.url || "",
-          stage: Array.isArray(subtask.stage)
-            ? subtask.stage
-            : subtask.stage
-            ? [subtask.stage]
-            : [],
+          stages:
+            subtask.stages?.map((s) =>
+              typeof s === "string"
+                ? {
+                    name: s,
+                    is_completed: false,
+                    completed_by: null,
+                    completed_at: null,
+                  }
+                : s
+            ) || [],
           priority: subtask.priority || "",
           assign_to: subtask.assign_to?._id || subtask.assign_to || "",
           assign_date: subtask.assign_date?.slice(0, 10) || "",
@@ -92,11 +98,13 @@ const EditSubtask = () => {
       formData.append("task_name", values.task_name);
       formData.append("description", values.description);
       formData.append("url", values.url);
-      formData.append("stage", JSON.stringify(values.stage));
       formData.append("priority", values.priority);
       formData.append("assign_date", values.assign_date);
       formData.append("due_date", values.due_date);
       formData.append("assign_to", values.assign_to);
+
+      
+      formData.append("stages", JSON.stringify(values.stages));
 
       mediaFiles.forEach((file) => formData.append("media_files", file));
 
@@ -160,7 +168,7 @@ const EditSubtask = () => {
                 validationSchema={singleSchema}
                 onSubmit={handleUpdate}
               >
-                {() => (
+                {({ values, setFieldValue }) => (
                   <Form className="add-sub_task_main add-add_gen_main">
                     <div className="sms-add_task-form">
                       <div className="sms-add_name sms-add_same">
@@ -217,21 +225,41 @@ const EditSubtask = () => {
                               style={{ display: "block" }}
                             >
                               <Field
+                                className="h-3 w-3"
                                 type="checkbox"
-                                name="stage"
+                                name="stages"
+                                value={JSON.stringify({
+                                  name: opt,
+                                  is_completed: false,
+                                })}
+                                checked={values.stages.some(
+                                  (s) => s.name === opt
+                                )}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setFieldValue("stages", [
+                                      ...values.stages,
+                                      { name: opt, is_completed: false },
+                                    ]);
+                                  } else {
+                                    setFieldValue(
+                                      "stages",
+                                      values.stages.filter((s) => s.name !== opt)
+                                    );
+                                  }
+                                }}
                                 style={{
                                   marginRight: "10px",
                                   width: "20px",
                                   height: "20px",
                                 }}
-                                value={opt}
                               />
                               {opt}
                             </label>
                           ))}
                         </div>
                         <ErrorMessage
-                          name="stage"
+                          name="stages"
                           component="div"
                           className="error"
                         />

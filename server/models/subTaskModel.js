@@ -14,52 +14,38 @@ const commentSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now },
 });
 
+const stageSchema = new mongoose.Schema({
+  name: { type: String, required: true }, // e.g., "CAD Design"
+  completed: { type: Boolean, default: false },
+  completed_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Employee",
+    default: null,
+  },
+  completed_at: { type: Date, default: null },
+});
+
 const subTaskSchema = mongoose.Schema(
   {
     project_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project",
     },
-    task_name: {
-      type: String,
-    },
-    description: {
-      type: String,
-    },
-    url: {
-      type: String,
-    },
-    stage: {
-      type: [String],
-    },
-    current_stage_index: {
-      type: Number,
-      default: 0,
-    },
-    priority: {
-      type: String,
-    },
+    task_name: String,
+    description: String,
+    url: String,
+    stages: [stageSchema],
+    current_stage_index: { type: Number, default: 0 },
+    priority: String,
     assign_to: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Employee",
     },
-    assign_date: {
-      type: Date,
-    },
-    due_date: {
-      type: Date,
-    },
-    media_files: [
-      {
-        type: String,
-      },
-    ],
-    path_to_files: {
-      type: String,
-    },
-    status: {
-      type: String,
-    },
+    assign_date: Date,
+    due_date: Date,
+    media_files: [String],
+    path_to_files: String,
+    status: String,
     comments: [commentSchema],
     time_logs: [
       {

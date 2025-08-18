@@ -27,7 +27,6 @@ const SubtaskDashboardContainer = () => {
   const [selectedTaskIds, setSelectedTaskIds] = useState([]);
   const [bulkAssignTo, setBulkAssignTo] = useState("");
   const [bulkPriority, setBulkPriority] = useState("");
-  const [bulkStage, setBulkStage] = useState("");
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
@@ -43,6 +42,27 @@ const SubtaskDashboardContainer = () => {
       );
       setProject(projectRes.data.project);
       setSubtasks(res.data);
+      const normalized = res.data.map((t) => {
+        const rawStages = t.stages ?? t.stage ?? [];
+        // rawStages can be array of strings or array of objects
+        const stages = rawStages.map((s) =>
+          typeof s === "string"
+            ? {
+                name: s,
+                completed: false,
+                completed_by: null,
+                completed_at: null,
+              }
+            : {
+                name: s.name || s,
+                completed: s.completed || false,
+                completed_by: s.completed_by || s.completedBy || null,
+                completed_at: s.completed_at || s.completedAt || null,
+              }
+        );
+        return { ...t, stages };
+      });
+      setSubtasks(normalized);
     } catch (error) {
       console.error("Failed to fetch subtasks:", error);
     } finally {
@@ -69,13 +89,21 @@ const SubtaskDashboardContainer = () => {
     fetchEmployees();
   }, [projectId]);
 
-  const filteredSubtasks = subtasks.filter(
-    (task) =>
-      (!filters.assignTo || String(task.assign_to) === filters.assignTo) &&
-      (!filters.priority || task.priority === filters.priority) &&
-      (!filters.status || task.status === filters.status) &&
-      (!filters.stage || task.stage === filters.stage)
-  );
+  const filteredSubtasks = subtasks.filter((task) => {
+    const matchAssign =
+      !filters.assignTo ||
+      String(task.assign_to?._id ?? task.assign_to) ===
+        String(filters.assignTo);
+    const matchPriority =
+      !filters.priority || task.priority === filters.priority;
+    const matchStatus = !filters.status || task.status === filters.status;
+    const matchStage =
+      !filters.stage ||
+      (Array.isArray(task.stages) &&
+        task.stages.some((s) => s.name === filters.stage));
+
+    return matchAssign && matchPriority && matchStatus && matchStage;
+  });
 
   const handleBulkUpdateAll = async () => {
     if (selectedTaskIds.length === 0) return;
@@ -83,7 +111,6 @@ const SubtaskDashboardContainer = () => {
     if (bulkAssignTo) update.assign_to = bulkAssignTo;
 
     if (bulkPriority) update.priority = bulkPriority;
-    if (bulkStage) update.stage = bulkStage;
 
     if (Object.keys(update).length === 0) {
       toast.info("No changes selected.");
@@ -100,7 +127,6 @@ const SubtaskDashboardContainer = () => {
       fetchSubtasks();
       setBulkAssignTo("");
       setBulkPriority("");
-      setBulkStage("");
       setSelectedTaskIds([]);
     } catch (err) {
       console.error(err);
@@ -343,9 +369,45 @@ const SubtaskDashboardContainer = () => {
                   <td>{formateDate(task.due_date)}</td>
                   <td>{task.priority}</td>
                   <td>
-                    {Array.isArray(task.stage)
-                      ? task.stage.join(" → ")
-                      : task.stage}
+                    {Array.isArray(task.stages) && task.stages.length > 0 ? (
+                      <div className="flex justify-center items-center gap-2">
+                        {task.stages.map((s, i) => {
+                          const name = typeof s === "string" ? s : s.name;
+                          const completed = s?.completed;
+                          return (
+                            <span
+                              key={i}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                              }}
+                            >
+                              <small
+                                style={{
+                                  padding: "4px 8px",
+                                  borderRadius: "12px",
+                                  background: completed ? "#e6ffed" : "#f3f4f6",
+                                  color: completed ? "#097a3f" : "#444",
+                                  border: completed
+                                    ? "1px solid #b7f0c6"
+                                    : "1px solid #e0e0e0",
+                                  fontSize: "12px",
+                                }}
+                              >
+                                {completed ? "✓ " : ""}
+                                {name}
+                              </small>
+                              {i < task.stages.length - 1 && (
+                                <span style={{ margin: "0 6px" }}>→</span>
+                              )}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      "No stages"
+                    )}
                   </td>
                   <td>
                     <span
@@ -364,57 +426,61 @@ const SubtaskDashboardContainer = () => {
                       position: "relative",
                     }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "200px",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        cursor: "pointer",
-                        color: "#007bff",
-                        paddingRight: "20px", // To give space for the icon
-                        position: "relative",
-                      }}
-                      onClick={(e) => handleCopyToClipboard(task.url, e)}
-                      title="Click to copy. Ctrl+Click to open."
-                    >
-                      <span
+                    {task.url ? (
+                      <div
                         style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          width: "200px",
+                          whiteSpace: "nowrap",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                        }}
-                      >
-                        {task.url}
-                      </span>
-
-                      <span
-                        onClick={(e) => handleCopyToClipboard(task.url, e)}
-                        style={{
-                          position: "absolute",
-                          right: "2px",
-                          top: "50%",
-                          transform: "translateY(-50%)",
-                          fontSize: "14px",
-                          color: "#555",
                           cursor: "pointer",
+                          color: "#007bff",
+                          paddingRight: "20px", // To give space for the icon
+                          position: "relative",
                         }}
-                        title="Copy URL"
+                        onClick={(e) => handleCopyToClipboard(task.url, e)}
+                        title="Click to copy. Ctrl+Click to open."
                       >
-                        <img
-                          src="/SVG/clipboard.svg"
-                          alt="copy icon"
+                        <span
                           style={{
-                            width: "16px",
-                            height: "16px",
-                            filter: "hue-rotate(310deg)",
-                            opacity: 0.8,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
                           }}
-                        />
-                      </span>
-                    </div>
+                        >
+                          {task.url}
+                        </span>
+
+                        <span
+                          onClick={(e) => handleCopyToClipboard(task.url, e)}
+                          style={{
+                            position: "absolute",
+                            right: "2px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            fontSize: "14px",
+                            color: "#555",
+                            cursor: "pointer",
+                          }}
+                          title="Copy URL"
+                        >
+                          <img
+                            src="/SVG/clipboard.svg"
+                            alt="copy icon"
+                            style={{
+                              width: "16px",
+                              height: "16px",
+                              filter: "hue-rotate(310deg)",
+                              opacity: 0.8,
+                            }}
+                          />
+                        </span>
+                      </div>
+                    ) : (
+                      <small>No URL</small>
+                    )}
                   </td>
                   <td className="d-flex justify-content-start align-items-center">
                     {(() => {
@@ -526,25 +592,12 @@ const SubtaskDashboardContainer = () => {
                 ))}
               </select>
 
-              <select
-                value={bulkStage}
-                onChange={(e) => setBulkStage(e.target.value)}
-                className="dropdown_toggle"
-              >
-                <option value="">Change Stage</option>
-                {stageOptions.map((opt, idx) => (
-                  <option key={idx} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-
               <button
                 onClick={handleBulkUpdateAll}
                 className="theme_btn"
                 disabled={
                   selectedTaskIds.length === 0 ||
-                  (!bulkAssignTo && !bulkPriority && !bulkStage)
+                  (!bulkAssignTo && !bulkPriority)
                 }
               >
                 Apply Changes
