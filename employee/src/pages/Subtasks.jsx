@@ -432,7 +432,6 @@ const Subtasks = () => {
                                   stageMatch && statusMatch && employeeMatch
                                 );
                               })
-
                               .map((s, sIdx) => (
                                 <tr key={s.id}>
                                   <td>
@@ -458,10 +457,57 @@ const Subtasks = () => {
                                   </td>
                                   <td>{s.task_name}</td>
                                   <td>
-                                    {s.stage &&
-                                    s.current_stage_index !== undefined
-                                      ? s.stage[s.current_stage_index] || "N/A"
-                                      : "N/A"}
+                                    {Array.isArray(s.stages) &&
+                                    s.stages.length > 0 ? (
+                                      <div className="flex justify-center items-center gap-2">
+                                        {s.stages.map((stg, i) => {
+                                          const name =
+                                            typeof stg === "string"
+                                              ? stg
+                                              : stg.name;
+                                          const completed = stg?.completed;
+                                          return (
+                                            <span
+                                              key={i}
+                                              style={{
+                                                display: "inline-flex",
+                                                alignItems: "center",
+                                                gap: "6px",
+                                              }}
+                                            >
+                                              <small
+                                                style={{
+                                                  padding: "4px 8px",
+                                                  borderRadius: "12px",
+                                                  background: completed
+                                                    ? "#e6ffed"
+                                                    : "#f3f4f6",
+                                                  color: completed
+                                                    ? "#097a3f"
+                                                    : "#444",
+                                                  border: completed
+                                                    ? "1px solid #b7f0c6"
+                                                    : "1px solid #e0e0e0",
+                                                  fontSize: "12px",
+                                                }}
+                                              >
+                                                {completed ? "✓ " : ""}
+                                                {name}
+                                              </small>
+                                              {i < s.stages.length - 1 && (
+                                                <span
+                                                  style={{ margin: "0 6px" }}
+                                                >
+                                                  →
+                                                </span>
+                                              )}
+                                            </span>
+                                          );
+                                        })}
+                                      </div>
+                                    ) : (
+                                      "No stages"
+                                    )}
                                   </td>
                                   <td>
                                     <span
