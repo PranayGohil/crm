@@ -19,7 +19,7 @@ const EditSubtask = () => {
 
   const singleSchema = Yup.object({
     task_name: Yup.string().required("Subtask name is required"),
-    stages: Yup.array().min(1, "Select at least one stages"),
+    stages: Yup.array().min(1, "Select at least one stage"),
     priority: Yup.string().required("Priority is required"),
     assign_date: Yup.string().required("Start date is required"),
     due_date: Yup.string().required("Due date is required"),
@@ -103,7 +103,6 @@ const EditSubtask = () => {
       formData.append("due_date", values.due_date);
       formData.append("assign_to", values.assign_to);
 
-      
       formData.append("stages", JSON.stringify(values.stages));
 
       mediaFiles.forEach((file) => formData.append("media_files", file));
@@ -127,280 +126,328 @@ const EditSubtask = () => {
   if (loading) return <LoadingOverlay />;
 
   return (
-    <div className="subtask_management">
+    <div className="min-h-screen bg-gray-50 p-6">
       <ToastContainer position="top-center" />
-      <section className="d-flex justify-content-between align-items-center mx-5 mt-4 mb-2">
-        <div className="anp-heading-main ps-3">
-          <div
-            className="anp-back-btn"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate(-1);
-            }}
-            style={{ cursor: "pointer" }}
+
+      {/* Header */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-10 h-10 bg-gray-100 border border-gray-300 rounded-lg mr-4 hover:bg-gray-200 transition-colors"
           >
-            <img
-              src="/SVG/arrow-pc.svg"
-              alt="back"
-              className="mx-2"
-              style={{ scale: "1.3" }}
-            />
-          </div>
-          <div className="head-menu">
-            <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
-              Edit Subtask{" "}
-            </h1>
-          </div>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+          <h1 className="text-2xl font-semibold text-gray-800">Edit Subtask</h1>
         </div>
-      </section>
+      </div>
 
-      <section className="sm-add-task sms-add_and_generator mg-auto">
-        <div className="sm-add-task-inner sms-add_and_generatoe_inner">
-          <div className="sms-add_new-task sms-add_gen-task">
-            <div className="sms-add_task-inner">
-              {/* <div className="sms-add_task-heading">
-                <h2>Edit Subtask</h2>
-              </div> */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <Formik
+          enableReinitialize
+          initialValues={initialValues}
+          validationSchema={singleSchema}
+          onSubmit={handleUpdate}
+        >
+          {({ values, setFieldValue }) => (
+            <Form className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Subtask Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subtask Name
+                  </label>
+                  <Field
+                    type="text"
+                    name="task_name"
+                    placeholder="Subtask Name"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <ErrorMessage
+                    name="task_name"
+                    component="div"
+                    className="text-red-600 text-sm mt-1"
+                  />
+                </div>
 
-              <Formik
-                enableReinitialize
-                initialValues={initialValues}
-                validationSchema={singleSchema}
-                onSubmit={handleUpdate}
-              >
-                {({ values, setFieldValue }) => (
-                  <Form className="add-sub_task_main add-add_gen_main">
-                    <div className="sms-add_task-form">
-                      <div className="sms-add_name sms-add_same">
-                        <span>Subtask Name</span>
+                {/* URL */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    URL
+                  </label>
+                  <Field
+                    type="text"
+                    name="url"
+                    placeholder="URL"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <ErrorMessage
+                    name="url"
+                    component="div"
+                    className="text-red-600 text-sm mt-1"
+                  />
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
+                <Field
+                  as="textarea"
+                  name="description"
+                  placeholder="Description"
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <ErrorMessage
+                  name="description"
+                  component="div"
+                  className="text-red-600 text-sm mt-1"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Stage */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Stage
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {stageOptions.map((opt, idx) => (
+                      <label key={idx} className="flex items-center">
                         <Field
-                          type="text"
-                          name="task_name"
-                          placeholder="Subtask Name"
-                        />
-                        <ErrorMessage
-                          name="task_name"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sms-add_task-form">
-                      <div className="sms-add_des sms-add_same">
-                        <span>Description</span>
-                        <Field
-                          type="text"
-                          name="description"
-                          placeholder="Description"
-                        />
-                        <ErrorMessage
-                          name="description"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sms-add_task-form">
-                      <div className="sms-add_name sms-add_same">
-                        <span>URL</span>
-                        <Field type="text" name="url" placeholder="URL" />
-                        <ErrorMessage
-                          name="url"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sms-add_task-form">
-                      <div className="sms-add_same">
-                        <span>Stage</span>
-                        <div className="d-flex flex-wrap gap-2">
-                          {stageOptions.map((opt, idx) => (
-                            <label
-                              key={idx}
-                              className="d-flex align-items-center justify-content-center"
-                              style={{ display: "block" }}
-                            >
-                              <Field
-                                className="h-3 w-3"
-                                type="checkbox"
-                                name="stages"
-                                value={JSON.stringify({
-                                  name: opt,
-                                  is_completed: false,
-                                })}
-                                checked={values.stages.some(
-                                  (s) => s.name === opt
-                                )}
-                                onChange={(e) => {
-                                  if (e.target.checked) {
-                                    setFieldValue("stages", [
-                                      ...values.stages,
-                                      { name: opt, is_completed: false },
-                                    ]);
-                                  } else {
-                                    setFieldValue(
-                                      "stages",
-                                      values.stages.filter((s) => s.name !== opt)
-                                    );
-                                  }
-                                }}
-                                style={{
-                                  marginRight: "10px",
-                                  width: "20px",
-                                  height: "20px",
-                                }}
-                              />
-                              {opt}
-                            </label>
-                          ))}
-                        </div>
-                        <ErrorMessage
+                          type="checkbox"
                           name="stages"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sms-add_task-form">
-                      <div className="sms-add_same">
-                        <span>Priority</span>
-                        <Field
-                          as="select"
-                          name="priority"
-                          className="dropdown_toggle w-100 "
-                        >
-                          <option value="">Select Priority</option>
-                          {priorityOptions.map((opt, idx) => (
-                            <option key={idx} value={opt}>
-                              {opt}
-                            </option>
-                          ))}
-                        </Field>
-                        <ErrorMessage
-                          name="priority"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sms-add_task-form">
-                      <div className="sms-add_same">
-                        <span>Assign To</span>
-                        <Field
-                          as="select"
-                          name="assign_to"
-                          className="dropdown_toggle w-100 "
-                        >
-                          <option value="">Select Assign To</option>
-                          {employees.map((emp) => (
-                            <option key={emp._id} value={emp._id}>
-                              {emp.full_name}
-                            </option>
-                          ))}
-                        </Field>
-                        <ErrorMessage
-                          name="assign_to"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="anp-start_end-date sms-add_same">
-                      <span className="anp-client-name-para">
-                        Start Date - End Date
-                      </span>
-                      <div className="enp-date_input sms-add_same d-flex justify-content-around">
-                        <div>
-                          <Field type="date" name="assign_date" />
-                          <ErrorMessage
-                            name="assign_date"
-                            component="div"
-                            className="error"
-                          />
-                        </div>
-                        <div>
-                          <Field type="date" name="due_date" />
-                          <ErrorMessage
-                            name="due_date"
-                            component="div"
-                            className="error"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="sms-attach_files sms-add_same">
-                      <span>Content Included</span>
-                      <div className="epc-drag-drop-files">
-                        <img src="/SVG/drag-drop-vec.svg" alt="drag" />
-                        <input
-                          type="file"
-                          multiple
-                          style={{ display: "none" }}
-                          id="mediaFileInput"
-                          accept=".jpg,.jpeg,.png,.pdf"
+                          value={JSON.stringify({
+                            name: opt,
+                            is_completed: false,
+                          })}
+                          checked={values.stages.some((s) => s.name === opt)}
                           onChange={(e) => {
-                            const files = Array.from(e.target.files);
-                            setMediaFiles(files);
-                            setMediaPreviews(
-                              files.map((file) => URL.createObjectURL(file))
-                            );
+                            if (e.target.checked) {
+                              setFieldValue("stages", [
+                                ...values.stages,
+                                { name: opt, is_completed: false },
+                              ]);
+                            } else {
+                              setFieldValue(
+                                "stages",
+                                values.stages.filter((s) => s.name !== opt)
+                              );
+                            }
                           }}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            document.getElementById("mediaFileInput").click();
-                          }}
-                        >
-                          Drag and drop files here or click to browse
-                        </a>
-                        <span>JPG, PNG, PDF (Max 5MB)</span>
-                      </div>
-                    </div>
+                        <span className="ml-2 text-sm text-gray-700">
+                          {opt}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                  <ErrorMessage
+                    name="stages"
+                    component="div"
+                    className="text-red-600 text-sm mt-1"
+                  />
+                </div>
 
-                    {mediaPreviews.length > 0 && (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "8px",
-                          flexWrap: "wrap",
+                {/* Priority and Assign To */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Priority
+                    </label>
+                    <Field
+                      as="select"
+                      name="priority"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select Priority</option>
+                      {priorityOptions.map((opt, idx) => (
+                        <option key={idx} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </Field>
+                    <ErrorMessage
+                      name="priority"
+                      component="div"
+                      className="text-red-600 text-sm mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Assign To
+                    </label>
+                    <Field
+                      as="select"
+                      name="assign_to"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select Assign To</option>
+                      {employees.map((emp) => (
+                        <option key={emp._id} value={emp._id}>
+                          {emp.full_name}
+                        </option>
+                      ))}
+                    </Field>
+                    <ErrorMessage
+                      name="assign_to"
+                      component="div"
+                      className="text-red-600 text-sm mt-1"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Dates */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Start Date - End Date
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <Field
+                      type="date"
+                      name="assign_date"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <ErrorMessage
+                      name="assign_date"
+                      component="div"
+                      className="text-red-600 text-sm mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Field
+                      type="date"
+                      name="due_date"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <ErrorMessage
+                      name="due_date"
+                      component="div"
+                      className="text-red-600 text-sm mt-1"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* File Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Content Included
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                  <svg
+                    className="w-8 h-8 text-gray-400 mx-auto mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                  <input
+                    type="file"
+                    multiple
+                    style={{ display: "none" }}
+                    id="mediaFileInput"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files);
+                      setMediaFiles(files);
+                      setMediaPreviews(
+                        files.map((file) => URL.createObjectURL(file))
+                      );
+                    }}
+                  />
+                  <label
+                    htmlFor="mediaFileInput"
+                    className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                  >
+                    Drag and drop files here or click to browse
+                  </label>
+                  <p className="text-gray-500 text-sm mt-1">
+                    JPG, PNG, PDF (Max 5MB)
+                  </p>
+                </div>
+              </div>
+
+              {/* Media Previews */}
+              {mediaPreviews.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {mediaPreviews.map((preview, idx) => (
+                    <div key={idx} className="relative group">
+                      <img
+                        src={preview}
+                        alt="preview"
+                        className="w-20 h-20 object-cover rounded border border-gray-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMediaPreviews(
+                            mediaPreviews.filter((_, i) => i !== idx)
+                          );
+                          setMediaFiles(mediaFiles.filter((_, i) => i !== idx));
                         }}
+                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 group-hover:opacity-100 transition-opacity"
                       >
-                        {mediaPreviews.map((preview, idx) => (
-                          <img
-                            key={idx}
-                            src={preview}
-                            alt="preview"
-                            style={{ maxWidth: "80px" }}
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
                           />
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="sms-final_btns">
-                      <button type="reset" className="theme_secondary_btn">
-                        Reset Form
-                      </button>
-                      <button type="submit" className="theme_btn">
-                        Update Subtask
+                        </svg>
                       </button>
                     </div>
-                  </Form>
-                )}
-              </Formik>
-            </div>
-          </div>
-        </div>
-      </section>
+                  ))}
+                </div>
+              )}
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="reset"
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Reset Form
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Update Subtask
+                </button>
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </div>
     </div>
   );
 };

@@ -8019,6 +8019,7 @@ a {
   height: 0;
 }
 
+/* New CSS */
 .dashboard-container {
   padding: 20px;
   background: #f8f9fa;
@@ -8510,7 +8511,6 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
   height: 32px;
   border-radius: 6px;
   border: 1px solid;
@@ -8567,7 +8567,7 @@ a {
   transition: border-color 0.2s;
   font-weight: 500;
   width: 100%;
-  max-width: 120px;
+  max-width: 150px;
 }
 
 .filter-select:focus {
@@ -8737,3 +8737,506 @@ a {
     justify-content: center;
   }
 }
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+}
+
+.filter-options {
+  display: flex;
+  gap: 8px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border: 1px solid #ced4da;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #495057;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  background: #0a3749;
+  color: white;
+  border-color: #0a3749;
+}
+
+.projects-list {
+  padding: 0 20px;
+}
+
+.project-item {
+  margin-bottom: 16px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f8f9fa;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.project-header:hover {
+  background: #e9ecef;
+}
+
+.project-header.open {
+  background: #e3f2fd;
+  border-bottom: 1px solid #bbdefb;
+}
+
+.project-name {
+  font-weight: 600;
+  color: #212529;
+}
+
+.project-time {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.dropdown-arrow {
+  transition: transform 0.3s;
+}
+
+.dropdown-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+.subtasks-table-container {
+  padding: 0;
+  background: white;
+}
+
+.highlight {
+  font-weight: 600;
+  color: #0a3749;
+}
+
+.status-overdue {
+  background: #fff5f5;
+  color: #dc3545;
+  border: 1px solid #f5c6cb;
+}
+
+.status-overdue .status-dot {
+  background: #dc3545;
+}
+
+.custom-date-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.time-spent {
+  font-weight: 600;
+  color: #0a3749;
+  font-family: monospace;
+}
+
+.stage-badge {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #e9ecef;
+}
+
+.stage-badge.cad-design {
+  background: #e3f2fd;
+  color: #1976d2;
+  border-color: #bbdefb;
+}
+
+.stage-badge.set-design {
+  background: #fff3cd;
+  color: #856404;
+  border-color: #ffeaa7;
+}
+
+.stage-badge.delivery {
+  background: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
+}
+
+.stage-badge.render {
+  background: #e8f5e8;
+  color: #388e3c;
+  border-color: #c8e6c9;
+}
+
+/* Projects Grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.project-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  padding: 20px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.project-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.project-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #212529;
+  margin: 0;
+  flex: 1;
+  padding-right: 12px;
+}
+
+.project-client {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.project-dates {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.days-remaining {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: #e9ecef;
+  color: #495057;
+}
+
+.days-remaining.overdue {
+  background: #fff5f5;
+  color: #dc3545;
+}
+
+.progress-section {
+  margin-bottom: 16px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.progress-count {
+  font-weight: 600;
+  color: #495057;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #f1f3f4;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #0a3749;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.project-team {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.team-members {
+  display: flex;
+  align-items: center;
+}
+
+.team-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid white;
+  position: relative;
+}
+
+.team-avatar.placeholder {
+  background: #0a3749;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.team-avatar.more-members {
+  background: #e9ecef;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.team-count {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.project-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.action-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.action-btn.view-btn {
+  background: white;
+  border: 1px solid #e9ecef;
+  color: #495057;
+}
+
+.action-btn.view-btn:hover {
+  background: #f8f9fa;
+  border-color: #ced4da;
+}
+
+.action-btn.primary-btn {
+  background: #0a3749;
+  border: 1px solid #0a3749;
+  color: white;
+}
+
+.action-btn .primary-btn:hover {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+.no-projects {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.no-projects svg {
+  margin-bottom: 16px;
+  color: #ced4da;
+}
+
+.no-projects p {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* Filter group styles */
+.filter-group {
+  display: flex;
+  align-items: center;
+}
+
+.filter-group .filter-select {
+  margin-left: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .projects-grid {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .project-card {
+    padding: 16px;
+  }
+
+  .project-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .table-controls .controls-left {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    margin-top: 12px;
+  }
+
+  .filter-group .filter-select {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Notification Admin Styles - Add these to your existing CSS */
+
+/* Filter Tabs Section */
+.filter-tabs-section {
+  background: white;
+  border-radius: 8px;
+  padding: 0;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+}
+
+.filter-tabs {
+  display: flex;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.filter-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-right: 1px solid #e9ecef;
+  font-weight: 500;
+  color: #6c757d;
+  position: relative;
+}
+
+.filter-tab:last-child {
+  border-right: none;
+}
+
+.filter-tab:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.filter-tab.active {
+  background: white;
+  color: #0a3749;
+  border-bottom: 3px solid #0a3749;
+}
+
+.filter-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: white;
+}
+
+.filter-icon {
+  font-size: 18px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.filter-count {
+  background: #e9ecef;
+  color: #495057;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 12px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.filter-tab.active .filter-count {
+  background: #0a3749;
+  color: white;
+}
+
+

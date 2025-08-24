@@ -49,7 +49,7 @@ import Designation from "./pages/admin-panel/Designation";
 
 import AdminProfile from "./pages/admin-panel/AdminProfile";
 
-import ArchivedProjects from "./pages/admin-panel/ArchivedProjects";
+import ArchivedProjects from "./pages/admin-panel/project/ArchivedProjects";
 
 function App() {
   return (

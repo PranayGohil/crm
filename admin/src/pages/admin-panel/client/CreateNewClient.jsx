@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
-
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const CreateNewClient = () => {
@@ -78,6 +78,7 @@ const CreateNewClient = () => {
         console.error(err);
         toast.error(err.error);
       } finally {
+        setLoading(false);
         setSubmitting(false);
       }
     },
@@ -89,88 +90,125 @@ const CreateNewClient = () => {
   if (loading) return <LoadingOverlay />;
 
   return (
-    <>
-      <section className="cnc-first cd-client_dashboard header header_back_arrow">
-        <Link to="/client/dashboard" className="back_arrow_link mx-3">
-          <img src="/SVG/arrow-pc.svg" alt="Back" className="back_arrow" style={{ scale: "1.3" }} />
-        </Link>
-        <div className="cnc-first-inner cd-head-menu head-menu">
-          <h1>Create New Client</h1>
-          <p>Add a new client to your dashboard</p>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <ToastContainer position="top-center" />
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-10 h-10 bg-gray-100 border border-gray-300 rounded-lg mr-4 hover:bg-gray-200 transition-colors"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-800">
+              Create New Client
+            </h1>
+            <p className="text-gray-600">Add a new client to your dashboard</p>
+          </div>
         </div>
-      </section>
+      </div>
 
-      <section className="cnc-sec2">
-        <form onSubmit={handleSubmit}>
-          {/* section 1 */}
-          <div className="cnc-sec2-inner">
-            <div className="cnc-first-inner cd-head-menu head-menu">
-              <h1>Client Information</h1>
-            </div>
-            <div className="cnc-client-inf">
-              <div className="cnc-ci">
-                <div className="ci-inner cnc-css">
-                  <p>Full Name</p>
-                  <input
-                    type="text"
-                    name="full_name"
-                    value={values.full_name}
-                    onChange={handleChange}
-                    placeholder="e.g., John Doe"
-                    disabled={isSubmitting}
-                  />
-                  {touched.full_name && errors.full_name && (
-                    <div className="error">{errors.full_name}</div>
-                  )}
-                </div>
-                <div className="ci-inner cnc-css">
-                  <p>Email Address</p>
-                  <input
-                    type="email"
-                    name="email"
-                    value={values.email}
-                    onChange={handleChange}
-                    placeholder="e.g., john@example.com"
-                    disabled={isSubmitting}
-                  />
-                  {touched.email && errors.email && (
-                    <div className="error">{errors.email}</div>
-                  )}
-                </div>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Client Information Section */}
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Client Information
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  name="full_name"
+                  value={values.full_name}
+                  onChange={handleChange}
+                  placeholder="e.g., John Doe"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {touched.full_name && errors.full_name && (
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.full_name}
+                  </div>
+                )}
               </div>
 
-              <div className="cnc-ci">
-                <div className="ci-inner cnc-css">
-                  <p>Phone Number</p>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={values.phone}
-                    onChange={handleChange}
-                    placeholder="+91 9876543210"
-                    disabled={isSubmitting}
-                  />
-                  {touched.phone && errors.phone && (
-                    <div className="error">{errors.phone}</div>
-                  )}
-                </div>
-                <div className="ci-inner cnc-css">
-                  <p>Joining Date</p>
-                  <input
-                    type="date"
-                    name="joining_date"
-                    value={values.joining_date}
-                    onChange={handleChange}
-                    disabled={isSubmitting}
-                  />
-                  {touched.joining_date && errors.joining_date && (
-                    <div className="error">{errors.joining_date}</div>
-                  )}
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={values.email}
+                  onChange={handleChange}
+                  placeholder="e.g., john@example.com"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {touched.email && errors.email && (
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.email}
+                  </div>
+                )}
               </div>
 
-              <div className="cnc-add cnc-css">
-                <p>Address</p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone Number
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={values.phone}
+                  onChange={handleChange}
+                  placeholder="+91 9876543210"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {touched.phone && errors.phone && (
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.phone}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Joining Date
+                </label>
+                <input
+                  type="date"
+                  name="joining_date"
+                  value={values.joining_date}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {touched.joining_date && errors.joining_date && (
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.joining_date}
+                  </div>
+                )}
+              </div>
+
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Address
+                </label>
                 <input
                   type="text"
                   name="address"
@@ -178,175 +216,191 @@ const CreateNewClient = () => {
                   onChange={handleChange}
                   placeholder="Street, City, State, ZIP Code"
                   disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {touched.address && errors.address && (
-                  <div className="error">{errors.address}</div>
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.address}
+                  </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* section 2 */}
-          <div className="cnc-sec2-inner mt-5">
-            <div className="cnc-first-inner cd-head-menu head-menu">
-              <h1>Account Credentials</h1>
-            </div>
-            <div className="cnc-client-inf">
-              <div className="cnc-ci">
-                <div className="ci-inner cnc-css">
-                  <p>Username</p>
-                  <input
-                    type="text"
-                    name="username"
-                    value={values.username}
-                    onChange={handleChange}
-                    placeholder="e.g., John.Doe"
-                    disabled={isSubmitting}
-                  />
-                  {touched.username && errors.username && (
-                    <div className="error">{errors.username}</div>
-                  )}
-                </div>
-                <div className="ci-inner cnc-css">
-                  <p>Client Type / Category</p>
-                  <input
-                    type="text"
-                    name="client_type"
-                    value={values.client_type}
-                    onChange={handleChange}
-                    placeholder="Client Type / Category"
-                    disabled={isSubmitting}
-                  />
-                  {touched.client_type && errors.client_type && (
-                    <div className="error">{errors.client_type}</div>
-                  )}
-                </div>
+          {/* Account Credentials Section */}
+          <div className="pt-6 border-t border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Account Credentials
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  name="username"
+                  value={values.username}
+                  onChange={handleChange}
+                  placeholder="e.g., John.Doe"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {touched.username && errors.username && (
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.username}
+                  </div>
+                )}
               </div>
 
-              <div className="cnc-ci">
-                <div
-                  className="ci-inner cnc-css"
-                >
-                  <p>Password</p>
-                  <div style={{ position: "relative" }}>
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      value={values.password}
-                      onChange={handleChange}
-                      placeholder="********"
-                      disabled={isSubmitting}
-                    />
-                    <span
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="eye-icon"
-                      style={{
-                        position: "absolute",
-                        right: "10px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        cursor: "pointer",
-                      }}
-                    >
-                      {showPassword ? <FaEye /> : <FaEyeSlash />}
-                    </span>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Client Type / Category
+                </label>
+                <input
+                  type="text"
+                  name="client_type"
+                  value={values.client_type}
+                  onChange={handleChange}
+                  placeholder="Client Type / Category"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                {touched.client_type && errors.client_type && (
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.client_type}
                   </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={values.password}
+                    onChange={handleChange}
+                    placeholder="********"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <span
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </span>
                 </div>
                 {touched.password && errors.password && (
-                  <div className="error">{errors.password}</div>
-                )}
-                <div className="ci-inner cnc-css">
-                  <p>Confirm Password</p>
-                  <div style={{ position: "relative" }}>
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      name="confirm_password"
-                      value={values.confirm_password}
-                      onChange={handleChange}
-                      placeholder="********"
-                      disabled={isSubmitting}
-                    />
-                    <span
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      className="eye-icon"
-                      style={{
-                        position: "absolute",
-                        right: "10px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        cursor: "pointer",
-                      }}
-                    >
-                      {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
-                    </span>
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.password}
                   </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirm_password"
+                    value={values.confirm_password}
+                    onChange={handleChange}
+                    placeholder="********"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <span
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+                  >
+                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                  </span>
                 </div>
                 {touched.confirm_password && errors.confirm_password && (
-                  <div className="error">{errors.confirm_password}</div>
+                  <div className="text-red-600 text-sm mt-1">
+                    {errors.confirm_password}
+                  </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* section 3 */}
-          <div className="cnc-sec2-inner mt-5">
-            <div className="cnc-first-inner cd-head-menu head-menu">
-              <h1>Additional Details (Optional)</h1>
-            </div>
-            <div className="cnc-client-inf">
-              {/* optional fields (same as before, disable={isSubmitting}) */}
-              <div className="cnc-ci">
-                <div className="ci-inner cnc-css">
-                  <p>Company Name</p>
-                  <input
-                    type="text"
-                    name="company_name"
-                    value={values.company_name}
-                    onChange={handleChange}
-                    placeholder="Amore Corporation"
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className="ci-inner cnc-css">
-                  <p>GST / VAT Number</p>
-                  <input
-                    type="text"
-                    name="gst_number"
-                    value={values.gst_number}
-                    onChange={handleChange}
-                    placeholder="GST1234567ABC"
-                    disabled={isSubmitting}
-                  />
-                </div>
+          {/* Additional Details Section */}
+          <div className="pt-6 border-t border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              Additional Details (Optional)
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Company Name
+                </label>
+                <input
+                  type="text"
+                  name="company_name"
+                  value={values.company_name}
+                  onChange={handleChange}
+                  placeholder="Amore Corporation"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
               </div>
-              <div className="cnc-ci">
-                <div className="ci-inner cnc-css">
-                  <p>Business Phone</p>
-                  <input
-                    type="text"
-                    name="business_phone"
-                    value={values.business_phone}
-                    onChange={handleChange}
-                    placeholder="+91 9876543210"
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className="ci-inner cnc-css">
-                  <p>Website</p>
-                  <input
-                    type="text"
-                    name="website"
-                    value={values.website}
-                    onChange={handleChange}
-                    placeholder="https://www.amorecorp.com"
-                    disabled={isSubmitting}
-                  />
-                </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  GST / VAT Number
+                </label>
+                <input
+                  type="text"
+                  name="gst_number"
+                  value={values.gst_number}
+                  onChange={handleChange}
+                  placeholder="GST1234567ABC"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
               </div>
-              <div className="cnc-add cnc-css">
-                <p>LinkedIn</p>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Business Phone
+                </label>
+                <input
+                  type="text"
+                  name="business_phone"
+                  value={values.business_phone}
+                  onChange={handleChange}
+                  placeholder="+91 9876543210"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Website
+                </label>
+                <input
+                  type="text"
+                  name="website"
+                  value={values.website}
+                  onChange={handleChange}
+                  placeholder="https://www.amorecorp.com"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  LinkedIn
+                </label>
                 <input
                   type="text"
                   name="linkedin"
@@ -354,10 +408,14 @@ const CreateNewClient = () => {
                   onChange={handleChange}
                   placeholder="https://linkedin.com/company/amorecorp"
                   disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              <div className="cnc-add cnc-css">
-                <p>Business Address</p>
+
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Business Address
+                </label>
                 <input
                   type="text"
                   name="business_address"
@@ -365,10 +423,14 @@ const CreateNewClient = () => {
                   onChange={handleChange}
                   placeholder="789 Market Street, Suite 101, NY, USA"
                   disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              <div className="cnc-add cnc-css">
-                <p>Additional Notes</p>
+
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Additional Notes
+                </label>
                 <input
                   type="text"
                   name="additional_notes"
@@ -376,30 +438,58 @@ const CreateNewClient = () => {
                   onChange={handleChange}
                   placeholder="Client prefers email communication..."
                   disabled={isSubmitting}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
           </div>
-          <div className="d-flex justify-content-end">
+
+          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
             <button
               type="button"
-              className="theme_secondary_btn mt-3 me-3"
               onClick={() => navigate(-1)}
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
               disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="theme_btn mt-3"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
               disabled={isSubmitting}
             >
-              {isSubmitting ? <div className="loader"></div> : "Add Client"}
+              {isSubmitting ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Adding...
+                </>
+              ) : (
+                "Add Client"
+              )}
             </button>
           </div>
         </form>
-      </section>
-    </>
+      </div>
+    </div>
   );
 };
 

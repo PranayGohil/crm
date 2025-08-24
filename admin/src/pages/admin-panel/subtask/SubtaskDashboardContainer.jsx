@@ -567,7 +567,7 @@ const SubtaskDashboardContainer = () => {
           <div className="header-left">
             <button
               className="back-button"
-              onClick={() => navigate("/project/dashboard")}
+              onClick={() => navigate(-1)}
             >
               <svg
                 width="20"

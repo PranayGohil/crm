@@ -71,13 +71,14 @@ const ProjectDetails = () => {
   }, [projectId]);
 
   useEffect(() => {
-    setCompletedCount(
-      subTasks.filter((t) => t.status?.toLowerCase() === "completed").length
-    );
+    const completed = subTasks.filter(
+      (t) => t.status?.toLowerCase() === "completed"
+    ).length;
+    setCompletedCount(completed);
     setProgressPercent(
-      subTasks.length ? Math.round((completedCount / subTasks.length) * 100) : 0
+      subTasks.length ? Math.round((completed / subTasks.length) * 100) : 0
     );
-  }, [subTasks, completedCount]);
+  }, [subTasks]);
 
   const handleUpdate = async () => {
     try {
@@ -149,116 +150,136 @@ const ProjectDetails = () => {
 
   return (
     <>
-      <div className="preview-page p-3">
-        <section className="pb-sec1 d-flex justify-content-between">
-          <div className="anp-header-inner">
-            <div className="anp-heading-main">
-              <div
-                className="anp-back-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate(-1);
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                <img
-                  src="/SVG/arrow-pc.svg"
-                  alt="back"
-                  className="mx-2"
-                  style={{ scale: "1.3" }}
-                />
-              </div>
-              <div className="head-menu">
-                <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
-                  Project Details{" "}
-                </h1>
-              </div>
-            </div>
-          </div>
-          <div className="d-flex gap-2">
-            {project.isArchived ? (
+      <div className="min-h-screen bg-gray-50 p-6">
+        {/* Header */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
               <button
-                className="bg-danger theme_btn d-flex align-items-center"
-                onClick={() => setShowUnarchiveModal(true)}
+                onClick={() => navigate(-1)}
+                className="flex items-center justify-center w-10 h-10 bg-gray-100 border border-gray-300 rounded-lg mr-4 hover:bg-gray-200 transition-colors"
               >
-                <img
-                  src="/SVG/delete.svg"
-                  alt="unarchive"
-                  className="me-2"
-                  style={{ filter: "invert(1)" }}
-                />
-                Unarchive Project
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
               </button>
-            ) : (
+              <h1 className="text-2xl font-semibold text-gray-800">
+                Project Details
+              </h1>
+            </div>
+            <div className="flex gap-2">
+              {project.isArchived ? (
+                <button
+                  className="flex items-center gap-2 px-4 py-2 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                  onClick={() => setShowUnarchiveModal(true)}
+                  style={{ border: "1px solid red", color: "red" }}
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M5 8h14M5 8a2 2 0 1 1 0-4h14a2 2 0 1 1 0 4M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8m-9 4h4" />
+                  </svg>
+                  Unarchive Project
+                </button>
+              ) : (
+                <button
+                  className="flex items-center gap-2 px-4 py-2 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                  onClick={() => setShowArchiveModal(true)}
+                  style={{ border: "1px solid red", color: "red" }}
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M5 8h14M5 8a2 2 0 1 1 0-4h14a2 2 0 1 1 0 4M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8m-9 4h4" />
+                  </svg>
+                  Archive Project
+                </button>
+              )}
+
               <button
-                className="bg-danger theme_btn d-flex align-items-center"
-                onClick={() => setShowArchiveModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                onClick={() => setShowDeleteModal(true)}
               >
-                <img
-                  src="/SVG/delete.svg"
-                  alt="archive"
-                  className="me-2"
-                  style={{ filter: "invert(1)" }}
-                />
-                Archive Project
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+                Delete Project
               </button>
-            )}
-
-            <button
-              className="bg-danger theme_btn d-flex align-items-center"
-              onClick={() => setShowDeleteModal(true)}
-            >
-              <img
-                src="/SVG/delete.svg"
-                alt="delete"
-                className="me-2"
-                style={{ filter: "invert(1)" }}
-              />
-              Delete Project
-            </button>
-            <Link
-              to={`/project/edit/${project._id}`}
-              className="theme_btn d-flex align-items-center"
-            >
-              <img
-                src="/SVG/edit.svg"
-                alt="edit"
-                className="me-2"
-                style={{ filter: "invert(1)" }}
-              />
-              Edit Project
-            </Link>
-          </div>
-        </section>
-
-        <section className="pb-sec2">
-          <div className="pb-sec2-heading">
-            <div className="pb-subtask-head">
-              <h2>{project.project_name}</h2>
+              <Link
+                to={`/project/edit/${project._id}`}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                Edit Project
+              </Link>
             </div>
           </div>
-        </section>
+        </div>
 
-        <section className="pb-sec-3 pb-sec2">
-          <div className="pb-sec3-inner">
-            <div className="pb-client-id">
-              <div className="pb-pro-client pb-project-id">
-                <p>Project ID: </p>
-                <span>{project._id}</span>
+        {/* Project Title */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">
+            {project.project_name}
+          </h2>
+        </div>
+
+        {/* Project Info */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-gray-600">Project ID:</span>
+                <span className="font-medium">{project._id}</span>
               </div>
-              <div className="pb-pro-client pb-client">
-                <p>Client: </p>
-                <span>{client?.full_name || "N/A"}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-600">Client:</span>
+                <span className="font-medium">
+                  {client?.full_name || "N/A"}
+                </span>
               </div>
             </div>
 
-            <div className="pb-subtask-process">
+            <div className="flex items-center gap-2">
               {isEditing ? (
                 <>
                   <select
                     value={editingStatus}
                     onChange={(e) => setEditingStatus(e.target.value)}
-                    className="dropdown_toggle"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     disabled={saving}
                   >
                     <option value="">Select Status</option>
@@ -272,7 +293,7 @@ const ProjectDetails = () => {
                   <select
                     value={editingPriority}
                     onChange={(e) => setEditingPriority(e.target.value)}
-                    className="dropdown_toggle"
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     disabled={saving}
                   >
                     <option value="">Select Priority</option>
@@ -286,13 +307,13 @@ const ProjectDetails = () => {
                   <button
                     onClick={handleUpdate}
                     disabled={saving}
-                    className="theme_btn mx-2"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                   >
                     {saving ? "Saving..." : "Update"}
                   </button>
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="theme_secondary_btn"
+                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 disabled:opacity-50"
                     disabled={saving}
                   >
                     Cancel
@@ -300,15 +321,31 @@ const ProjectDetails = () => {
                 </>
               ) : (
                 <>
-                  <a href="#" className="cdn-bg-color-yellow color_yellow me-2">
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      project.status === "Completed"
+                        ? "bg-green-100 text-green-800"
+                        : project.status === "In Progress"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
                     {project.status || "Status Unknown"}
-                  </a>
-                  <a href="#" className="cdn-bg-color-red color_red me-2">
+                  </span>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      project.priority === "High"
+                        ? "bg-red-100 text-red-800"
+                        : project.priority === "Medium"
+                        ? "bg-orange-100 text-orange-800"
+                        : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
                     {project.priority || "Priority Unknown"}
-                  </a>
+                  </span>
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="theme_btn btn-sm"
+                    className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
                   >
                     Edit
                   </button>
@@ -316,197 +353,204 @@ const ProjectDetails = () => {
               )}
             </div>
           </div>
-        </section>
+        </div>
 
-        <section className="pb-sec-4 pb-sec2">
-          <div className="pb-sec4-inner pb-sec3-inner">
-            <div className="pb-task-overview-head">
-              <p>Project Overview</p>
-            </div>
-            <div className="pb-task-overview-inner">
-              <div className="pb-task-view overview1 row">
-                <div className="pb-taskinner row">
-                  <div className="col-md-4">Start Date:</div>
-                  <div className="col-md-8">
-                    {project.assign_date
-                      ? new Date(project.assign_date).toLocaleDateString()
-                      : "N/A"}
-                  </div>
-                </div>
-                <div className="pb-taskinner row">
-                  <div className="col-md-4">Due Date:</div>
-                  <div className="col-md-8">
-                    {project.due_date
-                      ? new Date(project.due_date).toLocaleDateString()
-                      : "N/A"}
-                  </div>
-                </div>
+        {/* Project Overview */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Project Overview
+            </h3>
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Start Date:</span>
+                <span className="font-medium">
+                  {project.assign_date
+                    ? new Date(project.assign_date).toLocaleDateString()
+                    : "N/A"}
+                </span>
               </div>
-              <div className="pb-task-view overview2 row">
-                <div className="pb-taskinner">
-                  <div className="col-md-4">Status:</div>
-                  <div className="col-md-8">{project.status || "N/A"}</div>
-                </div>
-                <div className="pb-taskinner">
-                  <div className="col-md-4">Completion:</div>
-                  <div className="col-md-8 d-flex flex-column">
-                    <div className="md-project-card__subtask_text">
-                      <div className="md-subtask-text">Subtasks Completed</div>
-                      <div className="md-subtask-total-sub_number">
-                        {completedCount}/{subTasks.length}
-                      </div>
-                    </div>
-                    <div className="md-project_card__progress_bar">
-                      <div
-                        className="md-project_card__progress_fill cdn-bg-color-blue"
-                        style={{ width: `${progressPercent}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Due Date:</span>
+                <span className="font-medium">
+                  {project.due_date
+                    ? new Date(project.due_date).toLocaleDateString()
+                    : "N/A"}
+                </span>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="pb-sec-5 pb-sec2">
-          <div className="pb-sec5-inner pb-sec3-inner d-flex flex-column">
-            <div className="pb-task-overview-head">
-              <p>Description</p>
-            </div>
-            <div className="pb-assigned-employees">
-              <div className="pb-task-view overview1">
-                <div className="pb-taskinner">
-                  <p>
-                    {project.content[0].description ||
-                      "No description provided."}
-                  </p>
-                </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Status:</span>
+                <span className="font-medium">{project.status || "N/A"}</span>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Project Content */}
-        <section className="pc-main-content">
-          <div className="pc-content-inner-txt">
-            <h4>Project Content</h4>
-            <span>Manage all project content, items, and pricing details</span>
-          </div>
-        </section>
-
-        <section className="pc-price-and-overview pc-sec-content">
-          <div className="pc-item-price">
-            <div className="pc-item-price-inner">
-              <h2>Jewelry Items & Pricing</h2>
-            </div>
-            <div className="pc-item-table">
-              {project?.content?.[0]?.items?.length > 0 ? (
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Jewelry Item</th>
-                      <th>Quantity</th>
-                      <th>Price per Item ({currency})</th>
-                      <th>Total ({currency})</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {project.content[0].items.map((item, idx) => (
-                      <tr key={idx}>
-                        <td>{item.name}</td>
-                        <td>{item.quantity}</td>
-                        <td>{item.price}</td>
-                        <td>{item.quantity * item.price}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colSpan="3">Sub Total</td>
-                      <td>
-                        {project.content[0].items.reduce(
-                          (sum, i) => sum + i.quantity * i.price,
-                          0
-                        )}
-                      </td>
-                    </tr>
-                  </tfoot>
-                </table>
-              ) : (
-                <p>No items added yet.</p>
-              )}
-            </div>
-          </div>
-
-          <div className="pc-pricing-overview">
-            <div className="pc-prc-inner">
-              <div className="prc-txt">
-                <h2>Pricing Overview</h2>
-              </div>
-            </div>
-            <div className="pc-total-project-price">
-              <p>Total Project Price</p>
-              <span>
-                {currency} {totalPrice}
-              </span>
-            </div>
-          </div>
-        </section>
-
-        <section className="pc-content-include">
-          <div className="pc-content-inner">
-            <h2>Content Included</h2>
-          </div>
-          <div className="pc-photo-video">
-            <div className="pc-content-photo">
-              <div className="pc-photo-detail">
-                <div className="photo-video-inner">
-                  <div className="not-completed-text">
-                    <h3>Media</h3>
-                    <p>Uploaded Media</p>
-                  </div>
-                </div>
-                <div className="pc-item-contain">
-                  <span>
-                    {project?.content?.[0]?.uploaded_files?.length || 0}
+              <div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-600">Completion:</span>
+                  <span className="font-medium">
+                    {completedCount}/{subTasks.length} subtasks
                   </span>
                 </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full"
+                    style={{ width: `${progressPercent}%` }}
+                  ></div>
+                </div>
               </div>
             </div>
           </div>
-        </section>
 
-        <section className="pc-notes-description">
-          <div className="pc-not-des-inner">
-            <h2>Project Notes / Description</h2>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Description
+            </h3>
+            <p className="text-gray-700">
+              {project.content?.[0]?.description || "No description provided."}
+            </p>
           </div>
-          <div className="pc-description">
-            <span>
-              {project?.content?.[0]?.description || "No description added."}
-            </span>
-          </div>
-        </section>
+        </div>
 
-        <section className="pc-media-preview">
-          <div className="pc-media-preview-inner">
-            <h2>Media Preview</h2>
-            <a href={`/project/gallery/${projectId}`}>View All</a>
+        {/* Project Content */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              Project Content
+            </h3>
+            <p className="text-gray-600">
+              Manage all project content, items, and pricing details
+            </p>
           </div>
-          <div className="pc-media-pre-imgs">
-            {project?.content?.[0]?.uploaded_files?.length > 0 ? (
-              project.content[0].uploaded_files
-                .slice(0, 3)
-                .map((url, idx) => (
-                  <img key={idx} src={url} alt={`media${idx}`} />
-                ))
-            ) : (
-              <p>No media uploaded.</p>
-            )}
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                Jewelry Items & Pricing
+              </h4>
+              {project?.content?.[0]?.items?.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Jewelry Item
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Quantity
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Price per Item ({currency})
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Total ({currency})
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {project.content[0].items.map((item, idx) => (
+                        <tr key={idx}>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {item.name}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {item.quantity}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {item.price}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {item.quantity * item.price}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot className="bg-gray-50">
+                      <tr>
+                        <td
+                          colSpan="3"
+                          className="px-4 py-4 text-sm font-medium text-gray-900"
+                        >
+                          Sub Total
+                        </td>
+                        <td className="px-4 py-4 text-sm font-medium text-gray-900">
+                          {project.content[0].items.reduce(
+                            (sum, i) => sum + i.quantity * i.price,
+                            0
+                          )}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-gray-600">No items added yet.</p>
+              )}
+            </div>
+
+            <div>
+              <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                Pricing Overview
+              </h4>
+              <div className="bg-blue-50 p-6 rounded-lg">
+                <p className="text-gray-600 mb-2">Total Project Price</p>
+                <p className="text-2xl font-bold text-blue-800">
+                  {currency} {totalPrice}
+                </p>
+              </div>
+
+              <h4 className="text-lg font-semibold text-gray-800 mt-6 mb-4">
+                Content Included
+              </h4>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h5 className="font-medium text-gray-800 mb-1">Media</h5>
+                <p className="text-gray-600 mb-2">Uploaded Media</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">
+                    {project?.content?.[0]?.uploaded_files?.length || 0} files
+                  </span>
+                  <Link
+                    to={`/project/gallery/${projectId}`}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    View All
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
-        </section>
+        </div>
+
+        {/* Media Preview */}
+        {project?.content?.[0]?.uploaded_files?.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Media Preview
+              </h3>
+              <Link
+                to={`/project/gallery/${projectId}`}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                View All
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {project.content[0].uploaded_files.slice(0, 3).map((url, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-lg overflow-hidden border border-gray-200"
+                >
+                  <img
+                    src={url}
+                    alt={`media${idx}`}
+                    className="w-full h-48 object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-      {/* ✅ Confirmation Modal */}
+
+      {/* Modals */}
       <Modal
         show={showDeleteModal}
         onHide={() => setShowDeleteModal(false)}

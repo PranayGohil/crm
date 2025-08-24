@@ -95,6 +95,7 @@ export const addSubTask = async (req, res) => {
 export const addBulkSubTasks = async (req, res) => {
   try {
     const tasks = req.body;
+    console.log("Received tasks:", tasks);
     const tasksWithObjectIds = tasks.map((task) => {
       const parsedStages = Array.isArray(task.stages) ? task.stages : [];
       return {
@@ -121,29 +122,31 @@ export const addBulkSubTasks = async (req, res) => {
       console.log("No admin found in the database");
     }
 
-    // 🔹 Realtime: Notify assigned employees
-    const io = req.app.get("io");
-    const connectedUsers = req.app.get("connectedUsers");
+    if (tasks[0].assign_to && connectedUsers[tasks[0].assign_to]) {
+      // 🔹 Realtime: Notify assigned employees
+      const io = req.app.get("io");
+      const connectedUsers = req.app.get("connectedUsers");
 
-    result.forEach(async (subtask) => {
-      const notification = await Notification.create({
-        title: "New Task Assigned",
-        description: `You have been assigned a new task: ${subtask.task_name}`,
-        type: "new_subtask",
-        icon: "",
-        related_id: subtask._id,
-        receiver_id: subtask.assign_to.toString(),
-        receiver_type: "employee",
-        created_by: admin?._id,
-        created_by_role: "admin",
+      result.forEach(async (subtask) => {
+        const notification = await Notification.create({
+          title: "New Task Assigned",
+          description: `You have been assigned a new task: ${subtask.task_name}`,
+          type: "new_subtask",
+          icon: "",
+          related_id: subtask._id,
+          receiver_id: subtask.assign_to.toString(),
+          receiver_type: "employee",
+          created_by: admin?._id,
+          created_by_role: "admin",
+        });
+        if (subtask.assign_to && connectedUsers[subtask.assign_to]) {
+          io.to(connectedUsers[subtask.assign_to]).emit(
+            "new_subtask",
+            notification
+          );
+        }
       });
-      if (subtask.assign_to && connectedUsers[subtask.assign_to]) {
-        io.to(connectedUsers[subtask.assign_to]).emit(
-          "new_subtask",
-          notification
-        );
-      }
-    });
+    }
 
     res.status(200).json(result);
   } catch (error) {

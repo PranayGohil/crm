@@ -87,16 +87,30 @@ const AdminProfile = () => {
   if (loading) return <LoadingOverlay />;
 
   return (
-    <section className="container mx-auto p-4">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <img
-          src="/SVG/vec-mem-pro.svg"
-          alt="back"
-          className="w-6 h-6 cursor-pointer"
-          onClick={() => navigate(-1)}
-        />
-        <h1 className="text-2xl font-semibold">Admin Profile</h1>
+    <section className="min-h-screen bg-gray-50 p-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-10 h-10 bg-gray-100 border border-gray-300 rounded-lg mr-4 hover:bg-gray-200 transition-colors"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-800">
+              Admin Profile
+            </h1>
+          </div>
+        </div>
       </div>
 
       {errors.general && (

@@ -1,4 +1,3 @@
-// File: EditProject.jsx
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { useFormik } from "formik";
@@ -112,7 +111,7 @@ const EditProject = () => {
               total_price: totalPrice,
               description: projectDescription,
               currency,
-              existing_files: existingFiles, // Important for retaining unremoved images
+              existing_files: existingFiles,
             },
           })
         );
@@ -183,368 +182,548 @@ const EditProject = () => {
   if (loading) return <LoadingOverlay />;
 
   return (
-    <div className="add_new_project_page">
-      <section className="anp-add_new_project-header">
-        <div className="anp-header-inner">
-            <div className="anp-heading-main">
+    <div className="min-h-screen bg-gray-50 p-6">
+      {/* Header */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-10 h-10 bg-gray-100 border border-gray-300 rounded-lg mr-4 hover:bg-gray-200 transition-colors"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+          <h1 className="text-2xl font-semibold text-gray-800">Edit Project</h1>
+        </div>
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+      >
+        <div className="space-y-6">
+          {/* Project Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Project Name
+            </label>
+            <input
+              type="text"
+              name="project_name"
+              value={values.project_name}
+              onChange={handleChange}
+              placeholder="Enter Project Name"
+              disabled={isSubmitting}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            {touched.project_name && errors.project_name && (
+              <div className="text-red-600 text-sm mt-1">
+                {errors.project_name}
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Client Selection */}
+            <div className="relative" ref={dropdownRef}>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Client Name
+              </label>
               <div
-                className="anp-back-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate(-1);
-                }}
-                style={{ cursor: "pointer" }}
+                className="flex items-center justify-between w-full px-4 py-2 border border-gray-300 rounded-lg cursor-pointer bg-white"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
               >
-                <img
-                  src="/SVG/arrow-pc.svg"
-                  alt="back"
-                  className="mx-2"
-                  style={{ scale: "1.3" }}
+                <span
+                  className={
+                    values.client_name ? "text-gray-800" : "text-gray-500"
+                  }
+                >
+                  {values.client_name || "Select Client"}
+                </span>
+                <svg
+                  className={`w-4 h-4 transition-transform ${
+                    dropdownOpen ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+              {dropdownOpen && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  {loading && (
+                    <div className="px-4 py-2 text-gray-500">Loading...</div>
+                  )}
+                  {clientError && (
+                    <div className="px-4 py-2 text-red-600">{clientError}</div>
+                  )}
+                  {!loading &&
+                    clients.map((client) => (
+                      <div
+                        key={client._id}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          setFieldValue("client_name", client.full_name);
+                          setFieldValue("client_id", client._id);
+                          setDropdownOpen(false);
+                        }}
+                      >
+                        {client.full_name}
+                      </div>
+                    ))}
+                </div>
+              )}
+              <Link
+                to="/client/create"
+                className="inline-flex items-center mt-2 text-blue-600 hover:text-blue-800"
+              >
+                <svg
+                  className="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                Add New Client
+              </Link>
+            </div>
+
+            {/* Dates */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Start Date - End Date
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="date"
+                  name="assign_date"
+                  value={values.assign_date}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <input
+                  type="date"
+                  name="due_date"
+                  value={values.due_date}
+                  onChange={handleChange}
+                  disabled={isSubmitting}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              <div className="head-menu">
-                <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
-                  Edit Project{" "}
-                </h1>
+              <div className="mt-1">
+                {touched.assign_date && errors.assign_date && (
+                  <div className="text-red-600 text-sm">
+                    {errors.assign_date}
+                  </div>
+                )}
+                {touched.due_date && errors.due_date && (
+                  <div className="text-red-600 text-sm">{errors.due_date}</div>
+                )}
               </div>
             </div>
           </div>
-      </section>
-      <form onSubmit={handleSubmit}>
-        <section className="anp-add_new_project_form">
-          <div className="anp-add_project_inner">
-            {/* Project Name */}
-            <div className="anp-prj_name sms-add_same">
-              <span>Project Name</span>
-              <input
-                type="text"
-                name="project_name"
-                value={values.project_name}
-                onChange={handleChange}
-                placeholder="Enter Project Name"
-                disabled={isSubmitting}
-              />
-              {touched.project_name && errors.project_name && (
-                <div className="error">{errors.project_name}</div>
-              )}
-            </div>
 
-            <div className="d-flex flex-col gap-4">
-              {/* Client Dropdown */}
-              <div className="anp-client-name btn_main" ref={dropdownRef}>
-                <span className="anp-client-name-para">Client Name</span>
-                <div
-                  className="anp-dropdown_toggle dropdown_toggle"
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
+          {/* Priority */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Priority
+            </label>
+            <div className="flex space-x-3">
+              {[
+                { level: "high", label: "High", value: "High" },
+                { level: "mid", label: "Medium", value: "Medium" },
+                { level: "low", label: "Low", value: "Low" },
+              ].map(({ level, label, value }) => (
+                <button
+                  key={level}
+                  type="button"
+                  className={`flex items-center px-4 py-2 rounded-lg border ${
+                    values.priority === value
+                      ? level === "high"
+                        ? "bg-red-100 text-red-800 border-red-300"
+                        : level === "mid"
+                        ? "bg-yellow-100 text-yellow-800 border-yellow-300"
+                        : "bg-green-100 text-green-800 border-green-300"
+                      : "bg-gray-100 text-gray-800 border-gray-300"
+                  }`}
+                  onClick={() => setFieldValue("priority", value)}
                 >
-                  <span className="text_btn">
-                    {values.client_name || "Select Client"}
-                  </span>
-                  <img src="/SVG/header-vector.svg" alt="arrow" />
-                </div>
-                {dropdownOpen && (
-                  <ul className="anp-dropdown_menu">
-                    {loading && <li>Loading...</li>}
-                    {clientError && (
-                      <li style={{ color: "red" }}>{clientError}</li>
-                    )}
-                    {!loading &&
-                      clients.map((client) => (
-                        <li
-                          key={client._id}
-                          onClick={() => {
-                            setFieldValue("client_name", client.full_name);
-                            setFieldValue("client_id", client._id);
-                            setDropdownOpen(false);
-                          }}
-                        >
-                          {client.full_name}
-                        </li>
-                      ))}
-                  </ul>
-                )}
-                <a href="/client/create" className="anp-add_client_btn">
-                  <img src="/SVG/plus-vec.svg" alt="plus" /> Add New Client
-                </a>
-              </div>
-
-              {/* Dates */}
-              <div className="anp-start_end-date sms-add_same">
-                <span>Start Date - End Date</span>
-                <div className="enp-date_input sms-add_same">
-                  <input
-                    type="date"
-                    name="assign_date"
-                    value={values.assign_date}
-                    onChange={handleChange}
-                    disabled={isSubmitting}
-                  />
-                  <input
-                    type="date"
-                    name="due_date"
-                    value={values.due_date}
-                    onChange={handleChange}
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className="error-group">
-                  {touched.assign_date && errors.assign_date && (
-                    <div className="error">{errors.assign_date}</div>
-                  )}
-                  {touched.due_date && errors.due_date && (
-                    <div className="error">{errors.due_date}</div>
-                  )}
-                </div>
-              </div>
+                  <span className="mr-2">{label}</span>
+                </button>
+              ))}
             </div>
+            {touched.priority && errors.priority && (
+              <div className="text-red-600 text-sm mt-1">{errors.priority}</div>
+            )}
+          </div>
 
-            {/* Priority */}
-            <div className="anp-client_priority sms-add_same">
-              <span>Priority</span>
-              <div className="anp-priority_btn">
-                {["high", "mid", "low"].map((level) =>
-                  level === "high" ? (
-                    <div
-                      key={level}
-                      className={`pr_btn anp-${level}_btn ${
-                        values.priority === "High" ? "active" : ""
-                      }`}
-                      onClick={() => setFieldValue("priority", "High")}
-                    >
-                      <img src={`/SVG/${level}-vec.svg`} alt={level} /> High
-                    </div>
-                  ) : level === "mid" ? (
-                    <div
-                      key={level}
-                      className={`pr_btn anp-${level}_btn ${
-                        values.priority === "Medium" ? "active" : ""
-                      }`}
-                      onClick={() => setFieldValue("priority", "Medium")}
-                    >
-                      <img src={`/SVG/${level}-vec.svg`} alt={level} /> Medium
-                    </div>
-                  ) : (
-                    <div
-                      key={level}
-                      className={`pr_btn anp-${level}_btn ${
-                        values.priority === "Low" ? "active" : ""
-                      }`}
-                      onClick={() => setFieldValue("priority", "Low")}
-                    >
-                      <img src={`/SVG/${level}-vec.svg`} alt={level} /> Low
-                    </div>
-                  )
-                )}
-              </div>
-              {touched.priority && errors.priority && (
-                <div className="error">{errors.priority}</div>
-              )}
-            </div>
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Project Description / Notes
+            </label>
+            <textarea
+              rows={5}
+              value={projectDescription}
+              onChange={(e) => setProjectDescription(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
 
-            {/* Description */}
-            <div className="epc-description-notes">
-              <span>Project Description / Notes</span>
-              <textarea
-                rows={5}
-                className="form-control"
-                value={projectDescription}
-                onChange={(e) => setProjectDescription(e.target.value)}
-              />
-            </div>
-
-            {/* Jewelry Items Table */}
-            <div className="epc-add-item-table">
-              <table className="jwell-table">
-                <thead>
+          {/* Jewelry Items Table */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Jewelry Items
+            </label>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
                   <tr>
-                    <th>Jewelry Item</th>
-                    <th>Quantity</th>
-                    <th>Price per Item</th>
-                    <th>Total</th>
-                    <th>Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Jewelry Item
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Quantity
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Price per Item
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Total
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="bg-white divide-y divide-gray-200">
                   {items.map((item, idx) => (
                     <tr key={idx}>
-                      <td>
+                      <td className="px-4 py-2 whitespace-nowrap">
                         <input
                           type="text"
                           value={item.name}
                           onChange={(e) =>
                             updateItem(idx, "name", e.target.value)
                           }
+                          className="w-full px-2 py-1 border border-gray-300 rounded"
                         />
                       </td>
-                      <td>
+                      <td className="px-4 py-2 whitespace-nowrap">
                         <input
                           type="number"
                           value={item.quantity}
                           onChange={(e) =>
                             updateItem(idx, "quantity", e.target.value)
                           }
+                          className="w-full px-2 py-1 border border-gray-300 rounded"
                         />
                       </td>
-                      <td>
+                      <td className="px-4 py-2 whitespace-nowrap">
                         <input
                           type="number"
                           value={item.price}
                           onChange={(e) =>
                             updateItem(idx, "price", e.target.value)
                           }
+                          className="w-full px-2 py-1 border border-gray-300 rounded"
                         />
                       </td>
-                      <td>{getTotal(item.quantity, item.price)}</td>
-                      <td>
-                        <span onClick={() => deleteRow(idx)}>
-                          <img src="/SVG/delete-vec.svg" alt="delete" />
-                        </span>
-                        <span onClick={() => resetRow(idx)}>
-                          <img src="/SVG/refresh-vec.svg" alt="reset" />
-                        </span>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        {getTotal(item.quantity, item.price)}
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        <div className="flex space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => deleteRow(idx)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
+                            </svg>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => resetRow(idx)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                              />
+                            </svg>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              <a
-                href="#"
-                className="epc-add-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  addItem();
-                }}
+            </div>
+            <button
+              type="button"
+              onClick={addItem}
+              className="mt-3 flex items-center text-blue-600 hover:text-blue-800"
+            >
+              <svg
+                className="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <img src="/SVG/plus-vec.svg" alt="plus" /> Add Item
-              </a>
-            </div>
-
-            {/* Price & Currency */}
-            <div className="epc-price-overview">
-              <div>
-                <p>Select Currency</p>
-                <select
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                  className="pc-dropdown_toggle bg-white"
-                >
-                  {["INR", "USD", "EUR", "AED"].map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <p>Subtotal</p>
-                <span>{getSubTotal()}</span>
-              </div>
-              <div>
-                <p>Total Project Price</p>
-                <input
-                  type="number"
-                  value={totalPrice}
-                  onChange={(e) => setTotalPrice(Number(e.target.value))}
-                  className="pc-dropdown_toggle bg-white"
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                 />
-              </div>
-            </div>
+              </svg>
+              Add Item
+            </button>
+          </div>
 
-            {/* File Upload */}
-            {existingFiles.length > 0 && (
-              <div className="uploaded-files-preview mt-3">
-                <ul className="file-list d-flex">
-                  {existingFiles.map((file, index) => (
-                    <li
-                      key={index}
-                      className="file-item d-flex flex-column mx-3"
-                    >
-                      <img
-                        src={file}
-                        alt="file"
-                        style={{
-                          width: "150px",
-                          height: "150px",
-                          objectFit: "contain",
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveExistingFile(file)}
-                      >
-                        ❌ Remove
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {selectedFiles.length > 0 && (
-              <div className="uploaded-files-preview mt-3">
-                <h4>New Files to Upload</h4>
-                <ul className="file-list d-flex">
-                  {selectedFiles.map((file, index) => (
-                    <li
-                      key={index}
-                      className="file-item d-flex flex-column mx-3"
-                    >
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt="preview"
-                        style={{
-                          width: "150px",
-                          height: "150px",
-                          objectFit: "contain",
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveSelectedFile(index)}
-                      >
-                        ❌ Remove
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div className="epc-drag-drop-files">
-              <img src="/SVG/drag-drop-vec.svg" alt="drag" />
-              <span>Drag and drop files here or</span>
-              <label className="browse-btn">
-                Browse Files
-                <input
-                  type="file"
-                  multiple
-                  hidden
-                  onChange={handleFileChange}
-                />
+          {/* Price & Currency */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Currency
               </label>
-            </div>
-            <div className="epc-num-of-file-uploaded">
-              <span>{selectedFiles.length}</span>
-              <p>new files selected</p>
-            </div>
-
-            {/* Submit Button */}
-            <div className="anp-create_btn">
-              <button
-                type="submit"
-                className="anp-create_task-btn"
-                disabled={isSubmitting}
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                {isSubmitting ? (
-                  <div className="loader"></div>
-                ) : (
-                  <>
-                    <img src="/SVG/save-vec.svg" alt="save" /> Save Project
-                  </>
-                )}
-              </button>
+                {["INR", "USD", "EUR", "AED"].map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Subtotal
+              </label>
+              <div className="px-4 py-2 bg-white border border-gray-300 rounded-lg">
+                {getSubTotal()}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Total Project Price
+              </label>
+              <input
+                type="number"
+                value={totalPrice}
+                onChange={(e) => setTotalPrice(Number(e.target.value))}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
             </div>
           </div>
-        </section>
+
+          {/* File Upload */}
+          {(existingFiles.length > 0 || selectedFiles.length > 0) && (
+            <div>
+              <h3 className="text-lg font-medium text-gray-800 mb-3">
+                Uploaded Files
+              </h3>
+
+              {existingFiles.length > 0 && (
+                <div className="mb-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                    Existing Files
+                  </h4>
+                  <div className="flex flex-wrap gap-4">
+                    {existingFiles.map((file, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={file}
+                          alt="file"
+                          className="w-32 h-32 object-cover rounded-lg border border-gray-300"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveExistingFile(file)}
+                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 group-hover:opacity-100 transition-opacity"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedFiles.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                    New Files to Upload
+                  </h4>
+                  <div className="flex flex-wrap gap-4">
+                    {selectedFiles.map((file, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt="preview"
+                          className="w-32 h-32 object-cover rounded-lg border border-gray-300"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSelectedFile(index)}
+                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 group-hover:opacity-100 transition-opacity"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* File Upload Area */}
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <svg
+              className="w-12 h-12 text-gray-400 mx-auto mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
+            <p className="text-gray-600 mb-2">Drag and drop files here or</p>
+            <label className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700">
+              <span>Browse Files</span>
+              <input type="file" multiple hidden onChange={handleFileChange} />
+            </label>
+            <p className="text-gray-500 text-sm mt-2">
+              {selectedFiles.length} new files selected
+            </p>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  Save Project
+                </>
+              )}
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   );

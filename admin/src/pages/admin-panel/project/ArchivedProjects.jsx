@@ -1,11 +1,10 @@
-import { useState, useEffect, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { statusOptions } from "../../../options.js";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import ProjectCard from "../../../components/admin/ProjectCard";
 
-const AllProject = () => {
+const ArchivedProjects = () => {
   const navigate = useNavigate();
   const [selectedClient, setSelectedClient] = useState({
     id: "All Client",
@@ -14,7 +13,7 @@ const AllProject = () => {
   const [selectedStatus, setSelectedStatus] = useState("All Status");
   const [searchTerm, setSearchTerm] = useState("");
   const [clients, setClients] = useState([]);
-  const statuses = statusOptions;
+  const statuses = ["To do", "In progress", "In Review", "Block", "Done"];
   const [projects, setProjects] = useState([]);
   const [projectSubtasks, setProjectSubtasks] = useState({});
   const [employees, setEmployees] = useState({});
@@ -38,13 +37,13 @@ const AllProject = () => {
     fetchClients();
   }, []);
 
-  // Fetch projects, subtasks & employees
+  // Fetch archived projects, subtasks & employees
   useEffect(() => {
     const fetchAllData = async () => {
       setLoading(true);
       try {
         const res = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/project/get-all`
+          `${process.env.REACT_APP_API_URL}/api/project/get-archived`
         );
         setProjects(res.data);
 
@@ -123,21 +122,8 @@ const AllProject = () => {
                 <path d="m15 18-6-6 6-6" />
               </svg>
             </button>
-            <h1 className="header-title">All Projects</h1>
+            <h1 className="header-title">Archived Projects</h1>
           </div>
-          <Link to="/project/add" className="add-button">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M12 5v14m-7-7h14" />
-            </svg>
-            Add Project
-          </Link>
         </div>
       </section>
 
@@ -145,11 +131,11 @@ const AllProject = () => {
       <section className="stats-section">
         <div className="stats-info">
           <span className="stats-number">{filteredProjects.length}</span>
-          <span>of {projects.length} Projects</span>
+          <span>Archived Projects</span>
         </div>
         <div className="stats-info">
           <span className="stats-number">{Object.keys(employees).length}</span>
-          <span>Active Employees</span>
+          <span>Team Members</span>
         </div>
       </section>
 
@@ -161,10 +147,9 @@ const AllProject = () => {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="🔍 Search by project name..."
+              placeholder="🔍 Search archived projects..."
               className="search-input"
             />
-
             <div className="flex gap-3">
               <div className="filter-group">
                 <select
@@ -231,15 +216,30 @@ const AllProject = () => {
           </div>
         </div>
 
+        <div className="archived-projects-notice flex px-3 bg-[#fff3cd] py-2 text-[#856404] font-semibold">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M5 8h14M5 8a2 2 0 1 1 0-4h14a2 2 0 1 1 0 4M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8m-9 4h4" />
+          </svg>
+          <span>These projects are archived and no longer active</span>
+        </div>
+
         <ProjectCard
           filteredProjects={filteredProjects}
           projectSubtasks={projectSubtasks}
           loading={loading}
           employees={employees}
+          isArchived={true}
         />
       </section>
     </div>
   );
 };
 
-export default AllProject;
+export default ArchivedProjects;

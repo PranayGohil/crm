@@ -124,7 +124,6 @@ const AddSubtask = () => {
           status: "To do",
         });
       }
-      console.log(newSubtasks);
       await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/add-bulk`,
         newSubtasks
@@ -141,458 +140,509 @@ const AddSubtask = () => {
 
   if (loading) return <LoadingOverlay />;
   return (
-    <div className="subtask-management-bulk-page">
+    <div className="min-h-screen bg-gray-50 p-6">
       <ToastContainer position="top-center" />
-      <section className="d-flex align-items-center justify-content-between px-3 pt-5 pb-2">
-        <div className="anp-heading-main ps-3">
-          <div
-            className="anp-back-btn"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate("/project/subtask-dashboard/" + projectId);
-            }}
-            style={{ cursor: "pointer" }}
+
+      {/* Header */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate(`/project/subtask-dashboard/${projectId}`)}
+            className="flex items-center justify-center w-10 h-10 bg-gray-100 border border-gray-300 rounded-lg mr-4 hover:bg-gray-200 transition-colors"
           >
-            <img
-              src="/SVG/arrow-pc.svg"
-              alt="back"
-              className="mx-2"
-              style={{ scale: "1.3" }}
-            />
-          </div>
-          <div className="head-menu">
-            <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
-              Add Subtask{" "}
-            </h1>
-          </div>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+          <h1 className="text-2xl font-semibold text-gray-800">Add Subtask</h1>
         </div>
-      </section>
+      </div>
 
-      <section className="sms-add_and_generator mg-auto">
-        <div className="sms-add_and_generatoe_inner">
-          {/* Single Subtask */}
-          <div className="sms-add_new-task sms-add_gen-task">
-            <div className="sms-add_task-inner">
-              <div className="sms-add_task-heading">
-                <h2>Add New Subtask</h2>
-              </div>
-              <Formik
-                initialValues={{
-                  task_name: "",
-                  description: "",
-                  url: "",
-                  stages: [],
-                  priority: "",
-                  assign_to: "",
-                  assign_date: "",
-                  due_date: "",
-                }}
-                validationSchema={singleSchema}
-                onSubmit={handleAddSingle}
-              >
-                {() => (
-                  <Form className="add-sub_task_main add-add_gen_main">
-                    <div className="sms-add_task-form">
-                      <div className="sms-add_name sms-add_same">
-                        <span>Subtask Name</span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Single Subtask Form */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Add New Subtask
+          </h2>
+          <Formik
+            initialValues={{
+              task_name: "",
+              description: "",
+              url: "",
+              stages: [],
+              priority: "",
+              assign_to: "",
+              assign_date: "",
+              due_date: "",
+            }}
+            validationSchema={singleSchema}
+            onSubmit={handleAddSingle}
+          >
+            {() => (
+              <Form className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subtask Name
+                  </label>
+                  <Field
+                    type="text"
+                    name="task_name"
+                    placeholder="Subtask Name"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <ErrorMessage
+                    name="task_name"
+                    component="div"
+                    className="text-red-600 text-sm mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </label>
+                  <Field
+                    type="text"
+                    name="description"
+                    placeholder="Description"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <ErrorMessage
+                    name="description"
+                    component="div"
+                    className="text-red-600 text-sm mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    URL
+                  </label>
+                  <Field
+                    type="text"
+                    name="url"
+                    placeholder="URL"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <ErrorMessage
+                    name="url"
+                    component="div"
+                    className="text-red-600 text-sm mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Stage
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {stageOptions.map((opt) => (
+                      <label key={opt} className="flex items-center">
                         <Field
-                          type="text"
-                          name="task_name"
-                          placeholder="Subtask Name"
-                        />
-                        <ErrorMessage
-                          name="task_name"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sms-add_task-form">
-                      <div className="sms-add_des sms-add_same">
-                        <span>Description</span>
-                        <Field
-                          type="text"
-                          name="description"
-                          placeholder="Description"
-                        />
-                        <ErrorMessage
-                          name="description"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sms-add_task-form">
-                      <div className="sms-add_url sms-add_same">
-                        <span>URL</span>
-                        <Field type="text" name="url" placeholder="URL" />
-                        <ErrorMessage
-                          name="url"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sms-add_task-form">
-                      <div className="sms-add_same">
-                        <span>Stage</span>
-                        <div className="d-flex flex-wrap gap-2">
-                          {stageOptions.map((opt) => (
-                            <label
-                              key={opt}
-                              className="d-flex align-items-center justify-content-center"
-                              style={{ display: "block" }}
-                            >
-                              <Field
-                                type="checkbox"
-                                name="stages"
-                                style={{
-                                  marginRight: "10px",
-                                  width: "20px",
-                                  height: "20px",
-                                }}
-                                value={opt}
-                              />
-                              {opt}
-                            </label>
-                          ))}
-                        </div>
-                        <ErrorMessage
+                          type="checkbox"
                           name="stages"
-                          component="div"
-                          className="error"
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          value={opt}
                         />
-                      </div>
-                    </div>
-
-                    <div className="sms-add_task-form">
-                      <div className="sms-add_same">
-                        <span>Priority</span>
-                        <Field
-                          as="select"
-                          name="priority"
-                          className="dropdown_toggle w-100 "
-                        >
-                          <option value="">Select Priority</option>
-                          {priorityOptions.map((opt, idx) => (
-                            <option key={idx} value={opt}>
-                              {opt}
-                            </option>
-                          ))}
-                        </Field>
-                        <ErrorMessage
-                          name="priority"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sms-add_task-form">
-                      <div className="sms-add_same">
-                        <span>Assign To</span>
-                        <Field
-                          as="select"
-                          name="assign_to"
-                          className="dropdown_toggle w-100 "
-                        >
-                          <option value="">Select Assign To</option>
-                          {employees.map((emp) => (
-                            <option key={emp._id} value={emp._id}>
-                              {emp.full_name}
-                            </option>
-                          ))}
-                        </Field>
-
-                        <ErrorMessage
-                          name="assign_to"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Start & end date */}
-                    <div className="anp-start_end-date sms-add_same">
-                      <span className="anp-client-name-para">
-                        Start Date - End Date
-                      </span>
-                      <div className="enp-date_input sms-add_same d-flex justify-content-around">
-                        <div>
-                          <Field type="date" name="assign_date" />
-                          <ErrorMessage
-                            name="assign_date"
-                            component="div"
-                            className="error"
-                          />
-                        </div>
-                        <div>
-                          <Field type="date" name="due_date" />
-                          <ErrorMessage
-                            name="due_date"
-                            component="div"
-                            className="error"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="sms-attach_files sms-add_same">
-                      <span>Content Included</span>
-                      <div className="epc-drag-drop-files">
-                        <img src="/SVG/drag-drop-vec.svg" alt="drag" />
-                        <input
-                          type="file"
-                          multiple
-                          style={{ display: "none" }}
-                          id="mediaFileInput"
-                          accept=".jpg,.jpeg,.png,.pdf"
-                          onChange={(e) => {
-                            const files = Array.from(e.target.files);
-                            setMediaFiles(files);
-                            setMediaPreviews(
-                              files.map((file) => URL.createObjectURL(file))
-                            );
-                          }}
-                        />
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            document.getElementById("mediaFileInput").click();
-                          }}
-                        >
-                          Drag and drop files here or click to browse
-                        </a>
-                        <span>JPG, PNG, PDF (Max 5MB)</span>
-                      </div>
-                    </div>
-
-                    {mediaPreviews.length > 0 && (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "8px",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        {mediaPreviews.map((preview, idx) => (
-                          <img
-                            key={idx}
-                            src={preview}
-                            alt="preview"
-                            style={{ maxWidth: "80px" }}
-                          />
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="sms-final_btns">
-                      <div className="sms-reset-btn">
-                        <button type="reset" className="theme_secondary_btn">
-                          Reset Form
-                        </button>
-                      </div>
-                      <div className="sms-save-btn">
-                        <button type="submit" className="theme_btn">
-                          Save Subtask
-                        </button>
-                      </div>
-                    </div>
-                  </Form>
-                )}
-              </Formik>
-            </div>
-          </div>
-
-          {/* Bulk Subtask Generator */}
-          <div className="sms-generate_task sms-add_gen-task">
-            <div className="sms-add_task-inner">
-              <div className="sms-add_task-heading">
-                <h2>Bulk Subtask Generator</h2>
-              </div>
-              <Formik
-                initialValues={{
-                  bulkPrefix: "",
-                  bulkStart: 1,
-                  bulkEnd: 5,
-                  bulkStage: [],
-                  bulkPriority: "",
-                  bulkAssignTo: "",
-                  bulkAssignDate: "",
-                  bulkDueDate: "",
-                }}
-                validationSchema={bulkSchema}
-                onSubmit={handleBulkGenerate}
-              >
-                {() => (
-                  <Form className="sms-add_task-form add-add_gen_main">
-                    <div className="sms-add_subfix sms-add_same">
-                      <span>Subtask Prefix</span>
-                      <Field
-                        name="bulkPrefix"
-                        type="text"
-                        placeholder="e.g., Ring"
-                      />
-                      <ErrorMessage
-                        name="bulkPrefix"
-                        component="div"
-                        className="error"
-                      />
-                    </div>
-
-                    <div className="sms-add_number sms-add_same">
-                      <div className="add_num-1 sms-add_same">
-                        <span>Start Number</span>
-                        <Field name="bulkStart" type="number" />
-                        <ErrorMessage
-                          name="bulkStart"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                      <div className="add_num-1 sms-add_same">
-                        <span>End Number</span>
-                        <Field name="bulkEnd" type="number" />
-                        <ErrorMessage
-                          name="bulkEnd"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="sms-add_subfix sms-add_same">
-                      <span>URL</span>
-                      <Field
-                        name="bulkUrl"
-                        type="text"
-                        placeholder="e.g., Ring"
-                      />
-                      <ErrorMessage
-                        name="bulkUrl"
-                        component="div"
-                        className="error"
-                      />
-                    </div>
-
-                    <div className="sms-comman-setting">
-                      <h3>Common Settings for Generated Subtasks</h3>
-
-                      <div className="sms-add_same">
-                        <span>Stage</span>
-                        <div className="d-flex flex-wrap gap-2">
-                          {stageOptions.map((opt) => (
-                            <label
-                              key={opt}
-                              className="d-flex align-items-center justify-content-center"
-                              style={{ display: "block" }}
-                            >
-                              <Field
-                                type="checkbox"
-                                name="bulkStage"
-                                style={{
-                                  marginRight: "10px",
-                                  width: "20px",
-                                  height: "20px",
-                                }}
-                                value={opt}
-                              />
-                              {opt}
-                            </label>
-                          ))}
-                        </div>
-                        <ErrorMessage
-                          name="bulkStage"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-
-                      <div className="sms-add_same">
-                        <span>Priority</span>
-                        <Field
-                          as="select"
-                          name="bulkPriority"
-                          className="dropdown_toggle w-100 "
-                        >
-                          <option value="">Select Priority</option>
-                          {priorityOptions.map((opt, idx) => (
-                            <option key={idx} value={opt}>
-                              {opt}
-                            </option>
-                          ))}
-                        </Field>
-                        <ErrorMessage
-                          name="bulkPriority"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-
-                      <div className="sms-add_same">
-                        <span>Assign To</span>
-                        <Field
-                          as="select"
-                          name="bulkAssignTo"
-                          className="dropdown_toggle w-100 "
-                        >
-                          <option value="">Select Assign To</option>
-                          {employees.map((emp) => (
-                            <option key={emp._id} value={emp._id}>
-                              {emp.full_name}
-                            </option>
-                          ))}
-                        </Field>
-                        <ErrorMessage
-                          name="bulkAssignTo"
-                          component="div"
-                          className="error"
-                        />
-                      </div>
-
-                      {/* Start & end date */}
-                      <div className="anp-start_end-date sms-add_same">
-                        <span className="anp-client-name-para">
-                          Start Date - End Date
+                        <span className="ml-2 text-sm text-gray-700">
+                          {opt}
                         </span>
-                        <div className="enp-date_input sms-add_same d-flex justify-content-around">
-                          <div>
-                            <Field type="date" name="bulkAssignDate" />
-                            <ErrorMessage
-                              name="bulkAssignDate"
-                              component="div"
-                              className="error"
-                            />
-                          </div>
-                          <div>
-                            <Field type="date" name="bulkDueDate" />
-                            <ErrorMessage
-                              name="bulkDueDate"
-                              component="div"
-                              className="error"
-                            />
-                          </div>
-                        </div>
+                      </label>
+                    ))}
+                  </div>
+                  <ErrorMessage
+                    name="stages"
+                    component="div"
+                    className="text-red-600 text-sm mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Priority
+                  </label>
+                  <Field
+                    as="select"
+                    name="priority"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select Priority</option>
+                    {priorityOptions.map((opt, idx) => (
+                      <option key={idx} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </Field>
+                  <ErrorMessage
+                    name="priority"
+                    component="div"
+                    className="text-red-600 text-sm mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Assign To
+                  </label>
+                  <Field
+                    as="select"
+                    name="assign_to"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select Assign To</option>
+                    {employees.map((emp) => (
+                      <option key={emp._id} value={emp._id}>
+                        {emp.full_name}
+                      </option>
+                    ))}
+                  </Field>
+                  <ErrorMessage
+                    name="assign_to"
+                    component="div"
+                    className="text-red-600 text-sm mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Start Date - End Date
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Field
+                        type="date"
+                        name="assign_date"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      <ErrorMessage
+                        name="assign_date"
+                        component="div"
+                        className="text-red-600 text-sm mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Field
+                        type="date"
+                        name="due_date"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      <ErrorMessage
+                        name="due_date"
+                        component="div"
+                        className="text-red-600 text-sm mt-1"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Content Included
+                  </label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                    <svg
+                      className="w-8 h-8 text-gray-400 mx-auto mb-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
+                    </svg>
+                    <input
+                      type="file"
+                      multiple
+                      style={{ display: "none" }}
+                      id="mediaFileInput"
+                      accept=".jpg,.jpeg,.png,.pdf"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files);
+                        setMediaFiles(files);
+                        setMediaPreviews(
+                          files.map((file) => URL.createObjectURL(file))
+                        );
+                      }}
+                    />
+                    <label
+                      htmlFor="mediaFileInput"
+                      className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                    >
+                      Drag and drop files here or click to browse
+                    </label>
+                    <p className="text-gray-500 text-sm mt-1">
+                      JPG, PNG, PDF (Max 5MB)
+                    </p>
+                  </div>
+                </div>
+
+                {mediaPreviews.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {mediaPreviews.map((preview, idx) => (
+                      <img
+                        key={idx}
+                        src={preview}
+                        alt="preview"
+                        className="w-20 h-20 object-cover rounded border border-gray-300"
+                      />
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="reset"
+                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                  >
+                    Reset Form
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Save Subtask
+                  </button>
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </div>
+
+        {/* Bulk Subtask Generator */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Bulk Subtask Generator
+          </h2>
+          <Formik
+            initialValues={{
+              bulkPrefix: "",
+              bulkStart: 1,
+              bulkEnd: 5,
+              bulkStage: [],
+              bulkPriority: "",
+              bulkAssignTo: "",
+              bulkAssignDate: "",
+              bulkDueDate: "",
+              bulkUrl: "",
+            }}
+            validationSchema={bulkSchema}
+            onSubmit={handleBulkGenerate}
+          >
+            {() => (
+              <Form className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subtask Prefix
+                  </label>
+                  <Field
+                    name="bulkPrefix"
+                    type="text"
+                    placeholder="e.g., Ring"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <ErrorMessage
+                    name="bulkPrefix"
+                    component="div"
+                    className="text-red-600 text-sm mt-1"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Start Number
+                    </label>
+                    <Field
+                      name="bulkStart"
+                      type="number"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <ErrorMessage
+                      name="bulkStart"
+                      component="div"
+                      className="text-red-600 text-sm mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      End Number
+                    </label>
+                    <Field
+                      name="bulkEnd"
+                      type="number"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <ErrorMessage
+                      name="bulkEnd"
+                      component="div"
+                      className="text-red-600 text-sm mt-1"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    URL
+                  </label>
+                  <Field
+                    name="bulkUrl"
+                    type="text"
+                    placeholder="URL for all subtasks"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <ErrorMessage
+                    name="bulkUrl"
+                    component="div"
+                    className="text-red-600 text-sm mt-1"
+                  />
+                </div>
+
+                <div className="pt-4 border-t border-gray-200">
+                  <h3 className="text-lg font-medium text-gray-800 mb-3">
+                    Common Settings for Generated Subtasks
+                  </h3>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Stage
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {stageOptions.map((opt) => (
+                        <label key={opt} className="flex items-center">
+                          <Field
+                            type="checkbox"
+                            name="bulkStage"
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            value={opt}
+                          />
+                          <span className="ml-2 text-sm text-gray-700">
+                            {opt}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                    <ErrorMessage
+                      name="bulkStage"
+                      component="div"
+                      className="text-red-600 text-sm mt-1"
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Priority
+                    </label>
+                    <Field
+                      as="select"
+                      name="bulkPriority"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select Priority</option>
+                      {priorityOptions.map((opt, idx) => (
+                        <option key={idx} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </Field>
+                    <ErrorMessage
+                      name="bulkPriority"
+                      component="div"
+                      className="text-red-600 text-sm mt-1"
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Assign To
+                    </label>
+                    <Field
+                      as="select"
+                      name="bulkAssignTo"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">Select Assign To</option>
+                      {employees.map((emp) => (
+                        <option key={emp._id} value={emp._id}>
+                          {emp.full_name}
+                        </option>
+                      ))}
+                    </Field>
+                    <ErrorMessage
+                      name="bulkAssignTo"
+                      component="div"
+                      className="text-red-600 text-sm mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Start Date - End Date
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Field
+                          type="date"
+                          name="bulkAssignDate"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        <ErrorMessage
+                          name="bulkAssignDate"
+                          component="div"
+                          className="text-red-600 text-sm mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Field
+                          type="date"
+                          name="bulkDueDate"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        <ErrorMessage
+                          name="bulkDueDate"
+                          component="div"
+                          className="text-red-600 text-sm mt-1"
+                        />
                       </div>
                     </div>
+                  </div>
+                </div>
 
-                    <div className="sms-generate_btn sms-add_same">
-                      <button type="submit" className="theme_btn">
-                        <img src="/SVG/generate-vec.svg" alt="g1" /> Generate
-                        Subtasks
-                      </button>
-                    </div>
-                  </Form>
-                )}
-              </Formik>
-            </div>
-          </div>
+                <div className="pt-4">
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                  >
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
+                    </svg>
+                    Generate Subtasks
+                  </button>
+                </div>
+              </Form>
+            )}
+          </Formik>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
