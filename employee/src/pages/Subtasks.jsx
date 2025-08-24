@@ -437,7 +437,6 @@ const Subtasks = () => {
                                   stageMatch && statusMatch && employeeMatch
                                 );
                               })
-
                               .map((s, sIdx) => (
                                 <tr key={s.id}>
                                   <td>
