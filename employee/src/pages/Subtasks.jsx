@@ -53,9 +53,8 @@ const Subtasks = () => {
       ]);
 
       const myEmployees = employeesRes.data.filter(
-        (emp) => emp.reporting_manager === user._id
+        (emp) => emp.reporting_manager?._id === user._id
       );
-
       setProjects(projectsRes.data);
       setClients(clientsRes.data);
       setEmployees(myEmployees);
@@ -136,10 +135,15 @@ const Subtasks = () => {
     const matchStage =
       filters.stage === "Stage" ||
       p.subtasks?.some((s) => {
-        console.log(s.stage[s.current_stage_index || 0], filters.stage);
+        if (!Array.isArray(s.stages) || s.stages.length === 0) return false;
+        const index =
+          typeof s.current_stage_index === "number" ? s.current_stage_index : 0;
+        const currentStageName = s.stages?.[index]?.name?.toLowerCase() || "";
         return (
-          s.stage[s.current_stage_index || 0].toLowerCase() ===
-          filters.stage.toLowerCase()
+          currentStageName?.toLowerCase() === filters.stage.toLowerCase() ||
+          s.stages.some(
+            (ss) => ss?.name?.toLowerCase() === filters.stage.toLowerCase()
+          )
         );
       });
 
@@ -190,7 +194,6 @@ const Subtasks = () => {
   };
 
   const calculateTimeTracked = (timeLogs = []) => {
-    console.log("Calculating time tracked for logs:", timeLogs);
     let totalMs = 0;
     timeLogs.forEach((log) => {
       const start = dayjs(log.start_time);
@@ -351,7 +354,9 @@ const Subtasks = () => {
                         project.subtasks?.filter((s) => {
                           const stageMatch =
                             filters.stage === "Stage" ||
-                            s.stage[s.current_stage_index]?.toLowerCase() ===
+                            s.stages[
+                              s.current_stage_index
+                            ]?.name?.toLowerCase() ===
                               filters.stage.toLowerCase();
 
                           const statusMatch =
@@ -398,7 +403,7 @@ const Subtasks = () => {
                             <tr>
                               <th></th>
                               <th>Subtask Name</th>
-                              <th>Stage</th>
+                              <th className="flex justify-center">Stage</th>
                               <th>Priority</th>
                               <th>Status</th>
                               <th>URL</th>
@@ -413,9 +418,9 @@ const Subtasks = () => {
                               ?.filter((s) => {
                                 const stageMatch =
                                   filters.stage === "Stage" ||
-                                  s.stage[
+                                  s.stages[
                                     s.current_stage_index
-                                  ]?.toLowerCase() ===
+                                  ]?.name?.toLowerCase() ===
                                     filters.stage.toLowerCase();
 
                                 const statusMatch =
@@ -452,16 +457,62 @@ const Subtasks = () => {
                                             )
                                           );
                                         }
-                                        console.log({ selectedTaskIds });
                                       }}
                                     />
                                   </td>
                                   <td>{s.task_name}</td>
                                   <td>
-                                    {s.stage &&
-                                    s.current_stage_index !== undefined
-                                      ? s.stage[s.current_stage_index] || "N/A"
-                                      : "N/A"}
+                                    {Array.isArray(s.stages) &&
+                                    s.stages.length > 0 ? (
+                                      <div className="flex justify-center items-center gap-2">
+                                        {s.stages.map((stg, i) => {
+                                          const name =
+                                            typeof stg === "string"
+                                              ? stg
+                                              : stg.name;
+                                          const completed = stg?.completed;
+                                          return (
+                                            <span
+                                              key={i}
+                                              style={{
+                                                display: "inline-flex",
+                                                alignItems: "center",
+                                                gap: "6px",
+                                              }}
+                                            >
+                                              <small
+                                                style={{
+                                                  padding: "4px 8px",
+                                                  borderRadius: "12px",
+                                                  background: completed
+                                                    ? "#e6ffed"
+                                                    : "#f3f4f6",
+                                                  color: completed
+                                                    ? "#097a3f"
+                                                    : "#444",
+                                                  border: completed
+                                                    ? "1px solid #b7f0c6"
+                                                    : "1px solid #e0e0e0",
+                                                  fontSize: "12px",
+                                                }}
+                                              >
+                                                {completed ? "✓ " : ""}
+                                                {name}
+                                              </small>
+                                              {i < s.stages.length - 1 && (
+                                                <span
+                                                  style={{ margin: "0 6px" }}
+                                                >
+                                                  →
+                                                </span>
+                                              )}
+                                            </span>
+                                          );
+                                        })}
+                                      </div>
+                                    ) : (
+                                      "No stages"
+                                    )}
                                   </td>
                                   <td>
                                     <span
@@ -487,7 +538,7 @@ const Subtasks = () => {
                                   </td>
                                   <td
                                     style={{
-                                      width: "200px",
+                                      maxWidth: "200px",
                                       position: "relative",
                                     }}
                                   >
@@ -495,8 +546,7 @@ const Subtasks = () => {
                                       style={{
                                         display: "flex",
                                         alignItems: "center",
-                                        justifyContent: "space-between",
-                                        width: "200px",
+                                        maxWidth: "200px",
                                         whiteSpace: "nowrap",
                                         overflow: "hidden",
                                         textOverflow: "ellipsis",

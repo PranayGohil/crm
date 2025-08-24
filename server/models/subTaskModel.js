@@ -51,6 +51,7 @@ const subTaskSchema = mongoose.Schema(
       {
         start_time: { type: Date },
         end_time: { type: Date, default: null },
+        user_id: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
       },
     ],
   },

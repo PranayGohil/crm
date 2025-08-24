@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 
@@ -247,7 +247,7 @@ const EmployeeDashboard = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Filter bar */}
         <div className="flex items-end">
           <div className="flex gap-4 items-center">
@@ -296,7 +296,20 @@ const EmployeeDashboard = () => {
       <section className="main-2">
         {filteredEmployees.map((member) => (
           <div className="person-data" key={member._id}>
-            <div className="background-color"></div>
+            <div className="background-color relative">
+              <div className="absolute bottom-[-55%] right-0">
+                {member.reporting_manager?.full_name && (
+                  <div className="flex flex-col justify-end items-end p-2">
+                    <small className="font-bold">Reported By </small>
+                    <small>
+                      <Link to={`/employee/profile/${member.reporting_manager._id}`} className="text-black">
+                        {member.reporting_manager?.full_name}
+                      </Link>
+                    </small>
+                  </div>
+                )}
+              </div>
+            </div>
             <div className="person-1-data">
               <div className="prn-img">
                 {member.profile_pic ? (

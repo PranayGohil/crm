@@ -73,9 +73,9 @@ export const addSubTask = async (req, res) => {
       const notification = await Notification.create({
         title: "New Task Assigned",
         description: `You have been assigned a new task: ${subTask.task_name}`,
-        type: "Task Updates",
+        type: "new_subtask",
         icon: "",
-        related_id: "new_subtask",
+        related_id: subTask._id,
         receiver_id: assign_to.toString(),
         receiver_type: "employee",
         created_by: admin._id,
@@ -129,9 +129,9 @@ export const addBulkSubTasks = async (req, res) => {
       const notification = await Notification.create({
         title: "New Task Assigned",
         description: `You have been assigned a new task: ${subtask.task_name}`,
-        type: "Task Updates",
+        type: "new_subtask",
         icon: "",
-        related_id: "new_subtask",
+        related_id: subtask._id,
         receiver_id: subtask.assign_to.toString(),
         receiver_type: "employee",
         created_by: admin?._id,
@@ -273,9 +273,9 @@ export const updateSubTask = async (req, res) => {
       const notification_to_previous_assignee = await Notification.create({
         title: `Subtask Updated - ${subTask.task_name}`,
         description: `Your subtask has been updated: ${subTask.task_name}`,
-        type: "Task Updates",
+        type: "subtask_updated",
         icon: "",
-        related_id: "subtask_updated",
+        related_id: subTask._id,
         receiver_id: subTask.assign_to || null,
         receiver_type: "employee",
       });
@@ -294,9 +294,9 @@ export const updateSubTask = async (req, res) => {
     const notification = await Notification.create({
       title: `Subtask Updated - ${updated.task_name}`,
       description: `Your subtask has been updated: ${updated.task_name}`,
-      type: "Task Updates",
+      type: "subtask_updated",
       icon: "",
-      related_id: "subtask_updated",
+      related_id: subTask._id,
       receiver_id: updated.assign_to,
       receiver_type: "employee",
     });
@@ -347,6 +347,13 @@ export const completeStage = async (req, res) => {
     } else {
       subtask.status = "Completed";
       subtask.assign_to = null;
+    }
+
+    const hasOpenTimer = subtask.time_logs.some((log) => !log.end_time);
+    if (hasOpenTimer) {
+      const lastLog = subtask.time_logs[subtask.time_logs.length - 1];
+      lastLog.end_time = new Date();
+      await subtask.save();
     }
 
     await subtask.save();
@@ -400,12 +407,18 @@ export const changeSubTaskStatus = async (req, res) => {
     // ✅ Handle time logs
     if (status === "In Progress") {
       const hasOpenTimer = subtask.time_logs.some((log) => !log.end_time);
+
       if (!hasOpenTimer) {
-        subtask.time_logs.push({ start_time: new Date() });
+        subtask.time_logs.push({
+          user_id: subtask.assign_to,
+          start_time: new Date(),
+        });
       }
     } else {
       subtask.time_logs = subtask.time_logs.map((log) => {
-        if (!log.end_time) log.end_time = new Date();
+        if (!log.end_time) {
+          log.end_time = new Date();
+        }
         return log;
       });
     }
@@ -550,7 +563,7 @@ export const bulkUpdateSubtasks = async (req, res) => {
         const oldNotification = await Notification.create({
           title: `Subtask Updated - ${task.task_name}`,
           description: `You are no longer assigned to subtask: ${task.task_name}`,
-          type: "Task Updates",
+          type: "subtask_updated",
           icon: "/SVG/task-com-vec.svg",
           related_id: task._id,
           receiver_id: oldAssigneeId,
@@ -571,7 +584,7 @@ export const bulkUpdateSubtasks = async (req, res) => {
         const newNotification = await Notification.create({
           title: `Subtask Updated - ${task.task_name}`,
           description: `You have been assigned a new subtask: ${task.task_name}`,
-          type: "Task Updates",
+          type: "subtask_updated",
           icon: "/SVG/task-com-vec.svg",
           related_id: task._id,
           receiver_id: newAssigneeId,
@@ -606,7 +619,7 @@ export const bulkDeleteSubtasks = async (req, res) => {
 // Get all projects with attached subtasks
 export const getAllProjectsWithSubtasks = async (req, res) => {
   try {
-    const projects = await Project.find().lean();
+    const projects = await Project.find({ isArchived: false }).lean();
 
     const projectIds = projects.map((p) => p._id.toString());
     const subtasks = await SubTask.find({

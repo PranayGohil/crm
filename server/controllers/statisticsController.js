@@ -79,7 +79,7 @@ export const UpcomingDueDates = async (req, res) => {
 
 export const RecentProjects = async (req, res) => {
   try {
-    const projects = await Project.find()
+    const projects = await Project.find({ isArchived: false })
       .sort({ assign_date: -1 })
       .limit(4)
       .lean();
@@ -139,10 +139,10 @@ export const getDepartmentCapacities = async (req, res) => {
       "CAD Design": await SubTask.countDocuments({
         "stages.name": "CAD Design",
       }),
-      "SET Design":
-        (await SubTask.countDocuments({ "stages.name": "SET Design" })),
-      "Render":
-        (await SubTask.countDocuments({ "stages.name": "Render" })),
+      "SET Design": await SubTask.countDocuments({
+        "stages.name": "SET Design",
+      }),
+      Render: await SubTask.countDocuments({ "stages.name": "Render" }),
     };
 
     // STEP 3: Estimate only completion dates (not days count)

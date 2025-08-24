@@ -24,7 +24,7 @@ employeeRouter.get("/get/:id", getEmployeeInfo);
 employeeRouter.post("/login", loginEmployee);
 employeeRouter.delete("/delete/:id", deleteEmployee);
 employeeRouter.post("/edit/:id", upload.single("profile_pic"), editEmployee);
-employeeRouter.get("/tasks/:id", getEmployeeTasks);
+employeeRouter.get("/tasks/:employeeId", getEmployeeTasks);
 employeeRouter.get("/dashboard/:employeeId", getEmployeeDashboardData);
 employeeRouter.get("/managers", getManagers);
 

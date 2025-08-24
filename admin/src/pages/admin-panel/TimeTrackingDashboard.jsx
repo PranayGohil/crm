@@ -5,6 +5,7 @@ import moment from "moment";
 
 const TimeTrackingDashboard = () => {
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("employeeUser"));
   const [projects, setProjects] = useState([]);
   const [subtasks, setSubtasks] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -20,7 +21,9 @@ const TimeTrackingDashboard = () => {
     const fetchData = async () => {
       try {
         const [projRes, subRes, empRes] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all`),
+          axios.get(
+            `${process.env.REACT_APP_API_URL}/api/project/get-all-archived`
+          ),
           axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/get-all`),
           axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`),
         ]);
@@ -151,7 +154,7 @@ const TimeTrackingDashboard = () => {
               <p>Track time spent by your team across tasks and projects.</p>
             </div>
           </div>
-          
+
           <div className="ett-time-duration">
             <div>
               <div className="ett-time-type d-flex gap-3">

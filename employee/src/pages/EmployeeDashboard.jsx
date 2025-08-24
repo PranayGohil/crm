@@ -39,6 +39,10 @@ const EmployeeDashboard = () => {
     },
   ]);
   const { socket } = useSocket();
+
+  const storedUser = localStorage.getItem("employeeUser");
+  const currentEmployeeId = storedUser ? JSON.parse(storedUser)._id : null;
+
   const [user, setUser] = useState(null);
   const [projects, setProjects] = useState([]);
   const [subtasks, setSubtasks] = useState([]);
@@ -140,7 +144,7 @@ const EmployeeDashboard = () => {
         `${process.env.REACT_APP_API_URL}/api/employee/dashboard/${employeeId}`,
         { params: filter }
       );
-
+      console.log(res.data);
       // Step 1: Filter subtasks first (date already applied from backend via params)
       let filteredSubtasks = res.data.subtasks || [];
 
@@ -166,24 +170,40 @@ const EmployeeDashboard = () => {
       );
 
       setProjects(filteredProjects);
+
+      // Important: keep the subtasks as-is (they contain employeeCompletedStages, completedByEmployee)
       setSubtasks(filteredSubtasks);
 
       // Step 3: Update stats
       setTaskStats((prev) => [
         { ...prev[0], value: filteredSubtasks.length || "0" },
-        { ...prev[1], value: res.data.completed || "0" },
+        {
+          ...prev[1],
+          // completed is whether employee completed any stage (flag from backend)
+          value:
+            filteredSubtasks.filter((t) => t.completedByEmployee).length || "0",
+        },
         { ...prev[2], value: res.data.timeLogged || "0h 0m" },
       ]);
 
-      // Step 4: Handle running timers
+      // Step 4: Handle running timers — ONLY consider logs for this employee
       const timers = {};
       filteredSubtasks.forEach((task) => {
-        if (task.status === "In Progress") {
-          const lastLog = task.time_logs?.[task.time_logs.length - 1];
-          if (lastLog && !lastLog.end_time) {
-            const elapsed = dayjs().diff(dayjs(lastLog.start_time));
-            timers[task._id] = elapsed;
-          }
+        // find last open log that belongs to this employee
+        const lastOpenLogForEmployee = (task.time_logs || [])
+          .slice()
+          .reverse()
+          .find(
+            (log) =>
+              !log.end_time &&
+              (log.user_id?.toString?.() || log.user_id) === employeeId
+          );
+
+        if (lastOpenLogForEmployee) {
+          const elapsed = dayjs().diff(
+            dayjs(lastOpenLogForEmployee.start_time)
+          );
+          timers[task._id] = elapsed;
         }
       });
       setRunningTimers(timers);
@@ -559,6 +579,10 @@ const EmployeeDashboard = () => {
                               let isRunning = false;
 
                               (task.time_logs || []).forEach((log) => {
+                                const logUserId =
+                                  log.user_id?.toString?.() || log.user_id;
+                                if (logUserId !== currentEmployeeId) return; // skip other users' logs
+
                                 const start = dayjs(log.start_time);
                                 const end = log.end_time
                                   ? dayjs(log.end_time)
@@ -568,13 +592,20 @@ const EmployeeDashboard = () => {
                               });
 
                               if (isRunning && runningTimers[task._id]) {
-                                totalMs -= dayjs().diff(
-                                  dayjs(
-                                    task.time_logs.find((log) => !log.end_time)
-                                      ?.start_time
-                                  )
+                                // adjust the currently-open log to use the live timer we track
+                                const openLog = (task.time_logs || []).find(
+                                  (log) =>
+                                    !log.end_time &&
+                                    (log.user_id?.toString?.() ||
+                                      log.user_id) === currentEmployeeId
                                 );
-                                totalMs += runningTimers[task._id];
+                                if (openLog) {
+                                  // subtract naive now-diff and add runningTimers value (keeps consistent live display)
+                                  totalMs -= dayjs().diff(
+                                    dayjs(openLog.start_time)
+                                  );
+                                  totalMs += runningTimers[task._id];
+                                }
                               }
 
                               const runningMs = runningTimers[task._id] || 0;
@@ -626,74 +657,156 @@ const EmployeeDashboard = () => {
                                     </span>
                                   </td>
                                   <td>
-                                    <select
-                                      className={`time-table-badge md-status-${(
-                                        task.status || ""
-                                      )
-                                        .toLowerCase()
-                                        .replace(" ", "")}`}
-                                      value={task.status}
-                                      onChange={(e) =>
-                                        handleChangeStatus(task, e.target.value)
+                                    {(() => {
+                                      const assignToId =
+                                        task.assign_to?.toString?.() ||
+                                        task.assign_to;
+
+                                      const showCompletedForEmployee =
+                                        (!assignToId &&
+                                          task.completedByEmployee) ||
+                                        (assignToId &&
+                                          assignToId !== currentEmployeeId &&
+                                          task.completedByEmployee);
+
+                                      // compute what should be shown
+                                      const displayStatus =
+                                        showCompletedForEmployee
+                                          ? "Completed"
+                                          : task.status || "-";
+
+                                      if (
+                                        showCompletedForEmployee &&
+                                        !task.currentStageAssignedToEmployee
+                                      ) {
+                                        // ✅ just show badge, no dropdown
+                                        return (
+                                          <span
+                                            className={`time-table-badge md-status-${displayStatus
+                                              .toLowerCase()
+                                              .replace(" ", "")}`}
+                                          >
+                                            {displayStatus}
+                                          </span>
+                                        );
                                       }
-                                      style={{
-                                        minWidth: "100px",
-                                        padding: "4px 6px",
-                                        borderRadius: "6px",
-                                      }}
-                                    >
-                                      {statusOptions.map((status) => (
-                                        <option
-                                          key={status}
-                                          value={status}
-                                          className={`md-status-${(status || "")
+
+                                      // ✅ otherwise show dropdown
+                                      return (
+                                        <select
+                                          className={`time-table-badge md-status-${displayStatus
                                             .toLowerCase()
                                             .replace(" ", "")}`}
+                                          value={displayStatus}
+                                          onChange={(e) =>
+                                            handleChangeStatus(
+                                              task,
+                                              e.target.value
+                                            )
+                                          }
+                                          style={{
+                                            minWidth: "100px",
+                                            padding: "4px 6px",
+                                            borderRadius: "6px",
+                                          }}
                                         >
-                                          {status}
-                                        </option>
-                                      ))}
-                                    </select>
+                                          {statusOptions.map((status) => (
+                                            <option
+                                              key={status}
+                                              value={status}
+                                              className={`md-status-${status
+                                                .toLowerCase()
+                                                .replace(" ", "")}`}
+                                            >
+                                              {status}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      );
+                                    })()}
                                   </td>
-                                  <td>
-                                    {Array.isArray(task.stages) &&
-                                    task.stages.length > 0 &&
-                                    task.current_stage_index !== undefined
-                                      ? (() => {
-                                          const currentStage =
-                                            task.stages[
-                                              task.current_stage_index
-                                            ];
-                                          const name =
-                                            typeof currentStage === "string"
-                                              ? currentStage
-                                              : currentStage.name;
-                                          const completed =
-                                            currentStage?.completed;
 
-                                          return (
+                                  <td>
+                                    {task.employeeCompletedStages &&
+                                    task.employeeCompletedStages.length > 0 ? (
+                                      <div>
+                                        {task.employeeCompletedStages.map(
+                                          (stageName, idx) => (
                                             <small
+                                              key={`emp-stage-${idx}`}
                                               style={{
-                                                padding: "6px 12px",
+                                                display: "inline-block",
+                                                marginRight: "6px",
+                                                padding: "4px 10px",
                                                 borderRadius: "12px",
-                                                background: completed
-                                                  ? "#e6ffed"
-                                                  : "#f3f4f6",
-                                                color: completed
-                                                  ? "#097a3f"
-                                                  : "#444",
-                                                border: completed
-                                                  ? "1px solid #b7f0c6"
-                                                  : "1px solid #e0e0e0",
+                                                background: "#e6ffed",
+                                                color: "#097a3f",
+                                                border: "1px solid #b7f0c6",
                                                 fontSize: "12px",
                                               }}
                                             >
-                                              {completed ? "✓ " : ""}
-                                              {name}
+                                              ✓ {stageName}
                                             </small>
-                                          );
-                                        })()
-                                      : "No current stage"}
+                                          )
+                                        )}
+
+                                        {task.currentStageAssignedToEmployee && (
+                                          <small
+                                            style={{
+                                              padding: "6px 12px",
+                                              borderRadius: "12px",
+                                              background: "#f3f4f6",
+                                              color: "#444",
+                                              border: "1px solid #e0e0e0",
+                                              fontSize: "12px",
+                                            }}
+                                          >
+                                            {
+                                              task.stages[
+                                                task.current_stage_index
+                                              ].name
+                                            }
+                                          </small>
+                                        )}
+                                      </div>
+                                    ) : // if none completed by employee, show the current stage as before:
+                                    Array.isArray(task.stages) &&
+                                      task.stages.length > 0 &&
+                                      task.current_stage_index !== undefined ? (
+                                      (() => {
+                                        const currentStage =
+                                          task.stages[task.current_stage_index];
+                                        const name =
+                                          typeof currentStage === "string"
+                                            ? currentStage
+                                            : currentStage.name;
+                                        const completed =
+                                          currentStage?.completed;
+                                        return (
+                                          <small
+                                            style={{
+                                              padding: "6px 12px",
+                                              borderRadius: "12px",
+                                              background: completed
+                                                ? "#e6ffed"
+                                                : "#f3f4f6",
+                                              color: completed
+                                                ? "#097a3f"
+                                                : "#444",
+                                              border: completed
+                                                ? "1px solid #b7f0c6"
+                                                : "1px solid #e0e0e0",
+                                              fontSize: "12px",
+                                            }}
+                                          >
+                                            {completed ? "✓ " : ""}
+                                            {name}
+                                          </small>
+                                        );
+                                      })()
+                                    ) : (
+                                      "No current stage"
+                                    )}
                                   </td>
 
                                   <td

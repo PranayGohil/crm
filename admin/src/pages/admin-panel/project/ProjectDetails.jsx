@@ -22,6 +22,8 @@ const ProjectDetails = () => {
   const [saving, setSaving] = useState(false);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [showUnarchiveModal, setShowUnarchiveModal] = useState(false);
 
   const [completedCount, setCompletedCount] = useState(0);
   const [progressPercent, setProgressPercent] = useState(0);
@@ -115,6 +117,30 @@ const ProjectDetails = () => {
     }
   };
 
+  const handleArchive = async () => {
+    try {
+      await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/project/archive/${projectId}`
+      );
+      toast.success("Project archived successfully.");
+      navigate("/project/dashboard");
+    } catch (err) {
+      toast.error("Failed to archive project.");
+    }
+  };
+
+  const handleUnarchive = async () => {
+    try {
+      await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/project/unarchive/${projectId}`
+      );
+      toast.success("Project unarchived successfully.");
+      navigate("/archived-projects");
+    } catch (err) {
+      toast.error("Failed to unarchive project.");
+    }
+  };
+
   const currency = project?.content?.[0]?.currency || "INR";
   const totalPrice = project?.content?.[0]?.total_price || 0;
 
@@ -150,6 +176,34 @@ const ProjectDetails = () => {
             </div>
           </div>
           <div className="d-flex gap-2">
+            {project.isArchived ? (
+              <button
+                className="bg-danger theme_btn d-flex align-items-center"
+                onClick={() => setShowUnarchiveModal(true)}
+              >
+                <img
+                  src="/SVG/delete.svg"
+                  alt="unarchive"
+                  className="me-2"
+                  style={{ filter: "invert(1)" }}
+                />
+                Unarchive Project
+              </button>
+            ) : (
+              <button
+                className="bg-danger theme_btn d-flex align-items-center"
+                onClick={() => setShowArchiveModal(true)}
+              >
+                <img
+                  src="/SVG/delete.svg"
+                  alt="archive"
+                  className="me-2"
+                  style={{ filter: "invert(1)" }}
+                />
+                Archive Project
+              </button>
+            )}
+
             <button
               className="bg-danger theme_btn d-flex align-items-center"
               onClick={() => setShowDeleteModal(true)}
@@ -461,15 +515,59 @@ const ProjectDetails = () => {
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete selected subtask?
-        </Modal.Body>
+        <Modal.Body>Are you sure you want to delete this project?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
             Cancel
           </Button>
           <Button variant="danger" onClick={handleDelete}>
             Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={showArchiveModal}
+        onHide={() => setShowArchiveModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Archive</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to archive this project?</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowArchiveModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleArchive}>
+            Archive
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={showUnarchiveModal}
+        onHide={() => setShowUnarchiveModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Unarchive</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to unarchive this project?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowUnarchiveModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleUnarchive}>
+            Unarchive
           </Button>
         </Modal.Footer>
       </Modal>

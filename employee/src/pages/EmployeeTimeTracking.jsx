@@ -27,11 +27,13 @@ const EmployeeTimeTracking = () => {
     const fetchData = async () => {
       try {
         const [projRes, subRes] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all`),
-          axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/get-all`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all-archived`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/employee/tasks/${employeeId}`),
         ]);
         setProjects(projRes.data);
-        setSubtasks(subRes.data.filter((s) => s.assign_to === employeeId));
+        setSubtasks(subRes.data);
+        console.log("projects", projRes.data);
+        console.log("subtasks", subRes.data);
       } catch (error) {
         console.error("Data fetching error:", error);
       }
@@ -196,8 +198,9 @@ const EmployeeTimeTracking = () => {
 
       <section className="ett-task-time p-3">
         {projects.map((project) => {
+          console.log("Subtasks:", filteredSubtasks);
           const projectSubtasks = filteredSubtasks.filter(
-            (s) => s.project_id === project._id
+            (s) => s.project_id._id === project._id
           );
           if (projectSubtasks.length === 0) return null;
 
@@ -221,7 +224,7 @@ const EmployeeTimeTracking = () => {
                 <div className="task-name">{project.project_name}</div>
                 <div className="task-time">{formattedTime}</div>
                 <img
-                  src="SVG/header-vector.svg"
+                  src="/SVG/header-vector.svg"
                   alt="vec"
                   className="arrow_icon"
                 />

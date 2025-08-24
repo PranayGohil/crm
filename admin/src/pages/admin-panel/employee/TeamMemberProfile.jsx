@@ -208,7 +208,7 @@ const TeamMemberProfile = () => {
                     width: "100px",
                     height: "100px",
                     borderRadius: "50%",
-                    backgroundColor: "#007bff", // choose any color you like
+                    backgroundColor: "rgb(10 55 73)", 
                     color: "white",
                     display: "flex",
                     alignItems: "center",

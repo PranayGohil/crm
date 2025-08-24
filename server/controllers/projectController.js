@@ -51,7 +51,12 @@ export const addProject = async (req, res) => {
 };
 
 export const getProjects = async (req, res) => {
-  const projects = await Project.find();
+  const projects = await Project.find({ isArchived: false });
+  res.status(200).json(projects);
+};
+
+export const getProjectWithArchived = async (req, res) => {
+  const projects = await Project.find({});
   res.status(200).json(projects);
 };
 
@@ -218,7 +223,7 @@ export const addProjectContent = async (req, res) => {
 
 export const getAllProjectsWithTasks = async (req, res) => {
   try {
-    const projects = await Project.find({});
+    const projects = await Project.find({ isArchived: false });
     const projectsWithSubtasks = await Promise.all(
       projects.map(async (proj) => {
         const subtasks = await SubTask.find({
@@ -265,7 +270,7 @@ export const getProjectsForReportingManager = async (req, res) => {
     const employeeIds = employees.map((emp) => emp._id.toString());
 
     // 2. Get all projects
-    const projects = await Project.find({});
+    const projects = await Project.find({ isArchived: false });
 
     // 3. Filter projects by subtasks assigned to manager's employees
     const projectsWithSubtasks = await Promise.all(
@@ -333,5 +338,53 @@ export const bulkDelete = async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Failed to delete projects" });
+  }
+};
+
+// Archive Project
+export const archiveProject = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const project = await Project.findByIdAndUpdate(
+      projectId,
+      { isArchived: true, archivedAt: new Date() },
+      { new: true }
+    );
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    res.json({ message: "Project archived successfully", project });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const unarchiveProject = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const project = await Project.findByIdAndUpdate(
+      projectId,
+      { isArchived: false, archivedAt: null },
+      { new: true }
+    );
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    res.json({ message: "Project unarchived successfully", project });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getArchivedProjects = async (req, res) => {
+  try {
+    const projects = await Project.find({ isArchived: true });
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

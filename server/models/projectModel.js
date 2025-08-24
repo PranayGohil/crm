@@ -16,7 +16,6 @@ const projectSchema = mongoose.Schema(
     status: String,
     description: String,
 
-    // add content array
     content: [
       {
         items: [
@@ -32,6 +31,14 @@ const projectSchema = mongoose.Schema(
         currency: String,
       },
     ],
+    
+    isArchived: {
+      type: Boolean,
+      default: false,
+    },
+    archivedAt: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );

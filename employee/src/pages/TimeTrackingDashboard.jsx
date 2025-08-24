@@ -21,28 +21,24 @@ const TimeTrackingDashboard = () => {
     const fetchData = async () => {
       try {
         const [projRes, subRes, empRes] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all-archived`),
           axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/get-all`),
           axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`),
         ]);
 
         const myEmployees = empRes.data.filter(
-          (emp) => emp.reporting_manager === user._id
+          (emp) => emp.reporting_manager?._id === user._id
         );
-        console.log("myEmployees", empRes.data);
 
         const myEmployeeIds = myEmployees.map((emp) => emp._id);
 
         const mySubtasks = subRes.data.filter((s) =>
-          myEmployeeIds.includes(s.assign_to)
+          myEmployeeIds.includes(s.assign_to || s.time_logs.some((log) => myEmployeeIds.includes(log.user_id)))
         );
 
         const myProjects = projRes.data.filter((proj) =>
           mySubtasks.some((s) => s.project_id === proj._id)
         );
-        console.log("myProjects", myProjects);
-        console.log("mySubtasks", mySubtasks);
-        console.log("myEmployees", myEmployees);
         setProjects(myProjects);
         setSubtasks(mySubtasks);
         setEmployees(myEmployees);

@@ -37,7 +37,6 @@ const EmployeeNotificationPage = () => {
             },
           }
         );
-
         setNotifications(res.data.notifications);
 
         // 2. Mark all as read in the backend

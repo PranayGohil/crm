@@ -12,6 +12,10 @@ import {
   getProjectsForReportingManager,
   bulkUpdate,
   bulkDelete,
+  archiveProject,
+  unarchiveProject,
+  getArchivedProjects,
+  getProjectWithArchived,
 } from "../controllers/projectController.js";
 import upload from "../middlewares/upload.js"; // Ensure this is the correct path to your upload middleware
 
@@ -34,5 +38,10 @@ projectRouter.get("/all-tasks-projects", getAllProjectsWithTasks);
 projectRouter.get("/manager/:managerId", getProjectsForReportingManager);
 projectRouter.patch("/bulk-update", bulkUpdate);
 projectRouter.delete("/bulk-delete", bulkDelete);
+
+projectRouter.put("/archive/:projectId", archiveProject);
+projectRouter.put("/unarchive/:projectId", unarchiveProject);
+projectRouter.get("/get-archived", getArchivedProjects);
+projectRouter.get("/get-all-archived", getProjectWithArchived);
 
 export default projectRouter;

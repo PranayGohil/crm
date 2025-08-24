@@ -153,11 +153,6 @@ const DashboardMenu = () => {
 
           {/* Designation */}
           <div>
-            {/* {!collapsed && (
-              <p className="text-xs uppercase text-gray-300 mb-2">
-                Designation
-              </p>
-            )} */}
             <Link
               to="/designation"
               className={`flex items-center gap-3 px-3 py-2 text-white rounded-md transition ${
@@ -170,6 +165,23 @@ const DashboardMenu = () => {
                 className="w-5 h-5"
               />
               {!collapsed && <span>Designation</span>}
+            </Link>
+          </div>
+
+          {/* Archived Projects */}
+          <div>
+            <Link
+              to="/archived-projects"
+              className={`flex items-center gap-3 px-3 py-2 text-white rounded-md transition ${
+                isActive("/archived-projects") ? "bg-[#0c4559]" : "hover:bg-[#0c4559]"
+              }`}
+            >
+              <img
+                src="/SVG/team-member.svg"
+                alt="archived-projects"
+                className="w-5 h-5"
+              />
+              {!collapsed && <span>Archived Projects</span>}
             </Link>
           </div>
         </div>

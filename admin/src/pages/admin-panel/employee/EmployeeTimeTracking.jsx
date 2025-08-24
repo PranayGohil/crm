@@ -18,21 +18,26 @@ const EmployeeTimeTracking = () => {
 
   const employeeId = useParams().id;
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [projRes, subRes] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all`),
-          axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/get-all`),
+          axios.get(
+            `${process.env.REACT_APP_API_URL}/api/project/get-all-archived`
+          ),
+          axios.get(
+            `${process.env.REACT_APP_API_URL}/api/employee/tasks/${employeeId}`
+          ),
         ]);
         setProjects(projRes.data);
-        setSubtasks(subRes.data.filter((s) => s.assign_to === employeeId));
+        setSubtasks(subRes.data);
+        console.log("projects", projRes.data);
+        console.log("subtasks", subRes.data);
       } catch (error) {
         console.error("Data fetching error:", error);
       }
     };
-    fetchData();
+    if (employeeId) fetchData();
   }, [employeeId]);
 
   const handleToggle = (id) =>
@@ -56,6 +61,7 @@ const EmployeeTimeTracking = () => {
         }
         return false;
       }
+      case "All Time":
       default:
         return true;
     }
@@ -87,10 +93,16 @@ const EmployeeTimeTracking = () => {
       : `${duration.days()}d ${duration.hours()}h ${duration.minutes()}m`;
   };
 
+  const filteredSubtasks = subtasks.filter((s) =>
+    s.time_logs?.some((log) =>
+      log.start_time && log.end_time ? isWithinFilter(log.start_time) : false
+    )
+  );
+
   const summaryData = {
-    mainTasks: projects.length,
-    subtasks: subtasks.length,
-    totalTimeTracked: subtasks.reduce((acc, sub) => {
+    mainTasks: new Set(filteredSubtasks.map((s) => s.project_id)).size,
+    subtasks: filteredSubtasks.length,
+    totalTimeTracked: filteredSubtasks.reduce((acc, sub) => {
       const time = sub.time_logs?.reduce((subTotal, log) => {
         if (log.start_time && log.end_time && isWithinFilter(log.start_time)) {
           const diff = moment(log.end_time).diff(
@@ -113,43 +125,47 @@ const EmployeeTimeTracking = () => {
     <div className="time-tracking-dashboard-page p-3">
       <section className="ett-main-sec">
         <div className="tt-time-tracking ett-emp-tracking-time">
-          <div className="anp-header-inner">
-          <div className="anp-heading-main">
-            <div
-              className="anp-back-btn"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/employee/profile/" + employeeId);
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              <img
-                src="/SVG/arrow-pc.svg"
-                alt="back"
-                className="mx-2"
-                style={{ scale: "1.3" }}
-              />
-            </div>
-            <div className="head-menu">
-              <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
-                My Time Tracking{" "}
-              </h1>
-              <p>Track your time spent on tasks and projects.</p>
+          <div className="d-flex justify-content-between align-items-center">
+            <div className="anp-heading-main">
+              <div
+                className="anp-back-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(-1);
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <img
+                  src="/SVG/arrow-pc.svg"
+                  alt="back"
+                  className="mx-2"
+                  style={{ scale: "1.3" }}
+                />
+              </div>
+              <div className="head-menu">
+                <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
+                  My Time Tracking{" "}
+                </h1>
+                <p>Track your time spent on tasks and projects.</p>
+              </div>
             </div>
           </div>
-        </div>
           <div className="ett-time-duration">
             <div className="ett-time-type d-flex gap-3">
-              {["Today", "This Week", "This Month", "Custom"].map((label) => (
-                <a
-                  key={label}
-                  href="#"
-                  className={selectedFilter === label ? "ett-today active" : ""}
-                  onClick={() => setSelectedFilter(label)}
-                >
-                  {label}
-                </a>
-              ))}
+              {["All Time", "Today", "This Week", "This Month", "Custom"].map(
+                (label) => (
+                  <a
+                    key={label}
+                    href="#"
+                    className={
+                      selectedFilter === label ? "ett-today active" : ""
+                    }
+                    onClick={() => setSelectedFilter(label)}
+                  >
+                    {label}
+                  </a>
+                )
+              )}
             </div>
             {selectedFilter === "Custom" && (
               <div className="d-flex gap-3 mt-2">
@@ -181,8 +197,9 @@ const EmployeeTimeTracking = () => {
 
       <section className="ett-task-time p-3">
         {projects.map((project) => {
-          const projectSubtasks = subtasks.filter(
-            (s) => s.project_id === project._id
+          console.log("Subtasks:", filteredSubtasks);
+          const projectSubtasks = filteredSubtasks.filter(
+            (s) => s.project_id._id === project._id
           );
           if (projectSubtasks.length === 0) return null;
 

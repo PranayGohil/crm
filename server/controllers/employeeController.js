@@ -138,7 +138,7 @@ export const getEmployees = async (req, res) => {
     const employees = await Employee.find(
       {},
       "_id full_name email status designation department phone monthly_salary profile_pic is_manager reporting_manager"
-    );
+    ).populate("reporting_manager", "full_name _id");
     res.status(200).json(employees);
   } catch (error) {
     console.error("Error fetching employees:", error);
@@ -264,9 +264,18 @@ export const deleteEmployee = async (req, res) => {
 };
 
 export const getEmployeeTasks = async (req, res) => {
-  const { id } = req.params;
-  const tasks = await SubTask.find({ assign_to: { role: "employee", id: id } });
-  res.status(200).json(tasks);
+  try {
+    const { employeeId } = req.params;
+
+    const subtasks = await SubTask.find({
+      $or: [{ assign_to: employeeId }, { "stages.completed_by": employeeId }],
+    }).populate("project_id");
+
+    res.json(subtasks);
+  } catch (error) {
+    console.error("Error fetching employee subtasks:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
 export const getEmployeeDashboardData = async (req, res) => {
@@ -276,44 +285,86 @@ export const getEmployeeDashboardData = async (req, res) => {
 
     const start = startDate ? new Date(startDate) : null;
     let end = endDate ? new Date(endDate) : null;
+    if (end) end.setHours(23, 59, 59, 999);
 
-    if (end) {
-      end.setHours(23, 59, 59, 999);
-    }
+    const assignedSubtasks = await SubTask.find({
+      assign_to: employeeId,
+    }).populate("project_id");
 
-    const subtasks = await SubTask.find({ assign_to: employeeId }).populate(
-      "project_id"
-    );
-    const projectIds = subtasks.map((s) => s.project_id?._id).filter(Boolean);
+    const stageSubtasks = await SubTask.find({
+      "stages.completed_by": employeeId,
+    }).populate("project_id");
+
+    let allSubtasks = [
+      ...assignedSubtasks,
+      ...stageSubtasks.filter(
+        (s) => !assignedSubtasks.some((a) => a._id.equals(s._id))
+      ),
+    ];
+
     const uniqueProjectIds = [
-      ...new Set(projectIds.map((id) => id.toString())),
+      ...new Set(
+        allSubtasks.map((s) => s.project_id?._id?.toString()).filter(Boolean)
+      ),
     ];
     const projects = await Project.find({ _id: { $in: uniqueProjectIds } });
 
     let totalMs = 0;
     let completedCount = 0;
 
-    subtasks.forEach((task) => {
+    allSubtasks.forEach((task) => {
       const isCompleted = task.status === "Completed";
       if (isCompleted) {
         const completedAt = new Date(task.updatedAt || task.createdAt);
-        if (!start || (completedAt >= start && completedAt <= end)) {
-          completedCount++;
+
+        const didCompleteStage = task.stages.some(
+          (st) =>
+            st.completed_by?.toString() === employeeId &&
+            (!start || (st.completed_at >= start && st.completed_at <= end))
+        );
+
+        if (didCompleteStage || task.assign_to?.toString() === employeeId) {
+          if (!start || (completedAt >= start && completedAt <= end)) {
+            completedCount++;
+          }
         }
       }
 
       (task.time_logs || []).forEach((log) => {
-        const logStart = new Date(log.start_time);
-        const logEnd = log.end_time ? new Date(log.end_time) : new Date();
+        if (log.user_id?.toString() === employeeId) {
+          const logStart = new Date(log.start_time);
+          const logEnd = log.end_time ? new Date(log.end_time) : new Date();
 
-        if (!start || logEnd >= start) {
-          const effectiveStart = start && logStart < start ? start : logStart;
-          const effectiveEnd = end && logEnd > end ? end : logEnd;
-          if (!end || logStart <= end) {
-            totalMs += effectiveEnd - effectiveStart;
+          if (!start || logEnd >= start) {
+            const effectiveStart = start && logStart < start ? start : logStart;
+            const effectiveEnd = end && logEnd > end ? end : logEnd;
+            if (!end || logStart <= end) {
+              totalMs += effectiveEnd - effectiveStart;
+            }
           }
         }
       });
+    });
+
+    allSubtasks = allSubtasks.map((task) => {
+      const employeeStages = task.stages
+        .filter((st) => st.completed_by?.toString() === employeeId)
+        .map((st) => st.name);
+
+      const currentStage =
+        task.current_stage_index !== undefined
+          ? task.stages[task.current_stage_index]
+          : null;
+
+      const isCurrentStageAssignedToEmployee =
+        task.assign_to?.toString?.() === employeeId;
+
+      return {
+        ...task.toObject(),
+        employeeCompletedStages: employeeStages,
+        completedByEmployee: employeeStages.length > 0,
+        currentStageAssignedToEmployee: isCurrentStageAssignedToEmployee, // ✅ new flag
+      };
     });
 
     const hours = Math.floor(totalMs / 3600000);
@@ -322,7 +373,7 @@ export const getEmployeeDashboardData = async (req, res) => {
     const timeLogged = `${hours}h ${minutes}m ${seconds}s`;
 
     res.json({
-      subtasks,
+      subtasks: allSubtasks,
       projects,
       completed: completedCount,
       timeLogged,
