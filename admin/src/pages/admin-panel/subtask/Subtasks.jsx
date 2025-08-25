@@ -1,3 +1,4 @@
+// Completed UI
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -937,9 +938,11 @@ const Subtasks = () => {
 
         {/* Bulk Actions */}
         {selectedTaskIds.length > 0 && (
-          <div className="bulk-actions">
+          <div
+            className="bulk-actions"
+          >
             <div className="bulk-actions-header">
-              <span>
+              <span className="bulk-count-main">
                 <span className="bulk-count">{selectedTaskIds.length}</span>{" "}
                 items selected
               </span>

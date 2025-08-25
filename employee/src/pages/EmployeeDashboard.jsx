@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Modal, Button } from "react-bootstrap";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { useSocket } from "../contexts/SocketContext";
 import { statusOptions, priorityOptions } from "../options";
-import { IoMdArrowDropdown } from "react-icons/io";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 // Extend dayjs with duration
 dayjs.extend(duration);
@@ -18,21 +19,21 @@ const EmployeeDashboard = () => {
     {
       icon: "/SVG/clipboard.svg",
       alt: "total task",
-      bgClass: "empan-bg-purple",
+      bgClass: "bg-purple-100",
       label: "Total Tasks",
       value: "0",
     },
     {
       icon: "/SVG/true-yellow.svg",
       alt: "completed week",
-      bgClass: "empan-bg-yellow",
+      bgClass: "bg-yellow-100",
       label: "Completed This Week",
       value: "0",
     },
     {
       icon: "/SVG/time-blue.svg",
       alt: "time logged",
-      bgClass: "empan-bg-purple",
+      bgClass: "bg-blue-100",
       label: "Time Logged (This Week)",
       value: "0h 0m",
       link: "/time-tracking",
@@ -58,8 +59,8 @@ const EmployeeDashboard = () => {
   ];
   const [selectedFilter, setSelectedFilter] = useState("This Week");
   const [customRange, setCustomRange] = useState({
-    start: new Date(),
-    end: new Date(),
+    start: dayjs().format("YYYY-MM-DD"),
+    end: dayjs().format("YYYY-MM-DD"),
   });
 
   const [statusFilter, setStatusFilter] = useState("All");
@@ -129,7 +130,6 @@ const EmployeeDashboard = () => {
           },
         }
       );
-      console.log(res.data);
       setUser(res.data);
     } catch (err) {
       console.error("Error fetching user:", err);
@@ -144,8 +144,7 @@ const EmployeeDashboard = () => {
         `${process.env.REACT_APP_API_URL}/api/employee/dashboard/${employeeId}`,
         { params: filter }
       );
-      console.log(res.data);
-      // Step 1: Filter subtasks first (date already applied from backend via params)
+
       let filteredSubtasks = res.data.subtasks || [];
 
       if (statusFilter !== "All") {
@@ -161,7 +160,6 @@ const EmployeeDashboard = () => {
         );
       }
 
-      // Step 2: Filter projects to only keep ones that have at least 1 filtered subtask
       let filteredProjects = (res.data.projects || []).filter((project) =>
         filteredSubtasks.some(
           (s) =>
@@ -170,26 +168,20 @@ const EmployeeDashboard = () => {
       );
 
       setProjects(filteredProjects);
-
-      // Important: keep the subtasks as-is (they contain employeeCompletedStages, completedByEmployee)
       setSubtasks(filteredSubtasks);
 
-      // Step 3: Update stats
       setTaskStats((prev) => [
         { ...prev[0], value: filteredSubtasks.length || "0" },
         {
           ...prev[1],
-          // completed is whether employee completed any stage (flag from backend)
           value:
             filteredSubtasks.filter((t) => t.completedByEmployee).length || "0",
         },
         { ...prev[2], value: res.data.timeLogged || "0h 0m" },
       ]);
 
-      // Step 4: Handle running timers — ONLY consider logs for this employee
       const timers = {};
       filteredSubtasks.forEach((task) => {
-        // find last open log that belongs to this employee
         const lastOpenLogForEmployee = (task.time_logs || [])
           .slice()
           .reverse()
@@ -237,8 +229,8 @@ const EmployeeDashboard = () => {
         };
       case "Custom":
         return {
-          startDate: new Date(customRange.start).toISOString(),
-          endDate: new Date(customRange.end).toISOString(),
+          startDate: dayjs(customRange.start).startOf("day").toISOString(),
+          endDate: dayjs(customRange.end).endOf("day").toISOString(),
         };
       default:
         return {};
@@ -276,7 +268,6 @@ const EmployeeDashboard = () => {
   };
 
   const completeStage = async (task) => {
-    console.log(task);
     try {
       const user = JSON.parse(localStorage.getItem("employeeUser"));
       await axios.put(
@@ -306,113 +297,128 @@ const EmployeeDashboard = () => {
       .catch(() => toast.error("Failed to copy URL."));
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <LoadingOverlay />;
 
   return (
-    <div className="employee-dashboard">
-      <section className="header ttb-header">
-        <div className="head-menu ttb-header-menu">
-          <h1>Task board</h1>
-          <p>Manage your jewelry production workflow</p>
-        </div>
-        <div className="text-end">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <ToastContainer position="top-center" />
+
+      {/* Header */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-800">Task Board</h1>
+            <p className="text-gray-600">
+              Manage your jewelry production workflow
+            </p>
+          </div>
           {user?.reporting_manager?.full_name && (
-            <>
-              <h5 className="fw-bold">Reported By</h5>
-              <small>{user.reporting_manager?.full_name}</small>
-            </>
+            <div className="mt-4 md:mt-0 text-right">
+              <h5 className="font-semibold text-gray-800">Reported By</h5>
+              <p className="text-gray-600">
+                {user.reporting_manager?.full_name}
+              </p>
+            </div>
           )}
         </div>
-      </section>
-      <section className="ett-main-sec">
-        <div className="tt-time-tracking ett-emp-tracking-time">
-          <div className="ett-time-duration">
-            <div className="ett-time-type d-flex gap-3">
-              {filterOptions.map((label) => (
-                <a
-                  key={label}
-                  href="#"
-                  className={selectedFilter === label ? "ett-today active" : ""}
-                  onClick={() => setSelectedFilter(label)}
-                >
-                  {label}
-                </a>
-              ))}
-            </div>
-            {selectedFilter === "Custom" && (
-              <div className="d-flex gap-3 mt-2">
-                <input
-                  type="date"
-                  className="form-control"
-                  value={customRange.start}
-                  onChange={(e) => {
-                    console.log(e.target.value);
-                    setCustomRange({ ...customRange, start: e.target.value });
-                  }}
-                />
-                <input
-                  type="date"
-                  className="form-control"
-                  value={customRange.end}
-                  onChange={(e) =>
-                    setCustomRange({ ...customRange, end: e.target.value })
-                  }
-                />
-              </div>
-            )}
-          </div>
-        </div>
-        <section className="empan-boxes-main">
-          <div className="empan-boxes-inner">
-            {taskStats.map((item, index) => {
-              const content = (
-                <div className="empan-icon-text-box">
-                  <div className={`empan-icon ${item.bgClass}`}>
-                    <img src={item.icon} alt={item.alt} />
-                  </div>
-                  <div className="empan-text">
-                    <span className="emapn-header-text">{item.label}</span>
-                    <span className="emapn-main-text-number">{item.value}</span>
-                  </div>
-                </div>
-              );
-              return (
-                <div key={index}>
-                  {item.link ? <a href={item.link}>{content}</a> : content}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      </section>
+      </div>
 
-      <section className="ttb-table-main">
-        <div className="d-flex gap-3 align-items-center mt-3 px-5">
-          {/* Status Filter */}
-          <div style={{ width: "300px" }}>
-            <label className="form-label">Filter Subtasks by Status:</label>
-            <div className="flex">
-              <select
-                id="statusFilter"
-                className="form-control custom-select"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex flex-wrap gap-2">
+            {filterOptions.map((label) => (
+              <button
+                key={label}
+                className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                  selectedFilter === label
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                }`}
+                onClick={() => setSelectedFilter(label)}
               >
-                <option value="All">All Status</option>
-                {statusOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
+                {label}
+              </button>
+            ))}
           </div>
 
-          {/* Priority Filter */}
-          <div style={{ width: "300px" }}>
-            <label className="form-label">Filter Subtasks by Priority:</label>
+          {selectedFilter === "Custom" && (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="date"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={customRange.start}
+                onChange={(e) =>
+                  setCustomRange({ ...customRange, start: e.target.value })
+                }
+              />
+              <input
+                type="date"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={customRange.end}
+                onChange={(e) =>
+                  setCustomRange({ ...customRange, end: e.target.value })
+                }
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-3 mt-6">
+          {taskStats.map((item, index) => {
+            const content = (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex items-center">
+                <div
+                  className={`w-12 h-12 ${item.bgClass} rounded-lg flex items-center justify-center mr-4`}
+                >
+                  <img src={item.icon} alt={item.alt} className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">{item.label}</p>
+                  <p className="text-2xl font-bold text-gray-800">
+                    {item.value}
+                  </p>
+                </div>
+              </div>
+            );
+
+            return (
+              <div key={index}>
+                {item.link ? <Link to={item.link}>{content}</Link> : content}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Filter Subtasks by Status:
+            </label>
             <select
-              className="form-control custom-select"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="All">All Status</option>
+              {statusOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Filter Subtasks by Priority:
+            </label>
+            <select
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               value={priorityFilter}
               onChange={(e) => setPriorityFilter(e.target.value)}
             >
@@ -425,7 +431,11 @@ const EmployeeDashboard = () => {
             </select>
           </div>
         </div>
-        <div className="time-table-wrapper empan-time-table-wrapper">
+      </div>
+
+      {/* Projects Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
           <table className="time-table-table">
             <thead className="ttb-table-row">
               <tr>
@@ -936,7 +946,9 @@ const EmployeeDashboard = () => {
             </tbody>
           </table>
         </div>
-      </section>
+      </div>
+
+      {/* Complete Modal */}
       <Modal
         show={showCompleteModal}
         onHide={() => {

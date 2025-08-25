@@ -8623,9 +8623,17 @@ a {
 .bulk-actions {
   background: #e3f2fd;
   border: 1px solid #bbdefb;
-  border-radius: 8px;
-  padding: 16px 20px;
+  border-radius: 12px;
   margin-top: 16px;
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  padding: 16px 24px;
+  min-width: 750px;
+  max-width: 95vw;
 }
 
 .bulk-actions-header {
@@ -8647,6 +8655,7 @@ a {
   gap: 12px;
   align-items: center;
   flex-wrap: wrap;
+  min-width: 650px;
 }
 
 .bulk-btn {
@@ -8721,7 +8730,12 @@ a {
 
   .bulk-controls {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+  }
+
+  .bulk-count-main {
+    width: 100%;
+    text-align: center;
   }
 
   .filter-select {
@@ -9238,5 +9252,3 @@ a {
   background: #0a3749;
   color: white;
 }
-
-

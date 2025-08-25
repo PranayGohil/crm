@@ -4,9 +4,7 @@ import axios from "axios";
 import LoadingOverlay from "../components/LoadingOverlay";
 import { toast } from "react-toastify";
 import { statusOptions, priorityOptions } from "../options";
-
 import { Modal, Button } from "react-bootstrap";
-
 import { useSocket } from "../contexts/SocketContext";
 
 const ViewSubtask = () => {
@@ -16,17 +14,17 @@ const ViewSubtask = () => {
 
   const employee = JSON.parse(localStorage.getItem("employeeUser"));
   const employeeId = employee ? employee._id : null;
+  const profilePic = employee?.profile_pic || "/Image/default-profile.jpg";
 
   const [admin, setAdmin] = useState(null);
 
   const [subtask, setSubtask] = useState(null);
   const [project, setProject] = useState(null);
   const [client, setClient] = useState(null);
-  const [assignedEmployee, setAssignedEmployee] = useState(null); // single employee
+  const [assignedEmployee, setAssignedEmployee] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const [isEditing, setIsEditing] = useState(false);
-
   const [editingStatus, setEditingStatus] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -173,7 +171,7 @@ const ViewSubtask = () => {
       formData.append("user_type", "employee");
       for (const file of files) {
         console.log("File Data:", file);
-        formData.append("media_files", file); // must match .array("media_files")
+        formData.append("media_files", file);
       }
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/add-media/${subtaskId}`,
@@ -217,7 +215,6 @@ const ViewSubtask = () => {
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
-    setLoading(true);
     try {
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/add-comment/${subtaskId}`,
@@ -228,9 +225,6 @@ const ViewSubtask = () => {
     } catch (error) {
       console.error("Failed to add comment:", error);
       toast.error("Failed to add comment");
-    } finally {
-      setLoading(false);
-      setVisibleCommentsCount(7); // Reset to show only 7 comments after adding
     }
   };
 
@@ -247,487 +241,496 @@ const ViewSubtask = () => {
   if (!subtask) return <p>Subtask not found!</p>;
 
   return (
-    <div className="preview-page">
-      <section className="pb-sec1">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <div className="anp-heading-main">
-            <div
-              className="anp-back-btn"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/");
-              }}
-              style={{ cursor: "pointer" }}
+    <div className="min-h-screen bg-gray-50 p-6">
+      {/* Header */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="flex items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-10 h-10 bg-gray-100 border border-gray-300 rounded-lg mr-4 hover:bg-gray-200 transition-colors"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
             >
-              <img
-                src="/SVG/arrow-pc.svg"
-                alt="back"
-                className="mx-2"
-                style={{ scale: "1.3" }}
-              />
-            </div>
-            <div className="head-menu">
-              <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
-                Subtask Details{" "}
-              </h1>
-            </div>
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+          <div className="flex items-center gap-2">
+            <h1 className="text-lg text-gray-800">Subtask Details :</h1>
+            <h1 className="text-2xl font-semibold text-gray-800">
+              {project?.project_name || "Project Name"}
+            </h1>
           </div>
         </div>
-      </section>
+      </div>
 
-      <section className="pb-sec2">
-        <div className="pb-sec2-heading">
-          <div className="pb-subtask-head">
-            <h2>{project?.project_name || "Project Name"}</h2>
-            <p>{subtask.task_name || "Subtask Name"}</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="pb-sec-3 pb-sec2">
-        <div className="pb-sec3-inner">
-          <div className="pb-client-id">
-            <div className="pb-pro-client pb-project-id">
-              <p>Project ID: </p>
-              <span>{project?._id}</span>
-            </div>
-            <div className="pb-pro-client pb-client">
-              <p>Client: </p>
-              <span>{client?.full_name || "N/A"}</span>
-            </div>
-          </div>
-          <div>
-            {isEditing ? (
-              <div className="d-flex align-items-center gap-2">
-                <select
-                  value={editingStatus}
-                  onChange={(e) => setEditingStatus(e.target.value)}
-                  className="dropdown_toggle"
-                  disabled={saving}
-                >
-                  <option value="">Select Status</option>
-                  {statusOptions.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
-
-                <button
-                  onClick={handleUpdate}
-                  disabled={saving}
-                  className="theme_btn"
-                >
-                  {saving ? "Saving..." : "Update"}
-                </button>
-                <button
-                  onClick={() => setIsEditing(false)}
-                  disabled={saving}
-                  className="theme_secondary_btn"
-                >
-                  Cancel
-                </button>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Subtask Info Card */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  {subtask.task_name || "Subtask Name"}
+                </h2>
+                <div className="flex items-center mt-2 text-sm text-gray-600">
+                  <span className="mr-4">Project ID: {project?._id}</span>
+                  <span>Client: {client?.full_name || "N/A"}</span>
+                </div>
               </div>
-            ) : (
-              <>
-                <span className="cdn-bg-color-yellow color_yellow mx-2  rounded p-2">
-                  {subtask.status || "Status Unknown"}
-                </span>
-                <span className="cdn-bg-color-red color_red mx-2 rounded p-2">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    subtask.priority === "High"
+                      ? "bg-red-100 text-red-800"
+                      : subtask.priority === "Medium"
+                      ? "bg-orange-100 text-orange-800"
+                      : "bg-blue-100 text-blue-800"
+                  }`}
+                >
                   {subtask.priority || "Priority Unknown"}
                 </span>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="theme_btn"
-                >
-                  Edit
-                </button>
-              </>
+                {isEditing ? (
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={editingStatus}
+                      onChange={(e) => setEditingStatus(e.target.value)}
+                      className="px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      disabled={saving}
+                    >
+                      <option value="">Select Status</option>
+                      {statusOptions.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+
+                    <button
+                      onClick={handleUpdate}
+                      disabled={saving}
+                      className="px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      {saving ? "Saving..." : "Update"}
+                    </button>
+                    <button
+                      onClick={() => setIsEditing(false)}
+                      disabled={saving}
+                      className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        subtask.status === "Completed"
+                          ? "bg-green-100 text-green-800"
+                          : subtask.status === "In Progress"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {subtask.status || "Status Unknown"}
+                    </span>
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Stage:</span>
+                  <span className="font-medium">{subtask.stage || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Assigned To:</span>
+                  <span className="font-medium">
+                    {assignedEmployee?.full_name || "N/A"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Start Date:</span>
+                  <span className="font-medium">
+                    {subtask.assign_date
+                      ? formatDate(subtask.assign_date)
+                      : "N/A"}
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Created By:</span>
+                  <span className="font-medium">
+                    {client?.full_name || "N/A"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Status:</span>
+                  <span className="font-medium">{subtask.status || "N/A"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Due Date:</span>
+                  <span className="font-medium">
+                    {subtask.due_date ? formatDate(subtask.due_date) : "N/A"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <h3 className="text-lg font-medium text-gray-800 mb-2">
+                Description
+              </h3>
+              <p className="text-gray-700">
+                {subtask.description || "No description available."}
+              </p>
+            </div>
+
+            {subtask.url && (
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <h3 className="text-lg font-medium text-gray-800 mb-2">URL</h3>
+                <p className="text-gray-700">{subtask.url}</p>
+              </div>
             )}
           </div>
-        </div>
-      </section>
 
-      <section className="pb-sec-4 pb-sec2">
-        <div className="pb-sec4-inner pb-sec3-inner">
-          <div className="pb-task-overview-head">
-            <p>Task Overview</p>
-          </div>
-          <div className="pb-task-overview-inner">
-            <div className="pb-task-view overview1">
-              <div className="pb-taskinner">
-                <p>Stage:</p>
-                <span>{subtask.stage || "N/A"}</span>
-              </div>
-              <div className="pb-taskinner">
-                <p>Assigned To:</p>
-                <span>{assignedEmployee?.full_name || "N/A"}</span>
-              </div>
-              <div className="pb-taskinner">
-                <p>Start Date:</p>
-                <span>
-                  {subtask.assign_date
-                    ? formatDate(subtask.assign_date)
-                    : "N/A"}
-                </span>
-              </div>
+          {/* Media Section */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Attached Media
+              </h2>
+              <label
+                htmlFor="mediaUpload"
+                className="flex items-center px-3 py-1 bg-gray-100 text-gray-800 rounded-lg cursor-pointer hover:bg-gray-200"
+              >
+                <svg
+                  className="w-4 h-4 mr-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                Add Media
+                <input
+                  type="file"
+                  id="mediaUpload"
+                  multiple
+                  accept="image/*,application/pdf"
+                  className="hidden"
+                  onChange={(e) => handleUploadMedia(e.target.files)}
+                />
+              </label>
             </div>
-            <div className="pb-task-view overview2">
-              <div className="pb-taskinner">
-                <p>Created By:</p>
-                <span>{client?.full_name || "N/A"}</span>
-              </div>
-              <div className="pb-taskinner">
-                <p>Status:</p>
-                <span>{subtask.status || "N/A"}</span>
-              </div>
-              <div className="pb-taskinner">
-                <p>Due Date:</p>
-                <span>
-                  {subtask.due_date ? formatDate(subtask.due_date) : "N/A"}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section className="pb-sec-5 pb-sec2">
-        <div className="pb-sec5-inner pb-sec3-inner">
-          <div className="pb-project-description">
-            <h3>Description</h3>
-            <p>{subtask.description || "No description available."}</p>
-          </div>
-        </div>
-        {subtask.url && (
-          <div className="pb-sec5-inner pb-sec3-inner">
-            <div className="pb-project-description">
-              <h3>Url</h3>
-              <p>{subtask.url || "No description available."}</p>
-            </div>
-          </div>
-        )}
-      </section>
-
-      <section className="pb-sec-6 pb-sec2">
-        <div className="pb-sec6-inner pb-sec3-inner">
-          <h1>Attached Media</h1>
-          <div className="pb-attached-photo-sec">
-            <div className="pb-project-gallary">
-              {mediaItems.length === 0 ? (
-                <>
-                  <div>No media attached.</div>
-                  <br />
-                </>
-              ) : (
-                mediaItems.map((item, index) => (
-                  <div className="pb-gallary-img" key={index}>
+            {mediaItems.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <svg
+                  className="w-12 h-12 mx-auto mb-3 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <p>No media attached.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {mediaItems.map((item, index) => (
+                  <div key={index} className="relative group">
                     <img
                       src={item.src}
                       alt={item.alt}
-                      style={{ objectFit: "cover" }}
+                      className="w-full h-40 object-cover rounded-lg border border-gray-200"
                     />
-                    <div className="pb-gall-icons">
-                      <a
-                        href={item.src}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <div className="pb-media-icon">
-                          <img src="/SVG/css-eye.svg" alt="view" />
-                        </div>
-                      </a>
-                      <button
-                        className="pb-media-icon bg-light"
-                        type="button"
-                        style={{
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => {
-                          setMediaToRemove(item.src);
-                          setShowRemoveModal(true);
-                        }}
-                      >
-                        <img src="/SVG/delete.svg" alt="remove" />
-                      </button>
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-lg">
+                      <div className="flex space-x-2">
+                        <a
+                          href={item.src}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 bg-white rounded-full hover:bg-gray-100"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                            />
+                          </svg>
+                        </a>
+                        <button
+                          onClick={() => {
+                            setMediaToRemove(item.src);
+                            setShowRemoveModal(true);
+                          }}
+                          className="p-2 bg-white rounded-full hover:bg-gray-100"
+                        >
+                          <svg
+                            className="w-4 h-4 text-red-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
-            <label
-              htmlFor="mediaUpload"
-              className="pb-add-img mt-3"
-              style={{ cursor: "pointer" }}
-            >
-              <img src="/SVG/plus-grey.svg" alt="add" />
-              <span>Add Media</span>
-              <input
-                type="file"
-                id="mediaUpload"
-                multiple
-                accept="image/*,application/pdf"
-                className="d-none"
-                onChange={(e) => handleUploadMedia(e.target.files)}
-              />
-            </label>
-          </div>
-        </div>
-      </section>
-
-      <section className="pb-sec-7 pb-sec2">
-        <div className="pb-sec7-inner pb-sec3-inner">
-          <div className="pb-sec7-heading">
-            <h1>Comments</h1>
-          </div>
-          <div className="pb-add-post-comment mb-3">
-            <div className="pb-add-comment d-flex justify-content-end">
-              <div className="pb-type-comment">
-                <input
-                  type="text"
-                  className="text-end px-3"
-                  placeholder="Write a comment..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                />
-              </div>
-              {employee?.profile_pic ? (
-                <img
-                  src={employee?.profile_pic || "/Image/default-profile.jpg"}
-                  alt={employee?.full_name || "Employee"}
-                  style={{ borderRadius: "50%" }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    borderRadius: "50%",
-                    backgroundColor: "#0a3749",
-                    color: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "18px",
-                    fontWeight: "bold",
-                    textTransform: "uppercase",
-                    border: "2px solid white",
-                  }}
-                >
-                  {employee?.full_name
-                    ? employee.full_name.charAt(0).toUpperCase()
-                    : "?"}
-                </div>
-              )}
-            </div>
-            <div className="pb-add-components">
-              <div></div>
-              {/* <div className="pb-add-imgs">
-                  <a href="#">
-                    <img src="/SVG/add-photo.svg" alt="Add Photo" />
-                  </a>
-                  <a href="#">
-                    <img src="/SVG/add-emoji.svg" alt="Add Emoji" />
-                  </a>
-                  <a href="#">
-                    <img src="/SVG/mention.svg" alt="Mention" />
-                  </a>
-                </div> */}
-              <div className="add-mbr">
-                <div className="plus-icon">
-                  <a onClick={handleAddComment}>
-                    <span>Post Comment</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            {[...comments]
-              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-              .slice(0, visibleCommentsCount)
-              .map((comment) => (
-                <div className="pb-client-comment" key={comment._id}>
-                  {comment.user_type === "admin" ? (
-                    <>
-                      {admin?.profile_pic ? (
-                        <img
-                          src={admin.profile_pic}
-                          alt="Admin"
-                          style={{ borderRadius: "50%" }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: "50px",
-                            height: "50px",
-                            borderRadius: "50%",
-                            backgroundColor: "#0a3749",
-                            color: "#fff",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "18px",
-                            fontWeight: "bold",
-                            textTransform: "uppercase",
-                            border: "2px solid white",
-                          }}
-                        >
-                          {admin.username
-                            ? admin.username.charAt(0).toUpperCase()
-                            : "?"}
-                        </div>
-                      )}
-                      <div className="pb-comment-description">
-                        <div
-                          className="pb-comment-cilent-name"
-                          style={{ width: "90%" }}
-                        >
-                          <div className="pb-name-time">
-                            <div className="pb-cilent-name">
-                              <h4>
-                                {comment.user_type === "admin"
-                                  ? "Admin"
-                                  : comment.user_id?.full_name ||
-                                    "Unknown User"}
-                              </h4>
-                            </div>
-                            <p>
-                              <span style={{ paddingRight: "6px" }}>
-                                {formatDate(comment.created_at)}
-                              </span>
-                            </p>
-                          </div>
-                          <p>{comment.text}</p>
-                        </div>
-                      </div>
-                    </>
-                  ) : comment.user_id._id === employeeId ? (
-                    <>
-                      <div className="pb-comment-description d-flex justify-content-end">
-                        <div
-                          className="pb-comment-cilent-name"
-                          style={{ width: "90%" }}
-                        >
-                          <div className="pb-name-time">
-                            <div className="pb-cilent-name">
-                              <h4>
-                                {comment.user_type === "admin"
-                                  ? "Admin"
-                                  : comment.user_id?.full_name ||
-                                    "Unknown User"}
-                              </h4>
-                            </div>
-                            <p>
-                              <span style={{ paddingRight: "6px" }}>
-                                {formatDate(comment.created_at)}
-                              </span>
-                            </p>
-                          </div>
-                          <p>{comment.text}</p>
-                        </div>
-                      </div>
-                      {comment.user_id.profile_pic ? (
-                        <img
-                          src={comment.user_id.profile_pic}
-                          alt={comment.user_id.full_name}
-                          style={{ borderRadius: "50%" }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: "50px",
-                            height: "50px",
-                            borderRadius: "50%",
-                            backgroundColor: "#0a3749",
-                            color: "#fff",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "18px",
-                            fontWeight: "bold",
-                            textTransform: "uppercase",
-                            border: "2px solid white",
-                          }}
-                        >
-                          {comment.user_id?.full_name
-                            ? comment.user_id.full_name.charAt(0).toUpperCase()
-                            : "?"}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {comment.user_id.profile_pic ? (
-                        <img
-                          src={comment.user_id.profile_pic}
-                          alt={comment.user_id.full_name}
-                          style={{ borderRadius: "50%" }}
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: "50px",
-                            height: "50px",
-                            borderRadius: "50%",
-                            backgroundColor: "#0a3749",
-                            color: "#fff",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: "18px",
-                            fontWeight: "bold",
-                            textTransform: "uppercase",
-                            border: "2px solid white",
-                          }}
-                        >
-                          {comment.user_id?.full_name
-                            ? comment.user_id.full_name.charAt(0).toUpperCase()
-                            : "?"}
-                        </div>
-                      )}
-                      <div className="pb-comment-description">
-                        <div
-                          className="pb-comment-cilent-name"
-                          style={{ width: "90%" }}
-                        >
-                          <div className="pb-name-time">
-                            <div className="pb-cilent-name">
-                              <h4>
-                                {comment.user_type === "admin"
-                                  ? "Admin"
-                                  : comment.user_id?.full_name ||
-                                    "Unknown User"}
-                              </h4>
-                            </div>
-                            <p>
-                              <span style={{ paddingRight: "6px" }}>
-                                {formatDate(comment.created_at)}
-                              </span>
-                            </p>
-                          </div>
-                          <p>{comment.text}</p>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              ))}
-            {visibleCommentsCount < comments.length && (
-              <div style={{ textAlign: "center", marginTop: "10px" }}>
-                <button
-                  onClick={() => setVisibleCommentsCount((prev) => prev + 7)}
-                  className="theme_secondary_btn"
-                >
-                  See more comments
-                </button>
+                ))}
               </div>
             )}
           </div>
+
+          {/* Comments Section */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Comments
+            </h2>
+
+            {/* Add Comment */}
+            <div className="mb-6">
+              <div className="flex items-start space-x-3">
+                {employee?.profile_pic ? (
+                  <img
+                    src={profilePic}
+                    alt="Your profile"
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-sm">
+                    {employee?.full_name
+                      ? employee.full_name.charAt(0).toUpperCase()
+                      : "?"}
+                  </div>
+                )}
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    placeholder="Write a comment..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <div className="flex justify-end mt-2">
+                    <button
+                      onClick={handleAddComment}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Post Comment
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Comments List */}
+            <div className="space-y-4">
+              {[...comments]
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(0, visibleCommentsCount)
+                .map((comment) => (
+                  <div key={comment._id} className="flex items-start space-x-3">
+                    {comment.user_type === "admin" ? (
+                      <>
+                        <div className="flex-1 bg-gray-50 p-4 rounded-lg">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-medium">Admin</span>
+                            <span className="text-sm text-gray-500">
+                              {formatDate(comment.created_at)}
+                            </span>
+                          </div>
+                          <p className="text-gray-700">{comment.text}</p>
+                        </div>
+                        {admin?.profile_pic ? (
+                          <img
+                            src={admin.profile_pic}
+                            alt="Admin"
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-sm">
+                            {admin?.username
+                              ? admin.username.charAt(0).toUpperCase()
+                              : "?"}
+                          </div>
+                        )}
+                      </>
+                    ) : comment.user_id._id === employeeId ? (
+                      <>
+                        <div className="flex-1 bg-blue-50 p-4 rounded-lg">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-medium">
+                              {comment.user_id?.full_name || "Unknown User"}
+                            </span>
+                            <span className="text-sm text-gray-500">
+                              {formatDate(comment.created_at)}
+                            </span>
+                          </div>
+                          <p className="text-gray-700">{comment.text}</p>
+                        </div>
+                        {comment.user_id.profile_pic ? (
+                          <img
+                            src={comment.user_id.profile_pic}
+                            alt={comment.user_id.full_name}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-sm">
+                            {comment.user_id?.full_name
+                              ? comment.user_id.full_name
+                                  .charAt(0)
+                                  .toUpperCase()
+                              : "?"}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {comment.user_id.profile_pic ? (
+                          <img
+                            src={comment.user_id.profile_pic}
+                            alt={comment.user_id.full_name}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-sm">
+                            {comment.user_id?.full_name
+                              ? comment.user_id.full_name
+                                  .charAt(0)
+                                  .toUpperCase()
+                              : "?"}
+                          </div>
+                        )}
+                        <div className="flex-1 bg-gray-50 p-4 rounded-lg">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-medium">
+                              {comment.user_id?.full_name || "Unknown User"}
+                            </span>
+                            <span className="text-sm text-gray-500">
+                              {formatDate(comment.created_at)}
+                            </span>
+                          </div>
+                          <p className="text-gray-700">{comment.text}</p>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
+
+              {visibleCommentsCount < comments.length && (
+                <div className="text-center mt-4">
+                  <button
+                    onClick={() => setVisibleCommentsCount((prev) => prev + 7)}
+                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                  >
+                    Load More Comments
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </section>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Project Info */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Project Information
+            </h3>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-gray-600">Project Name</p>
+                <p className="font-medium">{project?.project_name || "N/A"}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Client</p>
+                <p className="font-medium">{client?.full_name || "N/A"}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Project ID</p>
+                <p className="font-medium">{project?._id || "N/A"}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Assigned Employee */}
+          {assignedEmployee && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Assigned To
+              </h3>
+              <div className="flex items-center space-x-3">
+                {assignedEmployee.profile_pic ? (
+                  <img
+                    src={assignedEmployee.profile_pic}
+                    alt={assignedEmployee.full_name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">
+                    {assignedEmployee.full_name?.charAt(0).toUpperCase() || "?"}
+                  </div>
+                )}
+                <div>
+                  <p className="font-medium">{assignedEmployee.full_name}</p>
+                  <p className="text-sm text-gray-600">
+                    {assignedEmployee.email}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Remove Media Modal */}
       <Modal
         show={showRemoveModal}
         onHide={() => setShowRemoveModal(false)}

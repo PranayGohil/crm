@@ -1,18 +1,24 @@
+// EmployeeTimeTracking.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
+import { Modal, Button } from "react-bootstrap";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 const EmployeeTimeTracking = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [projects, setProjects] = useState([]);
   const [subtasks, setSubtasks] = useState([]);
   const [openTable, setOpenTable] = useState(null);
-  const [selectedFilter, setSelectedFilter] = useState("All Time");
+  const [selectedFilter, setSelectedFilter] = useState("Today");
   const [customDateRange, setCustomDateRange] = useState({
     from: null,
     to: null,
   });
+  const [showCustomDateModal, setShowCustomDateModal] = useState(false);
+
   const [employeeId, setEmployeeId] = useState("");
 
   useEffect(() => {
@@ -25,10 +31,15 @@ const EmployeeTimeTracking = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const [projRes, subRes] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all-archived`),
-          axios.get(`${process.env.REACT_APP_API_URL}/api/employee/tasks/${employeeId}`),
+          axios.get(
+            `${process.env.REACT_APP_API_URL}/api/project/get-all-archived`
+          ),
+          axios.get(
+            `${process.env.REACT_APP_API_URL}/api/employee/tasks/${employeeId}`
+          ),
         ]);
         setProjects(projRes.data);
         setSubtasks(subRes.data);
@@ -36,13 +47,16 @@ const EmployeeTimeTracking = () => {
         console.log("subtasks", subRes.data);
       } catch (error) {
         console.error("Data fetching error:", error);
+      } finally {
+        setLoading(false);
       }
     };
     if (employeeId) fetchData();
   }, [employeeId]);
 
-  const handleToggle = (id) =>
+  const handleToggle = (id) => {
     setOpenTable((prev) => (prev === id ? null : id));
+  };
 
   const isWithinFilter = (dateStr) => {
     const date = moment(dateStr);
@@ -101,7 +115,7 @@ const EmployeeTimeTracking = () => {
   );
 
   const summaryData = {
-    mainTasks: new Set(filteredSubtasks.map((s) => s.project_id)).size,
+    mainTasks: new Set(filteredSubtasks.map((s) => s.project_id._id)).size,
     subtasks: filteredSubtasks.length,
     totalTimeTracked: filteredSubtasks.reduce((acc, sub) => {
       const time = sub.time_logs?.reduce((subTotal, log) => {
@@ -122,201 +136,277 @@ const EmployeeTimeTracking = () => {
     .utc(summaryData.totalTimeTracked * 1000)
     .format("HH:mm:ss");
 
+  if (loading) return <LoadingOverlay />;
+
   return (
-    <div className="time-tracking-dashboard-page p-3">
-      <section className="ett-main-sec">
-        <div className="tt-time-tracking ett-emp-tracking-time">
-          <div className="d-flex justify-content-between align-items-center">
-            <div className="anp-heading-main">
-              <div
-                className="anp-back-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate(-1);
-                }}
-                style={{ cursor: "pointer" }}
+    <div className="dashboard-container">
+      {/* Header */}
+      <section className="dashboard-header">
+        <div className="header-content">
+          <div className="header-left">
+            <button className="back-button" onClick={() => navigate(-1)}>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
               >
-                <img
-                  src="/SVG/arrow-pc.svg"
-                  alt="back"
-                  className="mx-2"
-                  style={{ scale: "1.3" }}
-                />
-              </div>
-              <div className="head-menu">
-                <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
-                  My Time Tracking{" "}
-                </h1>
-                <p>Track your time spent on tasks and projects.</p>
-              </div>
-            </div>
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+            </button>
+            <h1 className="header-title">My Time Tracking</h1>
           </div>
-          <div className="ett-time-duration">
-            <div className="ett-time-type d-flex gap-3">
-              {["All Time", "Today", "This Week", "This Month", "Custom"].map(
-                (label) => (
-                  <a
-                    key={label}
-                    href="#"
-                    className={
-                      selectedFilter === label ? "ett-today active" : ""
-                    }
-                    onClick={() => setSelectedFilter(label)}
-                  >
-                    {label}
-                  </a>
-                )
-              )}
-            </div>
-            {selectedFilter === "Custom" && (
-              <div className="d-flex gap-3 mt-2">
-                <input
-                  type="date"
-                  className="form-control"
-                  onChange={(e) =>
-                    setCustomDateRange((prev) => ({
-                      ...prev,
-                      from: e.target.value,
-                    }))
-                  }
-                />
-                <input
-                  type="date"
-                  className="form-control"
-                  onChange={(e) =>
-                    setCustomDateRange((prev) => ({
-                      ...prev,
-                      to: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-            )}
-          </div>
+          <p className="project-name">
+            Track your time spent on tasks and projects
+          </p>
         </div>
       </section>
 
-      <section className="ett-task-time p-3">
-        {projects.map((project) => {
-          console.log("Subtasks:", filteredSubtasks);
-          const projectSubtasks = filteredSubtasks.filter(
-            (s) => s.project_id._id === project._id
-          );
-          if (projectSubtasks.length === 0) return null;
+      {/* Stats */}
+      <section className="stats-section">
+        <div className="stats-info">
+          <span className="stats-number">{summaryData.mainTasks}</span>
+          <span>Main Tasks ({summaryData.subtasks} subtasks)</span>
+        </div>
+        <div className="stats-info">
+          <span className="stats-number">{totalTimeTrackedFormatted}</span>
+          <span>Total Time Tracked</span>
+        </div>
+      </section>
 
-          const totalTime = projectSubtasks.reduce((acc, sub) => {
-            const time = moment
-              .duration(calculateTimeSpent(sub.time_logs))
-              .asSeconds();
-            return acc + time;
-          }, 0);
-          const duration = moment.duration(totalTime, "seconds");
-          const formattedTime = `${duration.days()}d ${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
-
-          return (
-            <div key={project._id}>
-              <div
-                className={`ett-menu1 dropdown_toggle ${
-                  openTable === project._id ? "open" : ""
-                }`}
-                onClick={() => handleToggle(project._id)}
-              >
-                <div className="task-name">{project.project_name}</div>
-                <div className="task-time">{formattedTime}</div>
-                <img
-                  src="/SVG/header-vector.svg"
-                  alt="vec"
-                  className="arrow_icon"
-                />
+      {/* Filters */}
+      <section className="table-container">
+        <div className="table-controls">
+          <div className="controls-left">
+            <div className="filter-group">
+              <span className="filter-label">Time Range:</span>
+              <div className="filter-options">
+                {["All Time", "Today", "This Week", "This Month", "Custom"].map(
+                  (label) => (
+                    <button
+                      key={label}
+                      className={`filter-btn ${
+                        selectedFilter === label ? "active" : ""
+                      }`}
+                      onClick={() => {
+                        if (label === "Custom") {
+                          setShowCustomDateModal(true);
+                        } else {
+                          setSelectedFilter(label);
+                        }
+                      }}
+                    >
+                      {label}
+                    </button>
+                  )
+                )}
               </div>
-              <div
-                className="px-5 mb-3"
-                style={{ borderBottom: "1px solid #ccc" }}
-              >
-                <table
-                  id={project._id}
-                  className="ett-main-task-table subtask-table"
-                  style={{
-                    display: openTable === project._id ? "table" : "none",
-                  }}
+            </div>
+          </div>
+        </div>
+
+        {/* Projects List */}
+        <div className="projects-list">
+          {projects.map((project) => {
+            console.log("Subtasks:", filteredSubtasks);
+            const projectSubtasks = filteredSubtasks.filter(
+              (s) => s.project_id._id === project._id
+            );
+
+            const totalTime = projectSubtasks.reduce((acc, sub) => {
+              const time = moment
+                .duration(calculateTimeSpent(sub.time_logs))
+                .asSeconds();
+              return acc + time;
+            }, 0);
+            const duration = moment.duration(totalTime, "seconds");
+            const formattedTime = `${duration.days()}d ${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
+
+            if (projectSubtasks.length === 0) return null;
+
+            return (
+              <div key={project._id} className="project-item">
+                <div
+                  className={`project-header ${
+                    openTable === project._id ? "open" : ""
+                  }`}
+                  onClick={() => handleToggle(project._id)}
                 >
-                  <thead>
-                    <tr>
-                      <th>Subtask Name</th>
-                      <th>Stage</th>
-                      <th>Due Date</th>
-                      <th>Remaining Time</th>
-                      <th>Time Spent</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {projectSubtasks.map((subtask, index) => {
-                      const spent = calculateTimeSpent(subtask.time_logs);
-                      const remaining = calculateRemainingTime(
-                        subtask.due_date,
-                        subtask.status
-                      );
-                      return (
-                        <tr key={index}>
-                          <td>{subtask.task_name}</td>
-                          <td>
-                            <span
-                              className={`py-2 px-3 css-stage ${
-                                subtask.stage === "CAD Design"
-                                  ? "badge bg-primary"
-                                  : subtask.stage === "SET Design"
-                                  ? "badge bg-warning"
-                                  : subtask.stage === "Delivery"
-                                  ? "badge bg-success"
-                                  : subtask.stage === "Render"
-                                  ? "badge bg-info"
-                                  : ""
-                              }`}
-                            >
-                              {subtask.stage}
-                            </span>
-                          </td>
-                          <td>
-                            {moment(subtask.due_date).format("DD MMM YYYY")}
-                          </td>
-                          <td>
-                            <span
-                              className={`py-2 px-3 ${
-                                remaining === "Completed"
-                                  ? "badge bg-success"
-                                  : remaining === "Overdue"
-                                  ? "badge bg-danger"
-                                  : "badge bg-primary"
-                              }`}
-                            >
-                              {remaining}
-                            </span>
-                          </td>
-                          <td>{spent}</td>
+                  <div className="project-name">{project.project_name}</div>
+                  <div className="project-time">{formattedTime}</div>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className={`dropdown-arrow ${
+                      openTable === project._id ? "rotated" : ""
+                    }`}
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </div>
+
+                {openTable === project._id && (
+                  <div className="subtasks-table-container">
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th>Subtask Name</th>
+                          <th>Stage</th>
+                          <th>Due Date</th>
+                          <th>Remaining Time</th>
+                          <th>Time Spent</th>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                      </thead>
+                      <tbody>
+                        {projectSubtasks.map((subtask, index) => {
+                          const spent = calculateTimeSpent(subtask.time_logs);
+                          const remaining = calculateRemainingTime(
+                            subtask.due_date,
+                            subtask.status
+                          );
+
+                          return (
+                            <tr key={index}>
+                              <td>
+                                <div className="task-name-cell">
+                                  <span
+                                    className="task-name-text"
+                                    title={subtask.task_name}
+                                  >
+                                    {subtask.task_name}
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                <span
+                                  className={`stage-badge ${
+                                    subtask.stage === "CAD Design"
+                                      ? "stage-cad"
+                                      : subtask.stage === "SET Design"
+                                      ? "stage-set"
+                                      : subtask.stage === "Delivery"
+                                      ? "stage-delivery"
+                                      : subtask.stage === "Render"
+                                      ? "stage-render"
+                                      : "stage-default"
+                                  }`}
+                                >
+                                  {subtask.stage}
+                                </span>
+                              </td>
+                              <td>
+                                <span className="date-cell">
+                                  {moment(subtask.due_date).format(
+                                    "DD MMM YYYY"
+                                  )}
+                                </span>
+                              </td>
+                              <td>
+                                <span
+                                  className={`status-badge ${
+                                    remaining === "Completed"
+                                      ? "status-completed"
+                                      : remaining === "Overdue"
+                                      ? "status-overdue"
+                                      : "status-pending"
+                                  }`}
+                                >
+                                  <span className="status-dot"></span>
+                                  {remaining}
+                                </span>
+                              </td>
+                              <td>
+                                <span className="time-spent">{spent}</span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+
+        {/* Summary */}
+        <div className="pagination-container">
+          <div className="pagination-info">
+            Showing <span className="highlight">{summaryData.mainTasks}</span>{" "}
+            main tasks (
+            <span className="highlight">{summaryData.subtasks}</span> subtasks)
+          </div>
+          <div className="pagination-info">
+            Total time tracked:{" "}
+            <span className="highlight">{totalTimeTrackedFormatted}</span>
+          </div>
+        </div>
       </section>
 
-      <section className="tt-showing-task-detail">
-        <div className="tt-showing-task">
-          <p>
-            Showing <span>{summaryData.mainTasks}</span> main tasks
-          </p>
-          <p>
-            (<span>{summaryData.subtasks}</span> subtasks total)
-          </p>
-        </div>
-        <div className="tt-showing-time-tracking">
-          <span>Total time tracked: {totalTimeTrackedFormatted}</span>
-        </div>
-      </section>
+      {/* Custom Date Modal */}
+      <Modal
+        show={showCustomDateModal}
+        onHide={() => setShowCustomDateModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Select Custom Date Range</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="custom-date-inputs">
+            <div className="input-group">
+              <label>From:</label>
+              <input
+                type="date"
+                className="form-control w-100"
+                onChange={(e) =>
+                  setCustomDateRange((prev) => ({
+                    ...prev,
+                    from: e.target.value,
+                  }))
+                }
+              />
+            </div>
+            <div className="input-group">
+              <label>To:</label>
+              <input
+                type="date"
+                className="form-control w-100"
+                onChange={(e) =>
+                  setCustomDateRange((prev) => ({
+                    ...prev,
+                    to: e.target.value,
+                  }))
+                }
+              />
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowCustomDateModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setSelectedFilter("Custom");
+              setShowCustomDateModal(false);
+            }}
+          >
+            Apply
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

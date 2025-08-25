@@ -21,6 +21,8 @@ import ProjectDetails from "./pages/ProjectDetails";
 import Subtasks from "./pages/Subtasks";
 import TimeTrackingDashboard from "./pages/TimeTrackingDashboard";
 
+import ProjectMediaGallery from "./pages/ProjectMediaGallery";
+
 import LoginPage from "./pages/LoginPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -45,6 +47,10 @@ function App() {
           <Route
             path="/project/details/:projectId"
             element={<ProjectDetails />}
+          />
+          <Route
+            path="/project/gallery/:projectId"
+            element={<ProjectMediaGallery />}
           />
           <Route path="/time-tracking" element={<EmployeeTimeTracking />} />
           <Route path="/notifications" element={<EmployeeNotificationPage />} />

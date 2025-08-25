@@ -121,11 +121,12 @@ export const addBulkSubTasks = async (req, res) => {
     } else {
       console.log("No admin found in the database");
     }
+    
+    const io = req.app.get("io");
+    const connectedUsers = req.app.get("connectedUsers");
 
     if (tasks[0].assign_to && connectedUsers[tasks[0].assign_to]) {
       // 🔹 Realtime: Notify assigned employees
-      const io = req.app.get("io");
-      const connectedUsers = req.app.get("connectedUsers");
 
       result.forEach(async (subtask) => {
         const notification = await Notification.create({

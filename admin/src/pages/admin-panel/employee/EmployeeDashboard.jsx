@@ -43,7 +43,7 @@ const Dropdown = ({ label, options, selected, onChange }) => {
       </button>
       {isOpen && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
-          <ul className="py-1">
+          <ul className="py-1 px-0">
             {options.map((option, idx) => (
               <li
                 key={idx}
@@ -341,7 +341,7 @@ const EmployeeDashboard = () => {
       </div>
 
       {/* Employee cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         {filteredEmployees.map((member) => (
           <div
             key={member._id}

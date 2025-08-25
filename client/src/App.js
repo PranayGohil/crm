@@ -9,14 +9,14 @@ import Plain_layout from "./layout/Plain_layout";
 
 import SubtaskDashboardContainer from "./pages/SubtaskDashboardContainer";
 
-import ProjectContent from "./pages/ProjectContent";
+import ProjectContent from "./pages/ProjectDetails";
 import ProjectMediaGallery from "./pages/ProjectMediaGallery";
 
 
 // client admin
 
 import ClientDetailsPage from "./pages/ClientDetailsPage";
-import ClientAdminProjectDetails from "./pages/ClientAdminProjectDetails";
+import ClientDashboard from "./pages/ClientDashboard";
 
 import LoginPage from "./pages/LoginPage";
 
@@ -38,25 +38,25 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/" element={<ClientAdminProjectDetails />} />
+          <Route path="/" element={<ClientDashboard />} />
           <Route
             path="/profile"
             element={<ClientDetailsPage />}
           />
           <Route
             path="/dashboard"
-            element={<ClientAdminProjectDetails />}
+            element={<ClientDashboard />}
           />
           <Route
             path="/subtasks/:projectId"
             element={<SubtaskDashboardContainer />}
           />
           <Route
-            path="/view-content/:projectId"
+            path="/project-details/:projectId"
             element={<ProjectContent />}
           />
           <Route
-            path="/gallery/:projectId"
+            path="/project/gallery/:projectId"
             element={<ProjectMediaGallery />}
           />
           <Route

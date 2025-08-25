@@ -1,5 +1,6 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const ProjectCard = ({
   filteredProjects,
@@ -7,6 +8,8 @@ const ProjectCard = ({
   loading,
   employees,
 }) => {
+  const [clientMap, setClientMap] = useState({});
+
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
@@ -29,6 +32,34 @@ const ProjectCard = ({
     if (daysRemain === 0) return "Due today";
     return `${daysRemain} day${daysRemain !== 1 ? "s" : ""} remain`;
   };
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      const ids = [
+        ...new Set(filteredProjects.map((p) => p.client_id).filter(Boolean)),
+      ];
+      if (!ids.length) return;
+
+      try {
+        const results = await Promise.all(
+          ids.map((id) =>
+            axios
+              .get(`${process.env.REACT_APP_API_URL}/api/client/get/${id}`)
+              .then((res) => ({ id, name: res.data.full_name }))
+              .catch(() => ({ id, name: "Unknown Client" }))
+          )
+        );
+
+        const map = {};
+        results.forEach((r) => (map[r.id] = r.name));
+        setClientMap(map);
+      } catch (err) {
+        console.error("Error fetching clients", err);
+      }
+    };
+
+    fetchClients();
+  }, [filteredProjects]);
 
   // Get status class for styling
   const getStatusClass = (status) => {
@@ -92,7 +123,6 @@ const ProjectCard = ({
               <svg
                 width="16"
                 height="16"
-                viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -102,7 +132,7 @@ const ProjectCard = ({
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
-              <span>{project.client_name || "No client"}</span>
+              <span>{clientMap[project.client_id] || "No Client"}</span>
             </div>
 
             <div className="project-dates">
@@ -415,4 +445,3 @@ export default ProjectCard;
 // };
 
 // export default ProjectCard;
-

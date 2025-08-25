@@ -1,8 +1,10 @@
+// Updated with Complete UI
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { Modal, Button } from "react-bootstrap";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { stageOptions, priorityOptions, statusOptions } from "../options";
@@ -21,8 +23,10 @@ const Subtasks = () => {
   const [employees, setEmployees] = useState([]);
 
   const [selectedTaskIds, setSelectedTaskIds] = useState([]);
-  const [headerDropdownOpen, setHeaderDropdownOpen] = useState(null);
+  const [bulkAssignTo, setBulkAssignTo] = useState("");
+  const [bulkPriority, setBulkPriority] = useState("");
 
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [summary, setSummary] = useState(null);
 
   const [filters, setFilters] = useState({
@@ -32,15 +36,6 @@ const Subtasks = () => {
     stage: "Stage",
     employee: "Employee",
   });
-
-  const headerRef = useRef(null);
-
-  const dropdownData = {
-    status: statusOptions,
-    priority: priorityOptions,
-    stage: stageOptions,
-  };
-  dropdownData.employee = ["Employee", ...employees.map((e) => e.full_name)];
 
   const fetchAll = async () => {
     try {
@@ -60,6 +55,8 @@ const Subtasks = () => {
       setEmployees(myEmployees);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,45 +64,46 @@ const Subtasks = () => {
     fetchAll();
   }, []);
 
-  useEffect(() => {
-    setLoading(true);
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/api/statistics/summary`)
-      .then((res) => {
-        setSummary(res.data);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
+  const getStatsFromProjects = (projects) => {
+    let totalTasks = 0;
+    const tasksByStage = {};
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (headerRef.current && !headerRef.current.contains(e.target)) {
-        setHeaderDropdownOpen(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    projects.forEach((project) => {
+      (project.subtasks || []).forEach((subtask) => {
+        if (subtask.isArchived) return; // skip archived
 
-  const handleHeaderToggle = (key) => {
-    setHeaderDropdownOpen(headerDropdownOpen === key ? null : key);
-  };
+        totalTasks++;
 
-  const handleFilterSelect = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-    setHeaderDropdownOpen(null);
-  };
+        if (Array.isArray(subtask.stages) && subtask.stages.length > 0) {
+          const currentIndex =
+            typeof subtask.current_stage_index === "number"
+              ? subtask.current_stage_index
+              : 0;
 
-  const handleResetFilters = () => {
-    setFilters({
-      client: "All Client",
-      status: "Status",
-      priority: "Priority",
-      stage: "Stage",
-      employee: "Employee",
+          subtask.stages.forEach((stage, idx) => {
+            // Count all stages that are not yet completed
+            if (idx >= currentIndex && !stage.completed) {
+              tasksByStage[stage.name] = (tasksByStage[stage.name] || 0) + 1;
+            }
+          });
+        }
+      });
     });
+
+    console.log("tasksByStage", tasksByStage);
+    return { totalTasks, tasksByStage };
   };
+
+  // useEffect(() => {
+  //   setLoading(true);
+  //   axios
+  //     .get(`${process.env.REACT_APP_API_URL}/api/statistics/summary`)
+  //     .then((res) => {
+  //       setSummary(res.data);
+  //     })
+  //     .catch((err) => console.error(err))
+  //     .finally(() => setLoading(false));
+  // }, []);
 
   const clientIdToName = useMemo(() => {
     const map = {};
@@ -169,7 +167,6 @@ const Subtasks = () => {
     );
   });
 
-  // ✅ helper to compute remaining days
   const getRemainingDays = (dueDate) => {
     if (!dueDate) return "-";
     const today = new Date();
@@ -177,6 +174,60 @@ const Subtasks = () => {
     const diffTime = due - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays >= 0 ? `${diffDays} days` : "Overdue";
+  };
+
+  const handleBulkUpdateAll = async () => {
+    if (selectedTaskIds.length === 0) return;
+
+    const update = {};
+    if (bulkAssignTo) update.assign_to = bulkAssignTo;
+    if (bulkPriority) update.priority = bulkPriority;
+
+    if (Object.keys(update).length === 0) {
+      toast.info("No changes selected.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/subtask/bulk-update`,
+        {
+          ids: selectedTaskIds,
+          update,
+        }
+      );
+      toast.success("Changes applied!");
+      setBulkAssignTo("");
+      setBulkPriority("");
+      setSelectedTaskIds([]);
+      fetchAll();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to apply changes.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBulkConfirmDelete = async () => {
+    if (selectedTaskIds.length === 0) return;
+    setLoading(true);
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/subtask/bulk-delete`,
+        { ids: selectedTaskIds }
+      );
+      toast.success("Deleted!");
+      fetchAll();
+      setSelectedTaskIds([]);
+      setShowBulkDeleteModal(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Delete failed.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const calculateProjectTotalTime = (subtasks = []) => {
@@ -220,136 +271,296 @@ const Subtasks = () => {
       .catch(() => toast.error("Failed to copy URL."));
   };
 
+  const handleResetFilters = () => {
+    setFilters({
+      client: "All Client",
+      status: "Status",
+      priority: "Priority",
+      stage: "Stage",
+      employee: "Employee",
+    });
+    setSearchTerm("");
+  };
+
+  const formateDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = date.toLocaleString("default", { month: "short" });
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
+
   if (loading) return <LoadingOverlay />;
+
   return (
-    <section className="task_timeboard_wrapper">
-      <section className="header ttb-header">
-        <div className="d-flex align-items-top ps-3 pt-4">
-          <div
-            className="anp-back-btn"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate(-1);
-            }}
-            style={{ cursor: "pointer" }}
-          >
-            <img
-              src="/SVG/arrow-pc.svg"
-              alt="back"
-              className="mx-3"
-              style={{ scale: "1.3" }}
-            />
-          </div>
-          <div className="head-menu">
-            <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
-              All Subtasks{" "}
-            </h1>
-          </div>
-        </div>
-      </section>
-
-      <section className="ttb-search-btn-bar-main">
-        <div className="ttb-search-btn-bar-main-inner d-flex justify-content-between">
-          <div className="input-type ttb-search-bar">
-            <div className="img-search-input">
-              <img src="/SVG/search-icon.svg" alt="search" />
-            </div>
-            <div className="input-type-txt">
-              <input
-                type="text"
-                placeholder="Search by name, email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ border: "none" }}
-              />
-            </div>
-          </div>
-
-          <div className="ttb-all-btn-main" ref={headerRef}>
-            {["status", "stage", "employee"].map((key) => (
-              <div
-                key={key}
-                className={`btn_main ttb-btn ${
-                  headerDropdownOpen === key ? "open" : ""
-                }`}
-                style={{ marginLeft: "10px", width: "150px" }}
+    <div className="dashboard-container">
+      {/* Header */}
+      <section className="dashboard-header">
+        <div className="header-content">
+          <div className="header-left">
+            <button className="back-button" onClick={() => navigate(-1)}>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
               >
-                <div
-                  className="dropdown_toggle"
-                  onClick={() => handleHeaderToggle(key)}
-                >
-                  <span className="text_btn">{filters[key]}</span>
-                  <img src="/SVG/arrow.svg" alt="arrow" />
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+            </button>
+            <h1 className="header-title">All Subtasks</h1>
+          </div>
+
+          {/* Stats Card */}
+          {(() => {
+            const summary = getStatsFromProjects(projects);
+            return (
+              <div className="w-[500px] card p-3 shadow border-0">
+                <div className="md-common-para-icon md-para-icon-tasks">
+                  <span>Subtasks</span>
+                  <div className="md-common-icon">
+                    <img src="SVG/true-green.svg" alt="total tasks" />
+                  </div>
                 </div>
-                {headerDropdownOpen === key && (
-                  <ul className="dropdown_menu">
-                    {dropdownData[key].map((item, i) => (
-                      <li key={i} onClick={() => handleFilterSelect(key, item)}>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <div className="md-total-project-number">
+                  <span className="md-total-card-number">
+                    {summary.totalTasks}
+                  </span>
+                  <span className="md-total-card-text">Total</span>
+                </div>
+                <div className="mt-8 md-btn-cio">
+                  {Object.entries(summary.tasksByStage).map(
+                    ([stage, count]) => (
+                      <div
+                        key={stage}
+                        className={`${
+                          stage === "CAD Design"
+                            ? "badge bg-primary"
+                            : stage === "SET Design"
+                            ? "badge bg-success"
+                            : stage === "Render"
+                            ? "badge bg-info"
+                            : "badge bg-secondary"
+                        }`}
+                      >
+                        {count} {stage} Tasks Remaining
+                      </div>
+                    )
+                  )}
+                </div>
               </div>
-            ))}
-            <div className="filter ttb-filter" onClick={handleResetFilters}>
-              <img src="/SVG/filter-white.svg" alt="reset" />
-              <span>Reset Filters</span>
+            );
+          })()}
+        </div>
+      </section>
+
+      {/* Controls */}
+      <section className="controls-section">
+        <div className="controls-left mb-3 flex justify-between">
+          <div className="search-container flex items-center gap-3">
+            <input
+              type="text"
+              placeholder="Search by name, client, status..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+            <svg
+              className="search-icon"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </div>
+
+          <div className="filter-controls flex items-center gap-3 flex-col md:flex-row">
+            {/* Client Filter */}
+            <div className="filter-dropdown">
+              <select
+                value={filters.client}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, client: e.target.value }))
+                }
+                className="filter-select"
+              >
+                <option value="All Client">All Clients</option>
+                {clients.map((c) => (
+                  <option key={c._id} value={c.full_name}>
+                    {c.full_name}
+                  </option>
+                ))}
+              </select>
             </div>
+
+            {/* Status Filter */}
+            <div className="filter-dropdown">
+              <select
+                value={filters.status}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, status: e.target.value }))
+                }
+                className="filter-select"
+              >
+                <option value="Status">All Status</option>
+                {statusOptions.map((opt, idx) => (
+                  <option key={idx} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Priority Filter */}
+            <div className="filter-dropdown">
+              <select
+                value={filters.priority}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, priority: e.target.value }))
+                }
+                className="filter-select"
+              >
+                <option value="Priority">All Priority</option>
+                {priorityOptions.map((opt, idx) => (
+                  <option key={idx} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Stage Filter */}
+            <div className="filter-dropdown">
+              <select
+                value={filters.stage}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, stage: e.target.value }))
+                }
+                className="filter-select"
+              >
+                <option value="Stage">All Stages</option>
+                {stageOptions.map((opt, idx) => (
+                  <option key={idx} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Employee Filter */}
+            <div className="filter-dropdown">
+              <select
+                value={filters.employee}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, employee: e.target.value }))
+                }
+                className="filter-select"
+              >
+                <option value="Employee">All Employees</option>
+                {employees.map((emp) => (
+                  <option key={emp._id} value={emp.full_name}>
+                    {emp.full_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button className="reset-button" onClick={handleResetFilters}>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                <path d="M21 3v5h-5" />
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                <path d="M3 21v-5h5" />
+              </svg>
+              Reset All
+            </button>
           </div>
         </div>
       </section>
 
-      <section className="ttb-table-main">
-        <div className="time-table-wrapper">
-          <table className="time-table-table">
+      {/* Projects Table */}
+      <section className="table-container">
+        <div className="table-wrapper overflow-auto">
+          <table className="data-table">
             <thead>
               <tr>
-                <th></th>
+                <th className="expand-column"></th>
                 <th>Project Name</th>
+                <th>Client</th>
                 <th>Status</th>
                 <th>Subtasks</th>
                 <th>Total Time</th>
+                <th>Priority</th>
                 <th>Start Date</th>
                 <th>End Date</th>
-                <th>Remaining Time</th> {/* ✅ added */}
+                <th>Remaining Time</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredProjects.map((project, idx) => (
                 <React.Fragment key={project._id}>
-                  <tr>
+                  <tr className="project-row">
                     <td>
-                      <img
-                        src="/SVG/arrow.svg"
-                        alt="toggle"
-                        className={`time-table-toggle-btn ${
-                          openRow === idx ? "rotate-down" : ""
+                      <button
+                        className={`expand-button ${
+                          openRow === idx ? "expanded" : ""
                         }`}
                         onClick={() => setOpenRow(openRow === idx ? null : idx)}
-                      />
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path d="m9 18 6-6-6-6" />
+                        </svg>
+                      </button>
                     </td>
-                    {/* <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(project.id)}
-                        onChange={() => toggleSelect(project.id)}
-                      />
-                    </td> */}
-                    <td>{project.project_name}</td>
+                    <td>
+                      <div className="project-name-cell">
+                        <span
+                          className="project-name-text"
+                          title={project.project_name}
+                        >
+                          {project.project_name}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="client-name">
+                        {clientIdToName[project.client_id] || "N/A"}
+                      </span>
+                    </td>
                     <td>
                       <span
-                        className={`time-table-badge md-status-${(
-                          project.status || ""
-                        )
-                          .toLowerCase()
-                          .replace(" ", "")}`}
+                        className={`status-badge status-${
+                          project.status?.toLowerCase().replace(" ", "-") ||
+                          "default"
+                        }`}
                       >
+                        <span className="status-dot"></span>
                         {project.status}
                       </span>
                     </td>
                     {(() => {
-                      // Apply subtask-level filters (same logic you use inside expanded row)
                       const filteredSubtasks =
                         project.subtasks?.filter((s) => {
                           const stageMatch =
@@ -374,293 +585,363 @@ const Subtasks = () => {
 
                       return (
                         <>
-                          {/* ✅ Subtask count according to filters */}
-                          <td>{filteredSubtasks.length}</td>
-
-                          {/* ✅ Total time according to filtered subtasks */}
-                          <td>{calculateProjectTotalTime(filteredSubtasks)}</td>
+                          <td>
+                            <span className="subtask-count">
+                              {filteredSubtasks.length}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="time-cell">
+                              {calculateProjectTotalTime(filteredSubtasks)}
+                            </span>
+                          </td>
                         </>
                       );
                     })()}
                     <td>
-                      {project.assign_date
-                        ? new Date(project.assign_date).toLocaleDateString()
-                        : ""}
+                      <span
+                        className={`priority-badge priority-${
+                          project.priority?.toLowerCase().replace(" ", "-") ||
+                          "default"
+                        }`}
+                      >
+                        {project.priority}
+                      </span>
                     </td>
                     <td>
-                      {project.due_date
-                        ? new Date(project.due_date).toLocaleDateString()
-                        : ""}
+                      <span className="date-cell">
+                        {project.assign_date
+                          ? formateDate(project.assign_date)
+                          : "-"}
+                      </span>
                     </td>
-                    <td>{getRemainingDays(project.due_date)}</td>{" "}
+                    <td>
+                      <span className="date-cell">
+                        {project.due_date ? formateDate(project.due_date) : "-"}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="remaining-time">
+                        {getRemainingDays(project.due_date)}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="actions-cell">
+                        <Link
+                          to={`/project/details/${project.id}`}
+                          className="action-btn view-btn"
+                          title="View Project"
+                        >
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                          </svg>
+                        </Link>
+                      </div>
+                    </td>
                   </tr>
+
+                  {/* Expandable subtasks row */}
                   {openRow === idx && (
-                    <tr className="time-table-subtask-row">
-                      <td></td>
-                      <td colSpan="11">
-                        <table className="time-table-subtable">
-                          <thead>
-                            <tr>
-                              <th></th>
-                              <th>Subtask Name</th>
-                              <th className="flex justify-center">Stage</th>
-                              <th>Priority</th>
-                              <th>Status</th>
-                              <th>URL</th>
-                              <th>Assigned To</th>
-                              <th>Time Tracked</th>
-                              <th>Remaining Time</th>
-                              <th>Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {project.subtasks
-                              ?.filter((s) => {
-                                const stageMatch =
-                                  filters.stage === "Stage" ||
-                                  s.stages[
-                                    s.current_stage_index
-                                  ]?.name?.toLowerCase() ===
-                                    filters.stage.toLowerCase();
+                    <tr className="subtasks-expanded-row">
+                      <td colSpan="11" className="subtasks-container">
+                        <div className="subtasks-table-wrapper">
+                          <table className="subtasks-table w-100">
+                            <thead>
+                              <tr>
+                                <th className="checkbox-column">
+                                  <input
+                                    type="checkbox"
+                                    className="checkbox-input"
+                                    checked={
+                                      project.subtasks?.every((s) =>
+                                        selectedTaskIds.includes(s.id)
+                                      ) && project.subtasks?.length > 0
+                                    }
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        const projectSubtaskIds =
+                                          project.subtasks?.map((s) => s.id) ||
+                                          [];
+                                        setSelectedTaskIds((prev) => [
+                                          ...new Set([
+                                            ...prev,
+                                            ...projectSubtaskIds,
+                                          ]),
+                                        ]);
+                                      } else {
+                                        const projectSubtaskIds =
+                                          project.subtasks?.map((s) => s.id) ||
+                                          [];
+                                        setSelectedTaskIds((prev) =>
+                                          prev.filter(
+                                            (id) =>
+                                              !projectSubtaskIds.includes(id)
+                                          )
+                                        );
+                                      }
+                                    }}
+                                  />
+                                </th>
+                                <th>Subtask Name</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                                <th>Stages</th>
+                                <th>URL</th>
+                                <th>Assigned To</th>
+                                <th>Time Tracked</th>
+                                <th>Due Date</th>
+                                <th>Remaining</th>
+                                <th>Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {project.subtasks
+                                ?.filter((s) => {
+                                  const stageMatch =
+                                    filters.stage === "Stage" ||
+                                    s.stages[
+                                      s.current_stage_index
+                                    ]?.name?.toLowerCase() ===
+                                      filters.stage.toLowerCase();
 
-                                const statusMatch =
-                                  filters.status === "Status" ||
-                                  s.status?.toLowerCase() ===
-                                    filters.status.toLowerCase();
+                                  const statusMatch =
+                                    filters.status === "Status" ||
+                                    s.status?.toLowerCase() ===
+                                      filters.status.toLowerCase();
 
-                                const employeeMatch =
-                                  filters.employee === "Employee" ||
-                                  employees.find((e) => e._id === s.assign_to)
-                                    ?.full_name === filters.employee;
+                                  const employeeMatch =
+                                    filters.employee === "Employee" ||
+                                    employees.find((e) => e._id === s.assign_to)
+                                      ?.full_name === filters.employee;
 
-                                return (
-                                  stageMatch && statusMatch && employeeMatch
-                                );
-                              })
-                              .map((s, sIdx) => (
-                                <tr key={s.id}>
-                                  <td>
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedTaskIds.includes(s.id)}
-                                      onChange={(e) => {
-                                        if (e.target.checked) {
-                                          setSelectedTaskIds([
-                                            ...selectedTaskIds,
-                                            s.id,
-                                          ]);
-                                        } else {
-                                          setSelectedTaskIds(
-                                            selectedTaskIds.filter(
-                                              (id) => id !== s.id
-                                            )
-                                          );
-                                        }
-                                      }}
-                                    />
-                                  </td>
-                                  <td>{s.task_name}</td>
-                                  <td>
-                                    {Array.isArray(s.stages) &&
-                                    s.stages.length > 0 ? (
-                                      <div className="flex justify-center items-center gap-2">
-                                        {s.stages.map((stg, i) => {
-                                          const name =
-                                            typeof stg === "string"
-                                              ? stg
-                                              : stg.name;
-                                          const completed = stg?.completed;
-                                          return (
-                                            <span
-                                              key={i}
-                                              style={{
-                                                display: "inline-flex",
-                                                alignItems: "center",
-                                                gap: "6px",
-                                              }}
-                                            >
-                                              <small
-                                                style={{
-                                                  padding: "4px 8px",
-                                                  borderRadius: "12px",
-                                                  background: completed
-                                                    ? "#e6ffed"
-                                                    : "#f3f4f6",
-                                                  color: completed
-                                                    ? "#097a3f"
-                                                    : "#444",
-                                                  border: completed
-                                                    ? "1px solid #b7f0c6"
-                                                    : "1px solid #e0e0e0",
-                                                  fontSize: "12px",
-                                                }}
+                                  return (
+                                    stageMatch && statusMatch && employeeMatch
+                                  );
+                                })
+                                .map((s, sIdx) => (
+                                  <tr key={s.id}>
+                                    <td>
+                                      <input
+                                        type="checkbox"
+                                        className="checkbox-input"
+                                        checked={selectedTaskIds.includes(s.id)}
+                                        onChange={(e) => {
+                                          if (e.target.checked) {
+                                            setSelectedTaskIds([
+                                              ...selectedTaskIds,
+                                              s.id,
+                                            ]);
+                                          } else {
+                                            setSelectedTaskIds(
+                                              selectedTaskIds.filter(
+                                                (id) => id !== s.id
+                                              )
+                                            );
+                                          }
+                                        }}
+                                      />
+                                    </td>
+                                    <td>
+                                      <div className="task-name-cell">
+                                        <span
+                                          className="task-name-text"
+                                          title={s.task_name}
+                                        >
+                                          {s.task_name}
+                                        </span>
+                                      </div>
+                                    </td>
+                                    <td>
+                                      <span
+                                        className={`status-badge status-${
+                                          s.status
+                                            ?.toLowerCase()
+                                            .replace(" ", "-") || "default"
+                                        }`}
+                                      >
+                                        <span className="status-dot"></span>
+                                        {s.status}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      <span
+                                        className={`priority-badge priority-${
+                                          s.priority
+                                            ?.toLowerCase()
+                                            .replace(" ", "-") || "default"
+                                        }`}
+                                      >
+                                        {s.priority}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      {Array.isArray(s.stages) &&
+                                      s.stages.length > 0 ? (
+                                        <div className="stages-container">
+                                          {s.stages.map((stg, i) => {
+                                            const name =
+                                              typeof stg === "string"
+                                                ? stg
+                                                : stg.name;
+                                            const completed = stg?.completed;
+                                            return (
+                                              <div
+                                                key={i}
+                                                className="stage-flow"
                                               >
-                                                {completed ? "✓ " : ""}
-                                                {name}
-                                              </small>
-                                              {i < s.stages.length - 1 && (
                                                 <span
-                                                  style={{ margin: "0 6px" }}
+                                                  className={`stage-badge ${
+                                                    completed
+                                                      ? "completed"
+                                                      : "pending"
+                                                  }`}
                                                 >
-                                                  →
+                                                  {completed && (
+                                                    <span className="check-icon">
+                                                      ✓
+                                                    </span>
+                                                  )}
+                                                  {name}
                                                 </span>
-                                              )}
+                                                {i < s.stages.length - 1 && (
+                                                  <span className="stage-arrow">
+                                                    →
+                                                  </span>
+                                                )}
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      ) : (
+                                        <span className="no-data">
+                                          No stages
+                                        </span>
+                                      )}
+                                    </td>
+                                    <td>
+                                      {s.url ? (
+                                        <div
+                                          className="url-cell"
+                                          onClick={(e) =>
+                                            handleCopyToClipboard(s.url, e)
+                                          }
+                                          title="Click to copy • Ctrl+Click to open"
+                                        >
+                                          <span className="url-text">
+                                            {s.url}
+                                          </span>
+                                          <div className="copy-icon-wrapper">
+                                            <svg
+                                              className="copy-icon"
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              strokeWidth="2"
+                                            >
+                                              <rect
+                                                x="9"
+                                                y="9"
+                                                width="13"
+                                                height="13"
+                                                rx="2"
+                                                ry="2"
+                                              ></rect>
+                                              <path d="m5 15-4-4 4-4"></path>
+                                            </svg>
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <span className="no-data">No URL</span>
+                                      )}
+                                    </td>
+                                    <td>
+                                      {(() => {
+                                        const assignedEmp = employees.find(
+                                          (emp) => emp._id === s.assign_to
+                                        );
+                                        if (!assignedEmp)
+                                          return (
+                                            <span className="no-data">
+                                              Unassigned
                                             </span>
                                           );
-                                        })}
+
+                                        const firstLetter =
+                                          assignedEmp.full_name
+                                            ?.charAt(0)
+                                            .toUpperCase() || "?";
+
+                                        return (
+                                          <div className="assignee-cell">
+                                            {assignedEmp.profile_pic ? (
+                                              <img
+                                                src={assignedEmp.profile_pic}
+                                                alt={assignedEmp.full_name}
+                                                className="assignee-avatar"
+                                              />
+                                            ) : (
+                                              <div className="assignee-avatar-placeholder">
+                                                {firstLetter}
+                                              </div>
+                                            )}
+                                            <span className="assignee-name">
+                                              {assignedEmp.full_name}
+                                            </span>
+                                          </div>
+                                        );
+                                      })()}
+                                    </td>
+                                    <td>
+                                      <span className="time-cell">
+                                        {calculateTimeTracked(s.time_logs)}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      <span className="date-cell">
+                                        {s.due_date
+                                          ? formateDate(s.due_date)
+                                          : "-"}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      <span className="remaining-time">
+                                        {getRemainingDays(s.due_date)}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      <div className="actions-cell">
+                                        <Link
+                                          to={`/subtask/view/${s.id}`}
+                                          className="action-btn view-btn"
+                                          title="View"
+                                        >
+                                          <svg
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                          >
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle
+                                              cx="12"
+                                              cy="12"
+                                              r="3"
+                                            ></circle>
+                                          </svg>
+                                        </Link>
                                       </div>
-                                    ) : (
-                                      "No stages"
-                                    )}
-                                  </td>
-                                  <td>
-                                    <span
-                                      className={`time-table-badge md-status-${(
-                                        s.priority || ""
-                                      )
-                                        .toLowerCase()
-                                        .replace(" ", "")}`}
-                                    >
-                                      {s.priority}
-                                    </span>
-                                  </td>
-                                  <td>
-                                    <span
-                                      className={`time-table-badge md-status-${(
-                                        s.status || ""
-                                      )
-                                        .toLowerCase()
-                                        .replace(" ", "")}`}
-                                    >
-                                      {s.status}
-                                    </span>
-                                  </td>
-                                  <td
-                                    style={{
-                                      maxWidth: "200px",
-                                      position: "relative",
-                                    }}
-                                  >
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        maxWidth: "200px",
-                                        whiteSpace: "nowrap",
-                                        overflow: "hidden",
-                                        textOverflow: "ellipsis",
-                                        cursor: "pointer",
-                                        color: "#007bff",
-                                        paddingRight: "20px", // To give space for the icon
-                                        position: "relative",
-                                      }}
-                                      onClick={(e) =>
-                                        handleCopyToClipboard(s.url, e)
-                                      }
-                                      title="Click to copy. Ctrl+Click to open."
-                                    >
-                                      <span
-                                        style={{
-                                          overflow: "hidden",
-                                          textOverflow: "ellipsis",
-                                        }}
-                                      >
-                                        {s.url}
-                                      </span>
-
-                                      <span
-                                        onClick={(e) =>
-                                          handleCopyToClipboard(s.url, e)
-                                        }
-                                        style={{
-                                          position: "absolute",
-                                          right: "2px",
-                                          top: "50%",
-                                          transform: "translateY(-50%)",
-                                          fontSize: "14px",
-                                          color: "#555",
-                                          cursor: "pointer",
-                                        }}
-                                        title="Copy URL"
-                                      >
-                                        <img
-                                          src="/SVG/clipboard.svg"
-                                          alt="copy icon"
-                                          style={{
-                                            width: "16px",
-                                            height: "16px",
-                                            filter: "hue-rotate(310deg)",
-                                            opacity: 0.8,
-                                          }}
-                                        />
-                                      </span>
-                                    </div>
-                                  </td>
-                                  <td className="d-flex justify-content-center align-items-center">
-                                    {(() => {
-                                      const assignedEmp = employees.find(
-                                        (emp) => emp._id === s.assign_to
-                                      );
-                                      if (!assignedEmp) return "Not Assigned";
-                                      const firstLetter = assignedEmp.full_name
-                                        ? assignedEmp.full_name
-                                            .charAt(0)
-                                            .toUpperCase()
-                                        : "?";
-
-                                      return (
-                                        <span className="css-ankit d-flex align-items-center">
-                                          {assignedEmp.profile_pic ? (
-                                            <img
-                                              src={assignedEmp.profile_pic}
-                                              alt={assignedEmp.full_name}
-                                              style={{
-                                                width: "24px",
-                                                height: "24px",
-                                                borderRadius: "50%",
-                                                marginRight: "4px",
-                                                objectFit: "cover",
-                                              }}
-                                            />
-                                          ) : (
-                                            <div
-                                              style={{
-                                                width: "24px",
-                                                height: "24px",
-                                                borderRadius: "50%",
-                                                backgroundColor:
-                                                  "rgb(10 55 73)",
-                                                color: "#fff",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                fontSize: "12px",
-                                                marginRight: "4px",
-                                                textTransform: "uppercase",
-                                              }}
-                                            >
-                                              {firstLetter}
-                                            </div>
-                                          )}
-                                          {assignedEmp.full_name}
-                                        </span>
-                                      );
-                                    })()}
-                                  </td>
-                                  <td>{calculateTimeTracked(s.time_logs)}</td>{" "}
-                                  <td>{getRemainingDays(s.due_date)}</td>
-                                  <td>
-                                    <Link
-                                      to={`/subtask/view/${s.id}`}
-                                      className="mx-1"
-                                    >
-                                      <img src="/SVG/eye-view.svg" alt="view" />
-                                    </Link>
-                                  </td>
-                                </tr>
-                              ))}
-                          </tbody>
-                        </table>
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </td>
                     </tr>
                   )}
@@ -669,8 +950,90 @@ const Subtasks = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Bulk Actions */}
+        {selectedTaskIds.length > 0 && (
+          <div className="bulk-actions">
+            <div className="bulk-actions-header">
+              <span className="bulk-count-main">
+                <span className="bulk-count">{selectedTaskIds.length}</span>{" "}
+                items selected
+              </span>
+              <div className="bulk-controls">
+                <select
+                  value={bulkAssignTo}
+                  onChange={(e) => setBulkAssignTo(e.target.value)}
+                  className="filter-select"
+                  style={{ maxWidth: "150px" }}
+                >
+                  <option value="">👤 Assign To</option>
+                  {employees.map((emp) => (
+                    <option key={emp._id} value={emp._id}>
+                      {emp.full_name}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={bulkPriority}
+                  onChange={(e) => setBulkPriority(e.target.value)}
+                  className="filter-select"
+                  style={{ maxWidth: "150px" }}
+                >
+                  <option value="">⚡ Set Priority</option>
+                  {priorityOptions.map((opt, idx) => (
+                    <option key={idx} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  onClick={handleBulkUpdateAll}
+                  className="bulk-btn bulk-btn-primary"
+                  disabled={!bulkAssignTo && !bulkPriority}
+                >
+                  ✓ Apply Changes
+                </button>
+
+                <button
+                  className="bulk-btn bulk-btn-danger"
+                  onClick={() => setShowBulkDeleteModal(true)}
+                >
+                  🗑️ Delete Selected
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
-    </section>
+
+      {/* Bulk Delete Modal */}
+      <Modal
+        show={showBulkDeleteModal}
+        onHide={() => setShowBulkDeleteModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete{" "}
+          <strong>{selectedTaskIds.length}</strong> selected subtask(s)?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowBulkDeleteModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleBulkConfirmDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
   );
 };
 

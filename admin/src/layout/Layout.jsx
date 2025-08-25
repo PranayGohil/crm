@@ -25,7 +25,7 @@ const Layout = () => {
         </main>
 
         {/* Footer */}
-        <footer className="bg-white shadow-inner">
+        <footer className="bg-white shadow-inner border">
           <Footer />
         </footer>
       </div>

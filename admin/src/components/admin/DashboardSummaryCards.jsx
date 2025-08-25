@@ -298,7 +298,7 @@ const DashboardSummaryCards = () => {
                     ? `~${days} ${
                         viewOption === "withSundays" ? "calendar" : "working"
                       } days to complete tasks`
-                    : "Insufficient capacity";
+                    : "Insufficient capacity or No tasks to complete";
                 }
 
                 return (
@@ -310,7 +310,7 @@ const DashboardSummaryCards = () => {
                       {dept}
                     </h5>
                     <div className="text-sm text-gray-600">
-                      {label === "Insufficient capacity" ? (
+                      {label === "Insufficient capacity or No tasks to complete" ? (
                         <span className="text-red-500">{label}</span>
                       ) : (
                         <>

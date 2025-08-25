@@ -21,7 +21,7 @@ import AddNewProject from "./pages/admin-panel/project/AddNewProject";
 import AddSubtask from "./pages/admin-panel/subtask/AddSubtask";
 import SubtaskDashboardContainer from "./pages/admin-panel/subtask/SubtaskDashboardContainer";
 
-import ProjectMediaGallery from "./components/admin/ProjectMediaGallery";
+import ProjectMediaGallery from "./pages/admin-panel/ProjectMediaGallery";
 
 import EmployeeDashboard from "./pages/admin-panel/employee/EmployeeDashboard";
 import EmployeeProfileEdit from "./pages/admin-panel/employee/EmployeeProfileEdit";

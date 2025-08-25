@@ -246,7 +246,10 @@ const EditProject = () => {
                     values.client_name ? "text-gray-800" : "text-gray-500"
                   }
                 >
-                  {values.client_name || "Select Client"}
+                  {values.client_name ||
+                    clients.find((c) => c._id === values.client_id)
+                      ?.full_name ||
+                    "Select Client"}
                 </span>
                 <svg
                   className={`w-4 h-4 transition-transform ${

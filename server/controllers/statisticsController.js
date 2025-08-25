@@ -13,21 +13,40 @@ import SubTask from "../models/subTaskModel.js";
 
 export const Summary = async (req, res) => {
   try {
-    const totalProjects = await Project.countDocuments();
+    // Count projects, clients, employees
+    const totalProjects = await Project.countDocuments({ isArchived: false });
     const totalClients = await Client.countDocuments();
     const totalEmployees = await Employee.countDocuments();
-    const totalTasks = await SubTask.countDocuments();
 
+    // ✅ Get only subtasks that belong to non-archived projects
+    const subtasks = await SubTask.aggregate([
+      {
+        $lookup: {
+          from: "projects", // collection name (lowercase + plural of model name)
+          localField: "project_id",
+          foreignField: "_id",
+          as: "project",
+        },
+      },
+      { $unwind: "$project" },
+      { $match: { "project.isArchived": false } }, // filter archived projects
+      {
+        $project: {
+          stages: 1,
+          current_stage_index: 1,
+        },
+      },
+    ]);
+
+    // totalTasks = subtasks of active projects only
+    const totalTasks = subtasks.length;
+
+    // Stage counts
     const stageCounts = {
       "CAD Design": 0,
       "SET Design": 0,
       Render: 0,
     };
-
-    const subtasks = await SubTask.find(
-      {},
-      { stages: 1, current_stage_index: 1 }
-    );
 
     subtasks.forEach((task) => {
       if (
@@ -88,6 +107,7 @@ export const RecentProjects = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const getDepartmentCapacities = async (req, res) => {
   try {
     const now = new Date();
@@ -115,7 +135,7 @@ export const getDepartmentCapacities = async (req, res) => {
     employees.forEach((emp) => {
       const dept = emp.department || "Unknown";
       if (!allowedDepartments.includes(dept)) return;
-      console.log("Processing employee:", emp.department);
+
       if (!departmentData[dept]) {
         departmentData[dept] = {
           totalDailyCapacity: 0,
@@ -134,20 +154,43 @@ export const getDepartmentCapacities = async (req, res) => {
         cap * workingDaysInMonth.length;
     });
 
-    // STEP 2: Count SubTasks by stages
+    // STEP 2: Count SubTasks by stages (only active projects)
+    const subtaskStageCounts = await SubTask.aggregate([
+      {
+        $lookup: {
+          from: "projects", // collection name in Mongo
+          localField: "project_id",
+          foreignField: "_id",
+          as: "project",
+        },
+      },
+      { $unwind: "$project" },
+      { $match: { "project.isArchived": false } }, // only active projects
+      { $unwind: "$stages" }, // expand each stage
+      {
+        $group: {
+          _id: "$stages.name",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Initialize counts
     const stageCounts = {
-      "CAD Design": await SubTask.countDocuments({
-        "stages.name": "CAD Design",
-      }),
-      "SET Design": await SubTask.countDocuments({
-        "stages.name": "SET Design",
-      }),
-      Render: await SubTask.countDocuments({ "stages.name": "Render" }),
+      "CAD Design": 0,
+      "SET Design": 0,
+      Render: 0,
     };
 
-    // STEP 3: Estimate only completion dates (not days count)
-    for (const [stages, totalTasks] of Object.entries(stageCounts)) {
-      const dept = departmentData[stages];
+    subtaskStageCounts.forEach((s) => {
+      if (stageCounts[s._id] !== undefined) {
+        stageCounts[s._id] = s.count;
+      }
+    });
+
+    // STEP 3: Estimate completion dates
+    for (const [stageName, totalTasks] of Object.entries(stageCounts)) {
+      const dept = departmentData[stageName];
       if (!dept || totalTasks === 0 || dept.totalDailyCapacity === 0) continue;
 
       const dailyCap = dept.totalDailyCapacity;
@@ -186,8 +229,6 @@ export const getDepartmentCapacities = async (req, res) => {
           end: workingDate,
         }).length - 1;
     }
-
-    console.log("Department Data:", departmentData);
 
     res.status(200).json({
       month: now.toLocaleString("default", { month: "long" }),

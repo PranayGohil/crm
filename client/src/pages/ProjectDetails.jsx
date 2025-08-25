@@ -11,7 +11,6 @@ const ProjectDetails = () => {
   const navigate = useNavigate();
 
   const [project, setProject] = useState(null);
-  const [client, setClient] = useState(null);
   const [subTasks, setSubTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,13 +26,6 @@ const ProjectDetails = () => {
         );
         const proj = projectRes.data.project;
         setProject(proj);
-
-        if (proj.client_id) {
-          const clientRes = await axios.get(
-            `${process.env.REACT_APP_API_URL}/api/client/get/${proj.client_id}`
-          );
-          setClient(clientRes.data);
-        }
 
         const subtasksRes = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/subtask/project/${projectId}`
@@ -58,7 +50,6 @@ const ProjectDetails = () => {
       subTasks.length ? Math.round((completed / subTasks.length) * 100) : 0
     );
   }, [subTasks]);
-
 
   const currency = project?.content?.[0]?.currency || "INR";
   const totalPrice = project?.content?.[0]?.total_price || 0;
@@ -100,51 +91,6 @@ const ProjectDetails = () => {
           <h2 className="text-2xl font-bold text-gray-800">
             {project.project_name}
           </h2>
-        </div>
-
-        {/* Project Info */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-gray-600">Project ID:</span>
-                <span className="font-medium">{project._id}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-gray-600">Client:</span>
-                <span className="font-medium">
-                  {client?.full_name || "N/A"}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  project.priority === "High"
-                    ? "bg-red-100 text-red-800"
-                    : project.priority === "Medium"
-                    ? "bg-orange-100 text-orange-800"
-                    : "bg-blue-100 text-blue-800"
-                }`}
-              >
-                {project.priority || "Priority Unknown"}
-              </span>
-              <>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    project.status === "Completed"
-                      ? "bg-green-100 text-green-800"
-                      : project.status === "In Progress"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {project.status || "Status Unknown"}
-                </span>
-              </>
-            </div>
-          </div>
         </div>
 
         {/* Project Overview */}

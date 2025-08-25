@@ -8,44 +8,30 @@ const HeaderClient = () => {
   const username = clientUser?.username || "";
 
   const firstLetter = full_name ? full_name.charAt(0).toUpperCase() : "?";
-  return (
-    <div className="ha-header_client_main">
-      <div className="ha-header_client_main_inner">
-        <div className="ett-header">
-          <div className="ett-header-inner">
-            <div className="ha-header-maulshree-Jle d-flex justify-content-center align-items-center">
-              <img src="/SVG/diamond-rich_teal.svg" alt="logo" />
-              <h1 style={{ marginBottom: "0" }}>Maulshree Jewellery</h1>
-            </div>
 
-            <div className="header-notification">
-              <Link
-                to={`/profile`}
-                className="ha-header-img-admin_name"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <div
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                    borderRadius: "50%",
-                    backgroundColor: "rgb(10 55 73)",
-                    color: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "15px",
-                    textTransform: "uppercase",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {firstLetter}
-                </div>
-                <span>{full_name}</span>
-              </Link>
-            </div>
+  return (
+    <div className="bg-white px-6 py-3 flex flex-col sm:flex-row justify-between items-center">
+      {/* Left Section - Logo + Title */}
+      <div className="flex items-center gap-3">
+        <img src="/SVG/diamond-rich_teal.svg" alt="logo" className="w-8 h-8" />
+        <h1 className="text-lg font-semibold text-gray-800 m-0">
+          Maulshree Jewellery
+        </h1>
+      </div>
+
+      {/* Profile */}
+      <div className="flex items-center gap-6 sm:pt-0 pt-2">
+        <Link
+          to="/profile"
+          className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+        >
+          {/* Profile Icon / First Letter */}
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-teal-900 text-white flex items-center justify-center text-sm sm:text-base font-bold uppercase">
+            {firstLetter}
           </div>
-        </div>
+          {/* Full Name */}
+          <span className="sm:inline font-medium">{full_name}</span>
+        </Link>
       </div>
     </div>
   );

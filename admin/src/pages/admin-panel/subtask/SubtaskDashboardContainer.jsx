@@ -565,10 +565,7 @@ const SubtaskDashboardContainer = () => {
       <section className="dashboard-header">
         <div className="header-content">
           <div className="header-left">
-            <button
-              className="back-button"
-              onClick={() => navigate(-1)}
-            >
+            <button className="back-button" onClick={() => navigate(-1)}>
               <svg
                 width="20"
                 height="20"
@@ -793,7 +790,7 @@ const SubtaskDashboardContainer = () => {
         {selectedTaskIds.length > 0 && (
           <div className="bulk-actions">
             <div className="bulk-actions-header">
-              <span>
+              <span className="bulk-count-main">
                 <span className="bulk-count">{selectedTaskIds.length}</span>{" "}
                 items selected
               </span>

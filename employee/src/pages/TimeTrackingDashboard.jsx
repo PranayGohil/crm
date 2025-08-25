@@ -2,9 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
+import { Modal, Button } from "react-bootstrap";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 const TimeTrackingDashboard = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const user = JSON.parse(localStorage.getItem("employeeUser"));
   const [projects, setProjects] = useState([]);
   const [subtasks, setSubtasks] = useState([]);
@@ -16,16 +19,19 @@ const TimeTrackingDashboard = () => {
     to: null,
   });
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("All");
+  const [showCustomDateModal, setShowCustomDateModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const [projRes, subRes, empRes] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all-archived`),
+          axios.get(
+            `${process.env.REACT_APP_API_URL}/api/project/get-all-archived`
+          ),
           axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/get-all`),
           axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`),
         ]);
-
         const myEmployees = empRes.data.filter(
           (emp) => emp.reporting_manager?._id === user._id
         );
@@ -33,7 +39,10 @@ const TimeTrackingDashboard = () => {
         const myEmployeeIds = myEmployees.map((emp) => emp._id);
 
         const mySubtasks = subRes.data.filter((s) =>
-          myEmployeeIds.includes(s.assign_to || s.time_logs.some((log) => myEmployeeIds.includes(log.user_id)))
+          myEmployeeIds.includes(
+            s.assign_to ||
+              s.time_logs.some((log) => myEmployeeIds.includes(log.user_id))
+          )
         );
 
         const myProjects = projRes.data.filter((proj) =>
@@ -44,6 +53,8 @@ const TimeTrackingDashboard = () => {
         setEmployees(myEmployees);
       } catch (error) {
         console.error("Data fetching error:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -139,83 +150,82 @@ const TimeTrackingDashboard = () => {
     .utc(summaryData.totalTimeTracked * 1000)
     .format("HH:mm:ss");
 
-  return (
-    <div className="time-tracking-dashboard-page p-3">
-      <section className="ett-main-sec">
-        <div className="tt-time-tracking ett-emp-tracking-time">
-          <div className="d-flex align-items-center mb-3">
-            <div
-              className="anp-back-btn"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/");
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              <img
-                src="/SVG/arrow-pc.svg"
-                alt="back"
-                className="mx-3"
-                style={{ scale: "1.3" }}
-              />
-            </div>
-            <div className="head-menu ms-3">
-              <h1 style={{ marginBottom: "0", fontSize: "1.5rem" }}>
-                Subtasks Time Tracking{" "}
-              </h1>
-              <p>Track time spent by your team across tasks and projects.</p>
-            </div>
-          </div>
+  if (loading) return <LoadingOverlay />;
 
-          <div className="ett-time-duration">
-            <div>
-              <div className="ett-time-type d-flex gap-3">
+  return (
+    <div className="dashboard-container">
+      {/* Header */}
+      <section className="dashboard-header">
+        <div className="header-content">
+          <div className="header-left">
+            <button className="back-button" onClick={() => navigate("/")}>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+            </button>
+            <h1 className="header-title">Subtasks Time Tracking</h1>
+          </div>
+          <p className="project-name">
+            Track time spent by your team across tasks and projects
+          </p>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="stats-section">
+        <div className="stats-info">
+          <span className="stats-number">{summaryData.mainTasks}</span>
+          <span>Main Tasks ({summaryData.subtasks} subtasks)</span>
+        </div>
+        <div className="stats-info">
+          <span className="stats-number">{totalTimeTrackedFormatted}</span>
+          <span>Total Time Tracked</span>
+        </div>
+      </section>
+
+      {/* Filters */}
+      <section className="table-container">
+        <div className="table-controls">
+          <div className="controls-left flex justify-between">
+            <div className="filter-group">
+              <span className="filter-label">Time Range:</span>
+              <div className="filter-options">
                 {["All Time", "Today", "This Week", "This Month", "Custom"].map(
                   (label) => (
-                    <a
+                    <button
                       key={label}
-                      href="#"
-                      className={
-                        selectedFilter === label ? "ett-today active" : ""
-                      }
-                      onClick={() => setSelectedFilter(label)}
+                      className={`filter-btn ${
+                        selectedFilter === label ? "active" : ""
+                      }`}
+                      onClick={() => {
+                        if (label === "Custom") {
+                          setShowCustomDateModal(true);
+                        } else {
+                          setSelectedFilter(label);
+                        }
+                      }}
                     >
                       {label}
-                    </a>
+                    </button>
                   )
                 )}
               </div>
-              {selectedFilter === "Custom" && (
-                <div className="d-flex gap-3 mt-2">
-                  <input
-                    type="date"
-                    className="form-control"
-                    onChange={(e) =>
-                      setCustomDateRange((prev) => ({
-                        ...prev,
-                        from: e.target.value,
-                      }))
-                    }
-                  />
-                  <input
-                    type="date"
-                    className="form-control"
-                    onChange={(e) =>
-                      setCustomDateRange((prev) => ({
-                        ...prev,
-                        to: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              )}
             </div>
-            <div className="mt-3">
+
+            <div className="filter-group">
+              <span className="filter-label">Employee:</span>
               <select
-                className="form-select"
-                style={{ maxWidth: "300px" }}
                 value={selectedEmployeeId}
                 onChange={(e) => setSelectedEmployeeId(e.target.value)}
+                className="filter-select"
+                style={{ width: "200px" }}
               >
                 <option value="All">All Employees</option>
                 {employees.map((emp) => (
@@ -227,148 +237,262 @@ const TimeTrackingDashboard = () => {
             </div>
           </div>
         </div>
-      </section>
 
-      <section className="ett-task-time p-3">
-        <div className="ett-table-heading">
-          <p>Project</p>
-          <p>Total Working Time</p>
-          <p>Action</p>
-        </div>
+        {/* Projects List */}
+        <div className="projects-list">
+          {projects.map((project) => {
+            const projectSubtasks = filteredSubtasks.filter(
+              (s) => s.project_id === project._id
+            );
 
-        {projects.map((project) => {
-          const projectSubtasks = filteredSubtasks.filter(
-            (s) => s.project_id === project._id
-          );
+            const totalTime = projectSubtasks.reduce((acc, sub) => {
+              const time = moment
+                .duration(calculateTimeSpent(sub.time_logs))
+                .asSeconds();
+              return acc + time;
+            }, 0);
+            const duration = moment.duration(totalTime, "seconds");
+            const formattedTime = `${duration.days()}d ${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
 
-          const totalTime = projectSubtasks.reduce((acc, sub) => {
-            const time = moment
-              .duration(calculateTimeSpent(sub.time_logs))
-              .asSeconds();
-            return acc + time;
-          }, 0);
-          const duration = moment.duration(totalTime, "seconds");
-          const formattedTime = `${duration.days()}d ${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
+            if (projectSubtasks.length === 0) return null;
 
-          if (projectSubtasks.length === 0) return null;
-
-          return (
-            <React.Fragment key={project._id}>
-              <div className="btn_main">
+            return (
+              <div key={project._id} className="project-item">
                 <div
-                  className={`ett-menu1 dropdown_toggle ${
+                  className={`project-header ${
                     openTable === project._id ? "open" : ""
                   }`}
                   onClick={() => handleToggle(project._id)}
                 >
-                  <div className="task-name">{project.project_name}</div>
-                  <div className="task-time">{formattedTime}</div>
-                  <img
-                    src="SVG/header-vector.svg"
-                    alt="vec"
-                    className="arrow_icon"
-                  />
+                  <div className="project-name">{project.project_name}</div>
+                  <div className="project-time">{formattedTime}</div>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className={`dropdown-arrow ${
+                      openTable === project._id ? "rotated" : ""
+                    }`}
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
                 </div>
-              </div>
-              <div
-                className="px-5 mb-3"
-                style={{ borderBottom: "1px solid #ccc" }}
-              >
-                <table
-                  id={project._id}
-                  className="ett-main-task-table subtask-table"
-                  style={{
-                    display: openTable === project._id ? "table" : "none",
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th>Subtask Name</th>
-                      <th>Stage</th>
-                      <th>Due Date</th>
-                      <th>Remaining Time</th>
-                      <th>Time Spent</th>
-                      <th>Assigned Employees</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {projectSubtasks.map((subtask, index) => {
-                      const employee = getEmployeeById(subtask.assign_to);
-                      const spent = calculateTimeSpent(subtask.time_logs);
-                      const remaining = calculateRemainingTime(
-                        subtask.due_date,
-                        subtask.status
-                      );
 
-                      return (
-                        <tr key={index}>
-                          <td>{subtask.task_name}</td>
-                          <td>
-                            <span
-                              className={`py-2 px-3 css-stage ${
-                                subtask.stage === "CAD Design"
-                                  ? "badge bg-primary"
-                                  : subtask.stage === "SET Design"
-                                  ? "badge bg-warning"
-                                  : subtask.stage === "Delivery"
-                                  ? "badge bg-success"
-                                  : subtask.stage === "Render"
-                                  ? "badge bg-info"
-                                  : ""
-                              }`}
-                            >
-                              {subtask.stage}
-                            </span>
-                          </td>
-                          <td>
-                            {moment(subtask.due_date).format("DD MMM YYYY")}
-                          </td>
-                          <td>
-                            <span
-                              className={`py-2 px-3 ${
-                                remaining === "Completed"
-                                  ? "badge bg-success"
-                                  : remaining === "Overdue"
-                                  ? "badge bg-danger"
-                                  : "badge bg-primary"
-                              }`}
-                            >
-                              {remaining}
-                            </span>
-                          </td>
-                          <td>{spent}</td>
-                          <td>
-                            <span className="css-ankit">
-                              {employee?.profile_pic && (
-                                <img src={employee.profile_pic} alt="emp" />
-                              )}
-                              {employee?.full_name || "N/A"}
-                            </span>
-                          </td>
+                {openTable === project._id && (
+                  <div className="subtasks-table-container">
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th>Subtask Name</th>
+                          <th>Stage</th>
+                          <th>Due Date</th>
+                          <th>Remaining Time</th>
+                          <th>Time Spent</th>
+                          <th>Assigned Employees</th>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                      </thead>
+                      <tbody>
+                        {projectSubtasks.map((subtask, index) => {
+                          const employee = getEmployeeById(subtask.assign_to);
+                          const spent = calculateTimeSpent(subtask.time_logs);
+                          const remaining = calculateRemainingTime(
+                            subtask.due_date,
+                            subtask.status
+                          );
+
+                          return (
+                            <tr key={index}>
+                              <td>
+                                <div className="task-name-cell">
+                                  <span
+                                    className="task-name-text"
+                                    title={subtask.task_name}
+                                  >
+                                    {subtask.task_name}
+                                  </span>
+                                </div>
+                              </td>
+                              <td>
+                                {Array.isArray(subtask.stages) &&
+                                subtask.stages.length > 0 ? (
+                                  <div className="flex items-center gap-2">
+                                    {subtask.stages.map((stg, i) => {
+                                      const name =
+                                        typeof stg === "string"
+                                          ? stg
+                                          : stg.name;
+                                      const completed = stg?.completed;
+                                      return (
+                                        <span
+                                          key={i}
+                                          style={{
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            gap: "6px",
+                                          }}
+                                        >
+                                          <small
+                                            style={{
+                                              padding: "4px 8px",
+                                              borderRadius: "12px",
+                                              background: completed
+                                                ? "#e6ffed"
+                                                : "#f3f4f6",
+                                              color: completed
+                                                ? "#097a3f"
+                                                : "#444",
+                                              border: completed
+                                                ? "1px solid #b7f0c6"
+                                                : "1px solid #e0e0e0",
+                                              fontSize: "12px",
+                                            }}
+                                          >
+                                            {completed ? "✓ " : ""}
+                                            {name}
+                                          </small>
+                                          {i < subtask.stages.length - 1 && (
+                                            <span style={{ margin: "0 6px" }}>
+                                              →
+                                            </span>
+                                          )}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                ) : (
+                                  "No stages"
+                                )}
+                              </td>
+                              <td>
+                                <span className="date-cell">
+                                  {moment(subtask.due_date).format(
+                                    "DD MMM YYYY"
+                                  )}
+                                </span>
+                              </td>
+                              <td>
+                                <span
+                                  className={`status-badge ${
+                                    remaining === "Completed"
+                                      ? "status-completed"
+                                      : remaining === "Overdue"
+                                      ? "status-overdue"
+                                      : "status-pending"
+                                  }`}
+                                >
+                                  <span className="status-dot"></span>
+                                  {remaining}
+                                </span>
+                              </td>
+                              <td>
+                                <span className="time-spent">{spent}</span>
+                              </td>
+                              <td>
+                                <div className="assignee-cell">
+                                  {employee?.profile_pic ? (
+                                    <img
+                                      src={employee.profile_pic}
+                                      alt={employee.full_name}
+                                      className="assignee-avatar"
+                                    />
+                                  ) : (
+                                    <div className="assignee-avatar-placeholder">
+                                      {employee?.full_name
+                                        ?.charAt(0)
+                                        .toUpperCase() || "?"}
+                                    </div>
+                                  )}
+                                  <span className="assignee-name">
+                                    {employee?.full_name || "N/A"}
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
-            </React.Fragment>
-          );
-        })}
+            );
+          })}
+        </div>
+
+        {/* Summary */}
+        <div className="pagination-container">
+          <div className="pagination-info">
+            Showing <span className="highlight">{summaryData.mainTasks}</span>{" "}
+            main tasks (
+            <span className="highlight">{summaryData.subtasks}</span> subtasks)
+          </div>
+          <div className="pagination-info">
+            Total time tracked:{" "}
+            <span className="highlight">{totalTimeTrackedFormatted}</span>
+          </div>
+        </div>
       </section>
 
-      <section className="tt-showing-task-detail">
-        <div className="tt-showing-task">
-          <p>
-            Showing <span>{summaryData.mainTasks}</span> main tasks
-          </p>
-          <p>
-            (<span>{summaryData.subtasks}</span> subtasks total)
-          </p>
-        </div>
-        <div className="tt-showing-time-tracking">
-          <span>Total time tracked: {totalTimeTrackedFormatted}</span>
-        </div>
-      </section>
+      {/* Custom Date Modal */}
+      <Modal
+        show={showCustomDateModal}
+        onHide={() => setShowCustomDateModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Select Custom Date Range</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="custom-date-inputs">
+            <div className="input-group">
+              <label>From:</label>
+              <input
+                type="date"
+                className="form-control w-100"
+                onChange={(e) =>
+                  setCustomDateRange((prev) => ({
+                    ...prev,
+                    from: e.target.value,
+                  }))
+                }
+              />
+            </div>
+            <div className="input-group">
+              <label>To:</label>
+              <input
+                type="date"
+                className="form-control w-100"
+                onChange={(e) =>
+                  setCustomDateRange((prev) => ({
+                    ...prev,
+                    to: e.target.value,
+                  }))
+                }
+              />
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowCustomDateModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setSelectedFilter("Custom");
+              setShowCustomDateModal(false);
+            }}
+          >
+            Apply
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
