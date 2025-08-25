@@ -121,7 +121,7 @@ export const addBulkSubTasks = async (req, res) => {
     } else {
       console.log("No admin found in the database");
     }
-    
+
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
 
@@ -343,6 +343,13 @@ export const completeStage = async (req, res) => {
     subtask.stages[stageIndex].completed_by = subtask.assign_to;
     subtask.stages[stageIndex].completed_at = new Date();
 
+    // Maek Employee Status Inactive
+    const employee = await Employee.findById(subtask.assign_to);
+    if (employee) {
+      employee.status = "Inactive";
+      await employee.save();
+    }
+
     // Move to next stage or finish
     if (stageIndex + 1 < subtask.stages.length) {
       subtask.current_stage_index = stageIndex + 1;
@@ -361,6 +368,31 @@ export const completeStage = async (req, res) => {
     }
 
     await subtask.save();
+
+    const admin = await Admin.findOne(); // Get the first admin in the collection
+    if (admin) {
+      console.log("Admin found:", admin._id);
+    } else {
+      console.log("No admin found in the database");
+    }
+    const notification = await Notification.create({
+      title: `${employee?.full_name} Completed a subtask ${subtask.task_name}`,
+      description: `Completed a subtask: ${subtask.task_name}`,
+      type: "subtask_updated",
+      icon: employee?.profile_pic || null,
+      related_id: subtask._id,
+      receiver_id: admin._id,
+      receiver_type: "admin",
+      created_by: employee?._id,
+      created_by_role: "employee",
+    });
+    const io = req.app.get("io");
+    const connectedUsers = req.app.get("connectedUsers");
+
+    if (admin._id && connectedUsers[admin._id]) {
+      io.to(connectedUsers[admin._id]).emit("subtask_updated", notification);
+    }
+
     res.json(subtask);
   } catch (err) {
     console.error("Error completing stage:", err);

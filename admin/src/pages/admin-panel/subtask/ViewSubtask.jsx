@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import { toast } from "react-toastify";
@@ -239,9 +239,7 @@ const ViewSubtask = () => {
             </svg>
           </button>
           <div className="flex items-center gap-2">
-            <h1 className="text-lg text-gray-800">
-              Subtask Details : 
-            </h1>
+            <h1 className="text-lg text-gray-800">Subtask Details :</h1>
             <h1 className="text-2xl font-semibold text-gray-800">
               {project?.project_name || "Project Name"}
             </h1>
@@ -390,6 +388,10 @@ const ViewSubtask = () => {
               <p className="text-gray-700">
                 {subtask.description || "No description available."}
               </p>
+            </div>
+
+            <div className="mt-6 p-6 border-t border-gray-200 text-end">
+              <Link to={`/subtask/logs/${subtask._id}`} className="mt-4">View Logs</Link>
             </div>
           </div>
 

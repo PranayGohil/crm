@@ -51,6 +51,8 @@ import AdminProfile from "./pages/admin-panel/AdminProfile";
 
 import ArchivedProjects from "./pages/admin-panel/project/ArchivedProjects";
 
+import SubtaskLogs from "./pages/admin-panel/subtask/SubtaskLogs";
+
 function App() {
   return (
     <Router>
@@ -133,6 +135,8 @@ function App() {
           <Route path="/designation" element={<Designation />} />
 
           <Route path="/archived-projects" element={<ArchivedProjects />} />
+
+          <Route path="/subtask/logs/:subtaskId" element={<SubtaskLogs />} />
         </Route>
 
         <Route path="/" element={<Plain_layout />}>

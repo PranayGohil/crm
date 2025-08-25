@@ -138,7 +138,14 @@ const AddNewProject = () => {
   const getSubTotal = () =>
     items.reduce((sum, i) => sum + i.quantity * i.price, 0);
 
-  const handleFileChange = (e) => setSelectedFiles([...e.target.files]);
+  const handleFileChange = (e) => {
+    const filesArray = Array.from(e.target.files);
+    setSelectedFiles((prev) => [...prev, ...filesArray]);
+  };
+
+  const handleRemoveSelectedFile = (index) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
 
   if (loading) return <LoadingOverlay />;
 
@@ -526,8 +533,90 @@ const AddNewProject = () => {
             </div>
           </div>
 
+          {/* Image Preview Section */}
+          {selectedFiles.length > 0 && (
+            <div>
+              <h3 className="text-lg font-medium text-gray-800 mb-3">
+                Selected Files Preview
+              </h3>
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 mb-4">
+                {selectedFiles.map((file, index) => (
+                  <div key={index} className="relative group">
+                    <div className="aspect-square overflow-hidden rounded-lg border-2 border-gray-200">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`preview-${index}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSelectedFile(index)}
+                      className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-700"
+                      title="Remove image"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                    {/* File name tooltip */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-75 text-white text-xs p-1 rounded-b- group-hover:opacity-100 transition-opacity">
+                      <p className="truncate" title={file.name}>
+                        {file.name}
+                      </p>
+                      <p className="text-gray-300">
+                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="text-sm text-gray-600">
+                <p>
+                  {selectedFiles.length} file
+                  {selectedFiles.length !== 1 ? "s" : ""} selected
+                </p>
+                <p>
+                  Total size:{" "}
+                  {(
+                    selectedFiles.reduce((acc, file) => acc + file.size, 0) /
+                    1024 /
+                    1024
+                  ).toFixed(2)}{" "}
+                  MB
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* File Upload Area */}
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+          <div
+            className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors"
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.currentTarget.classList.add("border-blue-400", "bg-blue-50");
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              e.currentTarget.classList.remove("border-blue-400", "bg-blue-50");
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.currentTarget.classList.remove("border-blue-400", "bg-blue-50");
+              const files = Array.from(e.dataTransfer.files);
+              setSelectedFiles((prev) => [...prev, ...files]);
+            }}
+          >
             <svg
               className="w-12 h-12 text-gray-400 mx-auto mb-4"
               fill="none"
@@ -542,13 +631,38 @@ const AddNewProject = () => {
               />
             </svg>
             <p className="text-gray-600 mb-2">Drag and drop files here or</p>
-            <label className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700">
+            <label className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors">
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
               <span>Browse Files</span>
-              <input type="file" multiple hidden onChange={handleFileChange} />
+              <input
+                type="file"
+                multiple
+                hidden
+                accept="image/*"
+                onChange={handleFileChange}
+              />
             </label>
             <p className="text-gray-500 text-sm mt-2">
-              {selectedFiles.length} new files selected
+              Supports: JPG, PNG, GIF, WebP
             </p>
+            {selectedFiles.length > 0 && (
+              <p className="text-blue-600 text-sm mt-1 font-medium">
+                + {selectedFiles.length} file
+                {selectedFiles.length !== 1 ? "s" : ""} ready to upload
+              </p>
+            )}
           </div>
 
           {/* Submit Button */}
@@ -556,7 +670,7 @@ const AddNewProject = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
               {isSubmitting ? (
                 <>
