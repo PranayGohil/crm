@@ -404,10 +404,17 @@ export const completeStage = async (req, res) => {
 export const deleteSubTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const subTask = await SubTask.findByIdAndDelete(id);
+    const subTask = await SubTask.findById(id);
     if (!subTask) {
       return res.status(404).json({ message: "Subtask not found" });
     }
+    if (subTask.status === "In Progress") {
+      return res
+        .status(400)
+        .json({ message: "Cannot delete a subtask that is In Progress" });
+    }
+    await SubTask.findByIdAndDelete(id);
+
     res.status(200).json({ message: "Subtask deleted successfully" });
   } catch (error) {
     console.error("Error deleting subtask:", error);
@@ -644,8 +651,31 @@ export const bulkUpdateSubtasks = async (req, res) => {
 export const bulkDeleteSubtasks = async (req, res) => {
   try {
     const { ids } = req.body;
+
+    // Find subtasks first
+    const subtasks = await SubTask.find({ _id: { $in: ids } });
+
+    if (!subtasks || subtasks.length === 0) {
+      return res.status(404).json({ message: "No subtasks found" });
+    }
+
+    // Check if any subtask is in progress
+    const inProgressTask = subtasks.find(
+      (task) => task.status === "In Progress"
+    );
+    if (inProgressTask) {
+      return res.status(400).json({
+        message: "Cannot delete. One or more subtasks are In Progress.",
+      });
+    }
+
+    // If all are safe, delete them
     const result = await SubTask.deleteMany({ _id: { $in: ids } });
-    res.json(result);
+
+    res.status(200).json({
+      message: "Subtasks deleted successfully",
+      deletedCount: result.deletedCount,
+    });
   } catch (error) {
     console.error("Error bulk deleting subtasks:", error);
     res.status(500).json({ error: "Bulk delete failed" });

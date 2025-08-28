@@ -508,7 +508,8 @@ const SubtaskDashboardContainer = () => {
       setShowDeleteModal(false);
     } catch (err) {
       console.error(err);
-      toast.error("Delete failed.");
+      setShowDeleteModal(false);
+      toast.error((err.response?.data?.message || ""));
     } finally {
       setLoading(false);
     }
@@ -528,7 +529,8 @@ const SubtaskDashboardContainer = () => {
       setShowBulkDeleteModal(false);
     } catch (err) {
       console.error(err);
-      toast.error("Delete failed.");
+      setShowBulkDeleteModal(false);
+      toast.error((err.response?.data?.message || ""));
     } finally {
       setLoading(false);
     }

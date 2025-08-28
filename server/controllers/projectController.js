@@ -86,10 +86,43 @@ export const updateProject = async (req, res) => {
 };
 
 export const deleteProject = async (req, res) => {
-  const { id } = req.params;
-  const project = await Project.findByIdAndDelete(id);
-  const subtasks = await SubTask.deleteMany({ project_id: id });
-  res.status(200).json(project, subtasks);
+  try {
+    const { id } = req.params;
+
+    // Find subtasks related to this project
+    const subtasks = await SubTask.find({ project_id: id });
+
+    if (subtasks.length > 0) {
+      // Check if any subtask is in progress
+      const inProgressTask = subtasks.find(
+        (task) => task.status === "In Progress"
+      );
+      if (inProgressTask) {
+        return res.status(400).json({
+          message:
+            "Cannot delete project. One or more subtasks are In Progress.",
+        });
+      }
+
+      // If no subtasks are in progress → delete them
+      await SubTask.deleteMany({ project_id: id });
+    }
+
+    // Now delete the project
+    const project = await Project.findByIdAndDelete(id);
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    res.status(200).json({
+      message: "Project and related subtasks deleted successfully",
+      project,
+    });
+  } catch (error) {
+    console.error("Error deleting project:", error);
+    res.status(500).json({ message: "Failed to delete project" });
+  }
 };
 
 export const getProjectInfo = async (req, res) => {

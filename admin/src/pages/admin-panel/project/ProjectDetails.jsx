@@ -114,7 +114,9 @@ const ProjectDetails = () => {
       toast.success("Project deleted successfully.");
       navigate("/project/dashboard");
     } catch (err) {
-      toast.error("Failed to delete project.");
+      toast.error((err.response?.data?.message || "Failed to delete project."));
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
