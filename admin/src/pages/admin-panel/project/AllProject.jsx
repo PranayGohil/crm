@@ -94,7 +94,7 @@ const AllProject = () => {
   const filteredProjects = projects.filter((project) => {
     const clientMatch =
       selectedClient.id === "All Client" ||
-      project.client_id === selectedClient.id;
+      project.client_id === selectedClient._id;
     const statusMatch =
       selectedStatus === "All Status" || project.status === selectedStatus;
     const searchMatch = project.project_name

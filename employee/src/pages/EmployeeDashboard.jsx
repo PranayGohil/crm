@@ -138,12 +138,12 @@ const EmployeeDashboard = () => {
 
   const fetchDashboardData = async (employeeId) => {
     try {
-      setLoading(true);
       const filter = getFilterDates();
       const res = await axios.get(
         `${process.env.REACT_APP_API_URL}/api/employee/dashboard/${employeeId}`,
         { params: filter }
       );
+      console.log("Dashboard data:", res.data);
 
       let filteredSubtasks = res.data.subtasks || [];
 
@@ -175,7 +175,7 @@ const EmployeeDashboard = () => {
         {
           ...prev[1],
           value:
-            filteredSubtasks.filter((t) => t.completedByEmployee).length || "0",
+            res.data.completed || "0",
         },
         { ...prev[2], value: res.data.timeLogged || "0h 0m" },
       ]);

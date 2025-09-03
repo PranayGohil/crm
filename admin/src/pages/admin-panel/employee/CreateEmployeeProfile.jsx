@@ -83,7 +83,6 @@ const CreateEmployeeProfile = () => {
     department: Yup.string().required("Department is required"),
     designation: Yup.string().required("Designation is required"),
     employment_type: Yup.string().required("Employment type is required"),
-    reporting_manager: Yup.string().nullable(),
     date_of_joining: Yup.string().required("Date of joining is required"),
     monthly_salary: Yup.number()
       .typeError("Must be a number")
@@ -527,7 +526,7 @@ const CreateEmployeeProfile = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Capacity (Hours/Week)
+                      Capacity
                     </label>
                     <Field
                       type="number"

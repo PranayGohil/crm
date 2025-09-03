@@ -11,7 +11,6 @@ const ViewSubtask = () => {
 
   const [subtask, setSubtask] = useState(null);
   const [project, setProject] = useState(null);
-  const [assignedEmployee, setAssignedEmployee] = useState(null);
 
   const [mediaItems, setMediaItems] = useState([]);
 
@@ -33,13 +32,6 @@ const ViewSubtask = () => {
         `${process.env.REACT_APP_API_URL}/api/project/get/${subtaskData.project_id}`
       );
       setProject(projectData.project);
-
-      if (subtaskData.assign_to) {
-        const { data: employeeData } = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/employee/get/${subtaskData.assign_to}`
-        );
-        setAssignedEmployee(employeeData);
-      }
     } catch (error) {
       console.error("Failed to load subtask details:", error);
       toast.error("Failed to load subtask details.");
@@ -113,23 +105,7 @@ const ViewSubtask = () => {
             {/* Mobile-first grid layout */}
             <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-1 md:grid-cols-2 sm:gap-4">
               <div className="space-y-3">
-                <div className="flex justify-between items-start py-2 border-b border-gray-100 sm:border-b-0">
-                  <span className="text-sm text-gray-600 font-medium">
-                    Stage:
-                  </span>
-                  <span className="text-sm font-semibold text-right ml-2 break-words">
-                    {subtask.stage || "N/A"}
-                  </span>
-                </div>
-                <div className="flex justify-between items-start py-2 border-b border-gray-100 sm:border-b-0">
-                  <span className="text-sm text-gray-600 font-medium">
-                    Assigned To:
-                  </span>
-                  <span className="text-sm font-semibold text-right ml-2 break-words">
-                    {assignedEmployee?.full_name || "N/A"}
-                  </span>
-                </div>
-                <div className="flex justify-between items-start py-2 border-b border-gray-100 sm:border-b-0">
+                <div className="flex justify-start items-start py-2 border-b border-gray-100 sm:border-b-0">
                   <span className="text-sm text-gray-600 font-medium">
                     Start Date:
                   </span>
@@ -139,43 +115,22 @@ const ViewSubtask = () => {
                       : "N/A"}
                   </span>
                 </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-start py-2 border-b border-gray-100 sm:border-b-0">
-                  <span className="text-sm text-gray-600 font-medium">
-                    URL:
-                  </span>
-                  <span className="text-sm font-semibold text-right ml-2 break-all">
-                    {subtask.url ? (
-                      <a
-                        href={subtask.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 underline"
-                      >
-                        {subtask.url.length > 30
-                          ? `${subtask.url.substring(0, 30)}...`
-                          : subtask.url}
-                      </a>
-                    ) : (
-                      "N/A"
-                    )}
-                  </span>
-                </div>
-                <div className="flex justify-between items-start py-2 border-b border-gray-100 sm:border-b-0">
-                  <span className="text-sm text-gray-600 font-medium">
-                    Status:
-                  </span>
-                  <span className="text-sm font-semibold text-right ml-2">
-                    {subtask.status || "N/A"}
-                  </span>
-                </div>
-                <div className="flex justify-between items-start py-2 border-b border-gray-100 sm:border-b-0">
+                <div className="flex justify-start items-start py-2 border-b border-gray-100 sm:border-b-0">
                   <span className="text-sm text-gray-600 font-medium">
                     Due Date:
                   </span>
                   <span className="text-sm font-semibold text-right ml-2">
                     {subtask.due_date ? formatDate(subtask.due_date) : "N/A"}
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex justify-start items-start py-2 border-b border-gray-100 sm:border-b-0">
+                  <span className="text-sm text-gray-600 font-medium">
+                    Status:
+                  </span>
+                  <span className="text-sm font-semibold text-right ml-2">
+                    {subtask.status || "N/A"}
                   </span>
                 </div>
               </div>
