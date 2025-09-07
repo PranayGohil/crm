@@ -40,6 +40,7 @@ export const addEmployee = async (req, res) => {
       monthly_salary,
       employment_type,
       reporting_manager,
+      manage_stages,
       is_manager,
     } = req.body;
 
@@ -73,6 +74,7 @@ export const addEmployee = async (req, res) => {
         ? new mongoose.Types.ObjectId(reporting_manager) // 👈 ensure it’s saved as ObjectId
         : null,
       is_manager,
+      manage_stages: is_manager ? manage_stages || [] : [],
     });
 
     await newEmployee.save();

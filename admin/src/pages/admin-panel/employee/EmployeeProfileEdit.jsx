@@ -7,8 +7,9 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { stageOptions, priorityOptions } from "../../../options";
 
-const departmentOptions = ["SET Design", "CAD Design", "Render"];
+// const departmentOptions = ["SET Design", "CAD Design", "Render"];
 const employmentTypes = ["Full-time", "Part-time"];
 
 const EmployeeProfileEdit = () => {
@@ -18,6 +19,7 @@ const EmployeeProfileEdit = () => {
   const [profilePreview, setProfilePreview] = useState(null);
   const [managers, setManagers] = useState([]);
   const [designations, setDesignations] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
 
   const [initialValues, setInitialValues] = useState({
@@ -37,6 +39,7 @@ const EmployeeProfileEdit = () => {
     emergency_contact: "",
     capacity: "",
     is_manager: false,
+    manage_stages: [],
   });
 
   const validationSchema = Yup.object().shape({
@@ -63,6 +66,12 @@ const EmployeeProfileEdit = () => {
       .typeError("Must be a number")
       .required("Monthly salary is required"),
     is_manager: Yup.boolean(),
+    manage_stages: Yup.array().when("is_manager", {
+      is: true,
+      then: (schema) =>
+        schema.min(1, "Select at least one stage for a reporting manager"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
   });
 
   // Fetch employee data
@@ -83,6 +92,7 @@ const EmployeeProfileEdit = () => {
             ? data.date_of_joining.split("T")[0]
             : "",
           reporting_manager: data.reporting_manager?._id || "",
+          manage_stages: data.manage_stages || [],
         });
         setProfilePreview(data.profile_pic || null);
       } catch (err) {
@@ -114,6 +124,15 @@ const EmployeeProfileEdit = () => {
       .catch((err) => console.error("Error fetching designations", err));
   }, []);
 
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/api/department/get-all`)
+      .then((res) => {
+        if (res.data.success) setDepartments(res.data.departments);
+      })
+      .catch((err) => console.error("Error fetching departments", err));
+  }, []);
+
   const handleFileChange = (e, setFieldValue) => {
     if (e.target.files[0]) {
       setProfilePreview(e.target.files[0]);
@@ -127,7 +146,14 @@ const EmployeeProfileEdit = () => {
       const formData = new FormData();
       Object.entries(values).forEach(([key, val]) => {
         if (val !== null && val !== undefined) {
-          formData.append(key, typeof val === "boolean" ? val.toString() : val);
+          if (Array.isArray(val)) {
+            val.forEach((v) => formData.append(`${key}[]`, v)); // ✅ handle arrays
+          } else {
+            formData.append(
+              key,
+              typeof val === "boolean" ? val.toString() : val
+            );
+          }
         }
       });
 
@@ -369,9 +395,9 @@ const EmployeeProfileEdit = () => {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">Select Department</option>
-                      {departmentOptions.map((dept, idx) => (
-                        <option key={idx} value={dept}>
-                          {dept}
+                      {departments.map((dept, idx) => (
+                        <option key={idx} value={dept.name}>
+                          {dept.name}
                         </option>
                       ))}
                     </Field>
@@ -532,6 +558,40 @@ const EmployeeProfileEdit = () => {
                       Is Reporting Manager
                     </label>
                   </div>
+
+                  {values.is_manager && (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Manage Stages
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {stageOptions.map(
+                          (stage, idx) => (
+                            <label
+                              key={idx}
+                              className="flex items-center space-x-2"
+                            >
+                              <Field
+                                type="checkbox"
+                                name="manage_stages"
+                                value={stage}
+                                checked={values.manage_stages.includes(stage)}
+                                className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                              />
+                              <span className="text-sm text-gray-700">
+                                {stage}
+                              </span>
+                            </label>
+                          )
+                        )}
+                      </div>
+                      <ErrorMessage
+                        name="manage_stages"
+                        component="div"
+                        className="text-red-600 text-sm mt-1"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -2,6 +2,7 @@ export const stageOptions = [
   "CAD Design",
   "SET Design",
   "Render",
+  "QC",
   "Delivery",
 ];
 

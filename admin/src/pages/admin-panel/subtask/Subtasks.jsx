@@ -284,24 +284,26 @@ const Subtasks = () => {
                 <img src="SVG/true-green.svg" alt="total tasks" />
               </div>
             </div>
-            <div className="md-total-project-number">
-              <span className="md-total-card-number">{summary.totalTasks}</span>
-              <span className="md-total-card-text">Total</span>
+            <div className="flex items-end mb-4">
+              <span className="text-3xl font-bold text-gray-800">{summary.totalTasks}</span>
+              <span className="ml-2 text-gray-600">Total</span>
             </div>
-            <div className="mt-8 md-btn-cio">
+            <div className="flex flex-wrap gap-2">
               {summary.tasksByStage &&
                 Object.entries(summary.tasksByStage).map(([stage, count]) => (
                   <div
                     key={stage}
-                    className={`${
-                      stage === "CAD Design"
-                        ? "badge bg-primary"
-                        : stage === "SET Design"
-                        ? "badge bg-success"
-                        : stage === "Render"
-                        ? "badge bg-info"
-                        : ""
-                    } `}
+                    className={`px-3 py-1 text-sm font-medium rounded-full ${
+                    stage === "CAD Design"
+                      ? "bg-blue-100 text-blue-800"
+                      : stage === "SET Design"
+                      ? "bg-green-100 text-green-800"
+                      : stage === "Render"
+                      ? "bg-purple-100 text-purple-800"
+                      : stage === "QC"
+                      ? "bg-cyan-100 text-cyan-800" 
+                      : "bg-gray-100 text-gray-800"
+                  }`}
                   >
                     {count} {stage} Tasks Remaining
                   </div>

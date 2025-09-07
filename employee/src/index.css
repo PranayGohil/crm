@@ -9014,6 +9014,12 @@ a {
   border-color: #c8e6c9;
 }
 
+.stage-badge.qc {
+  background: #f8f9fa;
+  color: #6c757d;
+  border-color: #e9ecef;
+}
+
 /* Projects Grid */
 .projects-grid {
   display: grid;

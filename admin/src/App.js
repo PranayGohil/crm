@@ -46,6 +46,7 @@ import ViewSubtask from "./pages/admin-panel/subtask/ViewSubtask";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 import Designation from "./pages/admin-panel/Designation";
+import Department from "./pages/admin-panel/Department";
 
 import AdminProfile from "./pages/admin-panel/AdminProfile";
 
@@ -133,6 +134,7 @@ function App() {
             element={<CreateEmployeeProfile />}
           />
           <Route path="/designation" element={<Designation />} />
+          <Route path="/department" element={<Department />} />
 
           <Route path="/archived-projects" element={<ArchivedProjects />} />
 

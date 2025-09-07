@@ -1,4 +1,10 @@
-export const stageOptions = ["CAD Design", "SET Design", "Render", "Delivery"];
+export const stageOptions = [
+  "CAD Design",
+  "SET Design",
+  "Render",
+  "QC",
+  "Delivery",
+];
 
 export const priorityOptions = ["Low", "Medium", "High"];
 

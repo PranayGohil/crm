@@ -7,7 +7,13 @@ import Notification from "../models/notificationModel.js";
 import mongoose, { connect } from "mongoose";
 import cloudinary from "../config/cloudinary.js";
 
-const FIXED_STAGE_ORDER = ["CAD Design", "SET Design", "Render", "Delivery"];
+const FIXED_STAGE_ORDER = [
+  "CAD Design",
+  "SET Design",
+  "Render",
+  "QC",
+  "Delivery",
+];
 
 function sortStages(inputStages) {
   const uniqueStages = [...new Set(inputStages)];

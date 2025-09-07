@@ -143,6 +143,8 @@ const DashboardSummaryCards = () => {
                       ? "bg-green-100 text-green-800"
                       : stage === "Render"
                       ? "bg-purple-100 text-purple-800"
+                      : stage === "QC"
+                      ? "bg-cyan-100 text-cyan-800" 
                       : "bg-gray-100 text-gray-800"
                   }`}
                 >

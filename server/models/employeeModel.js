@@ -54,6 +54,7 @@ const employeeSchema = mongoose.Schema({
     ref: "Employee",
   },
   is_manager: { type: Boolean, default: false },
+  manage_stages: [{ type: String }],
   created_at: {
     type: Date,
     default: Date.now,

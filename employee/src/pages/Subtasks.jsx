@@ -335,14 +335,16 @@ const Subtasks = () => {
                     ([stage, count]) => (
                       <div
                         key={stage}
-                        className={`${
+                        className={`px-3 py-1 text-sm font-medium rounded-full ${
                           stage === "CAD Design"
-                            ? "badge bg-primary"
+                            ? "bg-blue-100 text-blue-800"
                             : stage === "SET Design"
-                            ? "badge bg-success"
+                            ? "bg-green-100 text-green-800"
                             : stage === "Render"
-                            ? "badge bg-info"
-                            : "badge bg-secondary"
+                            ? "bg-purple-100 text-purple-800"
+                            : stage === "QC"
+                            ? "bg-cyan-100 text-cyan-800"
+                            : "bg-gray-100 text-gray-800"
                         }`}
                       >
                         {count} {stage} Tasks Remaining

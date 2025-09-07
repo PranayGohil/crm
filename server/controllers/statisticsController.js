@@ -45,7 +45,8 @@ export const Summary = async (req, res) => {
     const stageCounts = {
       "CAD Design": 0,
       "SET Design": 0,
-      Render: 0,
+      "Render": 0,
+      "QC": 0,
     };
 
     subtasks.forEach((task) => {
@@ -53,7 +54,7 @@ export const Summary = async (req, res) => {
         Array.isArray(task.stages) &&
         typeof task.current_stage_index === "number"
       ) {
-        ["CAD Design", "SET Design", "Render"].forEach((stageName) => {
+        ["CAD Design", "SET Design", "Render", "QC"].forEach((stageName) => {
           const stageIndex = task.stages.findIndex((s) => s.name === stageName);
           if (stageIndex !== -1 && task.current_stage_index <= stageIndex) {
             stageCounts[stageName]++;
@@ -128,7 +129,7 @@ export const getDepartmentCapacities = async (req, res) => {
     const workingDaysInMonth = allDaysInMonth.filter((d) => !isHoliday(d));
 
     const employees = await Employee.find();
-    const allowedDepartments = ["SET Design", "CAD Design", "Render"];
+    const allowedDepartments = ["SET Design", "CAD Design", "Render", "QC"];
     const departmentData = {};
 
     // STEP 1: Aggregate department capacities
@@ -179,7 +180,8 @@ export const getDepartmentCapacities = async (req, res) => {
     const stageCounts = {
       "CAD Design": 0,
       "SET Design": 0,
-      Render: 0,
+      "Render": 0,
+      "QC": 0,
     };
 
     subtaskStageCounts.forEach((s) => {

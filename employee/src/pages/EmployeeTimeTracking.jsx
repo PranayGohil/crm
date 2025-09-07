@@ -294,6 +294,8 @@ const EmployeeTimeTracking = () => {
                                       ? "stage-delivery"
                                       : subtask.stage === "Render"
                                       ? "stage-render"
+                                      : subtask.stage === "QC"
+                                      ? "stage-qc"
                                       : "stage-default"
                                   }`}
                                 >

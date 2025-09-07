@@ -1,58 +1,58 @@
-// Designation.jsx
+// Department.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const Designation = () => {
+const Department = () => {
   const navigate = useNavigate();
-  const [designations, setDesignations] = useState([]);
-  const [newDesignation, setNewDesignation] = useState("");
+  const [departments, setDepartments] = useState([]);
+  const [newDepartment, setNewDepartment] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const fetchDesignations = async () => {
+  const fetchDepartments = async () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/designation/get-all`
+        `${process.env.REACT_APP_API_URL}/api/department/get-all`
       );
-      setDesignations(res.data.designations);
+      setDepartments(res.data.departments);
     } catch (err) {
-      console.error("Failed to fetch designations", err);
+      console.error("Failed to fetch departments", err);
     } finally {
       setLoading(false);
     }
   };
 
   const handleAdd = async () => {
-    if (!newDesignation.trim()) return;
-    console.log(newDesignation);
+    if (!newDepartment.trim()) return;
+    console.log(newDepartment);
     try {
       const res = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/designation/add`,
+        `${process.env.REACT_APP_API_URL}/api/department/add`,
         {
-          name: newDesignation,
+          name: newDepartment,
         }
       );
-      setDesignations([...designations, res.data]);
-      setNewDesignation("");
+      setDepartments([...departments, res.data]);
+      setNewDepartment("");
     } catch (err) {
-      console.error("Failed to add designation", err);
+      console.error("Failed to add department", err);
     }
   };
 
   const handleDelete = async (id) => {
     try {
       await axios.delete(
-        `${process.env.REACT_APP_API_URL}/api/designation/delete/${id}`
+        `${process.env.REACT_APP_API_URL}/api/department/delete/${id}`
       );
-      setDesignations(designations.filter((d) => d._id !== id));
+      setDepartments(departments.filter((d) => d._id !== id));
     } catch (err) {
-      console.error("Failed to delete designation", err);
+      console.error("Failed to delete department", err);
     }
   };
 
   useEffect(() => {
-    fetchDesignations();
+    fetchDepartments();
   }, []);
 
   return (
@@ -76,7 +76,7 @@ const Designation = () => {
           </button>
           <div>
             <h1 className="text-2xl font-semibold text-gray-800">
-              Manage Designations
+              Manage Departments
             </h1>
           </div>
         </div>
@@ -86,9 +86,9 @@ const Designation = () => {
           <input
             type="text"
             className="form-control"
-            placeholder="New Designation"
-            value={newDesignation}
-            onChange={(e) => setNewDesignation(e.target.value)}
+            placeholder="New Department"
+            value={newDepartment}
+            onChange={(e) => setNewDepartment(e.target.value)}
           />
           <button className="btn btn-primary" onClick={handleAdd}>
             Add
@@ -98,15 +98,15 @@ const Designation = () => {
           <p>Loading...</p>
         ) : (
           <ul className="list-group">
-            {designations.map((designation) => (
+            {departments.map((department) => (
               <li
-                key={designation._id}
+                key={department._id}
                 className="list-group-item d-flex justify-content-between align-items-center"
               >
-                {designation.name}
+                {department.name}
                 <button
                   className="btn btn-sm btn-danger"
-                  onClick={() => handleDelete(designation._id)}
+                  onClick={() => handleDelete(department._id)}
                 >
                   Delete
                 </button>
@@ -119,4 +119,4 @@ const Designation = () => {
   );
 };
 
-export default Designation;
+export default Department;
