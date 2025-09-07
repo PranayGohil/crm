@@ -295,25 +295,53 @@ export const getAllProjectsWithTasks = async (req, res) => {
 
 export const getProjectsForReportingManager = async (req, res) => {
   try {
-    const { managerId } = req.params; // pass reporting manager ID from frontend or JWT
+    const { managerId } = req.params;
 
-    // 1. Find employees under this reporting manager
+    // 1. Find the manager (to access manage_stages)
+    const manager = await Employee.findById(managerId);
+    if (!manager) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Manager not found" });
+    }
+
+    const manageStages = manager.manage_stages || [];
+
+    // 2. Find employees under this reporting manager
     const employees = await Employee.find({ reporting_manager: managerId });
     const employeeIds = employees.map((emp) => emp._id.toString());
 
-    // 2. Get all projects
+    // 3. Get all projects
     const projects = await Project.find({ isArchived: false });
 
-    // 3. Filter projects by subtasks assigned to manager's employees
+    // 4. Filter projects by subtasks
     const projectsWithSubtasks = await Promise.all(
       projects.map(async (proj) => {
-        const subtasks = await SubTask.find({
+        // Subtasks of manager’s employees
+        const employeeSubtasks = await SubTask.find({
           project_id: proj._id.toString(),
-          assign_to: { $in: employeeIds }, // ✅ only subtasks of manager’s employees
+          assign_to: { $in: employeeIds },
         });
 
-        // Skip project if no subtasks matched
-        if (subtasks.length === 0) return null;
+        // Subtasks matching manager’s manage_stages
+        const stageSubtasks = await SubTask.find({
+          project_id: proj._id.toString(),
+          $expr: {
+            $in: [
+              { $arrayElemAt: ["$stages.name", "$current_stage_index"] },
+              manageStages,
+            ],
+          },
+        });
+
+        // Merge & remove duplicates
+        const allSubtasks = [...employeeSubtasks, ...stageSubtasks].filter(
+          (s, idx, arr) =>
+            idx ===
+            arr.findIndex((ss) => ss._id.toString() === s._id.toString())
+        );
+
+        if (allSubtasks.length === 0) return null;
 
         return {
           id: proj._id,
@@ -323,7 +351,7 @@ export const getProjectsForReportingManager = async (req, res) => {
           due_date: proj.due_date,
           priority: proj.priority,
           status: proj.status,
-          subtasks: subtasks.map((s) => ({
+          subtasks: allSubtasks.map((s) => ({
             id: s._id,
             task_name: s.task_name,
             stages: s.stages,
@@ -340,9 +368,7 @@ export const getProjectsForReportingManager = async (req, res) => {
       })
     );
 
-    // 4. Remove nulls (projects without matching subtasks)
     const filteredProjects = projectsWithSubtasks.filter(Boolean);
-    console.log("Filrtered projects:", filteredProjects);
     res.status(200).json(filteredProjects);
   } catch (error) {
     console.error("Error:", error);

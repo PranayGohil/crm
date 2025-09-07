@@ -285,7 +285,9 @@ const Subtasks = () => {
               </div>
             </div>
             <div className="flex items-end mb-4">
-              <span className="text-3xl font-bold text-gray-800">{summary.totalTasks}</span>
+              <span className="text-3xl font-bold text-gray-800">
+                {summary.totalTasks}
+              </span>
               <span className="ml-2 text-gray-600">Total</span>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -294,16 +296,16 @@ const Subtasks = () => {
                   <div
                     key={stage}
                     className={`px-3 py-1 text-sm font-medium rounded-full ${
-                    stage === "CAD Design"
-                      ? "bg-blue-100 text-blue-800"
-                      : stage === "SET Design"
-                      ? "bg-green-100 text-green-800"
-                      : stage === "Render"
-                      ? "bg-purple-100 text-purple-800"
-                      : stage === "QC"
-                      ? "bg-cyan-100 text-cyan-800" 
-                      : "bg-gray-100 text-gray-800"
-                  }`}
+                      stage === "CAD Design"
+                        ? "bg-blue-100 text-blue-800"
+                        : stage === "SET Design"
+                        ? "bg-green-100 text-green-800"
+                        : stage === "Render"
+                        ? "bg-purple-100 text-purple-800"
+                        : stage === "QC"
+                        ? "bg-cyan-100 text-cyan-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
                   >
                     {count} {stage} Tasks Remaining
                   </div>
@@ -522,10 +524,11 @@ const Subtasks = () => {
                         project.subtasks?.filter((s) => {
                           const stageMatch =
                             filters.stage === "Stage" ||
-                            s.stages[
-                              s.current_stage_index
-                            ]?.name?.toLowerCase() ===
-                              filters.stage.toLowerCase();
+                            s.stages?.some(
+                              (stg) =>
+                                stg?.name?.toLowerCase() ===
+                                filters.stage.toLowerCase()
+                            );
 
                           const statusMatch =
                             filters.status === "Status" ||
@@ -677,10 +680,11 @@ const Subtasks = () => {
                                 ?.filter((s) => {
                                   const stageMatch =
                                     filters.stage === "Stage" ||
-                                    s.stages[
-                                      s.current_stage_index
-                                    ]?.name?.toLowerCase() ===
-                                      filters.stage.toLowerCase();
+                                    s.stages?.some(
+                                      (stg) =>
+                                        stg?.name?.toLowerCase() ===
+                                        filters.stage.toLowerCase()
+                                    );
 
                                   const statusMatch =
                                     filters.status === "Status" ||
@@ -940,9 +944,7 @@ const Subtasks = () => {
 
         {/* Bulk Actions */}
         {selectedTaskIds.length > 0 && (
-          <div
-            className="bulk-actions"
-          >
+          <div className="bulk-actions">
             <div className="bulk-actions-header">
               <span className="bulk-count-main">
                 <span className="bulk-count">{selectedTaskIds.length}</span>{" "}

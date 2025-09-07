@@ -190,6 +190,7 @@ export const editEmployee = async (req, res) => {
       employment_type,
       reporting_manager,
       is_manager,
+      manage_stages,
     } = req.body;
 
     const employee = await Employee.findById(id);
@@ -240,6 +241,7 @@ export const editEmployee = async (req, res) => {
       employee.is_manager =
         typeof is_manager === "string" ? is_manager === "true" : !!is_manager;
     }
+    employee.manage_stages = is_manager ? manage_stages || [] : [];
 
     // Profile pic
     if (req.file) {

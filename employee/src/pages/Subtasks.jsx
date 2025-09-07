@@ -1,4 +1,3 @@
-// Updated with Complete UI
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -50,6 +49,7 @@ const Subtasks = () => {
       const myEmployees = employeesRes.data.filter(
         (emp) => emp.reporting_manager?._id === user._id
       );
+
       setProjects(projectsRes.data);
       setClients(clientsRes.data);
       setEmployees(myEmployees);
