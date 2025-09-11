@@ -20,7 +20,6 @@ const ViewSubtask = () => {
 
   const [subtask, setSubtask] = useState(null);
   const [project, setProject] = useState(null);
-  const [client, setClient] = useState(null);
   const [assignedEmployee, setAssignedEmployee] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -64,16 +63,9 @@ const ViewSubtask = () => {
         const { data: employeeData } = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/employee/get/${subtaskData.assign_to}`
         );
+        console.log("Employee Data:", employeeData);
         setAssignedEmployee(employeeData);
         console.log("Assigned Employee Data:", employeeData);
-      }
-
-      if (projectData.project.client_id) {
-        const { data: clientData } = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/client/get/${projectData.project.client_id}`
-        );
-        setClient(clientData);
-        console.log("Client Data:", clientData);
       }
     } catch (error) {
       console.error("Failed to load subtask details:", error);
@@ -279,10 +271,6 @@ const ViewSubtask = () => {
                 <h2 className="text-xl font-semibold text-gray-800">
                   {subtask.task_name || "Subtask Name"}
                 </h2>
-                <div className="flex items-center mt-2 text-sm text-gray-600">
-                  <span className="mr-4">Project ID: {project?._id}</span>
-                  <span>Client: {client?.full_name || "N/A"}</span>
-                </div>
               </div>
               <div className="flex items-center gap-2">
                 <span
@@ -354,13 +342,15 @@ const ViewSubtask = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Stage:</span>
-                  <span className="font-medium">{subtask.stage || "N/A"}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Assigned To:</span>
+                  <span className="text-gray-600">Current Stage:</span>
                   <span className="font-medium">
-                    {assignedEmployee?.full_name || "N/A"}
+                    {Array.isArray(subtask.stages) &&
+                    subtask.stages.length > 0 ? (
+                      subtask.stages[subtask.current_stage_index].name ||
+                      "No stages"
+                    ) : (
+                      <span className="no-data">No stages</span>
+                    )}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -373,12 +363,6 @@ const ViewSubtask = () => {
                 </div>
               </div>
               <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Created By:</span>
-                  <span className="font-medium">
-                    {client?.full_name || "N/A"}
-                  </span>
-                </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Status:</span>
                   <span className="font-medium">{subtask.status || "N/A"}</span>
@@ -688,10 +672,6 @@ const ViewSubtask = () => {
               <div>
                 <p className="text-sm text-gray-600">Project Name</p>
                 <p className="font-medium">{project?.project_name || "N/A"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Client</p>
-                <p className="font-medium">{client?.full_name || "N/A"}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Project ID</p>

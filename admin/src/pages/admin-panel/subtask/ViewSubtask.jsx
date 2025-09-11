@@ -362,8 +362,36 @@ const ViewSubtask = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Stage:</span>
-                  <span className="font-medium">{subtask.stage || "N/A"}</span>
+                  <span className="text-gray-600">Stages:</span>
+                  <span className="font-medium">
+                    {Array.isArray(subtask.stages) && subtask.stages.length > 0 ? (
+                      <div className="stages-container">
+                        {subtask.stages.map((stg, i) => {
+                          const name = typeof stg === "string" ? stg : stg.name;
+                          const completed = stg?.completed;
+                          return (
+                            <div key={i} className="stage-flow">
+                              <span
+                                className={`stage-badge ${
+                                  completed ? "completed" : "pending"
+                                }`}
+                              >
+                                {completed && (
+                                  <span className="check-icon">✓</span>
+                                )}
+                                {name}
+                              </span>
+                              {i < subtask.stages.length - 1 && (
+                                <span className="stage-arrow">→</span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <span className="no-data">No stages</span>
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Assigned To:</span>

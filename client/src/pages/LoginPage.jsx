@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const LoginPage = () => {
   const { login } = useAuth();
@@ -70,19 +71,20 @@ const LoginPage = () => {
         </div>
         <div className="fd-enter-password fd-enter-email">
           <p>Password</p>
-          <div className="login-enter-pass">
+          <div className="login-enter-pass relative">
             <input
               type={showPass ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
             />
-            <img
-              src="/SVG/css-eye.svg"
-              alt="toggle"
+            <span
+              className="absolute top-5 right-3"
               onClick={() => setShowPass(!showPass)}
               style={{ cursor: "pointer" }}
-            />
+            >
+              {showPass ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </div>
         </div>
 
@@ -94,13 +96,6 @@ const LoginPage = () => {
           </div>
         )}
 
-        <div className="login-change_pass">
-          <div className="login-remember">
-            <input type="checkbox" />
-            <p>Remember Me</p>
-          </div>
-          <a href="#">Forgot Password?</a>
-        </div>
         <div className="fd-reset-btn">
           <button
             className="theme_btn"

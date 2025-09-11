@@ -94,9 +94,6 @@ const LoginPage = () => {
           </div>
         )}
 
-        <div className="login-change_pass">
-          <a href="#">Forgot Password?</a>
-        </div>
         <div className="fd-reset-btn">
           <button
             className="theme_btn"

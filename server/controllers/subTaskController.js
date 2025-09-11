@@ -189,11 +189,9 @@ export const getSubtasksByProjectId = async (req, res) => {
 export const getSubTaskInfo = async (req, res) => {
   try {
     const { id } = req.params;
-    const subTask = await SubTask.findById(id).populate(
-      "comments.user_id",
-      "full_name profile_pic"
-    ); // populate commenter info
-
+    const subTask = await SubTask.findById(id)
+      .populate("comments.user_id", "full_name profile_pic")
+    console.log("subTask", subTask);
     if (!subTask) {
       return res.status(404).json({ error: "Subtask not found" });
     }
