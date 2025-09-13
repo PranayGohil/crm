@@ -164,8 +164,6 @@ const LoginPage = () => {
             )}
           </button>
         </div>
-
-        
       </div>
     </section>
   );
