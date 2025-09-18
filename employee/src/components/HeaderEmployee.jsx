@@ -73,7 +73,10 @@ const HeaderEmployee = () => {
             alt="logo"
             className="w-8 h-8"
           />
-          <h1 className="text-lg font-semibold">Maulshree Jewellery</h1>
+          <h1 className="text-lg font-semibold">
+            {/* Maulshree Jewellery */}
+            Pixel Orbit
+          </h1>
         </div>
 
         {/* Right side */}
