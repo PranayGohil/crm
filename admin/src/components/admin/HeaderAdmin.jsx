@@ -56,7 +56,8 @@ const HeaderAdmin = () => {
       <div className="flex items-center gap-3">
         <img src="/SVG/diamond-rich_teal.svg" alt="logo" className="w-8 h-8" />
         <h1 className="text-lg font-semibold text-gray-800 m-0">
-          Maulshree Jewellery
+          {/* Maulshree Jewellery */}
+          Pixel Orbit
         </h1>
       </div>
 
