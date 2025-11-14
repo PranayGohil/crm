@@ -295,17 +295,16 @@ const Subtasks = () => {
                 Object.entries(summary.tasksByStage).map(([stage, count]) => (
                   <div
                     key={stage}
-                    className={`px-3 py-1 text-sm font-medium rounded-full ${
-                      stage === "CAD Design"
+                    className={`px-3 py-1 text-sm font-medium rounded-full ${stage === "CAD Design"
                         ? "bg-blue-100 text-blue-800"
                         : stage === "SET Design"
-                        ? "bg-green-100 text-green-800"
-                        : stage === "Render"
-                        ? "bg-purple-100 text-purple-800"
-                        : stage === "QC"
-                        ? "bg-cyan-100 text-cyan-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
+                          ? "bg-green-100 text-green-800"
+                          : stage === "Render"
+                            ? "bg-purple-100 text-purple-800"
+                            : stage === "QC"
+                              ? "bg-cyan-100 text-cyan-800"
+                              : "bg-gray-100 text-gray-800"
+                      }`}
                   >
                     {count} {stage} Tasks Remaining
                   </div>
@@ -476,9 +475,8 @@ const Subtasks = () => {
                   <tr className="project-row">
                     <td>
                       <button
-                        className={`expand-button ${
-                          openRow === idx ? "expanded" : ""
-                        }`}
+                        className={`expand-button ${openRow === idx ? "expanded" : ""
+                          }`}
                         onClick={() => setOpenRow(openRow === idx ? null : idx)}
                       >
                         <svg
@@ -510,10 +508,9 @@ const Subtasks = () => {
                     </td>
                     <td>
                       <span
-                        className={`status-badge status-${
-                          project.status?.toLowerCase().replace(" ", "-") ||
+                        className={`status-badge status-${project.status?.toLowerCase().replace(" ", "-") ||
                           "default"
-                        }`}
+                          }`}
                       >
                         <span className="status-dot"></span>
                         {project.status}
@@ -533,7 +530,7 @@ const Subtasks = () => {
                           const statusMatch =
                             filters.status === "Status" ||
                             s.status?.toLowerCase() ===
-                              filters.status.toLowerCase();
+                            filters.status.toLowerCase();
 
                           const employeeMatch =
                             filters.employee === "Employee" ||
@@ -560,10 +557,9 @@ const Subtasks = () => {
                     })()}
                     <td>
                       <span
-                        className={`priority-badge priority-${
-                          project.priority?.toLowerCase().replace(" ", "-") ||
+                        className={`priority-badge priority-${project.priority?.toLowerCase().replace(" ", "-") ||
                           "default"
-                        }`}
+                          }`}
                       >
                         {project.priority}
                       </span>
@@ -689,7 +685,7 @@ const Subtasks = () => {
                                   const statusMatch =
                                     filters.status === "Status" ||
                                     s.status?.toLowerCase() ===
-                                      filters.status.toLowerCase();
+                                    filters.status.toLowerCase();
 
                                   const employeeMatch =
                                     filters.employee === "Employee" ||
@@ -735,11 +731,10 @@ const Subtasks = () => {
                                     </td>
                                     <td>
                                       <span
-                                        className={`status-badge status-${
-                                          s.status
+                                        className={`status-badge status-${s.status
                                             ?.toLowerCase()
                                             .replace(" ", "-") || "default"
-                                        }`}
+                                          }`}
                                       >
                                         <span className="status-dot"></span>
                                         {s.status}
@@ -747,18 +742,17 @@ const Subtasks = () => {
                                     </td>
                                     <td>
                                       <span
-                                        className={`priority-badge priority-${
-                                          s.priority
+                                        className={`priority-badge priority-${s.priority
                                             ?.toLowerCase()
                                             .replace(" ", "-") || "default"
-                                        }`}
+                                          }`}
                                       >
                                         {s.priority}
                                       </span>
                                     </td>
                                     <td>
                                       {Array.isArray(s.stages) &&
-                                      s.stages.length > 0 ? (
+                                        s.stages.length > 0 ? (
                                         <div className="stages-container">
                                           {s.stages.map((stg, i) => {
                                             const name =
@@ -772,11 +766,10 @@ const Subtasks = () => {
                                                 className="stage-flow"
                                               >
                                                 <span
-                                                  className={`stage-badge ${
-                                                    completed
+                                                  className={`stage-badge ${completed
                                                       ? "completed"
                                                       : "pending"
-                                                  }`}
+                                                    }`}
                                                 >
                                                   {completed && (
                                                     <span className="check-icon">

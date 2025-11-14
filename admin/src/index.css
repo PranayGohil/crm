@@ -826,7 +826,7 @@ input:focus-visible {
   gap: 4px;
 }
 
-.md-up-arrow-grenn > div {
+.md-up-arrow-grenn>div {
   font-weight: 400;
   font-size: 14px;
   line-height: 20px;
@@ -906,7 +906,7 @@ input:focus-visible {
   justify-content: space-between;
 }
 
-.md-btn-cio > div {
+.md-btn-cio>div {
   padding: 4px 11px;
   font-weight: 400;
   font-size: 12px;
@@ -2488,8 +2488,7 @@ input[type="checkbox"]:checked::after {
   margin-bottom: 24px !important;
 }
 
-.pe-enter-pass {
-}
+.pe-enter-pass {}
 
 .enter-pass {
   display: flex;
@@ -4616,8 +4615,7 @@ textarea {
   box-shadow: 0px 1px 2px 0px #0000000d;
 }
 
-.sms-add_gen-task-inner {
-}
+.sms-add_gen-task-inner {}
 
 .sms-add_task-heading h2 {
   font-family: "Inter", sans-serif;
@@ -6543,8 +6541,7 @@ textarea {
   color: #4b5563;
 }
 
-.pb-sec2 {
-}
+.pb-sec2 {}
 
 .pb-sec2-heading {
   display: flex;
@@ -7677,8 +7674,7 @@ textarea {
     padding-right: 10px;
   }
 
-  .emp-detail-header {
-  }
+  .emp-detail-header {}
 
   .main-2 {
     display: grid;
@@ -7990,7 +7986,8 @@ a {
 }
 
 .confirm-btn {
-  background-color: #e74c3c; /* red */
+  background-color: #e74c3c;
+  /* red */
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -7999,7 +7996,8 @@ a {
 }
 
 .cancel-btn {
-  background-color: #bdc3c7; /* grey */
+  background-color: #bdc3c7;
+  /* grey */
   color: black;
   border: none;
   padding: 0.5rem 1rem;
@@ -8360,6 +8358,16 @@ a {
   border-radius: 50%;
 }
 
+.status-to-do {
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #e9ecef;
+}
+
+.status-to-do .status-dot {
+  background: #6c757d;
+}
+
 .status-completed {
   background: #d4edda;
   color: #155724;
@@ -8371,19 +8379,29 @@ a {
 }
 
 .status-in-progress {
-  background: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
+  background: #dbeafe;
+  color: #1e5dcb;
+  border: 1px solid #1e5dcb;
 }
 
 .status-in-progress .status-dot {
-  background: #ffc107;
+  background: #1e5dcb;
 }
 
 .status-pending {
   background: #f8f9fa;
   color: #6c757d;
   border: 1px solid #e9ecef;
+}
+
+.status-paused {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.status-paused .status-dot {
+  background: #856404;
 }
 
 .status-pending .status-dot {
