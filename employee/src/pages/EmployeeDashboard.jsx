@@ -148,9 +148,21 @@ const EmployeeDashboard = () => {
       let filteredSubtasks = res.data.subtasks || [];
 
       if (statusFilter !== "All") {
-        filteredSubtasks = filteredSubtasks.filter(
-          (t) => (t.status || "").toLowerCase() === statusFilter.toLowerCase()
-        );
+        filteredSubtasks = filteredSubtasks.filter((t) => {
+          // Apply the same display logic as in the UI
+          const assignToId = t.assign_to?.toString?.() || t.assign_to;
+          const showCompletedForEmployee =
+            (!assignToId && t.completedByEmployee) ||
+            (assignToId &&
+              assignToId !== currentEmployeeId &&
+              t.completedByEmployee);
+
+          const displayStatus = showCompletedForEmployee
+            ? "Completed"
+            : t.status || "";
+
+          return displayStatus.toLowerCase() === statusFilter.toLowerCase();
+        });
       }
 
       if (priorityFilter !== "All") {
@@ -328,11 +340,10 @@ const EmployeeDashboard = () => {
             {filterOptions.map((label) => (
               <button
                 key={label}
-                className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                  selectedFilter === label
+                className={`px-4 py-2 rounded-lg text-sm font-medium ${selectedFilter === label
                     ? "bg-blue-600 text-white"
                     : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                }`}
+                  }`}
                 onClick={() => setSelectedFilter(label)}
               >
                 {label}
@@ -459,25 +470,23 @@ const EmployeeDashboard = () => {
                 return (
                   <React.Fragment key={project._id}>
                     <tr
-                      className={`time-table-row ${
-                        projectSubtasks.some(
-                          (task) =>
-                            task.status === "In Progress" &&
-                            runningTimers[task._id]
-                        )
+                      className={`time-table-row ${projectSubtasks.some(
+                        (task) =>
+                          task.status === "In Progress" &&
+                          runningTimers[task._id]
+                      )
                           ? "highlight-running"
                           : ""
-                      }`}
+                        }`}
                     >
                       <td>
                         <img
                           src="/SVG/arrow.svg"
                           alt="arrow"
-                          className={`time-table-toggle-btn ${
-                            expandedProjectId === project._id
+                          className={`time-table-toggle-btn ${expandedProjectId === project._id
                               ? "rotate-down"
                               : ""
-                          }`}
+                            }`}
                           onClick={() => toggleTable(project._id)}
                         />
                       </td>
@@ -558,11 +567,10 @@ const EmployeeDashboard = () => {
                       </td>
                     </tr>
                     <tr
-                      className={`time-table-subtask-row ${
-                        expandedProjectId === project._id
+                      className={`time-table-subtask-row ${expandedProjectId === project._id
                           ? ""
                           : "time-table-hidden"
-                      }`}
+                        }`}
                     >
                       <td colSpan="10">
                         <table className="time-table-subtable time-table-subtable-left">
@@ -632,27 +640,26 @@ const EmployeeDashboard = () => {
                               return (
                                 <tr
                                   key={task._id}
-                                  className={`subtask-row ${
-                                    task.status === "In Progress" &&
-                                    runningTimers[task._id]
+                                  className={`subtask-row ${task.status === "In Progress" &&
+                                      runningTimers[task._id]
                                       ? "highlight-running"
                                       : ""
-                                  }`}
+                                    }`}
                                 >
                                   <td></td>
                                   <td>{task.task_name}</td>
                                   <td>
                                     {task.assign_date
                                       ? dayjs(task.assign_date).format(
-                                          "DD/MM/YYYY"
-                                        )
+                                        "DD/MM/YYYY"
+                                      )
                                       : "-"}
                                   </td>
                                   <td>
                                     {task.due_date
                                       ? dayjs(task.due_date).format(
-                                          "DD/MM/YYYY"
-                                        )
+                                        "DD/MM/YYYY"
+                                      )
                                       : "-"}
                                   </td>
                                   <td>
@@ -736,7 +743,7 @@ const EmployeeDashboard = () => {
 
                                   <td>
                                     {task.employeeCompletedStages &&
-                                    task.employeeCompletedStages.length > 0 ? (
+                                      task.employeeCompletedStages.length > 0 ? (
                                       <div>
                                         {task.employeeCompletedStages.map(
                                           (stageName, idx) => (
@@ -778,43 +785,43 @@ const EmployeeDashboard = () => {
                                         )}
                                       </div>
                                     ) : // if none completed by employee, show the current stage as before:
-                                    Array.isArray(task.stages) &&
-                                      task.stages.length > 0 &&
-                                      task.current_stage_index !== undefined ? (
-                                      (() => {
-                                        const currentStage =
-                                          task.stages[task.current_stage_index];
-                                        const name =
-                                          typeof currentStage === "string"
-                                            ? currentStage
-                                            : currentStage.name;
-                                        const completed =
-                                          currentStage?.completed;
-                                        return (
-                                          <small
-                                            style={{
-                                              padding: "6px 12px",
-                                              borderRadius: "12px",
-                                              background: completed
-                                                ? "#e6ffed"
-                                                : "#f3f4f6",
-                                              color: completed
-                                                ? "#097a3f"
-                                                : "#444",
-                                              border: completed
-                                                ? "1px solid #b7f0c6"
-                                                : "1px solid #e0e0e0",
-                                              fontSize: "12px",
-                                            }}
-                                          >
-                                            {completed ? "✓ " : ""}
-                                            {name}
-                                          </small>
-                                        );
-                                      })()
-                                    ) : (
-                                      "No current stage"
-                                    )}
+                                      Array.isArray(task.stages) &&
+                                        task.stages.length > 0 &&
+                                        task.current_stage_index !== undefined ? (
+                                        (() => {
+                                          const currentStage =
+                                            task.stages[task.current_stage_index];
+                                          const name =
+                                            typeof currentStage === "string"
+                                              ? currentStage
+                                              : currentStage.name;
+                                          const completed =
+                                            currentStage?.completed;
+                                          return (
+                                            <small
+                                              style={{
+                                                padding: "6px 12px",
+                                                borderRadius: "12px",
+                                                background: completed
+                                                  ? "#e6ffed"
+                                                  : "#f3f4f6",
+                                                color: completed
+                                                  ? "#097a3f"
+                                                  : "#444",
+                                                border: completed
+                                                  ? "1px solid #b7f0c6"
+                                                  : "1px solid #e0e0e0",
+                                                fontSize: "12px",
+                                              }}
+                                            >
+                                              {completed ? "✓ " : ""}
+                                              {name}
+                                            </small>
+                                          );
+                                        })()
+                                      ) : (
+                                        "No current stage"
+                                      )}
                                   </td>
 
                                   <td
@@ -885,13 +892,12 @@ const EmployeeDashboard = () => {
                                   </td>
                                   <td className="ttb-table-pause">
                                     {task.status === "In Progress" ||
-                                    !anotherTaskRunning ? (
+                                      !anotherTaskRunning ? (
                                       <div
-                                        className={`ttb-table-pause-inner ${
-                                          task.status === "In Progress"
+                                        className={`ttb-table-pause-inner ${task.status === "In Progress"
                                             ? "ttb-stop-bg-color"
                                             : "ttb-start-bg-color"
-                                        }`}
+                                          }`}
                                         onClick={() =>
                                           handleChangeStatus(
                                             task,
