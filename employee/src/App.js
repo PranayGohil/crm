@@ -20,6 +20,8 @@ import ProjectDetails from "./pages/ProjectDetails";
 
 import Subtasks from "./pages/Subtasks";
 import TimeTrackingDashboard from "./pages/TimeTrackingDashboard";
+import EmployeeCompletedTasks from "./pages/EmployeeCompletedTasks";
+import EmployeeActivityDashboard from "./pages/EmployeeActivityDashboard";
 
 import ProjectMediaGallery from "./pages/ProjectMediaGallery";
 
@@ -53,6 +55,11 @@ function App() {
             element={<ProjectMediaGallery />}
           />
           <Route path="/time-tracking" element={<EmployeeTimeTracking />} />
+          <Route
+            path="/completed-tasks"
+            element={<EmployeeCompletedTasks />}
+          />
+          <Route path="/activity-history" element={<EmployeeActivityDashboard />} />
           <Route path="/notifications" element={<EmployeeNotificationPage />} />
 
           <Route path="/subtasks" element={<Subtasks />} />

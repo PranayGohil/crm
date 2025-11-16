@@ -29,6 +29,7 @@ const EmployeeDashboard = () => {
       bgClass: "bg-yellow-100",
       label: "Completed",
       value: "0",
+      link: "/completed-tasks",
     },
     {
       icon: "/SVG/time-blue.svg",

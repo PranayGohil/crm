@@ -11,6 +11,8 @@ import {
   getEmployeeTasks,
   getEmployeeDashboardData,
   getManagers,
+  getEmployeeCompletedTasks,
+  getEmployeeActivityHistory,
 } from "../controllers/employeeController.js";
 import upload from "../middlewares/upload.js";
 
@@ -27,5 +29,7 @@ employeeRouter.post("/edit/:id", upload.single("profile_pic"), editEmployee);
 employeeRouter.get("/tasks/:employeeId", getEmployeeTasks);
 employeeRouter.get("/dashboard/:employeeId", getEmployeeDashboardData);
 employeeRouter.get("/managers", getManagers);
+employeeRouter.get("/completed-tasks/:employeeId", getEmployeeCompletedTasks);
+employeeRouter.get("/activity-history/:employeeId", getEmployeeActivityHistory);
 
 export default employeeRouter;

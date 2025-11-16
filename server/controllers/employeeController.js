@@ -3,6 +3,7 @@ import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
 import Designation from "../models/designationModel.js";
 import jwt from "jsonwebtoken";
+import moment from "moment";
 
 import mongoose from "mongoose";
 
@@ -397,5 +398,217 @@ export const getManagers = async (req, res) => {
     res.json({ success: true, data: managers });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Controller for getting employee completed tasks
+export const getEmployeeCompletedTasks = async (req, res) => {
+  try {
+    const { employeeId } = req.params;
+
+    // Find all subtasks where this employee completed at least one stage
+    const subtasks = await SubTask.find({
+      "stages.completed_by": employeeId,
+    }).populate("project_id", "project_name");
+
+    // Transform the data to show each completed stage as a separate entry
+    const completedTasks = [];
+
+    subtasks.forEach((subtask) => {
+      // Filter stages completed by this employee
+      const completedStages = subtask.stages.filter(
+        (stage) =>
+          stage.completed &&
+          stage.completed_by &&
+          stage.completed_by.toString() === employeeId
+      );
+
+      // For each completed stage, create an entry
+      completedStages.forEach((stage) => {
+        // Calculate time spent by this employee on this subtask
+        let totalTimeInSeconds = 0;
+        subtask.time_logs?.forEach((log) => {
+          if (
+            log.start_time &&
+            log.end_time &&
+            log.user_id &&
+            log.user_id.toString() === employeeId
+          ) {
+            const diff = moment(log.end_time).diff(
+              moment(log.start_time),
+              "seconds"
+            );
+            totalTimeInSeconds += diff;
+          }
+        });
+
+        // Format time spent
+        const duration = moment.duration(totalTimeInSeconds, "seconds");
+        const hours = Math.floor(duration.asHours());
+        const minutes = duration.minutes();
+        const seconds = duration.seconds();
+        const timeSpent = `${hours}h ${minutes}m ${seconds}s`;
+
+        completedTasks.push({
+          task_id: subtask._id,
+          task_name: subtask.task_name,
+          project_id: subtask.project_id._id,
+          project_name: subtask.project_id.project_name,
+          stage_name: stage.name,
+          completed_at: stage.completed_at,
+          timeSpent: timeSpent,
+          timeSpentSeconds: totalTimeInSeconds,
+          priority: subtask.priority,
+          status: subtask.status,
+        });
+      });
+    });
+
+    // Sort by completion date (most recent first)
+    completedTasks.sort(
+      (a, b) => new Date(b.completed_at) - new Date(a.completed_at)
+    );
+
+    res.json(completedTasks);
+  } catch (error) {
+    console.error("Error fetching employee completed tasks:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const getEmployeeActivityHistory = async (req, res) => {
+  try {
+    const { employeeId } = req.params;
+
+    // Find all subtasks where this employee is involved
+    const subtasks = await SubTask.find({
+      $or: [
+        { assign_to: employeeId },
+        { "stages.completed_by": employeeId },
+        { "time_logs.user_id": employeeId },
+      ],
+    }).populate("project_id", "project_name");
+
+    const activities = [];
+
+    subtasks.forEach((subtask) => {
+      const projectName = subtask.project_id?.project_name || "Unknown Project";
+      const taskName = subtask.task_name;
+      const taskId = subtask._id;
+
+      // 1. Task Assignment Activity
+      if (
+        subtask.assign_to &&
+        subtask.assign_to.toString() === employeeId &&
+        subtask.assign_date
+      ) {
+        activities.push({
+          type: "task_assigned",
+          timestamp: subtask.assign_date,
+          task_name: taskName,
+          task_id: taskId,
+          project_name: projectName,
+          details: `Task assigned to you`,
+        });
+      }
+
+      // 2. Time Log Activities (Started/Paused)
+      subtask.time_logs?.forEach((log) => {
+        if (log.user_id && log.user_id.toString() === employeeId) {
+          // Task Started
+          if (log.start_time) {
+            activities.push({
+              type: "task_started",
+              timestamp: log.start_time,
+              task_name: taskName,
+              task_id: taskId,
+              project_name: projectName,
+              details: `Started working on task`,
+            });
+          }
+
+          // Task Paused
+          if (log.end_time) {
+            const duration = moment.duration(
+              moment(log.end_time).diff(moment(log.start_time))
+            );
+            const hours = Math.floor(duration.asHours());
+            const minutes = duration.minutes();
+            const seconds = duration.seconds();
+            const durationFormatted = `${hours}h ${minutes}m ${seconds}s`;
+            const durationSeconds = duration.asSeconds();
+
+            activities.push({
+              type: "task_paused",
+              timestamp: log.end_time,
+              task_name: taskName,
+              task_id: taskId,
+              project_name: projectName,
+              duration: durationFormatted,
+              duration_seconds: durationSeconds,
+              details: `Paused task after working for ${durationFormatted}`,
+            });
+          }
+        }
+      });
+
+      // 3. Stage Completion Activities
+      subtask.stages?.forEach((stage) => {
+        if (
+          stage.completed &&
+          stage.completed_by &&
+          stage.completed_by.toString() === employeeId &&
+          stage.completed_at
+        ) {
+          // Calculate time spent on this stage
+          const stageLogs = subtask.time_logs?.filter(
+            (log) =>
+              log.user_id &&
+              log.user_id.toString() === employeeId &&
+              log.start_time &&
+              log.end_time
+          );
+
+          let totalSeconds = 0;
+          stageLogs?.forEach((log) => {
+            totalSeconds += moment(log.end_time).diff(
+              moment(log.start_time),
+              "seconds"
+            );
+          });
+
+          const duration = moment.duration(totalSeconds, "seconds");
+          const hours = Math.floor(duration.asHours());
+          const minutes = duration.minutes();
+          const durationFormatted = `${hours}h ${minutes}m`;
+
+          activities.push({
+            type: "stage_completed",
+            timestamp: stage.completed_at,
+            task_name: taskName,
+            task_id: taskId,
+            project_name: projectName,
+            stage_name: stage.name,
+            duration: durationFormatted,
+            duration_seconds: totalSeconds,
+            details: `Completed "${stage.name}" stage`,
+          });
+        }
+      });
+
+      // 4. Status Changes (can be inferred from time logs pattern)
+      // We can add status change tracking if you have a status_history field
+    });
+
+    // Sort activities by timestamp (most recent first)
+    activities.sort((a, b) => moment(b.timestamp).diff(moment(a.timestamp)));
+
+    res.json({
+      activities,
+      employee_id: employeeId,
+    });
+  } catch (error) {
+    console.error("Error fetching employee activity history:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };

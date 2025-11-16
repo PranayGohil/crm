@@ -1,7 +1,6 @@
 // EmployeeTimeTracking.jsx
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 import { Modal, Button } from "react-bootstrap";
@@ -125,9 +124,14 @@ const EmployeeTimeTracking = () => {
     }, 0),
   };
 
-  const totalTimeTrackedFormatted = moment
-    .utc(summaryData.totalTimeTracked * 1000)
-    .format("HH:mm:ss");
+  const duration = moment.duration(summaryData.totalTimeTracked, "seconds");
+
+  const days = Math.floor(duration.asDays());
+  const hours = duration.hours();
+  const minutes = duration.minutes();
+  const seconds = duration.seconds();
+
+  const totalTimeTrackedFormatted = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
   if (loading) return <LoadingOverlay />;
 

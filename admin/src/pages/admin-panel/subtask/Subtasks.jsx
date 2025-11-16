@@ -36,6 +36,120 @@ const Subtasks = () => {
     employee: "Employee",
   });
 
+  // Add these state variables at the top with your other useState declarations
+  const [sortConfig, setSortConfig] = useState({
+    key: null, // 'name' or 'dueDate'
+    direction: "asc", // 'asc' or 'desc'
+  });
+
+  // Add this sorting function after your other helper functions
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Natural sort function for alphanumeric strings
+  const naturalSort = (a, b) => {
+    const regex = /(\d+)|(\D+)/g;
+    const aParts = a.match(regex) || [];
+    const bParts = b.match(regex) || [];
+
+    for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+      const aPart = aParts[i] || "";
+      const bPart = bParts[i] || "";
+
+      const aIsNum = /^\d+$/.test(aPart);
+      const bIsNum = /^\d+$/.test(bPart);
+
+      if (aIsNum && bIsNum) {
+        const diff = parseInt(aPart, 10) - parseInt(bPart, 10);
+        if (diff !== 0) return diff;
+      } else {
+        const diff = aPart.localeCompare(bPart);
+        if (diff !== 0) return diff;
+      }
+    }
+    return 0;
+  };
+
+  // Add this function to sort the subtasks
+  const getSortedSubtasks = (subtasks) => {
+    if (!sortConfig.key || !subtasks) return subtasks;
+
+    const sorted = [...subtasks].sort((a, b) => {
+      if (sortConfig.key === "name") {
+        const nameA = (a.task_name || "").toLowerCase();
+        const nameB = (b.task_name || "").toLowerCase();
+
+        const result = naturalSort(nameA, nameB);
+        return sortConfig.direction === "asc" ? result : -result;
+      }
+
+      if (sortConfig.key === "dueDate") {
+        const dateA = a.due_date ? new Date(a.due_date).getTime() : 0;
+        const dateB = b.due_date ? new Date(b.due_date).getTime() : 0;
+
+        if (dateA === 0 && dateB === 0) return 0;
+        if (dateA === 0) return 1; // Move null dates to end
+        if (dateB === 0) return -1;
+
+        return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
+      }
+
+      return 0;
+    });
+
+    return sorted;
+  };
+
+  // Add this helper component for the sort icon
+  const SortIcon = ({ columnKey }) => {
+    if (sortConfig.key !== columnKey) {
+      return (
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          style={{ opacity: 0.3, marginLeft: "4px" }}
+        >
+          <path d="M12 5v14M5 12l7 7 7-7" />
+        </svg>
+      );
+    }
+
+    return sortConfig.direction === "asc" ? (
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        style={{ marginLeft: "4px" }}
+      >
+        <path d="M12 19V5M5 12l7-7 7 7" />
+      </svg>
+    ) : (
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        style={{ marginLeft: "4px" }}
+      >
+        <path d="M12 5v14M5 12l7 7 7-7" />
+      </svg>
+    );
+  };
+
   const fetchAll = async () => {
     try {
       const [projectsRes, clientsRes, employeesRes] = await Promise.all([
@@ -295,16 +409,17 @@ const Subtasks = () => {
                 Object.entries(summary.tasksByStage).map(([stage, count]) => (
                   <div
                     key={stage}
-                    className={`px-3 py-1 text-sm font-medium rounded-full ${stage === "CAD Design"
+                    className={`px-3 py-1 text-sm font-medium rounded-full ${
+                      stage === "CAD Design"
                         ? "bg-blue-100 text-blue-800"
                         : stage === "SET Design"
-                          ? "bg-green-100 text-green-800"
-                          : stage === "Render"
-                            ? "bg-purple-100 text-purple-800"
-                            : stage === "QC"
-                              ? "bg-cyan-100 text-cyan-800"
-                              : "bg-gray-100 text-gray-800"
-                      }`}
+                        ? "bg-green-100 text-green-800"
+                        : stage === "Render"
+                        ? "bg-purple-100 text-purple-800"
+                        : stage === "QC"
+                        ? "bg-cyan-100 text-cyan-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
                   >
                     {count} {stage} Tasks Remaining
                   </div>
@@ -475,8 +590,9 @@ const Subtasks = () => {
                   <tr className="project-row">
                     <td>
                       <button
-                        className={`expand-button ${openRow === idx ? "expanded" : ""
-                          }`}
+                        className={`expand-button ${
+                          openRow === idx ? "expanded" : ""
+                        }`}
                         onClick={() => setOpenRow(openRow === idx ? null : idx)}
                       >
                         <svg
@@ -508,9 +624,10 @@ const Subtasks = () => {
                     </td>
                     <td>
                       <span
-                        className={`status-badge status-${project.status?.toLowerCase().replace(" ", "-") ||
+                        className={`status-badge status-${
+                          project.status?.toLowerCase().replace(" ", "-") ||
                           "default"
-                          }`}
+                        }`}
                       >
                         <span className="status-dot"></span>
                         {project.status}
@@ -530,7 +647,7 @@ const Subtasks = () => {
                           const statusMatch =
                             filters.status === "Status" ||
                             s.status?.toLowerCase() ===
-                            filters.status.toLowerCase();
+                              filters.status.toLowerCase();
 
                           const employeeMatch =
                             filters.employee === "Employee" ||
@@ -557,9 +674,10 @@ const Subtasks = () => {
                     })()}
                     <td>
                       <span
-                        className={`priority-badge priority-${project.priority?.toLowerCase().replace(" ", "-") ||
+                        className={`priority-badge priority-${
+                          project.priority?.toLowerCase().replace(" ", "-") ||
                           "default"
-                          }`}
+                        }`}
                       >
                         {project.priority}
                       </span>
@@ -659,21 +777,55 @@ const Subtasks = () => {
                                     }}
                                   />
                                 </th>
-                                <th>Subtask Name</th>
+                                <th
+                                  onClick={() => handleSort("name")}
+                                  style={{
+                                    cursor: "pointer",
+                                    userSelect: "none",
+                                  }}
+                                  className="sortable-header"
+                                >
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    Subtask Name
+                                    <SortIcon columnKey="name" />
+                                  </div>
+                                </th>
                                 <th>Status</th>
                                 <th>Priority</th>
                                 <th>Stages</th>
                                 <th>URL</th>
                                 <th>Assigned To</th>
                                 <th>Time Tracked</th>
-                                <th>Due Date</th>
+                                <th
+                                  onClick={() => handleSort("dueDate")}
+                                  style={{
+                                    cursor: "pointer",
+                                    userSelect: "none",
+                                  }}
+                                  className="sortable-header"
+                                >
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    Due Date
+                                    <SortIcon columnKey="dueDate" />
+                                  </div>
+                                </th>
                                 <th>Remaining</th>
                                 <th>Actions</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {project.subtasks
-                                ?.filter((s) => {
+                              {getSortedSubtasks(
+                                project.subtasks?.filter((s) => {
                                   const stageMatch =
                                     filters.stage === "Stage" ||
                                     s.stages?.some(
@@ -685,7 +837,7 @@ const Subtasks = () => {
                                   const statusMatch =
                                     filters.status === "Status" ||
                                     s.status?.toLowerCase() ===
-                                    filters.status.toLowerCase();
+                                      filters.status.toLowerCase();
 
                                   const employeeMatch =
                                     filters.employee === "Employee" ||
@@ -696,233 +848,231 @@ const Subtasks = () => {
                                     stageMatch && statusMatch && employeeMatch
                                   );
                                 })
-                                .map((s, sIdx) => (
-                                  <tr key={s.id}>
-                                    <td>
-                                      <input
-                                        type="checkbox"
-                                        className="checkbox-input"
-                                        checked={selectedTaskIds.includes(s.id)}
-                                        onChange={(e) => {
-                                          if (e.target.checked) {
-                                            setSelectedTaskIds([
-                                              ...selectedTaskIds,
-                                              s.id,
-                                            ]);
-                                          } else {
-                                            setSelectedTaskIds(
-                                              selectedTaskIds.filter(
-                                                (id) => id !== s.id
-                                              )
-                                            );
-                                          }
-                                        }}
-                                      />
-                                    </td>
-                                    <td>
-                                      <div className="task-name-cell">
-                                        <span
-                                          className="task-name-text"
-                                          title={s.task_name}
-                                        >
-                                          {s.task_name}
-                                        </span>
-                                      </div>
-                                    </td>
-                                    <td>
+                              ).map((s, sIdx) => (
+                                <tr key={s.id}>
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      className="checkbox-input"
+                                      checked={selectedTaskIds.includes(s.id)}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                          setSelectedTaskIds([
+                                            ...selectedTaskIds,
+                                            s.id,
+                                          ]);
+                                        } else {
+                                          setSelectedTaskIds(
+                                            selectedTaskIds.filter(
+                                              (id) => id !== s.id
+                                            )
+                                          );
+                                        }
+                                      }}
+                                    />
+                                  </td>
+                                  <td>
+                                    <div className="task-name-cell">
                                       <span
-                                        className={`status-badge status-${s.status
-                                            ?.toLowerCase()
-                                            .replace(" ", "-") || "default"
-                                          }`}
+                                        className="task-name-text"
+                                        title={s.task_name}
                                       >
-                                        <span className="status-dot"></span>
-                                        {s.status}
+                                        {s.task_name}
                                       </span>
-                                    </td>
-                                    <td>
-                                      <span
-                                        className={`priority-badge priority-${s.priority
-                                            ?.toLowerCase()
-                                            .replace(" ", "-") || "default"
-                                          }`}
-                                      >
-                                        {s.priority}
-                                      </span>
-                                    </td>
-                                    <td>
-                                      {Array.isArray(s.stages) &&
-                                        s.stages.length > 0 ? (
-                                        <div className="stages-container">
-                                          {s.stages.map((stg, i) => {
-                                            const name =
-                                              typeof stg === "string"
-                                                ? stg
-                                                : stg.name;
-                                            const completed = stg?.completed;
-                                            return (
-                                              <div
-                                                key={i}
-                                                className="stage-flow"
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <span
+                                      className={`status-badge status-${
+                                        s.status
+                                          ?.toLowerCase()
+                                          .replace(" ", "-") || "default"
+                                      }`}
+                                    >
+                                      <span className="status-dot"></span>
+                                      {s.status}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span
+                                      className={`priority-badge priority-${
+                                        s.priority
+                                          ?.toLowerCase()
+                                          .replace(" ", "-") || "default"
+                                      }`}
+                                    >
+                                      {s.priority}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    {Array.isArray(s.stages) &&
+                                    s.stages.length > 0 ? (
+                                      <div className="stages-container">
+                                        {s.stages.map((stg, i) => {
+                                          const name =
+                                            typeof stg === "string"
+                                              ? stg
+                                              : stg.name;
+                                          const completed = stg?.completed;
+                                          return (
+                                            <div key={i} className="stage-flow">
+                                              <span
+                                                className={`stage-badge ${
+                                                  completed
+                                                    ? "completed"
+                                                    : "pending"
+                                                }`}
                                               >
-                                                <span
-                                                  className={`stage-badge ${completed
-                                                      ? "completed"
-                                                      : "pending"
-                                                    }`}
-                                                >
-                                                  {completed && (
-                                                    <span className="check-icon">
-                                                      ✓
-                                                    </span>
-                                                  )}
-                                                  {name}
-                                                </span>
-                                                {i < s.stages.length - 1 && (
-                                                  <span className="stage-arrow">
-                                                    →
+                                                {completed && (
+                                                  <span className="check-icon">
+                                                    ✓
                                                   </span>
                                                 )}
-                                              </div>
-                                            );
-                                          })}
-                                        </div>
-                                      ) : (
-                                        <span className="no-data">
-                                          No stages
-                                        </span>
-                                      )}
-                                    </td>
-                                    <td>
-                                      {s.url ? (
-                                        <div
-                                          className="url-cell"
-                                          onClick={(e) =>
-                                            handleCopyToClipboard(s.url, e)
-                                          }
-                                          title="Click to copy • Ctrl+Click to open"
-                                        >
-                                          <span className="url-text">
-                                            {s.url}
-                                          </span>
-                                          <div className="copy-icon-wrapper">
-                                            <svg
-                                              className="copy-icon"
-                                              viewBox="0 0 24 24"
-                                              fill="none"
-                                              stroke="currentColor"
-                                              strokeWidth="2"
-                                            >
-                                              <rect
-                                                x="9"
-                                                y="9"
-                                                width="13"
-                                                height="13"
-                                                rx="2"
-                                                ry="2"
-                                              ></rect>
-                                              <path d="m5 15-4-4 4-4"></path>
-                                            </svg>
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <span className="no-data">No URL</span>
-                                      )}
-                                    </td>
-                                    <td>
-                                      {(() => {
-                                        const assignedEmp = employees.find(
-                                          (emp) => emp._id === s.assign_to
-                                        );
-                                        if (!assignedEmp)
-                                          return (
-                                            <span className="no-data">
-                                              Unassigned
-                                            </span>
+                                                {name}
+                                              </span>
+                                              {i < s.stages.length - 1 && (
+                                                <span className="stage-arrow">
+                                                  →
+                                                </span>
+                                              )}
+                                            </div>
                                           );
-
-                                        const firstLetter =
-                                          assignedEmp.full_name
-                                            ?.charAt(0)
-                                            .toUpperCase() || "?";
-
-                                        return (
-                                          <div className="assignee-cell">
-                                            {assignedEmp.profile_pic ? (
-                                              <img
-                                                src={assignedEmp.profile_pic}
-                                                alt={assignedEmp.full_name}
-                                                className="assignee-avatar"
-                                              />
-                                            ) : (
-                                              <div className="assignee-avatar-placeholder">
-                                                {firstLetter}
-                                              </div>
-                                            )}
-                                            <span className="assignee-name">
-                                              {assignedEmp.full_name}
-                                            </span>
-                                          </div>
-                                        );
-                                      })()}
-                                    </td>
-                                    <td>
-                                      <span className="time-cell">
-                                        {calculateTimeTracked(s.time_logs)}
-                                      </span>
-                                    </td>
-                                    <td>
-                                      <span className="date-cell">
-                                        {s.due_date
-                                          ? formateDate(s.due_date)
-                                          : "-"}
-                                      </span>
-                                    </td>
-                                    <td>
-                                      <span className="remaining-time">
-                                        {getRemainingDays(s.due_date)}
-                                      </span>
-                                    </td>
-                                    <td>
-                                      <div className="actions-cell">
-                                        <Link
-                                          to={`/project/subtask/edit/${s.id}`}
-                                          className="action-btn edit-btn"
-                                          title="Edit"
-                                        >
-                                          <svg
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                          </svg>
-                                        </Link>
-                                        <Link
-                                          to={`/subtask/view/${s.id}`}
-                                          className="action-btn view-btn"
-                                          title="View"
-                                        >
-                                          <svg
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                            <circle
-                                              cx="12"
-                                              cy="12"
-                                              r="3"
-                                            ></circle>
-                                          </svg>
-                                        </Link>
+                                        })}
                                       </div>
-                                    </td>
-                                  </tr>
-                                ))}
+                                    ) : (
+                                      <span className="no-data">No stages</span>
+                                    )}
+                                  </td>
+                                  <td>
+                                    {s.url ? (
+                                      <div
+                                        className="url-cell"
+                                        onClick={(e) =>
+                                          handleCopyToClipboard(s.url, e)
+                                        }
+                                        title="Click to copy • Ctrl+Click to open"
+                                      >
+                                        <span className="url-text">
+                                          {s.url}
+                                        </span>
+                                        <div className="copy-icon-wrapper">
+                                          <svg
+                                            className="copy-icon"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                          >
+                                            <rect
+                                              x="9"
+                                              y="9"
+                                              width="13"
+                                              height="13"
+                                              rx="2"
+                                              ry="2"
+                                            ></rect>
+                                            <path d="m5 15-4-4 4-4"></path>
+                                          </svg>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <span className="no-data">No URL</span>
+                                    )}
+                                  </td>
+                                  <td>
+                                    {(() => {
+                                      const assignedEmp = employees.find(
+                                        (emp) => emp._id === s.assign_to
+                                      );
+                                      if (!assignedEmp)
+                                        return (
+                                          <span className="no-data">
+                                            Unassigned
+                                          </span>
+                                        );
+
+                                      const firstLetter =
+                                        assignedEmp.full_name
+                                          ?.charAt(0)
+                                          .toUpperCase() || "?";
+
+                                      return (
+                                        <div className="assignee-cell">
+                                          {assignedEmp.profile_pic ? (
+                                            <img
+                                              src={assignedEmp.profile_pic}
+                                              alt={assignedEmp.full_name}
+                                              className="assignee-avatar"
+                                            />
+                                          ) : (
+                                            <div className="assignee-avatar-placeholder">
+                                              {firstLetter}
+                                            </div>
+                                          )}
+                                          <span className="assignee-name">
+                                            {assignedEmp.full_name}
+                                          </span>
+                                        </div>
+                                      );
+                                    })()}
+                                  </td>
+                                  <td>
+                                    <span className="time-cell">
+                                      {calculateTimeTracked(s.time_logs)}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span className="date-cell">
+                                      {s.due_date
+                                        ? formateDate(s.due_date)
+                                        : "-"}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span className="remaining-time">
+                                      {getRemainingDays(s.due_date)}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <div className="actions-cell">
+                                      <Link
+                                        to={`/project/subtask/edit/${s.id}`}
+                                        className="action-btn edit-btn"
+                                        title="Edit"
+                                      >
+                                        <svg
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                        >
+                                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                          <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                        </svg>
+                                      </Link>
+                                      <Link
+                                        to={`/subtask/view/${s.id}`}
+                                        className="action-btn view-btn"
+                                        title="View"
+                                      >
+                                        <svg
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                        >
+                                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                          <circle
+                                            cx="12"
+                                            cy="12"
+                                            r="3"
+                                          ></circle>
+                                        </svg>
+                                      </Link>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))}
                             </tbody>
                           </table>
                         </div>
