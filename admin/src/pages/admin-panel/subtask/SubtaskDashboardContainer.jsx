@@ -55,17 +55,17 @@ const SubtaskDashboardContainer = () => {
         const stages = rawStages.map((s) =>
           typeof s === "string"
             ? {
-                name: s,
-                completed: false,
-                completed_by: null,
-                completed_at: null,
-              }
+              name: s,
+              completed: false,
+              completed_by: null,
+              completed_at: null,
+            }
             : {
-                name: s.name || s,
-                completed: s.completed || false,
-                completed_by: s.completed_by || s.completedBy || null,
-                completed_at: s.completed_at || s.completedAt || null,
-              }
+              name: s.name || s,
+              completed: s.completed || false,
+              completed_by: s.completed_by || s.completedBy || null,
+              completed_at: s.completed_at || s.completedAt || null,
+            }
         );
         return { ...t, stages };
       });
@@ -92,6 +92,26 @@ const SubtaskDashboardContainer = () => {
     fetchSubtasks();
     fetchEmployees();
   }, [projectId]);
+
+  const naturalSort = (rowA, rowB, columnId) => {
+    let a = rowA.getValue(columnId);
+    let b = rowB.getValue(columnId);
+
+    // Handle null/undefined values
+    if (a == null && b == null) return 0;
+    if (a == null) return 1;
+    if (b == null) return -1;
+
+    // Convert to strings and lowercase for case-insensitive comparison
+    a = String(a).toLowerCase();
+    b = String(b).toLowerCase();
+
+    // Use localeCompare with numeric option for natural sorting
+    return a.localeCompare(b, undefined, {
+      numeric: true,
+      sensitivity: 'base'
+    });
+  };
 
   // Column helper
   const columnHelper = createColumnHelper();
@@ -137,6 +157,7 @@ const SubtaskDashboardContainer = () => {
           </div>
         ),
         filterFn: "includesString",
+        sortingFn: naturalSort, // Add this line
       }),
 
       // Assign Date
@@ -208,9 +229,8 @@ const SubtaskDashboardContainer = () => {
                 return (
                   <div key={i} className="stage-flow">
                     <span
-                      className={`stage-badge ${
-                        completed ? "completed" : "pending"
-                      }`}
+                      className={`stage-badge ${completed ? "completed" : "pending"
+                        }`}
                     >
                       {completed && <span className="check-icon">✓</span>}
                       {name}
@@ -675,9 +695,8 @@ const SubtaskDashboardContainer = () => {
                       <div className="header-content-wrapper">
                         {/* Header with sorting */}
                         <div
-                          className={`header-main ${
-                            header.column.getCanSort() ? "cursor-pointer" : ""
-                          }`}
+                          className={`header-main ${header.column.getCanSort() ? "cursor-pointer" : ""
+                            }`}
                           onClick={header.column.getToggleSortingHandler()}
                         >
                           {flexRender(
@@ -751,7 +770,7 @@ const SubtaskDashboardContainer = () => {
             to{" "}
             {Math.min(
               (table.getState().pagination.pageIndex + 1) *
-                table.getState().pagination.pageSize,
+              table.getState().pagination.pageSize,
               table.getFilteredRowModel().rows.length
             )}{" "}
             of {table.getFilteredRowModel().rows.length} entries

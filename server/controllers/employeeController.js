@@ -315,26 +315,25 @@ export const getEmployeeDashboardData = async (req, res) => {
     const projects = await Project.find({ _id: { $in: uniqueProjectIds } });
 
     let totalMs = 0;
-    let completedCount = 0;
+    let completedCount = 0; // This will now count completed STAGES
 
     allSubtasks.forEach((task) => {
-      const isCompleted = task.status === "Completed";
-      if (isCompleted) {
-        const completedAt = new Date(task.updatedAt || task.createdAt);
-
-        const didCompleteStage = task.stages.some(
-          (st) =>
-            st.completed_by?.toString() === employeeId &&
-            (!start || (st.completed_at >= start && st.completed_at <= end))
-        );
-
-        if (didCompleteStage || task.assign_to?.toString() === employeeId) {
-          if (!start || (completedAt >= start && completedAt <= end)) {
-            completedCount++;
-          }
+      // Count completed stages by this employee
+      const employeeCompletedStages = task.stages.filter((stage) => {
+        if (!stage.completed || stage.completed_by?.toString() !== employeeId) {
+          return false;
         }
-      }
 
+        // Apply date filter if provided
+        if (!start) return true;
+
+        const completedAt = new Date(stage.completed_at);
+        return completedAt >= start && completedAt <= end;
+      });
+
+      completedCount += employeeCompletedStages.length;
+
+      // Time logs calculation (unchanged)
       (task.time_logs || []).forEach((log) => {
         if (log.user_id?.toString() === employeeId) {
           const logStart = new Date(log.start_time);
@@ -368,7 +367,7 @@ export const getEmployeeDashboardData = async (req, res) => {
         ...task.toObject(),
         employeeCompletedStages: employeeStages,
         completedByEmployee: employeeStages.length > 0,
-        currentStageAssignedToEmployee: isCurrentStageAssignedToEmployee, // ✅ new flag
+        currentStageAssignedToEmployee: isCurrentStageAssignedToEmployee,
       };
     });
 
@@ -380,7 +379,7 @@ export const getEmployeeDashboardData = async (req, res) => {
     res.json({
       subtasks: allSubtasks,
       projects,
-      completed: completedCount,
+      completed: completedCount, // Now counts completed STAGES, matching the other page
       timeLogged,
     });
   } catch (error) {

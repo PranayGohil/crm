@@ -145,9 +145,6 @@ const EmployeeCompletedTasks = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Completed:
-            </label>
             <div className="flex flex-wrap gap-2">
               {["All Time", "Today", "This Week", "This Month", "Custom"].map(
                 (label) => (
