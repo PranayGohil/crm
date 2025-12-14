@@ -197,51 +197,44 @@ const Subtasks = () => {
       filters.client === "All Client" ||
       clientName?.toLowerCase() === filters.client.toLowerCase();
 
-    const matchStatus =
-      filters.status === "Status" ||
-      p.subtasks?.some(
-        (s) => s.status?.toLowerCase() === filters.status.toLowerCase()
-      );
-
     const matchPriority =
       filters.priority === "Priority" ||
       p.priority?.toLowerCase() === filters.priority.toLowerCase();
 
-    const matchStage =
-      filters.stage === "Stage" ||
-      p.subtasks?.some((s) => {
-        if (!Array.isArray(s.stages) || s.stages.length === 0) return false;
-        const index =
-          typeof s.current_stage_index === "number" ? s.current_stage_index : 0;
-        const currentStageName = s.stages?.[index]?.name?.toLowerCase() || "";
-        return (
-          currentStageName?.toLowerCase() === filters.stage.toLowerCase() ||
-          s.stages.some(
-            (ss) => ss?.name?.toLowerCase() === filters.stage.toLowerCase()
-          )
-        );
-      });
+    // First filter the subtasks for this project
+    const matchingSubtasks =
+      p.subtasks?.filter((s) => {
+        const matchStatus =
+          filters.status === "Status" ||
+          s.status?.toLowerCase() === filters.status.toLowerCase();
 
-    const matchEmployee =
-      filters.employee === "Employee" ||
-      p.subtasks?.some((s) => {
-        const assignedEmp = employees.find((e) => e._id === s.assign_to);
-        return assignedEmp?.full_name === filters.employee;
-      });
+        const matchStage =
+          filters.stage === "Stage" ||
+          s.stages?.some(
+            (stg) => stg?.name?.toLowerCase() === filters.stage.toLowerCase()
+          );
+
+        const matchEmployee =
+          filters.employee === "Employee" ||
+          employees.find((e) => e._id === s.assign_to)?.full_name ===
+            filters.employee;
+
+        return matchStatus && matchStage && matchEmployee;
+      }) || [];
 
     const matchSearch =
       p.project_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.status?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return (
-      matchClient &&
-      matchStatus &&
-      matchPriority &&
-      matchStage &&
-      matchEmployee &&
-      matchSearch
-    );
+    // Only include the project if it has at least one matching subtask (or no filters are applied)
+    const hasMatchingSubtasks =
+      matchingSubtasks.length > 0 ||
+      (filters.status === "Status" &&
+        filters.stage === "Stage" &&
+        filters.employee === "Employee");
+
+    return matchClient && matchPriority && matchSearch && hasMatchingSubtasks;
   });
 
   const getRemainingDays = (dueDate) => {
