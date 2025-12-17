@@ -1,8 +1,7 @@
 import { SocketProvider } from "./contexts/SocketContext";
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Layout_employee from "./layout/Layout_employee";
@@ -31,60 +30,44 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Layout_employee />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/" element={<EmployeeDashboard />} />
+        <Route path="/dashboard" element={<EmployeeDashboard />} />
+        <Route path="/profile" element={<EmployeeProfile />} />
+
+        <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
         <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Layout_employee />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/" element={<EmployeeDashboard />} />
-          <Route path="/dashboard" element={<EmployeeDashboard />} />
-          <Route path="/profile" element={<EmployeeProfile />} />
+          path="/project/details/:projectId"
+          element={<ProjectDetails />}
+        />
+        <Route
+          path="/project/gallery/:projectId"
+          element={<ProjectMediaGallery />}
+        />
+        <Route path="/time-tracking" element={<EmployeeTimeTracking />} />
+        <Route path="/completed-tasks" element={<EmployeeCompletedTasks />} />
+        <Route
+          path="/activity-history"
+          element={<EmployeeActivityDashboard />}
+        />
+        <Route path="/notifications" element={<EmployeeNotificationPage />} />
 
-          <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
-          <Route
-            path="/project/details/:projectId"
-            element={<ProjectDetails />}
-          />
-          <Route
-            path="/project/gallery/:projectId"
-            element={<ProjectMediaGallery />}
-          />
-          <Route path="/time-tracking" element={<EmployeeTimeTracking />} />
-          <Route
-            path="/completed-tasks"
-            element={<EmployeeCompletedTasks />}
-          />
-          <Route path="/activity-history" element={<EmployeeActivityDashboard />} />
-          <Route path="/notifications" element={<EmployeeNotificationPage />} />
+        <Route path="/subtasks" element={<Subtasks />} />
+        <Route path="/team-time-tracking" element={<TimeTrackingDashboard />} />
+      </Route>
 
-          <Route path="/subtasks" element={<Subtasks />} />
-          <Route
-            path="/team-time-tracking"
-            element={<TimeTrackingDashboard />}
-          />
-        </Route>
-
-        <Route path="/" element={<Plain_layout />}>
-          <Route path="/login" element={<LoginPage />} />
-        </Route>
-      </Routes>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-        theme="colored"
-      />
-    </Router>
+      <Route path="/" element={<Plain_layout />}>
+        <Route path="/login" element={<LoginPage />} />
+      </Route>
+    </Routes>
   );
 }
 

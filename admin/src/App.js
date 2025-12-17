@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Layout from "./layout/Layout";
@@ -56,107 +55,94 @@ import SubtaskLogs from "./pages/admin-panel/subtask/SubtaskLogs";
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }
+      >
+        {/* Protected routes */}
+        <Route path="/" element={<DashboardOverview />} />
+        <Route index element={<DashboardOverview />} />
+        <Route path="/dashboard" element={<DashboardOverview />} />
+        <Route path="/admin/profile" element={<AdminProfile />} />
+
+        {/* client */}
+        <Route path="/client/dashboard" element={<ClientDashboardPage />} />
+        <Route path="/client/create" element={<CreateNewClient />} />
+        <Route path="/client/details/:id" element={<ClientDetailsPage />} />
+        <Route path="/client/edit/:id" element={<EditClient />} />
+
         <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          {/* Protected routes */}
-          <Route path="/" element={<DashboardOverview />} />
-          <Route index element={<DashboardOverview />} />
-          <Route path="/dashboard" element={<DashboardOverview />} />
-          <Route path="/admin/profile" element={<AdminProfile />} />
+          path="/client/projects/:username"
+          element={<ClientProjectDetails />}
+        />
 
-          {/* client */}
-          <Route path="/client/dashboard" element={<ClientDashboardPage />} />
-          <Route path="/client/create" element={<CreateNewClient />} />
-          <Route path="/client/details/:id" element={<ClientDetailsPage />} />
-          <Route path="/client/edit/:id" element={<EditClient />} />
+        <Route
+          path="/project/details/:projectId"
+          element={<ProjectDetails />}
+        />
+        <Route path="/project/dashboard" element={<AllProject />} />
+        <Route path="/project/add" element={<AddNewProject />} />
+        <Route
+          path="/project/subtask/add/:projectId"
+          element={<AddSubtask />}
+        />
+        <Route
+          path="/project/subtask-dashboard/:projectId"
+          element={<SubtaskDashboardContainer />}
+        />
 
-          <Route
-            path="/client/projects/:username"
-            element={<ClientProjectDetails />}
-          />
+        <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
+        <Route
+          path="/subtask/upcoming-due-dates"
+          element={<UpcomingDueDatesPage />}
+        />
+        <Route
+          path="/project/gallery/:projectId"
+          element={<ProjectMediaGallery />}
+        />
+        <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
+        <Route
+          path="/employee/edit/:employeeId"
+          element={<EmployeeProfileEdit />}
+        />
+        <Route path="/employee/profile/:id" element={<TeamMemberProfile />} />
+        <Route
+          path="/employee/timetracking/:id"
+          element={<EmployeeTimeTracking />}
+        />
+        <Route path="/subtasks" element={<Subtasks />} />
+        <Route path="/time-tracking" element={<TimeTrackingDashboard />} />
+        <Route path="/notifications" element={<NotificationAdmin />} />
 
-          <Route
-            path="/project/details/:projectId"
-            element={<ProjectDetails />}
-          />
-          <Route path="/project/dashboard" element={<AllProject />} />
-          <Route path="/project/add" element={<AddNewProject />} />
-          <Route
-            path="/project/subtask/add/:projectId"
-            element={<AddSubtask />}
-          />
-          <Route
-            path="/project/subtask-dashboard/:projectId"
-            element={<SubtaskDashboardContainer />}
-          />
+        {/* edit page */}
 
-          <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
-          <Route
-            path="/subtask/upcoming-due-dates"
-            element={<UpcomingDueDatesPage />}
-          />
-          <Route
-            path="/project/gallery/:projectId"
-            element={<ProjectMediaGallery />}
-          />
-          <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
-          <Route
-            path="/employee/edit/:employeeId"
-            element={<EmployeeProfileEdit />}
-          />
-          <Route path="/employee/profile/:id" element={<TeamMemberProfile />} />
-          <Route
-            path="/employee/timetracking/:id"
-            element={<EmployeeTimeTracking />}
-          />
-          <Route path="/subtasks" element={<Subtasks />} />
-          <Route path="/time-tracking" element={<TimeTrackingDashboard />} />
-          <Route path="/notifications" element={<NotificationAdmin />} />
+        <Route path="/project/edit/:projectId" element={<EditProject />} />
 
-          {/* edit page */}
+        <Route
+          path="/project/subtask/edit/:subtaskId"
+          element={<EditSubtask />}
+        />
+        <Route
+          path="/employee/create-profile"
+          element={<CreateEmployeeProfile />}
+        />
+        <Route path="/designation" element={<Designation />} />
+        <Route path="/department" element={<Department />} />
 
-          <Route path="/project/edit/:projectId" element={<EditProject />} />
+        <Route path="/archived-projects" element={<ArchivedProjects />} />
 
-          <Route
-            path="/project/subtask/edit/:subtaskId"
-            element={<EditSubtask />}
-          />
-          <Route
-            path="/employee/create-profile"
-            element={<CreateEmployeeProfile />}
-          />
-          <Route path="/designation" element={<Designation />} />
-          <Route path="/department" element={<Department />} />
+        <Route path="/subtask/logs/:subtaskId" element={<SubtaskLogs />} />
+      </Route>
 
-          <Route path="/archived-projects" element={<ArchivedProjects />} />
-
-          <Route path="/subtask/logs/:subtaskId" element={<SubtaskLogs />} />
-        </Route>
-
-        <Route path="/" element={<Plain_layout />}>
-          <Route path="/login" element={<LoginPage />} />
-        </Route>
-      </Routes>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-        theme="colored"
-      />
-    </Router>
+      <Route path="/" element={<Plain_layout />}>
+        <Route path="/login" element={<LoginPage />} />
+      </Route>
+    </Routes>
   );
 }
 

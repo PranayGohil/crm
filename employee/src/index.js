@@ -7,17 +7,34 @@ import "bootstrap/dist/css/bootstrap.css";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import { SocketProvider } from "./contexts/SocketContext";
+import NotificationPermissionBanner from "./NotificationPermissionBanner";
+
+import { BrowserRouter } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const employeeUser = JSON.parse(localStorage.getItem("employeeUser"));
 root.render(
-  <SocketProvider employeeId={employeeUser?._id}>
+  <BrowserRouter>
     <AuthProvider>
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
+      <SocketProvider employeeId={employeeUser?._id}>
+        <NotificationPermissionBanner />
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      </SocketProvider>
     </AuthProvider>
-  </SocketProvider>
+    <ToastContainer
+      position="top-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      pauseOnHover
+      draggable
+      theme="colored"
+    />
+  </BrowserRouter>
 );
 
 // If you want to start measuring performance in your app, pass a function

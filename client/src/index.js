@@ -7,13 +7,28 @@ import "bootstrap/dist/css/bootstrap.css";
 
 import { AuthProvider } from "./contexts/AuthContext";
 
+import { BrowserRouter } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <AuthProvider>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  </AuthProvider>
+  <BrowserRouter>
+    <AuthProvider>
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    </AuthProvider>
+    <ToastContainer
+      position="top-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      pauseOnHover
+      draggable
+      theme="colored"
+    />
+  </BrowserRouter>
 );
 
 // If you want to start measuring performance in your app, pass a function

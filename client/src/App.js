@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Layout_client from "./layout/Layout_client";
@@ -11,7 +10,6 @@ import SubtaskDashboardContainer from "./pages/SubtaskDashboardContainer";
 
 import ProjectContent from "./pages/ProjectDetails";
 import ProjectMediaGallery from "./pages/ProjectMediaGallery";
-
 
 // client admin
 
@@ -28,62 +26,40 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Layout_client />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/" element={<ClientDashboard />} />
+        <Route path="/profile" element={<ClientDetailsPage />} />
+        <Route path="/dashboard" element={<ClientDashboard />} />
         <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Layout_client />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/" element={<ClientDashboard />} />
-          <Route
-            path="/profile"
-            element={<ClientDetailsPage />}
-          />
-          <Route
-            path="/dashboard"
-            element={<ClientDashboard />}
-          />
-          <Route
-            path="/subtasks/:projectId"
-            element={<SubtaskDashboardContainer />}
-          />
-          <Route
-            path="/project-details/:projectId"
-            element={<ProjectContent />}
-          />
-          <Route
-            path="/project/gallery/:projectId"
-            element={<ProjectMediaGallery />}
-          />
-          <Route
-            path="ClientAdminNotificationPage"
-            element={<ClientAdminNotificationPage />}
-          />
-          <Route
-            path="/subtask/view/:subtaskId"
-            element={<ViewSubtask />}
-          />
-        </Route>
-        <Route path="/" element={<Plain_layout />}>
-          <Route path="/login" element={<LoginPage />} />
-        </Route>
-      </Routes>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-        theme="colored"
-      />
-    </Router>
+          path="/subtasks/:projectId"
+          element={<SubtaskDashboardContainer />}
+        />
+        <Route
+          path="/project-details/:projectId"
+          element={<ProjectContent />}
+        />
+        <Route
+          path="/project/gallery/:projectId"
+          element={<ProjectMediaGallery />}
+        />
+        <Route
+          path="ClientAdminNotificationPage"
+          element={<ClientAdminNotificationPage />}
+        />
+        <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
+      </Route>
+      <Route path="/" element={<Plain_layout />}>
+        <Route path="/login" element={<LoginPage />} />
+      </Route>
+    </Routes>
   );
 }
 
