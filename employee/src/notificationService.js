@@ -51,21 +51,25 @@ class NotificationService {
       return null;
     }
 
+    // Generate unique tag if not provided to prevent overlapping
+    const uniqueTag =
+      options.tag ||
+      `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
     const defaultOptions = {
-      icon: "/SVG/diamond-rich_teal.svg", // Your app icon
-      badge: "/SVG/diamond-rich_teal.svg",
+      icon: "/logo192.png", // Your app icon
+      badge: "/logo192.png",
       vibrate: [200, 100, 200],
-      requireInteraction: false,
+      requireInteraction: true, // Changed to true - keeps notification until user closes it
+      tag: uniqueTag, // Unique tag for each notification to prevent overlap
       ...options,
     };
 
     try {
       const notification = new Notification(title, defaultOptions);
 
-      // Auto close after 5 seconds if not clicked
-      setTimeout(() => {
-        notification.close();
-      }, 5000);
+      // Remove auto-close - let user dismiss manually
+      // Users can close it themselves or it will stay in notification center
 
       return notification;
     } catch (error) {

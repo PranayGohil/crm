@@ -302,6 +302,33 @@ const DashboardMenu = () => {
               <span className="font-medium">Archived Projects</span>
             )}
           </Link>
+
+          {/* Notification Settings */}
+          <Link
+            to="/notification-settings"
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${
+              isActive("/notification-settings")
+                ? "bg-blue-100 text-blue-600"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+              />
+            </svg>
+            {!collapsed && (
+              <span className="font-medium">Notification Settings</span>
+            )}
+          </Link>
         </div>
       </div>
 

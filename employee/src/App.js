@@ -28,6 +28,8 @@ import LoginPage from "./pages/LoginPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
+import NotificationSettings from "./NotificationSettings";
+
 function App() {
   return (
     <Routes>
@@ -62,6 +64,11 @@ function App() {
 
         <Route path="/subtasks" element={<Subtasks />} />
         <Route path="/team-time-tracking" element={<TimeTrackingDashboard />} />
+
+        <Route
+          path="/notification-settings"
+          element={<NotificationSettings />}
+        />
       </Route>
 
       <Route path="/" element={<Plain_layout />}>

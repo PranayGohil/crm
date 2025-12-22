@@ -47,12 +47,18 @@ export const SocketProvider = ({ children }) => {
 
       // Show browser notification (only if page is not focused)
       if (document.hidden && notificationPermission === "granted") {
+        // Generate unique tag for each notification to prevent overlap
+        const uniqueTag = `${notification.type}-${
+          notification.related_id || Date.now()
+        }-${Math.random().toString(36).substr(2, 9)}`;
+
         notificationService.showWithAction(
           notification.title,
           {
             body: notification.description || "",
             icon: notification.icon || "/SVG/diamond-rich_teal.svg",
-            tag: notification.related_id || `notification-${Date.now()}`,
+            tag: uniqueTag, // Unique tag to prevent overlap
+            requireInteraction: true, // Keep notification until user closes it
             data: {
               url: window.location.origin,
               notificationId: notification._id,

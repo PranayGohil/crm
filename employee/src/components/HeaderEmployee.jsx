@@ -128,7 +128,7 @@ const HeaderEmployee = () => {
 
             {/* Dropdown Menu */}
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-v20 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+              <div className="absolute right-0 mt-2 w-v40 bg-white border border-gray-200 rounded-md shadow-lg z-50">
                 <Link
                   to="/profile"
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
@@ -142,6 +142,13 @@ const HeaderEmployee = () => {
                   onClick={() => setDropdownOpen(false)}
                 >
                   Activity History
+                </Link>
+                <Link
+                  to="/notification-settings"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  Notification Settings
                 </Link>
                 <button
                   onClick={handleLogout}

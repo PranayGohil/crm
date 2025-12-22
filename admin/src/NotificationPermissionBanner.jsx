@@ -1,7 +1,6 @@
 // NotificationPermissionBanner.jsx
 import React, { useState, useEffect } from "react";
 import { useSocket } from "./contexts/SocketContext";
-import "./NotificationPermissionBanner.css";
 
 const NotificationPermissionBanner = () => {
   const { notificationPermission, requestNotificationPermission } = useSocket();
