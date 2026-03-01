@@ -15,7 +15,8 @@ const commentSchema = new mongoose.Schema({
 });
 
 const stageSchema = new mongoose.Schema({
-  name: { type: String, required: true }, // e.g., "CAD Design"
+  name: { type: String, required: true },
+  price: { type: Number, default: 0 },
   completed: { type: Boolean, default: false },
   completed_by: {
     type: mongoose.Schema.Types.ObjectId,
@@ -35,6 +36,8 @@ const subTaskSchema = mongoose.Schema(
     description: String,
     url: String,
     stages: [stageSchema],
+    total_price: { type: Number, default: 0 }, // sum of all stage prices
+    earned_amount: { type: Number, default: 0 }, // sum of completed stage prices
     current_stage_index: { type: Number, default: 0 },
     priority: String,
     assign_to: {

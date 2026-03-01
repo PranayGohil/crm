@@ -4,9 +4,9 @@ import Project from "../models/projectModel.js";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
+// clientController.js - update addClient to accept stage_pricing
 export const addClient = async (req, res) => {
   try {
-    console.log(req.body);
     const {
       full_name,
       email,
@@ -23,9 +23,9 @@ export const addClient = async (req, res) => {
       linkedin,
       business_address,
       additional_notes,
+      stage_pricing,
     } = req.body;
 
-    // 👉 Check if username already exists
     const existingUsername = await Client.findOne({ username });
     if (existingUsername) {
       return res.json({
@@ -34,7 +34,6 @@ export const addClient = async (req, res) => {
       });
     }
 
-    // (Optional) Also check for email
     const existingEmail = await Client.findOne({ email });
     if (existingEmail) {
       return res.json({
@@ -59,11 +58,14 @@ export const addClient = async (req, res) => {
       linkedin,
       business_address,
       additional_notes,
+      stage_pricing: stage_pricing || [],
     });
 
-    res
-      .status(200)
-      .json({ success: true, message: "Client added successfully", client });
+    res.status(200).json({
+      success: true,
+      message: "Client added successfully",
+      client,
+    });
   } catch (error) {
     console.error("Error in addClient:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -267,5 +269,83 @@ export const getClientsWithSubtasks = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to get clients with subtasks" });
+  }
+};
+
+// clientController.js - add this new function
+export const getClientEarningsReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const client = await Client.findById(id);
+    if (!client) return res.status(404).json({ message: "Client not found" });
+
+    // Get all projects for this client
+    const projects = await Project.find({ client_id: id });
+    const projectIds = projects.map((p) => p._id);
+
+    // Get all subtasks across those projects
+    const subtasks = await SubTask.find({ project_id: { $in: projectIds } });
+
+    // Build report
+    const projectBreakdown = projects.map((project) => {
+      const projectSubtasks = subtasks.filter(
+        (s) => s.project_id.toString() === project._id.toString()
+      );
+
+      const subtaskBreakdown = projectSubtasks.map((subtask) => ({
+        subtask_id: subtask._id,
+        task_name: subtask.task_name,
+        status: subtask.status,
+        total_price: subtask.total_price || 0,
+        earned_amount: subtask.earned_amount || 0,
+        pending_amount: (subtask.total_price || 0) - (subtask.earned_amount || 0),
+        stages: subtask.stages.map((stage) => ({
+          stage_name: stage.name,
+          price: stage.price || 0,
+          completed: stage.completed,
+          completed_at: stage.completed_at || null,
+        })),
+      }));
+
+      const projectTotal = subtaskBreakdown.reduce((s, t) => s + t.total_price, 0);
+      const projectEarned = subtaskBreakdown.reduce((s, t) => s + t.earned_amount, 0);
+
+      return {
+        project_id: project._id,
+        project_name: project.project_name,
+        status: project.status,
+        total_value: projectTotal,
+        earned_value: projectEarned,
+        pending_value: projectTotal - projectEarned,
+        subtasks: subtaskBreakdown,
+      };
+    });
+
+    // Grand totals
+    const grandTotal = projectBreakdown.reduce((s, p) => s + p.total_value, 0);
+    const grandEarned = projectBreakdown.reduce((s, p) => s + p.earned_value, 0);
+
+    res.json({
+      client_id: id,
+      client_name: client.full_name,
+      company_name: client.company_name,
+      stage_pricing: client.stage_pricing, // show what defaults were set
+      summary: {
+        total_value: grandTotal,
+        earned_value: grandEarned,
+        pending_value: grandTotal - grandEarned,
+        completion_percentage:
+          grandTotal > 0
+            ? Math.round((grandEarned / grandTotal) * 100)
+            : 0,
+        total_projects: projects.length,
+        total_subtasks: subtasks.length,
+      },
+      projects: projectBreakdown,
+    });
+  } catch (error) {
+    console.error("getClientEarningsReport error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

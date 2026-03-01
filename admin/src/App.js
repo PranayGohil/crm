@@ -53,6 +53,8 @@ import ArchivedProjects from "./pages/admin-panel/project/ArchivedProjects";
 
 import SubtaskLogs from "./pages/admin-panel/subtask/SubtaskLogs";
 
+import EarningsReport from "./pages/admin-panel/EarningsReport";
+
 import NotificationSettings from "./NotificationSettings";
 
 function App() {
@@ -139,6 +141,8 @@ function App() {
         <Route path="/archived-projects" element={<ArchivedProjects />} />
 
         <Route path="/subtask/logs/:subtaskId" element={<SubtaskLogs />} />
+
+        <Route path="/earnings-report" element={<EarningsReport />} />
 
         <Route
           path="/notification-settings"

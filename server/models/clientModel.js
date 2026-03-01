@@ -49,6 +49,18 @@ const clientScheme = mongoose.Schema({
   additional_notes: {
     type: String,
   },
+  stage_pricing: [
+    {
+      stage_name: {
+        type: String,
+        enum: ["CAD Design", "SET Design", "Render", "QC", "Delivery"],
+      },
+      price: {
+        type: Number,
+        default: 0,
+      },
+    },
+  ],
   created_at: {
     type: Date,
     default: Date.now,

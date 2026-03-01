@@ -8,6 +8,8 @@ import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
+const STAGE_OPTIONS = ["CAD Design", "SET Design", "Render", "QC", "Delivery"];
+
 const EditClient = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -31,6 +33,10 @@ const EditClient = () => {
       linkedin: "",
       business_address: "",
       additional_notes: "",
+      stage_pricing: STAGE_OPTIONS.map((stage) => ({
+        stage_name: stage,
+        price: 0,
+      })),
     },
     validationSchema: Yup.object({
       full_name: Yup.string().required("Full name is required"),
@@ -60,7 +66,7 @@ const EditClient = () => {
       try {
         setLoading(true);
         setSubmitting(true);
-        const res = await axios.put(
+        await axios.put(
           `${process.env.REACT_APP_API_URL}/api/client/update-username/${id}`,
           values
         );
@@ -86,6 +92,17 @@ const EditClient = () => {
           `${process.env.REACT_APP_API_URL}/api/client/get-username/${id}`
         );
         const client = res.data;
+
+        const mergedStagePricing = STAGE_OPTIONS.map((stage) => {
+          const existing = client.stage_pricing?.find(
+            (p) => p.stage_name === stage
+          );
+          return {
+            stage_name: stage,
+            price: existing?.price ?? 0,
+          };
+        });
+
         formik.setValues({
           full_name: client.full_name || "",
           email: client.email || "",
@@ -104,6 +121,7 @@ const EditClient = () => {
           linkedin: client.linkedin || "",
           business_address: client.business_address || "",
           additional_notes: client.additional_notes || "",
+          stage_pricing: mergedStagePricing,
         });
       } catch (err) {
         console.error(err);
@@ -115,7 +133,7 @@ const EditClient = () => {
     fetchClient();
   }, [id]); // eslint-disable-line
 
-  const { handleChange, handleSubmit, values, errors, touched, isSubmitting } =
+  const { handleChange, handleSubmit, values, errors, touched, isSubmitting, setFieldValue } =
     formik;
 
   if (loading) return <LoadingOverlay />;
@@ -332,6 +350,40 @@ const EditClient = () => {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* ── Stage Pricing Section ── */}
+          <div className="pt-6 border-t border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-800 mb-1">Stage Pricing</h2>
+            <p className="text-sm text-gray-500 mb-4">
+              Default prices per stage for this client. Auto-filled when creating subtasks.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {values.stage_pricing.map((item, index) => (
+                <div key={item.stage_name} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {item.stage_name}
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={item.price}
+                      onChange={(e) =>
+                        setFieldValue(
+                          `stage_pricing[${index}].price`,
+                          parseFloat(e.target.value) || 0
+                        )
+                      }
+                      disabled={isSubmitting}
+                      className="w-full pl-7 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

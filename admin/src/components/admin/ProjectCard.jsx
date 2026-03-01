@@ -2,32 +2,18 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-const ProjectCard = ({
-  filteredProjects,
-  projectSubtasks,
-  loading,
-  employees,
-}) => {
+const ProjectCard = ({ filteredProjects, projectSubtasks, loading, employees }) => {
   const [clientMap, setClientMap] = useState({});
 
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = date.toLocaleString("default", { month: "short" });
-    const year = date.getFullYear();
-    return `${day} ${month} ${year}`;
+    return `${date.getDate().toString().padStart(2, "0")} ${date.toLocaleString("default", { month: "short" })} ${date.getFullYear()}`;
   };
 
-  // Calculate days remaining
   const calculateDaysRemaining = (dueDate) => {
     if (!dueDate) return "-";
-
-    const today = new Date();
-    const due = new Date(dueDate);
-    const timeDiff = due.getTime() - today.getTime();
-    const daysRemain = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
+    const daysRemain = Math.ceil((new Date(dueDate) - new Date()) / (1000 * 3600 * 24));
     if (daysRemain < 0) return "Overdue";
     if (daysRemain === 0) return "Due today";
     return `${daysRemain} day${daysRemain !== 1 ? "s" : ""} remain`;
@@ -35,21 +21,16 @@ const ProjectCard = ({
 
   useEffect(() => {
     const fetchClients = async () => {
-      const ids = [
-        ...new Set(filteredProjects.map((p) => p.client_id).filter(Boolean)),
-      ];
+      const ids = [...new Set(filteredProjects.map((p) => p.client_id).filter(Boolean))];
       if (!ids.length) return;
-
       try {
         const results = await Promise.all(
           ids.map((id) =>
-            axios
-              .get(`${process.env.REACT_APP_API_URL}/api/client/get/${id}`)
+            axios.get(`${process.env.REACT_APP_API_URL}/api/client/get/${id}`)
               .then((res) => ({ id, name: res.data.full_name }))
               .catch(() => ({ id, name: "Unknown Client" }))
           )
         );
-
         const map = {};
         results.forEach((r) => (map[r.id] = r.name));
         setClientMap(map);
@@ -57,14 +38,11 @@ const ProjectCard = ({
         console.error("Error fetching clients", err);
       }
     };
-
     fetchClients();
   }, [filteredProjects]);
 
-  // Get status class for styling
   const getStatusClass = (status) => {
     if (!status) return "status-default";
-
     const statusMap = {
       "to do": "status-pending",
       "in progress": "status-in-progress",
@@ -73,7 +51,6 @@ const ProjectCard = ({
       done: "status-completed",
       completed: "status-completed",
     };
-
     return statusMap[status.toLowerCase()] || "status-default";
   };
 
@@ -81,14 +58,7 @@ const ProjectCard = ({
     <div className="projects-grid">
       {filteredProjects.length === 0 && !loading && (
         <div className="no-projects">
-          <svg
-            width="48"
-            height="48"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
           </svg>
           <p>No projects found matching your criteria.</p>
@@ -97,17 +67,17 @@ const ProjectCard = ({
 
       {filteredProjects.map((project) => {
         const subtasks = projectSubtasks[project._id] || [];
-        const employeeIds = Array.from(
-          new Set(subtasks.map((t) => t.assign_to).filter(Boolean))
-        );
-        const completedCount = subtasks.filter(
-          (t) => t.status?.toLowerCase() === "completed"
-        ).length;
-        const progressPercent = subtasks.length
-          ? Math.round((completedCount / subtasks.length) * 100)
-          : 0;
+        const employeeIds = Array.from(new Set(subtasks.map((t) => t.assign_to).filter(Boolean)));
+        const completedCount = subtasks.filter((t) => t.status?.toLowerCase() === "completed").length;
+        const progressPercent = subtasks.length ? Math.round((completedCount / subtasks.length) * 100) : 0;
         const daysRemain = calculateDaysRemaining(project.due_date);
         const statusClass = getStatusClass(project.status);
+
+        // ── Earnings from subtask fields ──
+        const totalValue = subtasks.reduce((sum, s) => sum + (s.total_price || 0), 0);
+        const earnedValue = subtasks.reduce((sum, s) => sum + (s.earned_amount || 0), 0);
+        const pendingValue = totalValue - earnedValue;
+        const earningPercent = totalValue > 0 ? Math.round((earnedValue / totalValue) * 100) : 0;
 
         return (
           <div className="project-card" key={project._id}>
@@ -120,13 +90,7 @@ const ProjectCard = ({
             </div>
 
             <div className="project-client">
-              <svg
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -137,29 +101,15 @@ const ProjectCard = ({
 
             <div className="project-dates">
               <div className="date-range">
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                   <line x1="16" y1="2" x2="16" y2="6" />
                   <line x1="8" y1="2" x2="8" y2="6" />
                   <line x1="3" y1="10" x2="21" y2="10" />
                 </svg>
-                <span>
-                  {formatDate(project.assign_date)} –{" "}
-                  {formatDate(project.due_date)}
-                </span>
+                <span>{formatDate(project.assign_date)} – {formatDate(project.due_date)}</span>
               </div>
-              <div
-                className={`days-remaining ${
-                  daysRemain === "Overdue" ? "overdue" : ""
-                }`}
-              >
+              <div className={`days-remaining ${daysRemain === "Overdue" ? "overdue" : ""}`}>
                 {daysRemain}
               </div>
             </div>
@@ -167,71 +117,67 @@ const ProjectCard = ({
             <div className="progress-section">
               <div className="progress-header">
                 <span>Subtasks Completed</span>
-                <span className="progress-count">
-                  {completedCount}/{subtasks.length}
-                </span>
+                <span className="progress-count">{completedCount}/{subtasks.length}</span>
               </div>
               <div className="progress-bar border">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${progressPercent}%` }}
-                ></div>
+                <div className="progress-fill" style={{ width: `${progressPercent}%` }}></div>
               </div>
             </div>
+
+            {/* ── Earnings Section ── */}
+            {totalValue > 0 && (
+              <div className="mt-3 mb-2 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Earnings</span>
+                  <span className="text-xs text-blue-600 font-medium">{earningPercent}% earned</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 mb-2">
+                  <div className="text-center">
+                    <p className="text-xs text-gray-400">Total</p>
+                    <p className="text-xs font-semibold text-gray-700">₹{totalValue.toLocaleString()}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs text-green-500">Earned</p>
+                    <p className="text-xs font-semibold text-green-700">₹{earnedValue.toLocaleString()}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs text-yellow-500">Pending</p>
+                    <p className="text-xs font-semibold text-yellow-700">₹{pendingValue.toLocaleString()}</p>
+                  </div>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: `${earningPercent}%` }}></div>
+                </div>
+              </div>
+            )}
 
             <div className="project-team">
               <div className="team-members">
                 {employeeIds.slice(0, 3).map((id, index) => {
                   const emp = employees[id];
-                  const firstLetter =
-                    emp?.full_name?.charAt(0).toUpperCase() || "?";
-
+                  const firstLetter = emp?.full_name?.charAt(0).toUpperCase() || "?";
                   return emp?.profile_pic ? (
-                    <img
-                      key={id}
-                      src={emp.profile_pic}
-                      alt={emp.full_name || "Employee"}
-                      className="team-avatar"
-                      style={{
-                        zIndex: 3 - index,
-                        marginLeft: index === 0 ? 0 : -10,
-                      }}
-                    />
+                    <img key={id} src={emp.profile_pic} alt={emp.full_name || "Employee"}
+                      className="team-avatar" style={{ zIndex: 3 - index, marginLeft: index === 0 ? 0 : -10 }} />
                   ) : (
-                    <div
-                      key={id}
-                      className="team-avatar placeholder"
-                      style={{
-                        zIndex: 3 - index,
-                        marginLeft: index === 0 ? 0 : -10,
-                      }}
-                    >
+                    <div key={id} className="team-avatar placeholder"
+                      style={{ zIndex: 3 - index, marginLeft: index === 0 ? 0 : -10 }}>
                       {firstLetter}
                     </div>
                   );
                 })}
                 {employeeIds.length > 3 && (
-                  <div className="team-avatar more-members">
-                    +{employeeIds.length - 3}
-                  </div>
+                  <div className="team-avatar more-members">+{employeeIds.length - 3}</div>
                 )}
               </div>
-              <span className="team-count">
-                {employeeIds.length} team members
-              </span>
+              <span className="team-count">{employeeIds.length} team members</span>
             </div>
 
             <div className="project-actions">
-              <Link
-                to={`/project/subtask-dashboard/${project._id}`}
-                className="action-btn view-btn"
-              >
+              <Link to={`/project/subtask-dashboard/${project._id}`} className="action-btn view-btn">
                 View Subtasks
               </Link>
-              <Link
-                to={`/project/details/${project._id}`}
-                className="action-btn primary-btn"
-              >
+              <Link to={`/project/details/${project._id}`} className="action-btn primary-btn">
                 View Project
               </Link>
             </div>
@@ -243,205 +189,3 @@ const ProjectCard = ({
 };
 
 export default ProjectCard;
-
-// old card
-
-// import React from "react";
-// import { Link } from "react-router-dom";
-
-// const ProjectCard = ({
-//   filteredProjects,
-//   projectSubtasks,
-//   loading,
-//   employees,
-// }) => {
-//   const formatDate = (dateString) => {
-//     if (!dateString) return "-";
-//     const date = new Date(dateString);
-//     const day = date.getDate().toString().padStart(2, "0");
-//     const month = date.toLocaleString("default", { month: "short" });
-//     const year = date.getFullYear();
-//     return `${day} ${month} ${year}`;
-//   };
-
-//   return (
-//     <section className="md-recent-main-project-main">
-//       <div className="md-recent-main-project-main-inner">
-//         <div className="md-recent-project-card">
-//           {filteredProjects.length === 0 && !loading && (
-//             <p style={{ textAlign: "center", marginTop: "20px" }}>
-//               No projects found.
-//             </p>
-//           )}
-
-//           {filteredProjects.map((project) => {
-//             const subtasks = projectSubtasks[project._id] || [];
-
-//             // Compute unique employee IDs assigned to this project's subtasks
-//             const employeeIds = Array.from(
-//               new Set(subtasks.map((t) => t.assign_to).filter(Boolean))
-//             );
-
-//             // Count completed subtasks
-//             const completedCount = subtasks.filter(
-//               (t) => t.status?.toLowerCase() === "completed"
-//             ).length;
-
-//             const progressPercent = subtasks.length
-//               ? Math.round((completedCount / subtasks.length) * 100)
-//               : 0;
-
-//             // Calculate days remaining
-//             const dueDate = project.due_date
-//               ? new Date(project.due_date)
-//               : null;
-//             const daysRemain = dueDate
-//               ? Math.max(
-//                   Math.ceil((dueDate - new Date()) / (1000 * 60 * 60 * 24)),
-//                   0
-//                 )
-//               : "-";
-
-//             return (
-//               <div className="md-project_card" key={project._id}>
-//                 <div
-//                   className={`md-project_card__header_border ${
-//                     project.status === "To Do"
-//                       ? "cdn-bg-color-gray"
-//                       : project.status === "In Progress"
-//                       ? "cdn-bg-color-blue"
-//                       : project.status === "Paused"
-//                       ? "cdn-bg-color-purple"
-//                       : project.status === "Completed"
-//                       ? "cdn-bg-color-green"
-//                       : project.status === "Blocked"
-//                       ? "cdn-bg-color-red"
-//                       : "cdn-bg-color-gray"
-//                   }`}
-//                 ></div>
-
-//                 <div className="md-project_card__content">
-//                   <div className="md-project_card__top_row">
-//                     <h3 className="md-project_card__title">
-//                       {project.project_name}
-//                     </h3>
-//                     <span
-//                       className={`md-status-btn md-status-${
-//                         project.status?.toLowerCase().replace(/\s+/g, "") ||
-//                         "todo"
-//                       }`}
-//                     >
-//                       {project.status || "To do"}
-//                     </span>
-//                   </div>
-
-//                   <div className="md-project_card__subtitle">
-//                     <p>{project.client_name}</p>
-//                     <div className="md-due-date-main">
-//                       <img src="/SVG/time-due.svg" alt="due" />
-//                       <span>{daysRemain} day remain</span>
-//                     </div>
-//                   </div>
-
-//                   <div className="md-project_card__date_row">
-//                     <div className="md-project_card__date">
-//                       <img src="/SVG/calendar.svg" alt="calendar" />
-//                       <span>
-//                         {formatDate(project.assign_date)} –{" "}
-//                         {formatDate(project.due_date)}
-//                       </span>
-//                     </div>
-//                   </div>
-
-//                   <div className="md-project-card__subtask_text">
-//                     <div className="md-subtask-text">Subtasks Completed</div>
-//                     <div className="md-subtask-total-sub_number">
-//                       {completedCount}/{subtasks.length}
-//                     </div>
-//                   </div>
-
-//                   <div className="md-project_card__progress_bar">
-//                     <div
-//                       className="md-project_card__progress_fill cdn-bg-color-blue"
-//                       style={{ width: `${progressPercent}%` }}
-//                     ></div>
-//                   </div>
-
-//                   <div className="md-project_card__footer_row">
-//                     <div
-//                       className="md-project_card__avatars"
-//                       style={{ display: "flex" }}
-//                     >
-//                       {employeeIds.slice(0, 3).map((id, index) => {
-//                         const emp = employees[id];
-//                         const firstLetter =
-//                           emp?.full_name?.charAt(0).toUpperCase() || "?";
-//                         return emp?.profile_pic ? (
-//                           <img
-//                             key={id}
-//                             src={emp.profile_pic}
-//                             alt={emp.full_name || "Employee"}
-//                             width={42}
-//                             height={42}
-//                             style={{
-//                               borderRadius: "50%",
-//                               objectFit: "cover",
-//                               border: "2px solid white",
-//                               marginLeft: index === 0 ? 0 : -10,
-//                             }}
-//                           />
-//                         ) : (
-//                           <div
-//                             key={id}
-//                             style={{
-//                               width: "42px",
-//                               height: "42px",
-//                               borderRadius: "50%",
-//                               backgroundColor: "#0a3749",
-//                               color: "#fff",
-//                               display: "flex",
-//                               alignItems: "center",
-//                               justifyContent: "center",
-//                               fontSize: "18px",
-//                               fontWeight: "bold",
-//                               textTransform: "uppercase",
-//                               border: "2px solid white",
-//                               marginLeft: index === 0 ? 0 : -10,
-//                             }}
-//                           >
-//                             {firstLetter}
-//                           </div>
-//                         );
-//                       })}
-//                     </div>
-
-//                     <span className="md-project_card__tasks_completed">
-//                       Active Staff: {employeeIds.length}
-//                     </span>
-//                   </div>
-
-//                   <div className="md-project_card__button_wrap">
-//                     <Link
-//                       to={`/project/subtask-dashboard/${project._id}`}
-//                       className="md-project_card__view_btn"
-//                     >
-//                       View Subtask
-//                     </Link>
-//                     <Link
-//                       to={`/project/details/${project._id}`}
-//                       className="md-project_card__view_btn"
-//                     >
-//                       View Project
-//                     </Link>
-//                   </div>
-//                 </div>
-//               </div>
-//             );
-//           })}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// export default ProjectCard;

@@ -1,6 +1,7 @@
 import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
 import Employee from "../models/employeeModel.js";
+import Client from "../models/clientModel.js";
 import Admin from "../models/adminModel.js";
 import Notification from "../models/notificationModel.js";
 
@@ -35,13 +36,47 @@ export const addSubTask = async (req, res) => {
       status,
     } = req.body;
 
-    let stages = JSON.parse(req.body.stages || "[]");
-    stages = sortStages(stages.map((s) => s.name)).map((s) => ({
-      name: s,
-      completed: false,
-      completed_by: null,
-      completed_at: null,
-    }));
+    // Parse stages sent from frontend
+    // Frontend sends: [{ name: "CAD Design", price: 500 }, ...]
+    // price is optional — if not sent, we auto-fill from client defaults
+    let rawStages = JSON.parse(req.body.stages || "[]");
+
+    // ── Fetch client's default stage pricing ──────────────────────────
+    const project = await Project.findById(project_id);
+    let clientStagePricing = [];
+
+    if (project?.client_id) {
+      const client = await Client.findById(project.client_id);
+      clientStagePricing = client?.stage_pricing || [];
+    }
+    // ─────────────────────────────────────────────────────────────────
+
+    // Sort stages in fixed order, then attach prices
+    const sortedStageNames = sortStages(rawStages.map((s) => s.name));
+
+    const stages = sortedStageNames.map((stageName) => {
+      const incomingStage = rawStages.find((s) => s.name === stageName);
+
+      // Priority: manual price from frontend > client default > 0
+      const clientDefault = clientStagePricing.find(
+        (p) => p.stage_name === stageName
+      );
+      const resolvedPrice =
+        incomingStage?.price != null
+          ? incomingStage.price
+          : clientDefault?.price ?? 0;
+
+      return {
+        name: stageName,
+        price: resolvedPrice,
+        completed: false,
+        completed_by: null,
+        completed_at: null,
+      };
+    });
+
+    // Calculate total_price from all stage prices
+    const total_price = stages.reduce((sum, s) => sum + (s.price || 0), 0);
 
     const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
 
@@ -51,6 +86,8 @@ export const addSubTask = async (req, res) => {
       description,
       url,
       stages,
+      total_price,
+      earned_amount: 0,
       priority,
       assign_date,
       due_date,
@@ -102,25 +139,58 @@ export const addBulkSubTasks = async (req, res) => {
   try {
     const tasks = req.body;
     console.log("Received tasks:", tasks);
+
+    // ── All bulk tasks belong to the same project, so fetch once ─────
+    const project = await Project.findById(tasks[0].project_id);
+    let clientStagePricing = [];
+
+    if (project?.client_id) {
+      const client = await Client.findById(project.client_id);
+      clientStagePricing = client?.stage_pricing || [];
+    }
+    // ─────────────────────────────────────────────────────────────────
+
     const tasksWithObjectIds = tasks.map((task) => {
       const parsedStages = Array.isArray(task.stages) ? task.stages : [];
+
+      const stages = sortStages(parsedStages.map((s) => s.name)).map((stageName) => {
+        const incomingStage = parsedStages.find((s) => s.name === stageName);
+
+        // Priority: manual price from frontend > client default > 0
+        const clientDefault = clientStagePricing.find(
+          (p) => p.stage_name === stageName
+        );
+        const resolvedPrice =
+          incomingStage?.price != null
+            ? incomingStage.price
+            : clientDefault?.price ?? 0;
+
+        return {
+          name: stageName,
+          price: resolvedPrice,
+          completed: false,
+          completed_by: null,
+          completed_at: null,
+        };
+      });
+
+      const total_price = stages.reduce((sum, s) => sum + (s.price || 0), 0);
+
       return {
         ...task,
         project_id: new mongoose.Types.ObjectId(task.project_id),
         assign_to: task.assign_to
           ? new mongoose.Types.ObjectId(task.assign_to)
           : null,
-        stages: sortStages(parsedStages.map((s) => s.name)).map((s) => ({
-          name: s,
-          completed: false,
-          completed_by: null,
-          completed_at: null,
-        })),
+        stages,
+        total_price,
+        earned_amount: 0,
       };
     });
 
     const result = await SubTask.insertMany(tasksWithObjectIds);
 
+    // ── Notifications (unchanged) ─────────────────────────────────────
     const admin = await Admin.findOne({});
     if (admin) {
       console.log("Admin found:", admin._id);
@@ -132,8 +202,6 @@ export const addBulkSubTasks = async (req, res) => {
     const connectedUsers = req.app.get("connectedUsers");
 
     if (tasks[0].assign_to && connectedUsers[tasks[0].assign_to]) {
-      // 🔹 Realtime: Notify assigned employees
-
       result.forEach(async (subtask) => {
         const notification = await Notification.create({
           title: "New Task Assigned",
@@ -154,6 +222,7 @@ export const addBulkSubTasks = async (req, res) => {
         }
       });
     }
+    // ─────────────────────────────────────────────────────────────────
 
     res.status(200).json(result);
   } catch (error) {
@@ -220,44 +289,49 @@ export const updateSubTask = async (req, res) => {
 
     console.log("req.body", req.body);
 
+    // ── Parse stages from "stages" field (frontend sends JSON string via FormData) ──
     let stageArray = [];
-    if (Array.isArray(req.body.stage)) {
-      stageArray = req.body.stage.map((s) => {
-        if (typeof s === "string") {
-          return { name: s, is_completed: false };
-        }
-        if (typeof s === "object" && s.name) {
-          return {
-            name: s.name,
-            is_completed: s.is_completed || false,
-            completed_by: s.completed_by || null,
-            completed_at: s.completed_at || null,
-          };
-        }
-      });
-    } else if (typeof req.body.stage === "string") {
+    if (typeof req.body.stages === "string") {
       try {
-        const parsed = JSON.parse(req.body.stage);
+        const parsed = JSON.parse(req.body.stages);
         if (Array.isArray(parsed)) {
           stageArray = parsed.map((s) => ({
             name: s.name || s,
-            is_completed: s.is_completed || false,
+            price: s.price ?? 0,           // ← preserve price
+            completed: s.completed || false,
             completed_by: s.completed_by || null,
             completed_at: s.completed_at || null,
           }));
         }
       } catch {
-        stageArray = [{ name: req.body.stage, is_completed: false }];
+        stageArray = [];
       }
+    } else if (Array.isArray(req.body.stages)) {
+      stageArray = req.body.stages.map((s) => ({
+        name: typeof s === "string" ? s : s.name,
+        price: s.price ?? 0,               // ← preserve price
+        completed: s.completed || false,
+        completed_by: s.completed_by || null,
+        completed_at: s.completed_at || null,
+      }));
     }
 
-    stageArray = sortStages(stageArray);
+    // Sort stages in fixed order
+    const sortedNames = sortStages(stageArray.map((s) => s.name));
+    stageArray = sortedNames.map((name) => {
+      const match = stageArray.find((s) => s.name === name);
+      return match || { name, price: 0, completed: false, completed_by: null, completed_at: null };
+    });
+
+    // ── Recalculate total_price from updated stage prices ──
+    const total_price = stageArray.reduce((sum, s) => sum + (s.price || 0), 0);
 
     let updateData = {
       task_name,
       description,
       url,
-      stage: stageArray,
+      stages: stageArray,               // ← was "stage", now "stages" (matches model)
+      total_price,                       // ← recalculated
       priority,
       assign_to: assign_to ? new mongoose.Types.ObjectId(assign_to) : null,
       assign_date,
@@ -277,6 +351,7 @@ export const updateSubTask = async (req, res) => {
     });
     if (!updated) return res.status(404).json({ message: "Subtask not found" });
 
+    // ── Notifications (unchanged) ─────────────────────────────────────
     if (subTask.assign_to != updated.assign_to) {
       const notification_to_previous_assignee = await Notification.create({
         title: `Subtask Updated - ${subTask.task_name}`,
@@ -309,16 +384,13 @@ export const updateSubTask = async (req, res) => {
       receiver_type: "employee",
     });
 
-    // 🔹 Realtime: Notify assigned employee
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
 
     if (updated.assign_to && connectedUsers[updated.assign_to]) {
-      io.to(connectedUsers[updated.assign_to]).emit(
-        "subtask_updated",
-        notification
-      );
+      io.to(connectedUsers[updated.assign_to]).emit("subtask_updated", notification);
     }
+    // ─────────────────────────────────────────────────────────────────
 
     res.json({
       success: true,
@@ -334,7 +406,6 @@ export const updateSubTask = async (req, res) => {
 export const completeStage = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("Completing stage for subtask:", id);
     const subtask = await SubTask.findById(id);
     if (!subtask) return res.status(404).json({ message: "Subtask not found" });
 
@@ -346,6 +417,10 @@ export const completeStage = async (req, res) => {
     subtask.stages[stageIndex].completed = true;
     subtask.stages[stageIndex].completed_by = subtask.assign_to;
     subtask.stages[stageIndex].completed_at = new Date();
+
+    // ── Update earned_amount ──────────────────────────────────────────
+    const completedStagePrice = subtask.stages[stageIndex].price || 0;
+    subtask.earned_amount = (subtask.earned_amount || 0) + completedStagePrice;
 
     // Maek Employee Status Inactive
     const employee = await Employee.findById(subtask.assign_to);
@@ -776,9 +851,8 @@ export const addComment = async (req, res) => {
       }
       const adminNotification = await Notification.create({
         title: `New Comment on Subtask ${updated.task_name}`,
-        description: `${
-          updated.comments[updated.comments.length - 1].user_id.full_name
-        } commented: ${text}`,
+        description: `${updated.comments[updated.comments.length - 1].user_id.full_name
+          } commented: ${text}`,
         type: "comment",
         icon: "/SVG/comment-vec.svg",
         related_id: subtaskId,
@@ -1019,3 +1093,4 @@ export const stopTimer = async (req, res) => {
     res.status(500).json({ message: "Failed to stop timer" });
   }
 };
+

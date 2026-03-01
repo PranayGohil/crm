@@ -11,6 +11,7 @@ import {
   getClientTasks,
   getClientProjectsWithUsername,
   getClientsWithSubtasks,
+  getClientEarningsReport
 } from "../controllers/clientController.js";
 
 const clientRouter = express.Router();
@@ -28,5 +29,6 @@ clientRouter.get("/tasks/:id", getClientTasks);
 clientRouter.get("/projects/:username", getClientProjectsWithUsername);
 
 clientRouter.get("/with-subtasks", getClientsWithSubtasks);
+clientRouter.get("/earnings-report/:id", getClientEarningsReport);
 
 export default clientRouter;
