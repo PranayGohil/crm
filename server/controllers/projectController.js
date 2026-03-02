@@ -255,40 +255,134 @@ export const addProjectContent = async (req, res) => {
 
 export const getAllProjectsWithTasks = async (req, res) => {
   try {
-    const projects = await Project.find({ isArchived: false });
-    const projectsWithSubtasks = await Promise.all(
-      projects.map(async (proj) => {
-        const subtasks = await SubTask.find({
-          project_id: proj._id.toString(),
-        });
-        return {
-          id: proj._id,
-          project_name: proj.project_name,
-          client_id: proj.client_id,
-          assign_date: proj.assign_date,
-          due_date: proj.due_date,
-          priority: proj.priority,
-          status: proj.status,
-          subtasks: subtasks.map((s) => ({
-            id: s._id,
-            task_name: s.task_name,
-            stages: s.stages,
-            current_stage_index: s.current_stage_index,
-            priority: s.priority,
-            status: s.status,
-            url: s.url,
-            assign_to: s.assign_to || null,
-            assign_date: s.assign_date,
-            due_date: s.due_date,
-            time_logs: s.time_logs,
-            timeTracked: "-", // add logic if you track time
-          })),
-        };
-      })
-    );
-    res.status(200).json(projectsWithSubtasks);
+    const {
+      page = 1,
+      limit = 20,
+      search = "",
+      client = "",
+      status = "",
+      priority = "",
+      stage = "",
+      employee = "",
+      subtaskStatus = "",
+    } = req.query;
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    // ── 1. Build project-level match ──────────────────────────────────
+    const projectMatch = { isArchived: false };
+
+    if (search) {
+      projectMatch.project_name = { $regex: search, $options: "i" };
+    }
+    if (client) {
+      projectMatch.client_id = client;
+    }
+    if (status) {
+      projectMatch.status = status;
+    }
+    if (priority) {
+      projectMatch.priority = priority;
+    }
+
+    // ── 2. Build subtask-level match ──────────────────────────────────
+    // Used BOTH in the $lookup pipeline and to decide whether a project
+    // should be included (when subtask filters are active).
+    const subtaskMatch = {};
+
+    if (employee) {
+      subtaskMatch.assign_to = new mongoose.Types.ObjectId(employee);
+    }
+    if (subtaskStatus) {
+      subtaskMatch.status = subtaskStatus;
+    }
+    if (stage) {
+      // Match subtasks whose stages array contains a stage with this name
+      subtaskMatch["stages.name"] = stage;
+    }
+
+    const hasSubtaskFilter = employee || subtaskStatus || stage;
+
+    // ── 3. Aggregation pipeline ───────────────────────────────────────
+    const pipeline = [
+      { $match: projectMatch },
+
+      // Join subtasks — filter them in the pipeline so we only pull
+      // the fields we actually render in the table.
+      {
+        $lookup: {
+          from: "subtasks",
+          let: { pid: { $toString: "$_id" } },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$project_id", { $toObjectId: "$$pid" }] },
+                ...(Object.keys(subtaskMatch).length ? subtaskMatch : {}),
+              },
+            },
+            // Only send the columns the UI needs — keeps the payload small
+            {
+              $project: {
+                task_name: 1,
+                status: 1,
+                priority: 1,
+                stages: 1,
+                current_stage_index: 1,
+                assign_to: 1,
+                assign_date: 1,
+                due_date: 1,
+                url: 1,
+                time_logs: 1,
+              },
+            },
+          ],
+          as: "subtasks",
+        },
+      },
+
+      // If subtask filters are active, drop projects that have no
+      // matching subtasks after the filtered $lookup.
+      ...(hasSubtaskFilter
+        ? [{ $match: { "subtasks.0": { $exists: true } } }]
+        : []),
+    ];
+
+    // Run count and data queries in parallel
+    const [countResult, projects] = await Promise.all([
+      Project.aggregate([...pipeline, { $count: "total" }]),
+      Project.aggregate([
+        ...pipeline,
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: Number(limit) },
+        // Only send project fields the table renders
+        {
+          $project: {
+            project_name: 1,
+            client_id: 1,
+            assign_date: 1,
+            due_date: 1,
+            priority: 1,
+            status: 1,
+            subtasks: 1,
+          },
+        },
+      ]),
+    ]);
+
+    const total = countResult[0]?.total ?? 0;
+
+    res.status(200).json({
+      projects,
+      pagination: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / Number(limit)),
+      },
+    });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("getAllProjectsWithTasks error:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -296,82 +390,107 @@ export const getAllProjectsWithTasks = async (req, res) => {
 export const getProjectsForReportingManager = async (req, res) => {
   try {
     const { managerId } = req.params;
+    const {
+      search = "",
+      status = "",
+      priority = "",
+      stage = "",
+      employee = "",
+      page = 1,
+      limit = 20,
+    } = req.query;
 
-    // 1. Find the manager (to access manage_stages)
-    const manager = await Employee.findById(managerId);
-    if (!manager) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Manager not found" });
-    }
+    const manager = await Employee.findById(managerId).lean();
+    if (!manager) return res.status(404).json({ success: false, message: "Manager not found" });
 
-    const manageStages = manager.manage_stages || [];
+    const manageStages = manager.manage_stages ?? [];
 
-    // 2. Find employees under this reporting manager
-    const employees = await Employee.find({ reporting_manager: managerId });
-    const employeeIds = employees.map((emp) => emp._id.toString());
+    // Get employee IDs under this manager
+    const teamEmployees = await Employee.find({ reporting_manager: managerId }, "_id").lean();
+    const teamIds = teamEmployees.map((e) => e._id);
 
-    // 3. Get all projects
-    const projects = await Project.find({ isArchived: false });
+    const skip = (Number(page) - 1) * Number(limit);
 
-    // 4. Filter projects by subtasks
-    const projectsWithSubtasks = await Promise.all(
-      projects.map(async (proj) => {
-        // Subtasks of manager’s employees
-        const employeeSubtasks = await SubTask.find({
-          project_id: proj._id.toString(),
-          assign_to: { $in: employeeIds },
-        });
+    const projectMatch = { isArchived: false };
+    if (search) projectMatch.project_name = { $regex: search, $options: "i" };
+    if (status) projectMatch.status = status;
+    if (priority) projectMatch.priority = priority;
 
-        // Subtasks matching manager’s manage_stages
-        const stageSubtasks = await SubTask.find({
-          project_id: proj._id.toString(),
-          $expr: {
-            $in: [
-              { $arrayElemAt: ["$stages.name", "$current_stage_index"] },
-              manageStages,
-            ],
+    const subtaskMatch = {};
+    if (employee) subtaskMatch.assign_to = new mongoose.Types.ObjectId(employee);
+    if (stage) subtaskMatch["stages.name"] = stage;
+
+    const subtaskPipeline = [
+      {
+        $match: {
+          $expr: { $eq: ["$project_id", "$$pid"] },
+          $or: [
+            { assign_to: { $in: teamIds } },
+            // Stage matches current stage name
+            ...(manageStages.length
+              ? [{
+                $expr: {
+                  $in: [
+                    { $arrayElemAt: ["$stages.name", "$current_stage_index"] },
+                    manageStages,
+                  ],
+                },
+              }]
+              : []),
+          ],
+          ...subtaskMatch,
+        },
+      },
+      {
+        $project: {
+          task_name: 1, stages: 1, current_stage_index: 1,
+          priority: 1, status: 1, url: 1,
+          assign_to: 1, assign_date: 1, due_date: 1, time_logs: 1,
+        },
+      },
+    ];
+
+    const pipeline = [
+      { $match: projectMatch },
+      {
+        $lookup: {
+          from: "subtasks",
+          let: { pid: "$_id" },
+          pipeline: subtaskPipeline,
+          as: "subtasks",
+        },
+      },
+      { $match: { "subtasks.0": { $exists: true } } },
+    ];
+
+    const [countRes, projects] = await Promise.all([
+      Project.aggregate([...pipeline, { $count: "total" }]),
+      Project.aggregate([
+        ...pipeline,
+        { $sort: { createdAt: -1 } },
+        { $skip: skip },
+        { $limit: Number(limit) },
+        {
+          $project: {
+            project_name: 1, client_id: 1,
+            assign_date: 1, due_date: 1,
+            priority: 1, status: 1, subtasks: 1,
           },
-        });
+        },
+      ]),
+    ]);
 
-        // Merge & remove duplicates
-        const allSubtasks = [...employeeSubtasks, ...stageSubtasks].filter(
-          (s, idx, arr) =>
-            idx ===
-            arr.findIndex((ss) => ss._id.toString() === s._id.toString())
-        );
-
-        if (allSubtasks.length === 0) return null;
-
-        return {
-          id: proj._id,
-          project_name: proj.project_name,
-          client_id: proj.client_id,
-          assign_date: proj.assign_date,
-          due_date: proj.due_date,
-          priority: proj.priority,
-          status: proj.status,
-          subtasks: allSubtasks.map((s) => ({
-            id: s._id,
-            task_name: s.task_name,
-            stages: s.stages,
-            current_stage_index: s.current_stage_index,
-            priority: s.priority,
-            status: s.status,
-            url: s.url,
-            assign_to: s.assign_to || null,
-            assign_date: s.assign_date,
-            due_date: s.due_date,
-            time_logs: s.time_logs,
-          })),
-        };
-      })
-    );
-
-    const filteredProjects = projectsWithSubtasks.filter(Boolean);
-    res.status(200).json(filteredProjects);
+    res.json({
+      projects,
+      pagination: {
+        total: countRes[0]?.total ?? 0,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil((countRes[0]?.total ?? 0) / Number(limit)),
+      },
+    });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("getProjectsForReportingManager error:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };

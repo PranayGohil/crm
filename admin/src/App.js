@@ -48,6 +48,7 @@ import Designation from "./pages/admin-panel/Designation";
 import Department from "./pages/admin-panel/Department";
 
 import AdminProfile from "./pages/admin-panel/AdminProfile";
+import ManageAdmins from "./pages/admin-panel/ManageAdmins";
 
 import ArchivedProjects from "./pages/admin-panel/project/ArchivedProjects";
 
@@ -143,6 +144,8 @@ function App() {
         <Route path="/subtask/logs/:subtaskId" element={<SubtaskLogs />} />
 
         <Route path="/earnings-report" element={<EarningsReport />} />
+
+        <Route path="/manage-admins" element={<ManageAdmins />} />
 
         <Route
           path="/notification-settings"

@@ -61,5 +61,21 @@ const employeeSchema = mongoose.Schema({
   },
 });
 
+// Unique login lookup (already created via unique:true, but explicit is fine)
+employeeSchema.index(
+  { username: 1 },
+  { unique: true, name: "idx_employee_username" }
+);
+
+employeeSchema.index(
+  { reporting_manager: 1 },
+  { name: "idx_employee_reporting_manager" }
+);
+
+employeeSchema.index(
+  { is_manager: 1 },
+  { name: "idx_employee_is_manager" }
+);
+
 const Employee = mongoose.model("Employee", employeeSchema);
 export default Employee;

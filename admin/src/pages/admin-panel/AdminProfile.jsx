@@ -28,7 +28,11 @@ const AdminProfile = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/admin/profile`
+        `${process.env.REACT_APP_API_URL}/api/admin/profile`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      }
       );
       if (res.data.success) {
         setForm({
@@ -69,7 +73,12 @@ const AdminProfile = () => {
 
       const res = await axios.put(
         `${process.env.REACT_APP_API_URL}/api/admin/update-profile`,
-        data
+        data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data"
+        }
+      }
       );
       if (res.data.success) {
         alert("Profile updated!");

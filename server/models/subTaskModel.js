@@ -63,5 +63,26 @@ const subTaskSchema = mongoose.Schema(
   }
 );
 
+// Single indexes
+subTaskSchema.index({ project_id: 1 }, { name: "idx_subtask_project" });
+subTaskSchema.index({ assign_to: 1 }, { name: "idx_subtask_assignee" });
+subTaskSchema.index({ status: 1 }, { name: "idx_subtask_status" });
+subTaskSchema.index({ "stages.name": 1 }, { name: "idx_subtask_stage_name" });
+subTaskSchema.index(
+  { "stages.completed_by": 1 },
+  { name: "idx_subtask_completed_by" }
+);
+
+// Compound indexes
+subTaskSchema.index(
+  { project_id: 1, status: 1 },
+  { name: "idx_subtask_project_status" }
+);
+
+subTaskSchema.index(
+  { project_id: 1, assign_to: 1 },
+  { name: "idx_subtask_project_assignee" }
+);
+
 const SubTask = mongoose.model("Subtask", subTaskSchema);
 export default SubTask;

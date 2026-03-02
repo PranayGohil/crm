@@ -5,7 +5,7 @@ import Client from "../models/clientModel.js";
 import Admin from "../models/adminModel.js";
 import Notification from "../models/notificationModel.js";
 
-import mongoose, { connect } from "mongoose";
+import mongoose from "mongoose";
 import cloudinary from "../config/cloudinary.js";
 
 const FIXED_STAGE_ORDER = [
@@ -758,35 +758,6 @@ export const bulkDeleteSubtasks = async (req, res) => {
   } catch (error) {
     console.error("Error bulk deleting subtasks:", error);
     res.status(500).json({ error: "Bulk delete failed" });
-  }
-};
-
-// Get all projects with attached subtasks
-export const getAllProjectsWithSubtasks = async (req, res) => {
-  try {
-    const projects = await Project.find({ isArchived: false }).lean();
-
-    const projectIds = projects.map((p) => p._id.toString());
-    const subtasks = await SubTask.find({
-      project_id: { $in: projectIds },
-    }).lean();
-
-    // group subtasks by project_id
-    const subtasksByProject = subtasks.reduce((acc, subtask) => {
-      if (!acc[subtask.project_id]) acc[subtask.project_id] = [];
-      acc[subtask.project_id].push(subtask);
-      return acc;
-    }, {});
-
-    const projectsWithSubtasks = projects.map((project) => ({
-      ...project,
-      subtasks: subtasksByProject[project._id.toString()] || [],
-    }));
-
-    res.json(projectsWithSubtasks);
-  } catch (error) {
-    console.error("Error fetching projects with subtasks:", error);
-    res.status(500).json({ message: "Server error" });
   }
 };
 

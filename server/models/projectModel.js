@@ -31,7 +31,7 @@ const projectSchema = mongoose.Schema(
         currency: String,
       },
     ],
-    
+
     isArchived: {
       type: Boolean,
       default: false,
@@ -42,6 +42,28 @@ const projectSchema = mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Single indexes
+projectSchema.index({ isArchived: 1 }, { name: "idx_project_archived" });
+projectSchema.index({ client_id: 1 }, { name: "idx_project_client" });
+projectSchema.index({ status: 1 }, { name: "idx_project_status" });
+projectSchema.index({ priority: 1 }, { name: "idx_project_priority" });
+
+// Text search index
+projectSchema.index(
+  { project_name: "text" },
+  {
+    name: "idx_project_name_text",
+    default_language: "english",
+  }
+);
+
+// Compound index
+projectSchema.index(
+  { isArchived: 1, client_id: 1 },
+  { name: "idx_project_archived_client" }
+);
+
 
 const Project = mongoose.model("Project", projectSchema);
 export default Project;

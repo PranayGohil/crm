@@ -10,7 +10,6 @@ import {
   completeStage,
   changeSubTaskStatus,
   changeSubTaskPriority,
-  getAllProjectsWithSubtasks,
   bulkUpdateSubtasks,
   bulkDeleteSubtasks,
   addComment,
@@ -37,7 +36,6 @@ subTaskRouter.put(
 subTaskRouter.put("/complete-stage/:id", completeStage);
 subTaskRouter.put("/change-status/:id", changeSubTaskStatus);
 subTaskRouter.put("/change-priority/:id", changeSubTaskPriority);
-subTaskRouter.get("/all-tasks-projects", getAllProjectsWithSubtasks);
 subTaskRouter.put("/bulk-update", bulkUpdateSubtasks);
 subTaskRouter.post("/bulk-delete", bulkDeleteSubtasks);
 

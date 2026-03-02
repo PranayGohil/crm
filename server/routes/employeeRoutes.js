@@ -13,6 +13,7 @@ import {
   getManagers,
   getEmployeeCompletedTasks,
   getEmployeeActivityHistory,
+  getEmployeeTimeTracking,
 } from "../controllers/employeeController.js";
 import upload from "../middlewares/upload.js";
 
@@ -31,5 +32,6 @@ employeeRouter.get("/dashboard/:employeeId", getEmployeeDashboardData);
 employeeRouter.get("/managers", getManagers);
 employeeRouter.get("/completed-tasks/:employeeId", getEmployeeCompletedTasks);
 employeeRouter.get("/activity-history/:employeeId", getEmployeeActivityHistory);
+employeeRouter.get("/time-tracking/:employeeId", getEmployeeTimeTracking);
 
 export default employeeRouter;
