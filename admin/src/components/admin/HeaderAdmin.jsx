@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSocket } from "../../contexts/SocketContext";
 
 const HeaderAdmin = () => {
   const { notifications, setNotifications } = useSocket();
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
   const fetchUser = async () => {
@@ -17,10 +18,16 @@ const HeaderAdmin = () => {
           },
         }
       );
+      console.log("Fetched user:", res.data);
+      if (!res.data.success) {
+        navigate("/login");
+        return;
+      }
       setUser(res.data.admin);
       fetchNotifications(res.data.admin._id);
     } catch (err) {
       console.error("Error fetching user:", err);
+      navigate("/login");
     }
   };
 

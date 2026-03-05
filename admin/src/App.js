@@ -58,6 +58,8 @@ import EarningsReport from "./pages/admin-panel/EarningsReport";
 
 import NotificationSettings from "./NotificationSettings";
 
+import ActivityLogs from "./pages/admin-panel/ActivityLogs";
+
 function App() {
   return (
     <Routes>
@@ -151,6 +153,7 @@ function App() {
           path="/notification-settings"
           element={<NotificationSettings />}
         />
+        <Route path="/activity-logs" element={<ActivityLogs />} />
       </Route>
 
       <Route path="/" element={<Plain_layout />}>

@@ -4,6 +4,7 @@ import Employee from "../models/employeeModel.js";
 import Client from "../models/clientModel.js";
 import Admin from "../models/adminModel.js";
 import Notification from "../models/notificationModel.js";
+import ActivityLogger from "../utils/activityLogger.js";
 
 import mongoose from "mongoose";
 import cloudinary from "../config/cloudinary.js";
@@ -21,6 +22,33 @@ function sortStages(inputStages) {
   return FIXED_STAGE_ORDER.filter((stage) => uniqueStages.includes(stage));
 }
 
+// Helper to get project and employee details for logging
+const getRelatedInfo = async (projectId, employeeId) => {
+  const related = {};
+
+  if (projectId) {
+    const project = await Project.findById(projectId);
+    if (project) {
+      related.project = {
+        id: project._id,
+        name: project.project_name
+      };
+    }
+  }
+
+  if (employeeId) {
+    const employee = await Employee.findById(employeeId);
+    if (employee) {
+      related.employee = {
+        id: employee._id,
+        name: employee.full_name
+      };
+    }
+  }
+
+  return related;
+};
+
 export const addSubTask = async (req, res) => {
   try {
     const {
@@ -37,11 +65,9 @@ export const addSubTask = async (req, res) => {
     } = req.body;
 
     // Parse stages sent from frontend
-    // Frontend sends: [{ name: "CAD Design", price: 500 }, ...]
-    // price is optional — if not sent, we auto-fill from client defaults
     let rawStages = JSON.parse(req.body.stages || "[]");
 
-    // ── Fetch client's default stage pricing ──────────────────────────
+    // Fetch project and client info
     const project = await Project.findById(project_id);
     let clientStagePricing = [];
 
@@ -49,15 +75,12 @@ export const addSubTask = async (req, res) => {
       const client = await Client.findById(project.client_id);
       clientStagePricing = client?.stage_pricing || [];
     }
-    // ─────────────────────────────────────────────────────────────────
 
     // Sort stages in fixed order, then attach prices
     const sortedStageNames = sortStages(rawStages.map((s) => s.name));
 
     const stages = sortedStageNames.map((stageName) => {
       const incomingStage = rawStages.find((s) => s.name === stageName);
-
-      // Priority: manual price from frontend > client default > 0
       const clientDefault = clientStagePricing.find(
         (p) => p.stage_name === stageName
       );
@@ -75,9 +98,7 @@ export const addSubTask = async (req, res) => {
       };
     });
 
-    // Calculate total_price from all stage prices
     const total_price = stages.reduce((sum, s) => sum + (s.price || 0), 0);
-
     const mediaFiles = req.files ? req.files.map((file) => file.path) : [];
 
     const subTaskData = {
@@ -102,13 +123,27 @@ export const addSubTask = async (req, res) => {
 
     const subTask = await SubTask.create(subTaskData);
 
-    const admin = await Admin.findOne({});
-    if (admin) {
-      console.log("Admin found:", admin._id);
-    } else {
-      console.log("No admin found in the database");
-    }
+    // 📝 LOG ACTIVITY
+    const logger = new ActivityLogger(req);
+    const relatedInfo = await getRelatedInfo(project_id, assign_to);
 
+    await logger.log('CREATE_SUBTASK', {
+      entity: {
+        id: subTask._id,
+        name: task_name,
+        type: 'subtask'
+      },
+      relatedTo: relatedInfo,
+      metadata: {
+        priority,
+        status,
+        stages: stages.length
+      },
+      description: `Created new subtask "${task_name}" for project "${project?.project_name || 'Unknown'}"`
+    });
+
+    // Rest of your existing code (notifications, etc.)
+    const admin = await Admin.findOne({});
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
 
@@ -140,7 +175,6 @@ export const addBulkSubTasks = async (req, res) => {
     const tasks = req.body;
     console.log("Received tasks:", tasks);
 
-    // ── All bulk tasks belong to the same project, so fetch once ─────
     const project = await Project.findById(tasks[0].project_id);
     let clientStagePricing = [];
 
@@ -148,15 +182,12 @@ export const addBulkSubTasks = async (req, res) => {
       const client = await Client.findById(project.client_id);
       clientStagePricing = client?.stage_pricing || [];
     }
-    // ─────────────────────────────────────────────────────────────────
 
     const tasksWithObjectIds = tasks.map((task) => {
       const parsedStages = Array.isArray(task.stages) ? task.stages : [];
 
       const stages = sortStages(parsedStages.map((s) => s.name)).map((stageName) => {
         const incomingStage = parsedStages.find((s) => s.name === stageName);
-
-        // Priority: manual price from frontend > client default > 0
         const clientDefault = clientStagePricing.find(
           (p) => p.stage_name === stageName
         );
@@ -190,6 +221,22 @@ export const addBulkSubTasks = async (req, res) => {
 
     const result = await SubTask.insertMany(tasksWithObjectIds);
 
+    // 📝 LOG ACTIVITY
+    const logger = new ActivityLogger(req);
+    const relatedInfo = await getRelatedInfo(tasks[0].project_id, tasks[0].assign_to);
+
+    await logger.log('BULK_CREATE_SUBTASKS', {
+      entity: {
+        type: 'subtask'
+      },
+      relatedTo: relatedInfo,
+      metadata: {
+        count: result.length,
+        taskNames: result.map(t => t.task_name).join(', ')
+      },
+      description: `Bulk created ${result.length} subtasks for project "${project?.project_name || 'Unknown'}"`
+    });
+
     // ── Notifications (unchanged) ─────────────────────────────────────
     const admin = await Admin.findOne({});
     if (admin) {
@@ -222,7 +269,6 @@ export const addBulkSubTasks = async (req, res) => {
         }
       });
     }
-    // ─────────────────────────────────────────────────────────────────
 
     res.status(200).json(result);
   } catch (error) {
@@ -350,6 +396,43 @@ export const updateSubTask = async (req, res) => {
       new: true,
     });
     if (!updated) return res.status(404).json({ message: "Subtask not found" });
+
+    // 📝 LOG ACTIVITY
+    const logger = new ActivityLogger(req);
+    const relatedInfo = await getRelatedInfo(originalSubTask.project_id, originalSubTask.assign_to);
+
+    // Track what changed
+    const changedFields = [];
+    if (originalSubTask.task_name !== updated.task_name) changedFields.push('task_name');
+    if (originalSubTask.description !== updated.description) changedFields.push('description');
+    if (originalSubTask.priority !== updated.priority) changedFields.push('priority');
+    if (originalSubTask.status !== updated.status) changedFields.push('status');
+    if (originalSubTask.assign_to?.toString() !== updated.assign_to?.toString()) changedFields.push('assignee');
+
+    await logger.log('UPDATE_SUBTASK', {
+      entity: {
+        id: updated._id,
+        name: updated.task_name,
+        type: 'subtask'
+      },
+      changes: {
+        before: {
+          task_name: originalSubTask.task_name,
+          status: originalSubTask.status,
+          priority: originalSubTask.priority,
+          assign_to: originalSubTask.assign_to
+        },
+        after: {
+          task_name: updated.task_name,
+          status: updated.status,
+          priority: updated.priority,
+          assign_to: updated.assign_to
+        },
+        updatedFields: changedFields
+      },
+      relatedTo: relatedInfo,
+      description: `Updated subtask "${updated.task_name}" (changed: ${changedFields.join(', ') || 'no changes'})`
+    });
 
     // ── Notifications (unchanged) ─────────────────────────────────────
     if (subTask.assign_to != updated.assign_to) {
@@ -494,6 +577,23 @@ export const deleteSubTask = async (req, res) => {
     }
     await SubTask.findByIdAndDelete(id);
 
+    // 📝 LOG ACTIVITY
+    const logger = new ActivityLogger(req);
+    await logger.log('DELETE_SUBTASK', {
+      entity: {
+        id: subTask._id,
+        name: subTask.task_name,
+        type: 'subtask'
+      },
+      relatedTo: relatedInfo,
+      metadata: {
+        status: subTask.status,
+        priority: subTask.priority
+      },
+      description: `Deleted subtask "${subTask.task_name}"`,
+      severity: 'warning'
+    });
+
     res.status(200).json({ message: "Subtask deleted successfully" });
   } catch (error) {
     console.error("Error deleting subtask:", error);
@@ -548,6 +648,26 @@ export const changeSubTaskStatus = async (req, res) => {
     // ✅ Update subtask status
     subtask.status = status;
     await subtask.save();
+
+    // 📝 LOG ACTIVITY (only if admin changed it)
+    if (userRole === "admin") {
+      const logger = new ActivityLogger(req);
+      const relatedInfo = await getRelatedInfo(subtask.project_id, subtask.assign_to);
+
+      await logger.log('CHANGE_SUBTASK_STATUS', {
+        entity: {
+          id: subtask._id,
+          name: subtask.task_name,
+          type: 'subtask'
+        },
+        changes: {
+          before: { status: oldStatus },
+          after: { status }
+        },
+        relatedTo: relatedInfo,
+        description: `Changed subtask "${subtask.task_name}" status from "${oldStatus}" to "${status}"`
+      });
+    }
 
     // ✅ Update employee status based on subtask state
     if (userRole === "employee" && subtask.assign_to) {

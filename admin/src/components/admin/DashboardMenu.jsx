@@ -18,9 +18,8 @@ const DashboardMenu = () => {
 
   return (
     <div
-      className={`flex flex-col relative justify-between bg-white border-r border-gray-200 transition-all duration-300 ${
-        collapsed ? "w-20" : "w-64"
-      } h-screen`}
+      className={`flex flex-col relative justify-between bg-white border-r border-gray-200 transition-all duration-300 ${collapsed ? "w-20" : "w-64"
+        } h-screen`}
     >
       {/* Collapse Button */}
       <div className="absolute -right-3 top-6 z-20 overflow-visible">
@@ -30,9 +29,8 @@ const DashboardMenu = () => {
         >
           <div className="flex justify-center items-center">
             <svg
-              className={`w-3 h-5 text-gray-600 transition-transform duration-300 ${
-                collapsed ? "rotate-180" : ""
-              }`}
+              className={`w-3 h-5 text-gray-600 transition-transform duration-300 ${collapsed ? "rotate-180" : ""
+                }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -77,11 +75,10 @@ const DashboardMenu = () => {
           {/* Dashboard */}
           <Link
             to="/dashboard"
-            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${
-              isActive("/dashboard")
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive("/dashboard")
+              ? "bg-blue-100 text-blue-600"
+              : "text-gray-600 hover:bg-gray-100"
+              }`}
           >
             <svg
               className="w-5 h-5"
@@ -102,11 +99,10 @@ const DashboardMenu = () => {
           {/* Projects */}
           <Link
             to="/project/dashboard"
-            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${
-              isActive("/project")
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive("/project")
+              ? "bg-blue-100 text-blue-600"
+              : "text-gray-600 hover:bg-gray-100"
+              }`}
           >
             <svg
               className="w-5 h-5"
@@ -127,11 +123,10 @@ const DashboardMenu = () => {
           {/* Tasks */}
           <Link
             to="/subtasks"
-            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${
-              isActive("/subtasks")
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive("/subtasks")
+              ? "bg-blue-100 text-blue-600"
+              : "text-gray-600 hover:bg-gray-100"
+              }`}
           >
             <svg
               className="w-5 h-5"
@@ -152,11 +147,10 @@ const DashboardMenu = () => {
           {/* Reports */}
           <Link
             to="/time-tracking"
-            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${
-              isActive("/time-tracking")
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive("/time-tracking")
+              ? "bg-blue-100 text-blue-600"
+              : "text-gray-600 hover:bg-gray-100"
+              }`}
           >
             <svg
               className="w-5 h-5"
@@ -179,11 +173,10 @@ const DashboardMenu = () => {
           {/* Clients */}
           <Link
             to="/client/dashboard"
-            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${
-              isActive("/client")
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive("/client")
+              ? "bg-blue-100 text-blue-600"
+              : "text-gray-600 hover:bg-gray-100"
+              }`}
           >
             <svg
               className="w-5 h-5"
@@ -204,11 +197,10 @@ const DashboardMenu = () => {
           {/* Employees */}
           <Link
             to="/employee/dashboard"
-            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${
-              isActive("/employee")
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive("/employee")
+              ? "bg-blue-100 text-blue-600"
+              : "text-gray-600 hover:bg-gray-100"
+              }`}
           >
             <svg
               className="w-5 h-5"
@@ -229,11 +221,10 @@ const DashboardMenu = () => {
           {/* Designation */}
           <Link
             to="/designation"
-            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${
-              isActive("/designation")
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive("/designation")
+              ? "bg-blue-100 text-blue-600"
+              : "text-gray-600 hover:bg-gray-100"
+              }`}
           >
             <svg
               className="w-5 h-5"
@@ -254,11 +245,10 @@ const DashboardMenu = () => {
           {/* Department */}
           <Link
             to="/department"
-            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${
-              isActive("/department")
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive("/department")
+              ? "bg-blue-100 text-blue-600"
+              : "text-gray-600 hover:bg-gray-100"
+              }`}
           >
             <svg
               className="w-5 h-5"
@@ -279,11 +269,10 @@ const DashboardMenu = () => {
           {/* Archived Projects */}
           <Link
             to="/archived-projects"
-            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${
-              isActive("/archived-projects")
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive("/archived-projects")
+              ? "bg-blue-100 text-blue-600"
+              : "text-gray-600 hover:bg-gray-100"
+              }`}
           >
             <svg
               className="w-5 h-5"
@@ -295,7 +284,7 @@ const DashboardMenu = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                d="M3 7h18M5 7v13a2 2 0 002 2h10a2 2 0 002-2V7M9 12h6"
               />
             </svg>
             {!collapsed && (
@@ -306,11 +295,10 @@ const DashboardMenu = () => {
           {/* Notification Settings */}
           <Link
             to="/notification-settings"
-            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${
-              isActive("/notification-settings")
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive("/notification-settings")
+              ? "bg-blue-100 text-blue-600"
+              : "text-gray-600 hover:bg-gray-100"
+              }`}
           >
             <svg
               className="w-5 h-5"
@@ -322,11 +310,37 @@ const DashboardMenu = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 11-6 0"
               />
             </svg>
             {!collapsed && (
               <span className="font-medium">Notification Settings</span>
+            )}
+          </Link>
+
+          {/* Earning Report */}
+          <Link
+            to="/earnings-report"
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive("/earnings-report")
+              ? "bg-blue-100 text-blue-600"
+              : "text-gray-600 hover:bg-gray-100"
+              }`}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 3v18h18M7 14l4-4 4 4 5-5"
+              />
+            </svg>
+            {!collapsed && (
+              <span className="font-medium">Earnings Report</span>
             )}
           </Link>
         </div>

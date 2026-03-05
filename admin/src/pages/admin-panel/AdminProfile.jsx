@@ -1,6 +1,6 @@
 // src/pages/admin/AdminProfile.jsx
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingOverlay from "../../components/admin/LoadingOverlay";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -17,6 +17,7 @@ const AdminProfile = () => {
     profile_pic_preview: "",
   });
   const [profilePic, setProfilePic] = useState(null);
+  const [role, setRole] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -35,6 +36,7 @@ const AdminProfile = () => {
       }
       );
       if (res.data.success) {
+        setRole(res.data.admin.role);
         setForm({
           ...res.data.admin,
           profile_pic_preview: res.data.admin.profile_pic || "",
@@ -97,7 +99,7 @@ const AdminProfile = () => {
 
   return (
     <section className="min-h-screen bg-gray-50 p-6">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="flex justify-between bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <div className="flex items-center">
           <button
             onClick={() => navigate(-1)}
@@ -120,6 +122,58 @@ const AdminProfile = () => {
             </h1>
           </div>
         </div>
+        {role === "super-admin" && (
+          <div className="flex items-center gap-3">
+            <Link to="/manage-admins"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 14a4 4 0 100-8 4 4 0 000 8z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 20a6 6 0 0112 0"
+                />
+              </svg>
+              Manage Admins
+            </Link>
+            <Link to="/activity-logs"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3.05 11a9 9 0 111.7 5.3M3 4v5h5"
+                />
+              </svg>
+              Activity Logs
+            </Link>
+          </div>
+        )}
       </div>
 
       {errors.general && (
