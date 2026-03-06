@@ -31,6 +31,12 @@ const Department = () => {
         `${process.env.REACT_APP_API_URL}/api/department/add`,
         {
           name: newDepartment,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
       );
       setDepartments([...departments, res.data]);
@@ -43,7 +49,12 @@ const Department = () => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(
-        `${process.env.REACT_APP_API_URL}/api/department/delete/${id}`
+        `${process.env.REACT_APP_API_URL}/api/department/delete/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       setDepartments(departments.filter((d) => d._id !== id));
     } catch (err) {

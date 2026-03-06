@@ -71,7 +71,13 @@ const CreateNewClient = () => {
         const { confirm_password, ...payload } = values;
         const res = await axios.post(
           `${process.env.REACT_APP_API_URL}/api/client/add`,
-          payload
+          payload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
         if (res.data.success) {
           toast.success("Client added successfully!");

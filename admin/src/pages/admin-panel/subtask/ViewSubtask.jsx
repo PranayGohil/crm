@@ -93,14 +93,63 @@ const ViewSubtask = () => {
 
   const handleUpdate = async () => {
     setLoading(true);
+
     try {
       setSaving(true);
-      await axios.put(`${process.env.REACT_APP_API_URL}/api/subtask/change-status/${subtaskId}`,
-        { status: editingStatus, userId: subtask.assign_to, userRole: "admin" });
-      await axios.put(`${process.env.REACT_APP_API_URL}/api/subtask/change-priority/${subtaskId}`,
-        { priority: editingPriority });
+
+      const requests = [];
+
+      // Only update status if changed
+      if (editingStatus !== subtask.status) {
+        requests.push(
+          axios.put(
+            `${process.env.REACT_APP_API_URL}/api/subtask/change-status/${subtaskId}`,
+            {
+              status: editingStatus,
+              userId: subtask.assign_to,
+              userRole: "admin",
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          )
+        );
+      }
+
+      // Only update priority if changed
+      if (editingPriority !== subtask.priority) {
+        requests.push(
+          axios.put(
+            `${process.env.REACT_APP_API_URL}/api/subtask/change-priority/${subtaskId}`,
+            { priority: editingPriority },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          )
+        );
+      }
+
+      // If nothing changed
+      if (requests.length === 0) {
+        toast.info("No changes detected.");
+        setIsEditing(false);
+        return;
+      }
+
+      await Promise.all(requests);
+
       toast.success("Subtask updated successfully!");
-      setSubtask((prev) => ({ ...prev, status: editingStatus, priority: editingPriority }));
+
+      setSubtask((prev) => ({
+        ...prev,
+        status: editingStatus,
+        priority: editingPriority,
+      }));
+
       setIsEditing(false);
     } catch (error) {
       toast.error("Failed to update subtask.");
@@ -117,7 +166,12 @@ const ViewSubtask = () => {
       formData.append("user_type", "admin");
       for (const file of files) formData.append("media_files", file);
       const { data } = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/subtask/add-media/${subtaskId}`, formData);
+        `${process.env.REACT_APP_API_URL}/api/subtask/add-media/${subtaskId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
       setMediaItems(data.media_files.map((url) => ({ src: url, alt: "Uploaded file" })));
       toast.success("Media uploaded!");
     } catch (error) {
@@ -133,7 +187,10 @@ const ViewSubtask = () => {
     try {
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/remove-media/${subtaskId}`,
-        { mediaUrl: mediaToRemove, user_type: "admin", user_id: userId });
+        { mediaUrl: mediaToRemove, user_type: "admin", user_id: userId }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      }
+      );
       setMediaItems(data.media_files.map((url) => ({ src: url, alt: "Uploaded file" })));
       toast.success("Media removed!");
     } catch (error) {
@@ -150,7 +207,10 @@ const ViewSubtask = () => {
     try {
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/add-comment/${subtaskId}`,
-        { user_type: "admin", text: newComment });
+        { user_type: "admin", text: newComment }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      }
+      );
       setComments(data.comments);
       setNewComment("");
     } catch (error) {
@@ -239,13 +299,13 @@ const ViewSubtask = () => {
               ) : (
                 <div className="flex items-center gap-2">
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${subtask.status === "Completed" ? "bg-green-100 text-green-800" :
-                      subtask.status === "In Progress" ? "bg-blue-100 text-blue-800" :
-                        "bg-yellow-100 text-yellow-800"}`}>
+                    subtask.status === "In Progress" ? "bg-blue-100 text-blue-800" :
+                      "bg-yellow-100 text-yellow-800"}`}>
                     {subtask.status || "Status Unknown"}
                   </span>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${subtask.priority === "High" ? "bg-red-100 text-red-800" :
-                      subtask.priority === "Medium" ? "bg-orange-100 text-orange-800" :
-                        "bg-blue-100 text-blue-800"}`}>
+                    subtask.priority === "Medium" ? "bg-orange-100 text-orange-800" :
+                      "bg-blue-100 text-blue-800"}`}>
                     {subtask.priority || "Priority Unknown"}
                   </span>
                   <button onClick={() => setIsEditing(true)}

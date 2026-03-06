@@ -537,6 +537,7 @@ export const completeStage = async (req, res) => {
     } else {
       console.log("No admin found in the database");
     }
+
     const notification = await Notification.create({
       title: `${employee?.full_name} Completed a subtask ${subtask.task_name}`,
       description: `Completed a subtask: ${subtask.task_name}`,
@@ -610,6 +611,8 @@ export const changeSubTaskStatus = async (req, res) => {
 
     const subtask = await SubTask.findById(id);
     if (!subtask) return res.status(404).json({ message: "Subtask not found" });
+
+    const oldStatus = subtask.status;
 
     // ⛔️ Prevent multiple running tasks for employee
     if (status === "In Progress" && userRole === "employee") {
@@ -770,6 +773,23 @@ export const changeSubTaskPriority = async (req, res) => {
       return res.status(404).json({ message: "Subtask not found" });
     }
 
+    // 📝 LOG ACTIVITY
+    const logger = new ActivityLogger(req);
+    const relatedInfo = await getRelatedInfo(updated.project_id, updated.assign_to);
+
+    await logger.log('CHANGE_SUBTASK_PRIORITY', {
+      entity: {
+        id: updated._id,
+        name: updated.task_name,
+        type: 'subtask'
+      },
+      changes: {
+        before: { priority: updated.priority },
+        after: { priority }
+      },
+      relatedTo: relatedInfo,
+      description: `Changed subtask "${updated.task_name}" priority from "${updated.priority}" to "${priority}"`
+    })
     res.status(200).json(updated);
   } catch (error) {
     console.error("Error changing subtask priority:", error);
@@ -839,6 +859,24 @@ export const bulkUpdateSubtasks = async (req, res) => {
       }
     }
 
+    // 📝 LOG ACTIVITY
+    const logger = new ActivityLogger(req);
+    const relatedInfo = await getRelatedInfo(updatedTasks[0]?.project_id, updatedTasks[0]?.assign_to);
+
+    await logger.log('BULK_UPDATE_SUBTASKS', {
+      entity: {
+        id: updatedTasks[0]?._id,
+        name: updatedTasks[0]?.task_name,
+        type: 'subtask'
+      },
+      changes: {
+        before: updatedTasks[0],
+        after: update
+      },
+      relatedTo: relatedInfo,
+      description: `Bulk updated subtasks: ${ids}`
+    })
+
     res.json({ success: true });
   } catch (error) {
     console.error("Error bulk updating subtasks:", error);
@@ -870,6 +908,20 @@ export const bulkDeleteSubtasks = async (req, res) => {
 
     // If all are safe, delete them
     const result = await SubTask.deleteMany({ _id: { $in: ids } });
+
+    // 📝 LOG ACTIVITY
+    const logger = new ActivityLogger(req);
+    const relatedInfo = await getRelatedInfo(subtasks[0]?.project_id, subtasks[0]?.assign_to);
+
+    await logger.log('BULK_DELETE_SUBTASKS', {
+      entity: {
+        id: subtasks[0]?._id,
+        name: subtasks[0]?.task_name,
+        type: 'subtask'
+      },
+      relatedTo: relatedInfo,
+      description: `Bulk deleted subtasks: ${ids}`
+    })
 
     res.status(200).json({
       message: "Subtasks deleted successfully",

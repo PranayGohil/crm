@@ -1,6 +1,7 @@
 // controllers/adminController.js
 import jwt from "jsonwebtoken";
 import Admin from "../models/adminModel.js";
+import ActivityLogger from "../utils/activityLogger.js";
 import cloudinary from "../config/cloudinary.js";
 
 // Generate JWT Token
@@ -137,6 +138,35 @@ export const createAdmin = async (req, res) => {
 
     await newAdmin.save();
 
+    // Get creator info for logging
+    const creator = await Admin.findById(req.user.id).select('username email role');
+
+    // 📝 LOG ACTIVITY - Super admin created a new admin
+    const logger = new ActivityLogger(req);
+
+    await logger.log('CREATE_ADMIN', {
+      entity: {
+        id: newAdmin._id,
+        name: username,
+        type: 'admin'
+      },
+      changes: {
+        after: {
+          username,
+          email,
+          phone,
+          role: 'admin'
+        }
+      },
+      metadata: {
+        createdBy: creator?.username || req.user.id,
+        hasProfilePic: !!req.file,
+        email
+      },
+      description: `Created new admin account for "${username}" (${email})`,
+      severity: 'info'
+    });
+
     // Remove password from response
     const adminResponse = newAdmin.toObject();
     delete adminResponse.password;
@@ -175,6 +205,15 @@ export const updateAdmin = async (req, res) => {
       });
     }
 
+    // Store original values for logging
+    const originalValues = {
+      username: admin.username,
+      email: admin.email,
+      phone: admin.phone,
+      isActive: admin.isActive,
+      profile_pic: admin.profile_pic
+    };
+
     // Update fields
     if (username) admin.username = username;
     if (email) admin.email = email;
@@ -191,6 +230,56 @@ export const updateAdmin = async (req, res) => {
     }
 
     await admin.save();
+
+    // 📝 LOG ACTIVITY - Super admin updated an admin
+    const logger = new ActivityLogger(req);
+
+    // Track what changed
+    const changedFields = [];
+    const changes = { before: {}, after: {} };
+
+    if (originalValues.username !== admin.username) {
+      changedFields.push('username');
+      changes.before.username = originalValues.username;
+      changes.after.username = admin.username;
+    }
+    if (originalValues.email !== admin.email) {
+      changedFields.push('email');
+      changes.before.email = originalValues.email;
+      changes.after.email = admin.email;
+    }
+    if (originalValues.phone !== admin.phone) {
+      changedFields.push('phone');
+      changes.before.phone = originalValues.phone;
+      changes.after.phone = admin.phone;
+    }
+    if (originalValues.isActive !== admin.isActive) {
+      changedFields.push('isActive');
+      changes.before.isActive = originalValues.isActive;
+      changes.after.isActive = admin.isActive;
+    }
+    if (req.file) {
+      changedFields.push('profile_pic');
+    }
+
+    await logger.log('UPDATE_ADMIN', {
+      entity: {
+        id: admin._id,
+        name: admin.username,
+        type: 'admin'
+      },
+      changes: {
+        before: changes.before,
+        after: changes.after,
+        updatedFields: changedFields
+      },
+      metadata: {
+        role: admin.role,
+        hasProfilePicChange: !!req.file
+      },
+      description: `Updated admin account for "${admin.username}" (changed: ${changedFields.join(', ') || 'no changes'})`,
+      severity: changedFields.length > 0 ? 'info' : 'warning'
+    });
 
     res.status(200).json({
       success: true,
@@ -224,12 +313,45 @@ export const deleteAdmin = async (req, res) => {
       });
     }
 
+    // Get creator info for logging
+    const creator = admin.createdBy ? await Admin.findById(admin.createdBy).select('username') : null;
+
+    // Store admin data for logging before deletion
+    const adminData = {
+      id: admin._id,
+      username: admin.username,
+      email: admin.email,
+      role: admin.role,
+      createdBy: creator?.username || 'System',
+      hasProfilePic: !!admin.profile_pic
+    };
+
     // Delete profile picture from Cloudinary
     if (admin.profile_pic_public_id) {
       await cloudinary.uploader.destroy(admin.profile_pic_public_id);
     }
 
     await admin.deleteOne();
+
+    // 📝 LOG ACTIVITY - Super admin deleted an admin
+    const logger = new ActivityLogger(req);
+
+    await logger.log('DELETE_ADMIN', {
+      entity: {
+        id: adminData.id,
+        name: adminData.username,
+        type: 'admin'
+      },
+      metadata: {
+        username: adminData.username,
+        email: adminData.email,
+        role: adminData.role,
+        createdBy: adminData.createdBy,
+        hadProfilePic: adminData.hasProfilePic
+      },
+      description: `Deleted admin account for "${adminData.username}" (${adminData.email})`,
+      severity: 'warning'
+    });
 
     res.status(200).json({
       success: true,
@@ -271,6 +393,14 @@ export const updateAdminProfile = async (req, res) => {
 
     const { username, email, phone, password } = req.body;
 
+    // Store original values for logging
+    const originalValues = {
+      username: admin.username,
+      email: admin.email,
+      phone: admin.phone,
+      profile_pic: admin.profile_pic
+    };
+
     // Don't allow role change through profile update
     if (username) admin.username = username;
     if (email) admin.email = email;
@@ -287,6 +417,55 @@ export const updateAdminProfile = async (req, res) => {
     }
 
     await admin.save();
+
+    // 📝 LOG ACTIVITY - Admin updated their own profile
+    const logger = new ActivityLogger(req);
+
+    // Track what changed
+    const changedFields = [];
+    const changes = { before: {}, after: {} };
+
+    if (originalValues.username !== admin.username) {
+      changedFields.push('username');
+      changes.before.username = originalValues.username;
+      changes.after.username = admin.username;
+    }
+    if (originalValues.email !== admin.email) {
+      changedFields.push('email');
+      changes.before.email = originalValues.email;
+      changes.after.email = admin.email;
+    }
+    if (originalValues.phone !== admin.phone) {
+      changedFields.push('phone');
+      changes.before.phone = originalValues.phone;
+      changes.after.phone = admin.phone;
+    }
+    if (req.file) {
+      changedFields.push('profile_pic');
+    }
+    if (password) {
+      changedFields.push('password');
+    }
+
+    await logger.log('UPDATE_ADMIN_PROFILE', {
+      entity: {
+        id: admin._id,
+        name: admin.username,
+        type: 'admin'
+      },
+      changes: {
+        before: changes.before,
+        after: changes.after,
+        updatedFields: changedFields
+      },
+      metadata: {
+        role: admin.role,
+        hasPasswordChange: !!password,
+        hasProfilePicChange: !!req.file
+      },
+      description: `Updated own profile (changed: ${changedFields.join(', ') || 'no changes'})`,
+      severity: changedFields.length > 0 ? 'info' : 'warning'
+    });
 
     res.status(200).json({
       success: true,

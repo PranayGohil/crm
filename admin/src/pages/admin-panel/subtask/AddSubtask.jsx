@@ -155,7 +155,13 @@ const AddSubtask = () => {
       }
       await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/add-bulk`,
-        newSubtasks
+        newSubtasks,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       toast.success("Bulk subtasks created successfully!");
       navigate(`/project/subtask-dashboard/${projectId}`);

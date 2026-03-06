@@ -3,13 +3,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../contexts/AuthContext";
 import LoadingOverlay from "../../components/admin/LoadingOverlay";
-import { FaEdit, FaTrash, FaPlus, FaUserShield, FaUser } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaUserShield, FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const ManageAdmins = () => {
     const { user } = useAuth();
     const [admins, setAdmins] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [editingAdmin, setEditingAdmin] = useState(null);
     const [formData, setFormData] = useState({
         username: "",
@@ -152,7 +153,7 @@ const ManageAdmins = () => {
                         <div className="flex items-center gap-4 mb-4">
                             <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden">
                                 <img
-                                    src={admin.profile_pic || "/SVG/default-avatar.svg"}
+                                    src={admin.profile_pic || "/SVG/reg-upload-photo.svg"}
                                     alt={admin.username}
                                     className="w-full h-full object-cover"
                                 />
@@ -161,8 +162,8 @@ const ManageAdmins = () => {
                                 <h3 className="font-semibold text-lg">{admin.username}</h3>
                                 <p className="text-sm text-gray-600">{admin.email}</p>
                                 <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full mt-1 ${admin.role === "super-admin"
-                                        ? "bg-purple-100 text-purple-800"
-                                        : "bg-blue-100 text-blue-800"
+                                    ? "bg-purple-100 text-purple-800"
+                                    : "bg-blue-100 text-blue-800"
                                     }`}>
                                     {admin.role === "super-admin" ? <FaUserShield /> : <FaUser />}
                                     {admin.role === "super-admin" ? "Super Admin" : "Admin"}
@@ -246,14 +247,22 @@ const ManageAdmins = () => {
                             {!editingAdmin && (
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium mb-1">Password*</label>
-                                    <input
-                                        type="password"
-                                        name="password"
-                                        value={formData.password}
-                                        onChange={handleInputChange}
-                                        required={!editingAdmin}
-                                        className="w-full p-2 border rounded"
-                                    />
+                                    <div className="relative">
+                                        <input
+                                            type={`${showPassword ? "text" : "password"}`}
+                                            name="password"
+                                            value={formData.password}
+                                            onChange={handleInputChange}
+                                            required={!editingAdmin}
+                                            className="w-full p-2 border rounded"
+                                        />
+                                        <span
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+                                        >
+                                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                        </span>
+                                    </div>
                                 </div>
                             )}
 

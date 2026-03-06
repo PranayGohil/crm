@@ -163,7 +163,13 @@ const EmployeeProfileEdit = () => {
 
       await axios.post(
         `${process.env.REACT_APP_API_URL}/api/employee/edit/${employeeId}`,
-        formData
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
 
       toast.success("Profile updated successfully!");

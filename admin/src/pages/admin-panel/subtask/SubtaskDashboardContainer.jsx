@@ -356,7 +356,9 @@ const SubtaskDashboardContainer = () => {
     if (Object.keys(update).length === 0) { toast.info("No changes selected."); return; }
     setLoading(true);
     try {
-      await axios.put(`${process.env.REACT_APP_API_URL}/api/subtask/bulk-update`, { ids: selectedTaskIds, update });
+      await axios.put(`${process.env.REACT_APP_API_URL}/api/subtask/bulk-update`, { ids: selectedTaskIds, update }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
       toast.success("Changes applied!");
       fetchSubtasks();
       setBulkAssignTo(""); setBulkPriority(""); setRowSelection({});
@@ -370,7 +372,9 @@ const SubtaskDashboardContainer = () => {
   const handleConfirmDelete = async () => {
     setLoading(true);
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/api/subtask/delete/${selectedSubtask}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/subtask/delete/${selectedSubtask}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
       toast.success("Deleted!");
       fetchSubtasks();
       setShowDeleteModal(false);
@@ -386,7 +390,9 @@ const SubtaskDashboardContainer = () => {
     if (selectedTaskIds.length === 0) return;
     setLoading(true);
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/api/subtask/bulk-delete`, { ids: selectedTaskIds });
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/subtask/bulk-delete`, { ids: selectedTaskIds }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
       toast.success("Deleted!");
       fetchSubtasks();
       setRowSelection({});

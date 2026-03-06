@@ -228,7 +228,9 @@ const Subtasks = () => {
 
     setLoading(true);
     try {
-      await axios.put(`${API}/api/subtask/bulk-update`, { ids: selectedTaskIds, update });
+      await axios.put(`${API}/api/subtask/bulk-update`, { ids: selectedTaskIds, update }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
       toast.success("Changes applied!");
       setBulkAssignTo(""); setBulkPriority(""); setSelectedTaskIds([]);
       fetchProjects(pagination.page);
@@ -243,7 +245,9 @@ const Subtasks = () => {
     if (!selectedTaskIds.length) return;
     setLoading(true);
     try {
-      await axios.post(`${API}/api/subtask/bulk-delete`, { ids: selectedTaskIds });
+      await axios.post(`${API}/api/subtask/bulk-delete`, { ids: selectedTaskIds }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
       toast.success("Deleted!");
       setSelectedTaskIds([]); setShowBulkDeleteModal(false);
       fetchProjects(pagination.page);
@@ -294,10 +298,10 @@ const Subtasks = () => {
                 {summary.tasksByStage &&
                   Object.entries(summary.tasksByStage).map(([stage, count]) => (
                     <div key={stage} className={`px-3 py-1 text-sm font-medium rounded-full ${stage === "CAD Design" ? "bg-blue-100 text-blue-800"
-                        : stage === "SET Design" ? "bg-green-100 text-green-800"
-                          : stage === "Render" ? "bg-purple-100 text-purple-800"
-                            : stage === "QC" ? "bg-cyan-100 text-cyan-800"
-                              : "bg-gray-100 text-gray-800"
+                      : stage === "SET Design" ? "bg-green-100 text-green-800"
+                        : stage === "Render" ? "bg-purple-100 text-purple-800"
+                          : stage === "QC" ? "bg-cyan-100 text-cyan-800"
+                            : "bg-gray-100 text-gray-800"
                       }`}>
                       {count} {stage} Tasks Remaining
                     </div>

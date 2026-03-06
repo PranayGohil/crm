@@ -133,7 +133,12 @@ const EditSubtask = () => {
       await axios.put(
         `${process.env.REACT_APP_API_URL}/api/subtask/update/${subtaskId}`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
       );
 
       toast.success("Subtask updated successfully!");

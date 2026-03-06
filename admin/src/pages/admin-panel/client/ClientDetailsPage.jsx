@@ -46,7 +46,12 @@ const ClientDetailsPage = () => {
     setLoading(true);
     try {
       await axios.delete(
-        `${process.env.REACT_APP_API_URL}/api/client/delete/${client._id}`
+        `${process.env.REACT_APP_API_URL}/api/client/delete/${client._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       toast.success("Client deleted successfully!");
       navigate("/client/dashboard");

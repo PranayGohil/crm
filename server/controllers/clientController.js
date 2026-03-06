@@ -1,6 +1,7 @@
 import Client from "../models/clientModel.js";
 import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
+import ActivityLogger from "../utils/activityLogger.js";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
@@ -59,6 +60,40 @@ export const addClient = async (req, res) => {
       business_address,
       additional_notes,
       stage_pricing: stage_pricing || [],
+    });
+
+    // 📝 LOG ACTIVITY - Admin created a new client
+    const logger = new ActivityLogger(req);
+
+    // Format stage pricing for logging
+    const stagePricingSummary = stage_pricing?.map(sp => ({
+      stage: sp.stage_name,
+      price: sp.price
+    })) || [];
+
+    await logger.log('CREATE_CLIENT', {
+      entity: {
+        id: client._id,
+        name: full_name || company_name || username,
+        type: 'client'
+      },
+      changes: {
+        after: {
+          full_name,
+          email,
+          client_type,
+          company_name,
+          hasStagePricing: stage_pricing?.length > 0
+        }
+      },
+      metadata: {
+        client_type,
+        hasCompany: !!company_name,
+        stagePricingCount: stage_pricing?.length || 0,
+        stagePricing: stagePricingSummary
+      },
+      description: `Created new client "${full_name || company_name || username}" (${client_type || 'Individual'})`,
+      severity: 'info'
     });
 
     res.status(200).json({
@@ -149,8 +184,91 @@ export const getClientByUsername = async (req, res) => {
 export const updateClient = async (req, res) => {
   try {
     const { id } = req.params;
-    const client = await Client.findByIdAndUpdate(id, req.body, { new: true });
-    res.status(200).json(client);
+
+    // Get original client before update
+    const originalClient = await Client.findById(id);
+    if (!originalClient) {
+      return res.status(404).json({ error: "Client not found" });
+    }
+
+    // Store original values for logging
+    const originalValues = {
+      full_name: originalClient.full_name,
+      email: originalClient.email,
+      phone: originalClient.phone,
+      client_type: originalClient.client_type,
+      company_name: originalClient.company_name,
+      stage_pricing: originalClient.stage_pricing,
+      status: originalClient.status
+    };
+
+    const updatedClient = await Client.findByIdAndUpdate(id, req.body, {
+      new: true
+    });
+
+    // 📝 LOG ACTIVITY - Admin updated a client
+    const logger = new ActivityLogger(req);
+
+    // Track what changed
+    const changedFields = [];
+    const changes = { before: {}, after: {} };
+
+    if (originalValues.full_name !== updatedClient.full_name) {
+      changedFields.push('full_name');
+      changes.before.full_name = originalValues.full_name;
+      changes.after.full_name = updatedClient.full_name;
+    }
+    if (originalValues.email !== updatedClient.email) {
+      changedFields.push('email');
+      changes.before.email = originalValues.email;
+      changes.after.email = updatedClient.email;
+    }
+    if (originalValues.phone !== updatedClient.phone) {
+      changedFields.push('phone');
+      changes.before.phone = originalValues.phone;
+      changes.after.phone = updatedClient.phone;
+    }
+    if (originalValues.client_type !== updatedClient.client_type) {
+      changedFields.push('client_type');
+      changes.before.client_type = originalValues.client_type;
+      changes.after.client_type = updatedClient.client_type;
+    }
+    if (originalValues.company_name !== updatedClient.company_name) {
+      changedFields.push('company_name');
+      changes.before.company_name = originalValues.company_name;
+      changes.after.company_name = updatedClient.company_name;
+    }
+
+    // Check if stage pricing changed
+    const originalStagePricingStr = JSON.stringify(originalValues.stage_pricing);
+    const newStagePricingStr = JSON.stringify(updatedClient.stage_pricing);
+    if (originalStagePricingStr !== newStagePricingStr) {
+      changedFields.push('stage_pricing');
+      changes.before.stage_pricing = originalValues.stage_pricing;
+      changes.after.stage_pricing = updatedClient.stage_pricing;
+    }
+
+    await logger.log('UPDATE_CLIENT', {
+      entity: {
+        id: updatedClient._id,
+        name: updatedClient.full_name || updatedClient.company_name || updatedClient.username,
+        type: 'client'
+      },
+      changes: {
+        before: changes.before,
+        after: changes.after,
+        updatedFields: changedFields
+      },
+      metadata: {
+        client_type: updatedClient.client_type,
+        hasCompany: !!updatedClient.company_name,
+        stagePricingCount: updatedClient.stage_pricing?.length || 0
+      },
+      description: `Updated client "${updatedClient.full_name || updatedClient.company_name}" (changed: ${changedFields.join(', ') || 'no changes'})`,
+      severity: changedFields.length > 0 ? 'info' : 'warning'
+    });
+
+    res.status(200).json(updatedClient);
   } catch (error) {
     console.error("Error in updateClient:", error);
     res.status(500).json({ error: "Server error" });
@@ -161,11 +279,92 @@ export const updateClientByUsername = async (req, res) => {
   try {
     const { username } = req.params;
     console.log("username", req.body);
-    const client = await Client.findOneAndUpdate({ username }, req.body, {
+
+    // Get original client before update
+    const originalClient = await Client.findOne({ username });
+    if (!originalClient) {
+      return res.status(404).json({ error: "Client not found" });
+    }
+
+    // Store original values for logging
+    const originalValues = {
+      full_name: originalClient.full_name,
+      email: originalClient.email,
+      phone: originalClient.phone,
+      client_type: originalClient.client_type,
+      company_name: originalClient.company_name,
+      stage_pricing: originalClient.stage_pricing
+    };
+
+    const updatedClient = await Client.findOneAndUpdate({ username }, req.body, {
       new: true,
     });
-    console.log("client", client);
-    res.status(200).json(client);
+
+    console.log("client", updatedClient);
+
+    // 📝 LOG ACTIVITY - Admin updated a client by username
+    const logger = new ActivityLogger(req);
+
+    // Track what changed
+    const changedFields = [];
+    const changes = { before: {}, after: {} };
+
+    if (originalValues.full_name !== updatedClient.full_name) {
+      changedFields.push('full_name');
+      changes.before.full_name = originalValues.full_name;
+      changes.after.full_name = updatedClient.full_name;
+    }
+    if (originalValues.email !== updatedClient.email) {
+      changedFields.push('email');
+      changes.before.email = originalValues.email;
+      changes.after.email = updatedClient.email;
+    }
+    if (originalValues.phone !== updatedClient.phone) {
+      changedFields.push('phone');
+      changes.before.phone = originalValues.phone;
+      changes.after.phone = updatedClient.phone;
+    }
+    if (originalValues.client_type !== updatedClient.client_type) {
+      changedFields.push('client_type');
+      changes.before.client_type = originalValues.client_type;
+      changes.after.client_type = updatedClient.client_type;
+    }
+    if (originalValues.company_name !== updatedClient.company_name) {
+      changedFields.push('company_name');
+      changes.before.company_name = originalValues.company_name;
+      changes.after.company_name = updatedClient.company_name;
+    }
+
+    // Check if stage pricing changed
+    const originalStagePricingStr = JSON.stringify(originalValues.stage_pricing);
+    const newStagePricingStr = JSON.stringify(updatedClient.stage_pricing);
+    if (originalStagePricingStr !== newStagePricingStr) {
+      changedFields.push('stage_pricing');
+      changes.before.stage_pricing = originalValues.stage_pricing;
+      changes.after.stage_pricing = updatedClient.stage_pricing;
+    }
+
+    await logger.log('UPDATE_CLIENT', {
+      entity: {
+        id: updatedClient._id,
+        name: updatedClient.full_name || updatedClient.company_name || updatedClient.username,
+        type: 'client'
+      },
+      changes: {
+        before: changes.before,
+        after: changes.after,
+        updatedFields: changedFields
+      },
+      metadata: {
+        client_type: updatedClient.client_type,
+        hasCompany: !!updatedClient.company_name,
+        stagePricingCount: updatedClient.stage_pricing?.length || 0
+      },
+      description: `Updated client "${updatedClient.full_name || updatedClient.company_name}" via username (changed: ${changedFields.join(', ') || 'no changes'})`,
+      severity: changedFields.length > 0 ? 'info' : 'warning'
+    });
+
+    res.status(200).json(updatedClient);
   } catch (error) {
     console.error("Error in updateClientByUsername:", error);
     res.status(500).json({ error: "Server error" });
@@ -177,22 +376,57 @@ export const deleteClient = async (req, res) => {
     console.log("deleteClient called");
     const { id } = req.params;
 
-    // 1. Delete the client
-    const client = await Client.findByIdAndDelete(id);
+    // Get client before deletion for logging
+    const client = await Client.findById(id);
+    if (!client) {
+      return res.status(404).json({ error: "Client not found" });
+    }
 
-    // 2. Find all projects of that client
+    // Find all projects of that client
     const projects = await Project.find({ client_id: id });
-
-    // 3. Get project ObjectIds properly
     const projectIds = projects.map((p) => new mongoose.Types.ObjectId(p._id));
+    const projectCount = projects.length;
 
-    // 4. Delete the projects
+    // Find subtasks count for logging
+    const subtaskCount = await SubTask.countDocuments({
+      project_id: { $in: projectIds }
+    });
+
+    // 1. Delete the client
+    await Client.findByIdAndDelete(id);
+
+    // 2. Delete the projects
     await Project.deleteMany({ client_id: id });
 
-    // 5. Delete subtasks linked to those projects
+    // 3. Delete subtasks linked to those projects
     await SubTask.deleteMany({ project_id: { $in: projectIds } });
 
-    res.status(200).json(client);
+    // 📝 LOG ACTIVITY - Admin deleted a client
+    const logger = new ActivityLogger(req);
+
+    await logger.log('DELETE_CLIENT', {
+      entity: {
+        id: client._id,
+        name: client.full_name || client.company_name || client.username,
+        type: 'client'
+      },
+      metadata: {
+        client_type: client.client_type,
+        hasCompany: !!client.company_name,
+        projectsDeleted: projectCount,
+        subtasksDeleted: subtaskCount,
+        email: client.email,
+        username: client.username
+      },
+      description: `Deleted client "${client.full_name || client.company_name}" along with ${projectCount} projects and ${subtaskCount} subtasks`,
+      severity: 'warning'
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Client and related data deleted successfully",
+      deletedClient: client
+    });
   } catch (error) {
     console.error("Error in deleteClient:", error);
     res.status(500).json({ error: "Server error" });

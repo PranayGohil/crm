@@ -31,6 +31,12 @@ const Designation = () => {
         `${process.env.REACT_APP_API_URL}/api/designation/add`,
         {
           name: newDesignation,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
       );
       setDesignations([...designations, res.data]);
@@ -43,7 +49,12 @@ const Designation = () => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(
-        `${process.env.REACT_APP_API_URL}/api/designation/delete/${id}`
+        `${process.env.REACT_APP_API_URL}/api/designation/delete/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       setDesignations(designations.filter((d) => d._id !== id));
     } catch (err) {

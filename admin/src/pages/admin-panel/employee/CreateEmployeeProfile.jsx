@@ -59,7 +59,13 @@ const CreateEmployeeProfile = () => {
           try {
             const res = await axios.post(
               `${process.env.REACT_APP_API_URL}/api/employee/check-username`,
-              { username: value }
+              { username: value },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }
             );
             return res.data.available;
           } catch (err) {
@@ -157,7 +163,13 @@ const CreateEmployeeProfile = () => {
 
       const res = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/employee/add`,
-        formData
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
 
       if (res.data.success) {

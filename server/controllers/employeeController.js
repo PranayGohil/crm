@@ -2,9 +2,9 @@ import Employee from "../models/employeeModel.js";
 import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
 import Designation from "../models/designationModel.js";
+import ActivityLogger from "../utils/activityLogger.js";
 import jwt from "jsonwebtoken";
 import moment from "moment";
-
 import mongoose from "mongoose";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -112,6 +112,42 @@ export const addEmployee = async (req, res) => {
     });
 
     await newEmployee.save();
+
+    // 📝 LOG ACTIVITY - Admin created a new employee
+    const logger = new ActivityLogger(req);
+
+    // Get reporting manager info for logging
+    let reportingManagerName = null;
+    if (reporting_manager) {
+      const manager = await Employee.findById(reporting_manager).select('full_name');
+      reportingManagerName = manager?.full_name;
+    }
+
+    await logger.log('CREATE_EMPLOYEE', {
+      entity: {
+        id: newEmployee._id,
+        name: full_name,
+        type: 'employee'
+      },
+      changes: {
+        after: {
+          username,
+          full_name,
+          designation,
+          department,
+          is_manager: !!is_manager,
+          reporting_manager: reportingManagerName
+        }
+      },
+      metadata: {
+        designation,
+        department,
+        isManager: !!is_manager,
+        hasProfilePic: !!req.file
+      },
+      description: `Created new employee "${full_name}" (${designation || 'No designation'})`,
+      severity: 'info'
+    });
 
     res.status(201).json({
       success: true,
@@ -242,6 +278,18 @@ export const editEmployee = async (req, res) => {
         .json({ success: false, message: "Employee not found" });
     }
 
+    // Store original values for logging
+    const originalValues = {
+      username: employee.username,
+      full_name: employee.full_name,
+      designation: employee.designation,
+      status: employee.status,
+      department: employee.department,
+      is_manager: employee.is_manager,
+      reporting_manager: employee.reporting_manager,
+      monthly_salary: employee.monthly_salary
+    };
+
     // Check username uniqueness
     if (username && username !== employee.username) {
       const existingUser = await Employee.findOne({ username });
@@ -263,27 +311,23 @@ export const editEmployee = async (req, res) => {
     employee.email = email || employee.email;
     employee.home_address = home_address || employee.home_address;
     employee.dob = dob ? new Date(dob) : employee.dob;
-    employee.emergency_contact =
-      emergency_contact || employee.emergency_contact;
+    employee.emergency_contact = emergency_contact || employee.emergency_contact;
     employee.capacity = capacity || employee.capacity;
     employee.department = department || employee.department;
-    employee.date_of_joining = date_of_joining
-      ? new Date(date_of_joining)
-      : employee.date_of_joining;
+    employee.date_of_joining = date_of_joining ? new Date(date_of_joining) : employee.date_of_joining;
     employee.monthly_salary = monthly_salary || employee.monthly_salary;
     employee.employment_type = employment_type || employee.employment_type;
 
-    // Reporting manager (expects ObjectId)
+    // Reporting manager
     if (reporting_manager) {
       employee.reporting_manager = reporting_manager;
     }
 
     // is_manager conversion
     if (typeof is_manager !== "undefined") {
-      employee.is_manager =
-        typeof is_manager === "string" ? is_manager === "true" : !!is_manager;
+      employee.is_manager = typeof is_manager === "string" ? is_manager === "true" : !!is_manager;
     }
-    employee.manage_stages = is_manager ? manage_stages || [] : [];
+    employee.manage_stages = employee.is_manager ? manage_stages || [] : [];
 
     // Profile pic
     if (req.file) {
@@ -291,6 +335,79 @@ export const editEmployee = async (req, res) => {
     }
 
     await employee.save();
+
+    // 📝 LOG ACTIVITY - Admin updated an employee
+    const logger = new ActivityLogger(req);
+
+    // Track what changed
+    const changedFields = [];
+    const changes = { before: {}, after: {} };
+
+    if (originalValues.full_name !== employee.full_name) {
+      changedFields.push('full_name');
+      changes.before.full_name = originalValues.full_name;
+      changes.after.full_name = employee.full_name;
+    }
+    if (originalValues.designation !== employee.designation) {
+      changedFields.push('designation');
+      changes.before.designation = originalValues.designation;
+      changes.after.designation = employee.designation;
+    }
+    if (originalValues.status !== employee.status) {
+      changedFields.push('status');
+      changes.before.status = originalValues.status;
+      changes.after.status = employee.status;
+    }
+    if (originalValues.department !== employee.department) {
+      changedFields.push('department');
+      changes.before.department = originalValues.department;
+      changes.after.department = employee.department;
+    }
+    if (originalValues.is_manager !== employee.is_manager) {
+      changedFields.push('is_manager');
+      changes.before.is_manager = originalValues.is_manager;
+      changes.after.is_manager = employee.is_manager;
+    }
+    if (originalValues.reporting_manager?.toString() !== employee.reporting_manager?.toString()) {
+      changedFields.push('reporting_manager');
+
+      // Get manager names for better logging
+      if (originalValues.reporting_manager) {
+        const oldManager = await Employee.findById(originalValues.reporting_manager).select('full_name');
+        changes.before.reporting_manager = oldManager?.full_name || originalValues.reporting_manager;
+      }
+      if (employee.reporting_manager) {
+        const newManager = await Employee.findById(employee.reporting_manager).select('full_name');
+        changes.after.reporting_manager = newManager?.full_name || employee.reporting_manager;
+      }
+    }
+    if (originalValues.monthly_salary !== employee.monthly_salary) {
+      changedFields.push('monthly_salary');
+      changes.before.monthly_salary = originalValues.monthly_salary;
+      changes.after.monthly_salary = employee.monthly_salary;
+    }
+    if (req.file) {
+      changedFields.push('profile_pic');
+    }
+
+    await logger.log('UPDATE_EMPLOYEE', {
+      entity: {
+        id: employee._id,
+        name: employee.full_name,
+        type: 'employee'
+      },
+      changes: {
+        before: changes.before,
+        after: changes.after,
+        updatedFields: changedFields
+      },
+      metadata: {
+        hasPasswordChange: !!password,
+        hasProfilePicChange: !!req.file
+      },
+      description: `Updated employee "${employee.full_name}" (changed: ${changedFields.join(', ') || 'no changes'})`,
+      severity: changedFields.length > 0 ? 'info' : 'warning'
+    });
 
     res.json({
       success: true,
@@ -304,9 +421,57 @@ export const editEmployee = async (req, res) => {
 };
 
 export const deleteEmployee = async (req, res) => {
-  const { id } = req.params;
-  const employee = await Employee.findByIdAndDelete(id);
-  res.status(200).json(employee);
+  try {
+    const { id } = req.params;
+
+    // Get employee before deletion for logging
+    const employee = await Employee.findById(id);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: "Employee not found" });
+    }
+
+    // Check if employee has active tasks
+    const activeTasks = await SubTask.findOne({
+      assign_to: id,
+      status: "In Progress"
+    });
+
+    if (activeTasks) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete employee with active tasks. Please reassign or complete their tasks first."
+      });
+    }
+
+    await Employee.findByIdAndDelete(id);
+
+    // 📝 LOG ACTIVITY - Admin deleted an employee
+    const logger = new ActivityLogger(req);
+
+    await logger.log('DELETE_EMPLOYEE', {
+      entity: {
+        id: employee._id,
+        name: employee.full_name,
+        type: 'employee'
+      },
+      metadata: {
+        username: employee.username,
+        designation: employee.designation,
+        department: employee.department,
+        wasManager: employee.is_manager
+      },
+      description: `Deleted employee "${employee.full_name}" (${employee.designation || 'No designation'})`,
+      severity: 'warning'
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Employee deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error deleting employee:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 };
 
 export const getEmployeeTasks = async (req, res) => {

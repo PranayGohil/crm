@@ -51,7 +51,10 @@ const ProjectDetails = () => {
           const employeeIds = proj.assign_to.map((a) => a.id);
           const employeesRes = await axios.post(
             `${process.env.REACT_APP_API_URL}/api/employee/get-multiple`,
-            { ids: employeeIds }
+            { ids: employeeIds },
+            {
+              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+            }
           );
           setAssignedEmployees(employeesRes.data.employees);
         }
@@ -83,22 +86,57 @@ const ProjectDetails = () => {
   const handleUpdate = async () => {
     try {
       setSaving(true);
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/project/change-status/${projectId}`,
-        { status: editingStatus }
-      );
-      await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/project/change-priority/${projectId}`,
-        { priority: editingPriority }
-      );
+
+      const requests = [];
+
+      // Update status only if changed
+      if (editingStatus !== project.status) {
+        requests.push(
+          axios.put(
+            `${process.env.REACT_APP_API_URL}/api/project/change-status/${projectId}`,
+            { status: editingStatus },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          )
+        );
+      }
+
+      // Update priority only if changed
+      if (editingPriority !== project.priority) {
+        requests.push(
+          axios.put(
+            `${process.env.REACT_APP_API_URL}/api/project/change-priority/${projectId}`,
+            { priority: editingPriority },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          )
+        );
+      }
+
+      // Nothing changed
+      if (requests.length === 0) {
+        toast.info("No changes detected.");
+        setIsEditing(false);
+        return;
+      }
+
+      await Promise.all(requests);
 
       setProject((prev) => ({
         ...prev,
         status: editingStatus,
         priority: editingPriority,
       }));
+
       toast.success("Project updated successfully.");
       setIsEditing(false);
+
     } catch (err) {
       toast.error("Failed to update project.");
     } finally {
@@ -109,7 +147,9 @@ const ProjectDetails = () => {
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `${process.env.REACT_APP_API_URL}/api/project/delete/${projectId}`
+        `${process.env.REACT_APP_API_URL}/api/project/delete/${projectId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      }
       );
       toast.success("Project deleted successfully.");
       navigate("/project/dashboard");
@@ -123,7 +163,13 @@ const ProjectDetails = () => {
   const handleArchive = async () => {
     try {
       await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/project/archive/${projectId}`
+        `${process.env.REACT_APP_API_URL}/api/project/archive/${projectId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
       );
       toast.success("Project archived successfully.");
       navigate("/project/dashboard");
@@ -135,7 +181,13 @@ const ProjectDetails = () => {
   const handleUnarchive = async () => {
     try {
       await axios.put(
-        `${process.env.REACT_APP_API_URL}/api/project/unarchive/${projectId}`
+        `${process.env.REACT_APP_API_URL}/api/project/unarchive/${projectId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
       );
       toast.success("Project unarchived successfully.");
       navigate("/archived-projects");
@@ -324,24 +376,22 @@ const ProjectDetails = () => {
               ) : (
                 <>
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      project.status === "Completed"
-                        ? "bg-green-100 text-green-800"
-                        : project.status === "In Progress"
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${project.status === "Completed"
+                      ? "bg-green-100 text-green-800"
+                      : project.status === "In Progress"
                         ? "bg-blue-100 text-blue-800"
                         : "bg-yellow-100 text-yellow-800"
-                    }`}
+                      }`}
                   >
                     {project.status || "Status Unknown"}
                   </span>
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      project.priority === "High"
-                        ? "bg-red-100 text-red-800"
-                        : project.priority === "Medium"
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${project.priority === "High"
+                      ? "bg-red-100 text-red-800"
+                      : project.priority === "Medium"
                         ? "bg-orange-100 text-orange-800"
                         : "bg-blue-100 text-blue-800"
-                    }`}
+                      }`}
                   >
                     {project.priority || "Priority Unknown"}
                   </span>

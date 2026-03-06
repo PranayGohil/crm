@@ -89,7 +89,13 @@ const AddNewProject = () => {
 
         const res = await axios.post(
           `${process.env.REACT_APP_API_URL}/api/project/add`,
-          formData
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
 
         if (res.data.success) {
@@ -220,9 +226,8 @@ const AddNewProject = () => {
                   {values.client_name || "Select Client"}
                 </span>
                 <svg
-                  className={`w-4 h-4 transition-transform ${
-                    dropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`w-4 h-4 transition-transform ${dropdownOpen ? "rotate-180" : ""
+                    }`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -330,15 +335,14 @@ const AddNewProject = () => {
                 <button
                   key={level}
                   type="button"
-                  className={`flex items-center px-4 py-2 rounded-lg border ${
-                    values.priority === value
+                  className={`flex items-center px-4 py-2 rounded-lg border ${values.priority === value
                       ? level === "high"
                         ? "bg-red-100 text-red-800 border-red-300"
                         : level === "mid"
-                        ? "bg-yellow-100 text-yellow-800 border-yellow-300"
-                        : "bg-green-100 text-green-800 border-green-300"
+                          ? "bg-yellow-100 text-yellow-800 border-yellow-300"
+                          : "bg-green-100 text-green-800 border-green-300"
                       : "bg-gray-100 text-gray-800 border-gray-300"
-                  }`}
+                    }`}
                   onClick={() => setFieldValue("priority", value)}
                 >
                   <span className="mr-2">{label}</span>

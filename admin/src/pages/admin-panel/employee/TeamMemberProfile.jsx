@@ -44,7 +44,12 @@ const TeamMemberProfile = () => {
   const handleDeleteEmployee = async () => {
     try {
       await axios.delete(
-        `${process.env.REACT_APP_API_URL}/api/employee/delete/${employee._id}`
+        `${process.env.REACT_APP_API_URL}/api/employee/delete/${employee._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
       toast.success("Employee deleted successfully!");
       navigate("/employee/dashboard");
@@ -210,19 +215,18 @@ const TeamMemberProfile = () => {
                 </h2>
                 <p className="text-gray-600">{employee.designation || "N/A"}</p>
                 <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                    employee.status === "Active"
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${employee.status === "Active"
                       ? "bg-green-100 text-green-800"
                       : employee.status === "on-leave"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
                 >
                   {employee.status === "Active"
                     ? "Active"
                     : employee.status === "Inactive"
-                    ? "Inactive"
-                    : "Blocked"}
+                      ? "Inactive"
+                      : "Blocked"}
                 </span>
               </div>
             </div>

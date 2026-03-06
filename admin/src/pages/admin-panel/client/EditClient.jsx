@@ -68,7 +68,13 @@ const EditClient = () => {
         setSubmitting(true);
         await axios.put(
           `${process.env.REACT_APP_API_URL}/api/client/update-username/${id}`,
-          values
+          values,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
         toast.success("Client updated successfully!");
         navigate(`/client/details/${values.username}`);
