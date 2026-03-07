@@ -7,10 +7,12 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { stageOptions, priorityOptions } from "../../../options";
+import { stageOptions } from "../../../options";
 
-// const departmentOptions = ["SET Design", "CAD Design", "Render"];
 const employmentTypes = ["Full-time", "Part-time"];
+const inputCls = "w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+const labelCls = "block text-sm font-medium text-gray-700 mb-1";
+const errCls = "text-red-600 text-xs mt-1";
 
 const EmployeeProfileEdit = () => {
   const { employeeId } = useParams();
@@ -23,37 +25,17 @@ const EmployeeProfileEdit = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const [initialValues, setInitialValues] = useState({
-    full_name: "",
-    username: "",
-    password: "",
-    email: "",
-    phone: "",
-    home_address: "",
-    dob: "",
-    department: "",
-    designation: "",
-    employment_type: "",
-    reporting_manager: "",
-    date_of_joining: "",
-    monthly_salary: "",
-    emergency_contact: "",
-    capacity: "",
-    is_manager: false,
-    manage_stages: [],
+    full_name: "", username: "", password: "", email: "", phone: "",
+    home_address: "", dob: "", department: "", designation: "",
+    employment_type: "", reporting_manager: "", date_of_joining: "",
+    monthly_salary: "", emergency_contact: "", capacity: "",
+    is_manager: false, manage_stages: [],
   });
 
   const validationSchema = Yup.object().shape({
     full_name: Yup.string().required("Full name is required"),
-    username: Yup.string()
-      .matches(/^[a-zA-Z0-9_-]+$/, {
-        message:
-          "Username can only contain letters, numbers, underscores (_) and dashes (-).",
-      })
-      .required("Username is required"),
-    password: Yup.string().matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/,
-      "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
-    ),
+    username: Yup.string().matches(/^[a-zA-Z0-9_-]+$/, "Letters, numbers, _ and - only").required("Username is required"),
+    password: Yup.string().matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/, "Min 8 chars, uppercase, lowercase, number & special character."),
     email: Yup.string().email("Invalid email").required("Email is required"),
     phone: Yup.string().required("Phone number is required"),
     home_address: Yup.string().required("Address is required"),
@@ -62,82 +44,40 @@ const EmployeeProfileEdit = () => {
     designation: Yup.string().required("Designation is required"),
     employment_type: Yup.string().required("Employment type is required"),
     date_of_joining: Yup.string().required("Date of joining is required"),
-    monthly_salary: Yup.number()
-      .typeError("Must be a number")
-      .required("Monthly salary is required"),
-    is_manager: Yup.boolean(),
+    monthly_salary: Yup.number().typeError("Must be a number").required("Monthly salary is required"),
     manage_stages: Yup.array().when("is_manager", {
-      is: true,
-      then: (schema) =>
-        schema.min(1, "Select at least one stage for a reporting manager"),
-      otherwise: (schema) => schema.notRequired(),
+      is: true, then: (s) => s.min(1, "Select at least one stage"), otherwise: (s) => s.notRequired(),
     }),
   });
 
-  // Fetch employee data
   useEffect(() => {
     const fetchEmployee = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/employee/get/${employeeId}`
-        );
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get/${employeeId}`);
         const data = res.data;
-        console.log(data);
         setInitialValues({
-          ...initialValues,
           ...data,
           dob: data.dob ? data.dob.split("T")[0] : "",
-          date_of_joining: data.date_of_joining
-            ? data.date_of_joining.split("T")[0]
-            : "",
+          date_of_joining: data.date_of_joining ? data.date_of_joining.split("T")[0] : "",
           reporting_manager: data.reporting_manager?._id || "",
           manage_stages: data.manage_stages || [],
         });
         setProfilePreview(data.profile_pic || null);
-      } catch (err) {
-        console.error("Error fetching employee:", err);
-        toast.error("Failed to load employee data");
-      } finally {
-        setLoading(false);
-      }
+      } catch (err) { console.error(err); toast.error("Failed to load employee data"); }
+      finally { setLoading(false); }
     };
     fetchEmployee();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [employeeId]);
+  }, [employeeId]); // eslint-disable-line
 
   useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/api/employee/managers`)
-      .then((res) => {
-        if (res.data.success) setManagers(res.data.data);
-      })
-      .catch((err) => console.error("Error fetching managers", err));
-  }, []);
-
-  useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`)
-      .then((res) => {
-        if (res.data.success) setDesignations(res.data.designations);
-      })
-      .catch((err) => console.error("Error fetching designations", err));
-  }, []);
-
-  useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/api/department/get-all`)
-      .then((res) => {
-        if (res.data.success) setDepartments(res.data.departments);
-      })
-      .catch((err) => console.error("Error fetching departments", err));
+    axios.get(`${process.env.REACT_APP_API_URL}/api/employee/managers`).then((r) => { if (r.data.success) setManagers(r.data.data); }).catch(console.error);
+    axios.get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`).then((r) => { if (r.data.success) setDesignations(r.data.designations); }).catch(console.error);
+    axios.get(`${process.env.REACT_APP_API_URL}/api/department/get-all`).then((r) => { if (r.data.success) setDepartments(r.data.departments); }).catch(console.error);
   }, []);
 
   const handleFileChange = (e, setFieldValue) => {
-    if (e.target.files[0]) {
-      setProfilePreview(e.target.files[0]);
-      setFieldValue("profile_pic", e.target.files[0]);
-    }
+    if (e.target.files[0]) { setProfilePreview(e.target.files[0]); setFieldValue("profile_pic", e.target.files[0]); }
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -146,475 +86,144 @@ const EmployeeProfileEdit = () => {
       const formData = new FormData();
       Object.entries(values).forEach(([key, val]) => {
         if (val !== null && val !== undefined) {
-          if (Array.isArray(val)) {
-            val.forEach((v) => formData.append(`${key}[]`, v)); // ✅ handle arrays
-          } else {
-            formData.append(
-              key,
-              typeof val === "boolean" ? val.toString() : val
-            );
-          }
+          if (Array.isArray(val)) val.forEach((v) => formData.append(`${key}[]`, v));
+          else formData.append(key, typeof val === "boolean" ? val.toString() : val);
         }
       });
-
-      if (profilePreview && typeof profilePreview !== "string") {
-        formData.append("profile_pic", profilePreview);
-      }
-
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/employee/edit/${employeeId}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
+      if (profilePreview && typeof profilePreview !== "string") formData.append("profile_pic", profilePreview);
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/employee/edit/${employeeId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       toast.success("Profile updated successfully!");
       navigate(`/employee/profile/${employeeId}`);
-    } catch (err) {
-      console.error("Failed to update:", err);
-      toast.error("Update failed");
-    } finally {
-      setLoading(false);
-      setSubmitting(false);
-    }
+    } catch (err) { console.error(err); toast.error("Update failed"); }
+    finally { setLoading(false); setSubmitting(false); }
   };
 
   if (loading) return <LoadingOverlay />;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <div className="flex items-center">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center justify-center w-10 h-10 bg-gray-100 border border-gray-300 rounded-lg mr-4 hover:bg-gray-200 transition-colors"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="m15 18-6-6 6-6" />
-            </svg>
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-6">
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="flex-shrink-0 flex items-center justify-center w-9 h-9 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg>
           </button>
-          <h1 className="text-2xl font-semibold text-gray-800">
-            Edit Employee Profile
-          </h1>
+          <h1 className="text-lg sm:text-2xl font-semibold text-gray-800">Edit Employee Profile</h1>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          enableReinitialize
-          onSubmit={handleSubmit}
-        >
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+        <Formik initialValues={initialValues} validationSchema={validationSchema} enableReinitialize onSubmit={handleSubmit}>
           {({ setFieldValue, values }) => (
             <Form className="space-y-6">
+
+              {/* Profile Picture */}
               <div className="flex flex-col items-center">
-                <label
-                  htmlFor="profilePic"
-                  className="cursor-pointer w-32 h-32 rounded-full border-2 border-dashed border-gray-300 overflow-hidden flex items-center justify-center bg-gray-100 mb-4"
-                >
+                <label htmlFor="profilePic"
+                  className="cursor-pointer w-24 h-24 sm:w-32 sm:h-32 rounded-full border-2 border-dashed border-gray-300 overflow-hidden flex items-center justify-center bg-gray-100 mb-2">
                   {profilePreview ? (
-                    <img
-                      src={
-                        typeof profilePreview === "string"
-                          ? profilePreview
-                          : URL.createObjectURL(profilePreview)
-                      }
-                      alt="profile"
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={typeof profilePreview === "string" ? profilePreview : URL.createObjectURL(profilePreview)} alt="profile" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="text-center p-4">
-                      <svg
-                        className="w-12 h-12 text-gray-400 mx-auto mb-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
+                    <div className="text-center p-3">
+                      <svg className="w-8 h-8 text-gray-400 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                       </svg>
-                      <span className="text-sm text-gray-500">
-                        Upload Photo
-                      </span>
+                      <span className="text-xs text-gray-500">Upload Photo</span>
                     </div>
                   )}
                 </label>
-                <input
-                  type="file"
-                  id="profilePic"
-                  hidden
-                  onChange={(e) => handleFileChange(e, setFieldValue)}
-                />
-                <p className="text-gray-500 text-sm">JPG, PNG (Max 5MB)</p>
+                <input type="file" id="profilePic" hidden onChange={(e) => handleFileChange(e, setFieldValue)} />
+                <p className="text-xs text-gray-500">JPG, PNG (Max 5MB)</p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Left Column */}
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Full Name
-                    </label>
-                    <Field
-                      name="full_name"
-                      type="text"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <ErrorMessage
-                      name="full_name"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Username
-                    </label>
-                    <Field
-                      type="text"
-                      name="username"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <ErrorMessage
-                      name="username"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <Field
-                        type={showPassword ? "text" : "password"}
-                        name="password"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Enter new password"
-                      />
-                      <span
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
-                      >
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                      </span>
-                    </div>
-                    <ErrorMessage
-                      name="password"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email
-                    </label>
-                    <Field
-                      type="email"
-                      name="email"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <ErrorMessage
-                      name="email"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone
-                    </label>
-                    <Field
-                      type="text"
-                      name="phone"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <ErrorMessage
-                      name="phone"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Home Address
-                    </label>
-                    <Field
-                      type="text"
-                      name="home_address"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <ErrorMessage
-                      name="home_address"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Date of Birth
-                    </label>
-                    <Field
-                      type="date"
-                      name="dob"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <ErrorMessage
-                      name="dob"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
+                <div className="sm:col-span-2">
+                  <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 pb-1 border-b border-gray-100">Personal Information</h2>
                 </div>
 
-                {/* Right Column */}
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Department
-                    </label>
-                    <Field
-                      as="select"
-                      name="department"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">Select Department</option>
-                      {departments.map((dept, idx) => (
-                        <option key={idx} value={dept.name}>
-                          {dept.name}
-                        </option>
-                      ))}
-                    </Field>
-                    <ErrorMessage
-                      name="department"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
+                <div><label className={labelCls}>Full Name</label><Field name="full_name" type="text" className={inputCls} /><ErrorMessage name="full_name" component="div" className={errCls} /></div>
+                <div><label className={labelCls}>Username</label><Field name="username" type="text" className={inputCls} /><ErrorMessage name="username" component="div" className={errCls} /></div>
+                <div>
+                  <label className={labelCls}>Password</label>
+                  <div className="relative">
+                    <Field type={showPassword ? "text" : "password"} name="password" className={inputCls} placeholder="Enter new password" />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Designation
-                    </label>
-                    <Field
-                      as="select"
-                      name="designation"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">Select Designation</option>
-                      {designations.map((designation, idx) => (
-                        <option key={idx} value={designation.name}>
-                          {designation.name}
-                        </option>
-                      ))}
-                    </Field>
-                    <ErrorMessage
-                      name="designation"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Employment Type
-                    </label>
-                    <Field
-                      as="select"
-                      name="employment_type"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">Select Employment Type</option>
-                      {employmentTypes.map((type, idx) => (
-                        <option key={idx} value={type}>
-                          {type}
-                        </option>
-                      ))}
-                    </Field>
-                    <ErrorMessage
-                      name="employment_type"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Reporting Manager
-                    </label>
-                    <Field
-                      as="select"
-                      name="reporting_manager"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="">Select Reporting Manager</option>
-                      {managers.map(
-                        (m) =>
-                          m._id !== employeeId && (
-                            <option key={m._id} value={m._id}>
-                              {m.full_name}
-                            </option>
-                          )
-                      )}
-                    </Field>
-                    <ErrorMessage
-                      name="reporting_manager"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Date of Joining
-                    </label>
-                    <Field
-                      type="date"
-                      name="date_of_joining"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <ErrorMessage
-                      name="date_of_joining"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Monthly Salary
-                    </label>
-                    <Field
-                      type="number"
-                      name="monthly_salary"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <ErrorMessage
-                      name="monthly_salary"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Emergency Contact
-                    </label>
-                    <Field
-                      type="text"
-                      name="emergency_contact"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <ErrorMessage
-                      name="emergency_contact"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Capacity
-                    </label>
-                    <Field
-                      type="number"
-                      name="capacity"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <ErrorMessage
-                      name="capacity"
-                      component="div"
-                      className="text-red-600 text-sm mt-1"
-                    />
-                  </div>
-
-                  <div className="flex items-center">
-                    <Field
-                      type="checkbox"
-                      name="is_manager"
-                      id="is_manager"
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <label
-                      htmlFor="is_manager"
-                      className="ml-2 block text-sm text-gray-700"
-                    >
-                      Is Reporting Manager
-                    </label>
-                  </div>
-
-                  {values.is_manager && (
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Manage Stages
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {stageOptions.map(
-                          (stage, idx) => (
-                            <label
-                              key={idx}
-                              className="flex items-center space-x-2"
-                            >
-                              <Field
-                                type="checkbox"
-                                name="manage_stages"
-                                value={stage}
-                                checked={values.manage_stages.includes(stage)}
-                                className="w-4 h-4 text-blue-600 border-gray-300 rounded"
-                              />
-                              <span className="text-sm text-gray-700">
-                                {stage}
-                              </span>
-                            </label>
-                          )
-                        )}
-                      </div>
-                      <ErrorMessage
-                        name="manage_stages"
-                        component="div"
-                        className="text-red-600 text-sm mt-1"
-                      />
-                    </div>
-                  )}
+                  <ErrorMessage name="password" component="div" className={errCls} />
                 </div>
+                <div><label className={labelCls}>Email</label><Field type="email" name="email" className={inputCls} /><ErrorMessage name="email" component="div" className={errCls} /></div>
+                <div><label className={labelCls}>Phone</label><Field type="text" name="phone" className={inputCls} /><ErrorMessage name="phone" component="div" className={errCls} /></div>
+                <div className="sm:col-span-2"><label className={labelCls}>Home Address</label><Field type="text" name="home_address" className={inputCls} /><ErrorMessage name="home_address" component="div" className={errCls} /></div>
+                <div><label className={labelCls}>Date of Birth</label><Field type="date" name="dob" className={inputCls} /><ErrorMessage name="dob" component="div" className={errCls} /></div>
+                <div><label className={labelCls}>Emergency Contact</label><Field type="text" name="emergency_contact" className={inputCls} /></div>
+
+                <div className="sm:col-span-2">
+                  <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mt-2 mb-3 pb-1 border-b border-gray-100">Professional Information</h2>
+                </div>
+
+                <div>
+                  <label className={labelCls}>Department</label>
+                  <Field as="select" name="department" className={inputCls}>
+                    <option value="">Select Department</option>
+                    {departments.map((d, i) => <option key={i} value={d.name}>{d.name}</option>)}
+                  </Field>
+                  <ErrorMessage name="department" component="div" className={errCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Designation</label>
+                  <Field as="select" name="designation" className={inputCls}>
+                    <option value="">Select Designation</option>
+                    {designations.map((d, i) => <option key={i} value={d.name}>{d.name}</option>)}
+                  </Field>
+                  <ErrorMessage name="designation" component="div" className={errCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Employment Type</label>
+                  <Field as="select" name="employment_type" className={inputCls}>
+                    <option value="">Select Employment Type</option>
+                    {employmentTypes.map((t, i) => <option key={i} value={t}>{t}</option>)}
+                  </Field>
+                  <ErrorMessage name="employment_type" component="div" className={errCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Reporting Manager</label>
+                  <Field as="select" name="reporting_manager" className={inputCls}>
+                    <option value="">Select Reporting Manager</option>
+                    {managers.map((m) => m._id !== employeeId && <option key={m._id} value={m._id}>{m.full_name}</option>)}
+                  </Field>
+                </div>
+                <div><label className={labelCls}>Date of Joining</label><Field type="date" name="date_of_joining" className={inputCls} /><ErrorMessage name="date_of_joining" component="div" className={errCls} /></div>
+                <div><label className={labelCls}>Monthly Salary</label><Field type="number" name="monthly_salary" className={inputCls} /><ErrorMessage name="monthly_salary" component="div" className={errCls} /></div>
+                <div><label className={labelCls}>Capacity</label><Field type="number" name="capacity" className={inputCls} /></div>
+
+                <div className="sm:col-span-2 flex items-center gap-2">
+                  <Field type="checkbox" name="is_manager" id="is_manager" className="w-4 h-4 text-blue-600 border-gray-300 rounded" />
+                  <label htmlFor="is_manager" className="text-sm text-gray-700">Is Reporting Manager</label>
+                </div>
+                {values.is_manager && (
+                  <div className="sm:col-span-2">
+                    <label className={labelCls}>Manage Stages</label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
+                      {stageOptions.map((stage, i) => (
+                        <label key={i} className="flex items-center gap-2 text-sm text-gray-700">
+                          <Field type="checkbox" name="manage_stages" value={stage} checked={values.manage_stages.includes(stage)} className="w-4 h-4 text-blue-600 border-gray-300 rounded" />
+                          {stage}
+                        </label>
+                      ))}
+                    </div>
+                    <ErrorMessage name="manage_stages" component="div" className={errCls} />
+                  </div>
+                )}
               </div>
 
-              <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
-                <button
-                  type="button"
-                  onClick={() => navigate(-1)}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Save Changes
-                </button>
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+                <button type="button" onClick={() => navigate(-1)} className="w-full sm:w-auto px-5 py-2.5 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">Cancel</button>
+                <button type="submit" className="w-full sm:w-auto px-5 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Save Changes</button>
               </div>
             </Form>
           )}

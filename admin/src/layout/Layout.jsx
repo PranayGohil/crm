@@ -1,22 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import DashboardMenu from "../components/admin/DashboardMenu";
 import HeaderAdmin from "../components/admin/HeaderAdmin";
 import Footer from "../components/admin/Footer";
 import { Outlet } from "react-router-dom";
 
 const Layout = () => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
     <div className="flex h-screen overflow-hidden">
+      {/* Mobile Overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="bg-white shadow-md">
-        <DashboardMenu />
+      <aside
+        className={`
+          fixed lg:relative z-40 lg:z-auto
+          h-full bg-white shadow-md
+          transition-transform duration-300 ease-in-out
+          ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        `}
+      >
+        <DashboardMenu onClose={() => setMobileOpen(false)} />
       </aside>
 
       {/* Main Section */}
-      <div className="w-100 flex flex-col overflow-auto">
+      <div className="flex flex-col flex-1 min-w-0 overflow-auto">
         {/* Header */}
         <header className="shadow bg-white sticky top-0 z-10">
-          <HeaderAdmin />
+          <HeaderAdmin onMenuToggle={() => setMobileOpen(true)} />
         </header>
 
         {/* Page Content */}

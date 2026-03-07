@@ -73,7 +73,7 @@ const EarningsWidget = () => {
 
     if (loading) {
         return (
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 mt-5">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
                 <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                     <span className="text-sm text-gray-400">Loading earnings...</span>
@@ -83,7 +83,7 @@ const EarningsWidget = () => {
     }
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 mt-5">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">

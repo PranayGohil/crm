@@ -17,8 +17,8 @@ const AddSubtask = () => {
 
   const [mediaFiles, setMediaFiles] = useState([]);
   const [mediaPreviews, setMediaPreviews] = useState([]);
+  const [activeTab, setActiveTab] = useState("single"); // "single" | "bulk"
 
-  // ── Client stage pricing fetched from backend ──
   const [clientStagePricing, setClientStagePricing] = useState([]);
 
   const singleSchema = Yup.object({
@@ -50,13 +50,11 @@ const AddSubtask = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch employees
         const empRes = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/employee/get-all`
         );
         setEmployees(empRes.data);
 
-        // Fetch project to get client_id, then fetch client stage pricing
         const projectRes = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`
         );
@@ -77,7 +75,6 @@ const AddSubtask = () => {
     fetchData();
   }, [projectId]);
 
-  // Helper: get client's default price for a stage
   const getClientPrice = (stageName) => {
     const match = clientStagePricing.find((p) => p.stage_name === stageName);
     return match?.price ?? 0;
@@ -98,7 +95,6 @@ const AddSubtask = () => {
       formData.append("status", "To Do");
       mediaFiles.forEach((file) => formData.append("media_files", file));
 
-      // ── Send stages with prices ──
       const stages = values.stages.map((name) => ({
         name,
         price: values.stagePrices[name] ?? getClientPrice(name),
@@ -138,7 +134,6 @@ const AddSubtask = () => {
           task_name: `${values.bulkPrefix} ${i}`,
           description: "",
           url: values.bulkUrl,
-          // ── Send bulk stages with prices ──
           stages: values.bulkStage.map((name) => ({
             name,
             price: values.bulkStagePrices[name] ?? getClientPrice(name),
@@ -176,34 +171,52 @@ const AddSubtask = () => {
   if (loading) return <LoadingOverlay />;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
         <div className="flex items-center">
           <button
             onClick={() => navigate(`/project/subtask-dashboard/${projectId}`)}
-            className="flex items-center justify-center w-10 h-10 bg-gray-100 border border-gray-300 rounded-lg mr-4 hover:bg-gray-200 transition-colors"
+            className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-gray-100 border border-gray-300 rounded-lg mr-3 sm:mr-4 hover:bg-gray-200 transition-colors flex-shrink-0"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="m15 18-6-6 6-6" />
             </svg>
           </button>
-          <h1 className="text-2xl font-semibold text-gray-800">Add Subtask</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">Add Subtask</h1>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Mobile Tab Switcher */}
+      <div className="flex lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-1 mb-4">
+        <button
+          onClick={() => setActiveTab("single")}
+          className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${activeTab === "single" ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"
+            }`}
+        >
+          Single Subtask
+        </button>
+        <button
+          onClick={() => setActiveTab("bulk")}
+          className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${activeTab === "bulk" ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"
+            }`}
+        >
+          Bulk Generator
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 
         {/* ── Single Subtask Form ── */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Add New Subtask</h2>
+        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 ${activeTab !== "single" ? "hidden lg:block" : ""}`}>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Add New Subtask</h2>
           <Formik
             initialValues={{
               task_name: "",
               description: "",
               url: "",
               stages: [],
-              stagePrices: {}, // { "CAD Design": 500, "Render": 300, ... }
+              stagePrices: {},
               priority: "",
               assign_to: "",
               assign_date: "",
@@ -217,41 +230,39 @@ const AddSubtask = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Subtask Name</label>
                   <Field type="text" name="task_name" placeholder="Subtask Name"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" />
                   <ErrorMessage name="task_name" component="div" className="text-red-600 text-sm mt-1" />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                   <Field type="text" name="description" placeholder="Description"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">URL</label>
                   <Field type="text" name="url" placeholder="URL"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" />
                 </div>
 
-                {/* ── Stages with Price Inputs ── */}
+                {/* Stage & Price */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Stage & Price</label>
                   <div className="space-y-2">
                     {stageOptions.map((opt) => {
                       const isChecked = values.stages.includes(opt);
                       return (
-                        <div key={opt} className="flex items-center gap-3">
-                          {/* Checkbox */}
-                          <label className="flex items-center gap-2 w-40 shrink-0">
+                        <div key={opt} className="flex items-center gap-2 sm:gap-3">
+                          <label className="flex items-center gap-2 min-w-0 flex-shrink-0" style={{ width: "clamp(120px, 40%, 160px)" }}>
                             <Field
                               type="checkbox"
                               name="stages"
                               value={opt}
-                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
                               onChange={(e) => {
                                 if (e.target.checked) {
                                   setFieldValue("stages", [...values.stages, opt]);
-                                  // Auto-fill client default price
                                   setFieldValue("stagePrices", {
                                     ...values.stagePrices,
                                     [opt]: getClientPrice(opt),
@@ -264,13 +275,12 @@ const AddSubtask = () => {
                                 }
                               }}
                             />
-                            <span className="text-sm text-gray-700">{opt}</span>
+                            <span className="text-sm text-gray-700 truncate">{opt}</span>
                           </label>
 
-                          {/* Price input — only show when stage is checked */}
                           {isChecked && (
-                            <div className="relative flex-1">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                            <div className="relative flex-1 min-w-0">
+                              <span className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
                               <input
                                 type="number"
                                 min="0"
@@ -281,8 +291,8 @@ const AddSubtask = () => {
                                     [opt]: parseFloat(e.target.value) || 0,
                                   })
                                 }
-                                placeholder={`Default: ₹${getClientPrice(opt)}`}
-                                className="w-full pl-7 pr-4 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder={`₹${getClientPrice(opt)}`}
+                                className="w-full pl-6 sm:pl-7 pr-2 sm:pr-4 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               />
                             </div>
                           )}
@@ -296,7 +306,7 @@ const AddSubtask = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                   <Field as="select" name="priority"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base">
                     <option value="">Select Priority</option>
                     {priorityOptions.map((opt, idx) => (
                       <option key={idx} value={opt}>{opt}</option>
@@ -308,7 +318,7 @@ const AddSubtask = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Assign To</label>
                   <Field as="select" name="assign_to"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base">
                     <option value="">Select Assign To</option>
                     {employees.map((emp) => (
                       <option key={emp._id} value={emp._id}>{emp.full_name}</option>
@@ -318,14 +328,16 @@ const AddSubtask = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Start Date - End Date</label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 sm:gap-3">
                     <div>
+                      <label className="block text-xs text-gray-500 mb-1">Start Date</label>
                       <Field type="date" name="assign_date"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" />
                     </div>
                     <div>
+                      <label className="block text-xs text-gray-500 mb-1">End Date</label>
                       <Field type="date" name="due_date"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" />
                       <ErrorMessage name="due_date" component="div" className="text-red-600 text-sm mt-1" />
                     </div>
                   </div>
@@ -333,8 +345,8 @@ const AddSubtask = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Content Included</label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                    <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-4 text-center">
+                    <svg className="w-7 h-7 sm:w-8 sm:h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                         d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
@@ -345,10 +357,10 @@ const AddSubtask = () => {
                         setMediaFiles(files);
                         setMediaPreviews(files.map((file) => URL.createObjectURL(file)));
                       }} />
-                    <label htmlFor="mediaFileInput" className="text-blue-600 hover:text-blue-800 cursor-pointer">
-                      Drag and drop files here or click to browse
+                    <label htmlFor="mediaFileInput" className="text-blue-600 hover:text-blue-800 cursor-pointer text-sm">
+                      Tap to browse files
                     </label>
-                    <p className="text-gray-500 text-sm mt-1">JPG, PNG, PDF (Max 5MB)</p>
+                    <p className="text-gray-500 text-xs mt-1">JPG, PNG, PDF (Max 5MB)</p>
                   </div>
                 </div>
 
@@ -356,18 +368,18 @@ const AddSubtask = () => {
                   <div className="flex flex-wrap gap-2">
                     {mediaPreviews.map((preview, idx) => (
                       <img key={idx} src={preview} alt="preview"
-                        className="w-20 h-20 object-cover rounded border border-gray-300" />
+                        className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded border border-gray-300" />
                     ))}
                   </div>
                 )}
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 pt-2 sm:pt-4">
                   <button type="reset"
-                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+                    className="w-full xs:w-auto px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base">
                     Reset Form
                   </button>
                   <button type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    className="w-full xs:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base">
                     Save Subtask
                   </button>
                 </div>
@@ -377,15 +389,15 @@ const AddSubtask = () => {
         </div>
 
         {/* ── Bulk Subtask Generator ── */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Bulk Subtask Generator</h2>
+        <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 ${activeTab !== "bulk" ? "hidden lg:block" : ""}`}>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Bulk Subtask Generator</h2>
           <Formik
             initialValues={{
               bulkPrefix: "",
               bulkStart: 1,
               bulkEnd: 5,
               bulkStage: [],
-              bulkStagePrices: {}, // { "CAD Design": 500, ... }
+              bulkStagePrices: {},
               bulkPriority: "",
               bulkAssignTo: "",
               bulkAssignDate: "",
@@ -400,48 +412,48 @@ const AddSubtask = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Subtask Prefix</label>
                   <Field name="bulkPrefix" type="text" placeholder="e.g., Ring"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" />
                   <ErrorMessage name="bulkPrefix" component="div" className="text-red-600 text-sm mt-1" />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Start Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Start No.</label>
                     <Field name="bulkStart" type="number"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                    <ErrorMessage name="bulkStart" component="div" className="text-red-600 text-sm mt-1" />
+                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" />
+                    <ErrorMessage name="bulkStart" component="div" className="text-red-600 text-xs mt-1" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">End Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">End No.</label>
                     <Field name="bulkEnd" type="number"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                    <ErrorMessage name="bulkEnd" component="div" className="text-red-600 text-sm mt-1" />
+                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" />
+                    <ErrorMessage name="bulkEnd" component="div" className="text-red-600 text-xs mt-1" />
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">URL</label>
                   <Field name="bulkUrl" type="text" placeholder="URL for all subtasks"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base" />
                 </div>
 
-                <div className="pt-4 border-t border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-800 mb-3">Common Settings for Generated Subtasks</h3>
+                <div className="pt-3 sm:pt-4 border-t border-gray-200">
+                  <h3 className="text-base sm:text-lg font-medium text-gray-800 mb-3">Common Settings</h3>
 
-                  {/* ── Bulk Stages with Price Inputs ── */}
+                  {/* Bulk Stages */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Stage & Price</label>
                     <div className="space-y-2">
                       {stageOptions.map((opt) => {
                         const isChecked = values.bulkStage.includes(opt);
                         return (
-                          <div key={opt} className="flex items-center gap-3">
-                            <label className="flex items-center gap-2 w-40 shrink-0">
+                          <div key={opt} className="flex items-center gap-2 sm:gap-3">
+                            <label className="flex items-center gap-2 flex-shrink-0" style={{ width: "clamp(120px, 40%, 160px)" }}>
                               <Field
                                 type="checkbox"
                                 name="bulkStage"
                                 value={opt}
-                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 flex-shrink-0"
                                 onChange={(e) => {
                                   if (e.target.checked) {
                                     setFieldValue("bulkStage", [...values.bulkStage, opt]);
@@ -457,12 +469,12 @@ const AddSubtask = () => {
                                   }
                                 }}
                               />
-                              <span className="text-sm text-gray-700">{opt}</span>
+                              <span className="text-sm text-gray-700 truncate">{opt}</span>
                             </label>
 
                             {isChecked && (
-                              <div className="relative flex-1">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                              <div className="relative flex-1 min-w-0">
+                                <span className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
                                 <input
                                   type="number"
                                   min="0"
@@ -473,8 +485,8 @@ const AddSubtask = () => {
                                       [opt]: parseFloat(e.target.value) || 0,
                                     })
                                   }
-                                  placeholder={`Default: ₹${getClientPrice(opt)}`}
-                                  className="w-full pl-7 pr-4 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder={`₹${getClientPrice(opt)}`}
+                                  className="w-full pl-6 sm:pl-7 pr-2 sm:pr-4 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                               </div>
                             )}
@@ -488,7 +500,7 @@ const AddSubtask = () => {
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                     <Field as="select" name="bulkPriority"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base">
                       <option value="">Select Priority</option>
                       {priorityOptions.map((opt, idx) => (
                         <option key={idx} value={opt}>{opt}</option>
@@ -500,7 +512,7 @@ const AddSubtask = () => {
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Assign To</label>
                     <Field as="select" name="bulkAssignTo"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base">
                       <option value="">Select Assign To</option>
                       {employees.map((emp) => (
                         <option key={emp._id} value={emp._id}>{emp.full_name}</option>
@@ -510,25 +522,27 @@ const AddSubtask = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Start Date - End Date</label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 sm:gap-3">
                       <div>
+                        <label className="block text-xs text-gray-500 mb-1">Start Date</label>
                         <Field type="date" name="bulkAssignDate"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        <ErrorMessage name="bulkAssignDate" component="div" className="text-red-600 text-sm mt-1" />
+                          className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" />
+                        <ErrorMessage name="bulkAssignDate" component="div" className="text-red-600 text-xs mt-1" />
                       </div>
                       <div>
+                        <label className="block text-xs text-gray-500 mb-1">End Date</label>
                         <Field type="date" name="bulkDueDate"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        <ErrorMessage name="bulkDueDate" component="div" className="text-red-600 text-sm mt-1" />
+                          className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" />
+                        <ErrorMessage name="bulkDueDate" component="div" className="text-red-600 text-xs mt-1" />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-2 sm:pt-4">
                   <button type="submit"
-                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    className="w-full px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center text-sm sm:text-base">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     Generate Subtasks

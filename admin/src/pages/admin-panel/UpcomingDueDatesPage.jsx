@@ -2,8 +2,99 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingOverlay from "../../components/admin/LoadingOverlay";
-import { Link } from "react-router-dom";
 
+/* ─── helpers ────────────────────────────────────────────────────────────── */
+const formatDate = (dateStr) => {
+  if (!dateStr) return "N/A";
+  const date = new Date(dateStr);
+  return `${String(date.getDate()).padStart(2, "0")} ${date.toLocaleString("default", { month: "short" })} ${date.getFullYear()}`;
+};
+
+const getDaysRemaining = (dueDateStr) => {
+  if (!dueDateStr) return null;
+  const diff = new Date(dueDateStr) - new Date();
+  return Math.max(Math.ceil(diff / 86400000), 0);
+};
+
+const daysBadge = (days) => {
+  if (days === null) return { bg: "bg-gray-50 border-gray-200 text-gray-500", dot: "bg-gray-400" };
+  if (days < 7) return { bg: "bg-red-50 border-red-200 text-red-700", dot: "bg-red-500" };
+  if (days < 14) return { bg: "bg-yellow-50 border-yellow-200 text-yellow-700", dot: "bg-yellow-500" };
+  return { bg: "bg-green-50 border-green-200 text-green-700", dot: "bg-green-500" };
+};
+
+const statusBadgeClass = (status) => {
+  const s = status?.toLowerCase().replace(" ", "-") || "default";
+  return `status-badge status-${s}`;
+};
+
+/* ─── mobile card ────────────────────────────────────────────────────────── */
+const TaskCard = ({ task }) => {
+  const daysLeft = getDaysRemaining(task.due_date);
+  const badge = daysBadge(daysLeft);
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3 shadow-sm">
+      {/* Project + status */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-xs text-gray-400 mb-0.5">Project</p>
+          <p className="font-semibold text-gray-800 text-sm truncate" title={task.project_id?.project_name}>
+            {task.project_id?.project_name || "N/A"}
+          </p>
+        </div>
+        <span className={statusBadgeClass(task.status)}>
+          <span className="status-dot"></span>
+          {task.status || "N/A"}
+        </span>
+      </div>
+
+      {/* Task name */}
+      <div>
+        <p className="text-xs text-gray-400 mb-0.5">Task</p>
+        <p className="text-sm text-gray-700 font-medium truncate" title={task.task_name}>{task.task_name || "N/A"}</p>
+      </div>
+
+      {/* Dates row */}
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <p className="text-xs text-gray-400 mb-0.5">Task Due</p>
+          <p className="text-xs font-medium text-gray-700">{formatDate(task.due_date)}</p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-400 mb-0.5">Project Due</p>
+          <p className="text-xs font-medium text-gray-700">{formatDate(task.project_id?.due_date)}</p>
+        </div>
+      </div>
+
+      {/* Assignee + days */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          {task.assign_to?.profile_pic ? (
+            <img src={task.assign_to.profile_pic} alt={task.assign_to?.full_name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+          ) : (
+            <div className="assignee-avatar-placeholder w-7 h-7 flex-shrink-0">
+              {task.assign_to?.full_name?.charAt(0)?.toUpperCase() || "?"}
+            </div>
+          )}
+          <span className="text-xs text-gray-600 truncate">{task.assign_to?.full_name || "Unassigned"}</span>
+        </div>
+
+        {daysLeft !== null ? (
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold ${badge.bg}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`}></span>
+            <span className="font-bold">{daysLeft}</span>
+            <span className="font-medium">{daysLeft === 1 ? "day" : "days"}</span>
+          </span>
+        ) : (
+          <span className="text-xs text-gray-400">N/A</span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/* ─── main ───────────────────────────────────────────────────────────────── */
 const UpcomingDueDatesPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -14,244 +105,30 @@ const UpcomingDueDatesPage = () => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/api/statistics/upcoming-due-dates`)
       .then((res) => {
-        const sortedData = [...res.data].sort((a, b) => {
-          const dateA = a.project_id?.due_date
-            ? new Date(a.project_id.due_date)
-            : new Date(0);
-          const dateB = b.project_id?.due_date
-            ? new Date(b.project_id.due_date)
-            : new Date(0);
-          return dateA - dateB; // ascending order
+        const sorted = [...res.data].sort((a, b) => {
+          const dA = a.project_id?.due_date ? new Date(a.project_id.due_date) : new Date(0);
+          const dB = b.project_id?.due_date ? new Date(b.project_id.due_date) : new Date(0);
+          return dA - dB;
         });
-        setDueTasks(sortedData);
+        setDueTasks(sorted);
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, []);
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "N/A";
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = date.toLocaleString("default", { month: "short" });
-    const year = date.getFullYear();
-    return `${day} ${month} ${year}`;
-  };
-
-  const getDaysRemaining = (dueDateStr) => {
-    if (!dueDateStr) return null;
-    const dueDate = new Date(dueDateStr);
-    const today = new Date();
-    const diffTime = dueDate - today;
-    return Math.max(Math.ceil(diffTime / (1000 * 60 * 60 * 24)), 0);
-  };
-
-  const getRemainingDaysBadgeClass = (days) => {
-    if (days === null) return "remaining-days-default";
-    if (days < 7) return "remaining-days-danger";
-    if (days < 14) return "remaining-days-warning";
-    return "remaining-days-success";
-  };
-
-  const getStatusBadgeClass = (status) => {
-    if (!status) return "status-default";
-    const statusLower = status.toLowerCase().replace(" ", "-");
-    return `status-${statusLower}`;
-  };
-
   if (loading) return <LoadingOverlay />;
+
+  const critical = dueTasks.filter((t) => { const d = getDaysRemaining(t.due_date); return d !== null && d < 7; }).length;
+  const warning = dueTasks.filter((t) => { const d = getDaysRemaining(t.due_date); return d !== null && d >= 7 && d < 14; }).length;
 
   return (
     <div className="dashboard-container">
-      <style jsx>{`
-        .project-cell {
-          max-width: 200px;
-        }
-
-        .project-name {
-          font-weight: 600;
-          color: #0a3749;
-          display: block;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .remaining-days-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 6px 12px;
-          border-radius: 16px;
-          font-size: 12px;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          white-space: nowrap;
-        }
-
-        .remaining-days-danger {
-          background: #fff5f5;
-          color: #dc3545;
-          border: 1px solid #f5c6cb;
-        }
-
-        .remaining-days-warning {
-          background: #fff3cd;
-          color: #856404;
-          border: 1px solid #ffeaa7;
-        }
-
-        .remaining-days-success {
-          background: #d4edda;
-          color: #155724;
-          border: 1px solid #c3e6cb;
-        }
-
-        .remaining-days-default {
-          background: #f8f9fa;
-          color: #6c757d;
-          border: 1px solid #e9ecef;
-        }
-
-        .days-number {
-          font-weight: 700;
-          font-size: 14px;
-        }
-
-        .days-text {
-          font-weight: 500;
-          font-size: 11px;
-        }
-
-        /* Enhanced Status Badges */
-        .status-default {
-          background: #f8f9fa;
-          color: #6c757d;
-          border: 1px solid #e9ecef;
-        }
-
-        .status-default .status-dot {
-          background: #6c757d;
-        }
-
-        /* No Data Container */
-        .no-data-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 16px;
-          color: #6c757d;
-        }
-
-        .no-data-icon {
-          opacity: 0.5;
-        }
-
-        .no-data-text {
-          font-size: 16px;
-          font-weight: 500;
-          margin: 0;
-          color: #6c757d;
-        }
-
-        /* Table Summary Footer */
-        .table-summary {
-          background: #f8f9fa;
-          border-top: 1px solid #e9ecef;
-          padding: 20px;
-        }
-
-        .summary-stats {
-          display: flex;
-          gap: 32px;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-        }
-
-        .summary-item {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .summary-label {
-          font-size: 14px;
-          color: #6c757d;
-          font-weight: 500;
-        }
-
-        .summary-value {
-          font-size: 18px;
-          font-weight: 700;
-          padding: 4px 12px;
-          border-radius: 12px;
-          background: #e9ecef;
-          color: #495057;
-          min-width: 32px;
-          text-align: center;
-        }
-
-        .summary-value.critical {
-          background: #fff5f5;
-          color: #dc3545;
-          border: 1px solid #f5c6cb;
-        }
-
-        .summary-value.warning {
-          background: #fff3cd;
-          color: #856404;
-          border: 1px solid #ffeaa7;
-        }
-
-        @media (max-width: 768px) {
-          .summary-stats {
-            flex-direction: column;
-            gap: 16px;
-            align-items: stretch;
-          }
-
-          .summary-item {
-            justify-content: space-between;
-            padding: 8px 12px;
-            background: white;
-            border-radius: 6px;
-            border: 1px solid #e9ecef;
-          }
-
-          .remaining-days-badge {
-            font-size: 11px;
-            padding: 4px 8px;
-          }
-
-          .days-number {
-            font-size: 12px;
-          }
-
-          .days-text {
-            font-size: 10px;
-          }
-
-          .project-cell,
-          .task-name-cell {
-            max-width: 150px;
-          }
-        }
-      `}</style>
       {/* Header */}
       <section className="dashboard-header">
         <div className="header-content">
           <div className="header-left">
             <button className="back-button" onClick={() => navigate("/")}>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="m15 18-6-6 6-6" />
               </svg>
             </button>
@@ -260,168 +137,110 @@ const UpcomingDueDatesPage = () => {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="stats-section">
-        <div className="stats-info">
-          <span className="stats-number">{dueTasks.length}</span>
-          <span>Upcoming Tasks</span>
+      {/* Summary strip */}
+      <section className="px-3 sm:px-4 py-3 sm:py-4">
+        <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-4 sm:items-center">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 text-center sm:text-left sm:flex sm:items-center sm:gap-3 sm:px-4">
+            <p className="text-xs text-gray-500 sm:hidden">Total</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-800">{dueTasks.length}</p>
+            <p className="text-xs text-gray-500 hidden sm:block">Upcoming Tasks</p>
+          </div>
+          <div className="bg-red-50 rounded-xl border border-red-200 shadow-sm p-3 text-center sm:text-left sm:flex sm:items-center sm:gap-3 sm:px-4">
+            <p className="text-xs text-red-500 sm:hidden">Critical</p>
+            <p className="text-xl sm:text-2xl font-bold text-red-700">{critical}</p>
+            <p className="text-xs text-red-500 hidden sm:block">&lt; 7 Days</p>
+          </div>
+          <div className="bg-yellow-50 rounded-xl border border-yellow-200 shadow-sm p-3 text-center sm:text-left sm:flex sm:items-center sm:gap-3 sm:px-4">
+            <p className="text-xs text-yellow-600 sm:hidden">Warning</p>
+            <p className="text-xl sm:text-2xl font-bold text-yellow-700">{warning}</p>
+            <p className="text-xs text-yellow-600 hidden sm:block">&lt; 14 Days</p>
+          </div>
         </div>
       </section>
 
-      {/* Table */}
-      <section className="table-container">
+      {/* ── Mobile Cards ── */}
+      <section className="md:hidden px-3 pb-4 space-y-3">
+        {dueTasks.length === 0 ? (
+          <div className="text-center py-12 text-gray-400">
+            <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            <p className="text-sm font-medium">No upcoming due tasks found</p>
+          </div>
+        ) : (
+          dueTasks.map((task, i) => <TaskCard key={i} task={task} />)
+        )}
+      </section>
+
+      {/* ── Desktop Table ── */}
+      <section className="table-container hidden md:block">
         <div style={{ overflow: "auto" }}>
           <table className="data-table">
             <thead>
               <tr>
-                <th>
-                  <div className="header-content-wrapper">
-                    <div className="header-main">Project</div>
-                  </div>
-                </th>
-                <th>
-                  <div className="header-content-wrapper">
-                    <div className="header-main">Task Name</div>
-                  </div>
-                </th>
-                <th>
-                  <div className="header-content-wrapper">
-                    <div className="header-main">Task Due Date</div>
-                  </div>
-                </th>
-                <th>
-                  <div className="header-content-wrapper">
-                    <div className="header-main">Project Due Date</div>
-                  </div>
-                </th>
-                <th>
-                  <div className="header-content-wrapper">
-                    <div className="header-main">Assigned To</div>
-                  </div>
-                </th>
-                <th>
-                  <div className="header-content-wrapper">
-                    <div className="header-main">Remaining Days</div>
-                  </div>
-                </th>
-                <th>
-                  <div className="header-content-wrapper">
-                    <div className="header-main">Status</div>
-                  </div>
-                </th>
+                <th>Project</th>
+                <th>Task Name</th>
+                <th>Task Due Date</th>
+                <th>Project Due Date</th>
+                <th>Assigned To</th>
+                <th>Remaining Days</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
               {dueTasks.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan="7"
-                    style={{ textAlign: "center", padding: "40px" }}
-                  >
-                    <div className="no-data-container">
-                      <div className="no-data-icon">
-                        <svg
-                          width="48"
-                          height="48"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                        >
-                          <rect
-                            x="3"
-                            y="4"
-                            width="18"
-                            height="18"
-                            rx="2"
-                            ry="2"
-                          />
-                          <line x1="16" y1="2" x2="16" y2="6" />
-                          <line x1="8" y1="2" x2="8" y2="6" />
-                          <line x1="3" y1="10" x2="21" y2="10" />
-                        </svg>
-                      </div>
-                      <p className="no-data-text">
-                        No upcoming due tasks found
-                      </p>
+                  <td colSpan="7" style={{ textAlign: "center", padding: "40px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", color: "#9ca3af" }}>
+                      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+                      </svg>
+                      <p style={{ margin: 0, fontWeight: 500 }}>No upcoming due tasks found</p>
                     </div>
                   </td>
                 </tr>
               ) : (
                 dueTasks.map((task, index) => {
                   const daysLeft = getDaysRemaining(task.due_date);
-                  const remainingDaysClass =
-                    getRemainingDaysBadgeClass(daysLeft);
-                  const statusClass = getStatusBadgeClass(task.status);
+                  const badge = daysBadge(daysLeft);
 
                   return (
                     <tr key={index}>
                       <td>
-                        <div className="project-cell">
-                          <span
-                            className="project-name"
-                            title={task.project_id?.project_name || "N/A"}
-                          >
-                            {task.project_id?.project_name || "N/A"}
-                          </span>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="task-name-cell">
-                          <span
-                            className="task-name-text"
-                            title={task.task_name || "N/A"}
-                          >
-                            {task.task_name || "N/A"}
-                          </span>
-                        </div>
-                      </td>
-                      <td>
-                        <span className="date-cell">
-                          {formatDate(task.due_date)}
+                        <span className="project-name-text" title={task.project_id?.project_name}>
+                          {task.project_id?.project_name || "N/A"}
                         </span>
                       </td>
                       <td>
-                        <span className="date-cell">
-                          {formatDate(task.project_id?.due_date)}
-                        </span>
+                        <span className="task-name-text" title={task.task_name}>{task.task_name || "N/A"}</span>
                       </td>
+                      <td><span className="date-cell">{formatDate(task.due_date)}</span></td>
+                      <td><span className="date-cell">{formatDate(task.project_id?.due_date)}</span></td>
                       <td>
                         <div className="assignee-cell">
                           {task.assign_to?.profile_pic ? (
-                            <img
-                              src={task.assign_to.profile_pic}
-                              alt={task.assign_to?.full_name || "User"}
-                              className="assignee-avatar"
-                            />
+                            <img src={task.assign_to.profile_pic} alt={task.assign_to?.full_name} className="assignee-avatar" />
                           ) : (
                             <div className="assignee-avatar-placeholder">
-                              {task.assign_to?.full_name
-                                ?.charAt(0)
-                                ?.toUpperCase() || "?"}
+                              {task.assign_to?.full_name?.charAt(0)?.toUpperCase() || "?"}
                             </div>
                           )}
-                          <span className="assignee-name">
-                            {task.assign_to?.full_name || "Unassigned"}
-                          </span>
+                          <span className="assignee-name">{task.assign_to?.full_name || "Unassigned"}</span>
                         </div>
                       </td>
                       <td>
                         {daysLeft !== null ? (
-                          <span
-                            className={`remaining-days-badge ${remainingDaysClass}`}
-                          >
-                            <span className="days-number">{daysLeft}</span>
-                            <span className="days-text">
-                              {daysLeft === 1 ? "Day" : "Days"} Remaining
-                            </span>
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold ${badge.bg}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${badge.dot}`}></span>
+                            <span className="font-bold text-sm">{daysLeft}</span>
+                            <span>{daysLeft === 1 ? "Day" : "Days"} Left</span>
                           </span>
                         ) : (
                           <span className="no-data">N/A</span>
                         )}
                       </td>
                       <td>
-                        <span className={`status-badge ${statusClass}`}>
+                        <span className={statusBadgeClass(task.status)}>
                           <span className="status-dot"></span>
                           {task.status || "N/A"}
                         </span>
@@ -434,35 +253,21 @@ const UpcomingDueDatesPage = () => {
           </table>
         </div>
 
-        {/* Summary Footer */}
+        {/* Summary footer (desktop only) */}
         {dueTasks.length > 0 && (
-          <div className="table-summary">
-            <div className="summary-stats">
-              <div className="summary-item">
-                <span className="summary-label">Total Tasks:</span>
-                <span className="summary-value">{dueTasks.length}</span>
+          <div className="bg-gray-50 border-t border-gray-200 px-5 py-4">
+            <div className="flex flex-wrap gap-6 items-center justify-center">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500 font-medium">Total Tasks:</span>
+                <span className="text-base font-bold px-3 py-1 rounded-xl bg-gray-200 text-gray-700">{dueTasks.length}</span>
               </div>
-              <div className="summary-item">
-                <span className="summary-label">Critical (&lt; 7 days):</span>
-                <span className="summary-value critical">
-                  {
-                    dueTasks.filter((task) => {
-                      const days = getDaysRemaining(task.due_date);
-                      return days !== null && days < 7;
-                    }).length
-                  }
-                </span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500 font-medium">Critical (&lt; 7 days):</span>
+                <span className="text-base font-bold px-3 py-1 rounded-xl bg-red-50 text-red-600 border border-red-200">{critical}</span>
               </div>
-              <div className="summary-item">
-                <span className="summary-label">Warning (&lt; 14 days):</span>
-                <span className="summary-value warning">
-                  {
-                    dueTasks.filter((task) => {
-                      const days = getDaysRemaining(task.due_date);
-                      return days !== null && days >= 7 && days < 14;
-                    }).length
-                  }
-                </span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500 font-medium">Warning (&lt; 14 days):</span>
+                <span className="text-base font-bold px-3 py-1 rounded-xl bg-yellow-50 text-yellow-700 border border-yellow-200">{warning}</span>
               </div>
             </div>
           </div>

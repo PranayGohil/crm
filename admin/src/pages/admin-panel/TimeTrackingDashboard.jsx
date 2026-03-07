@@ -1,14 +1,12 @@
-// TimeTrackingDashboard.jsx — fully server-side filtering + pagination
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
-import { Modal, Button } from "react-bootstrap";
 import LoadingOverlay from "../../components/admin/LoadingOverlay";
 
 const API = process.env.REACT_APP_API_URL;
 
-// ─── debounce hook ────────────────────────────────────────────────────────────
+// ── debounce hook ─────────────────────────────────────────────────────────────
 function useDebounce(value, delay = 400) {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
@@ -18,170 +16,101 @@ function useDebounce(value, delay = 400) {
   return debounced;
 }
 
-// ─── format ms → "Xd Xh Xm Xs" ──────────────────────────────────────────────
+// ── helpers ───────────────────────────────────────────────────────────────────
 const formatMs = (ms) => {
   if (!ms || ms <= 0) return "0h 0m 0s";
   const dur = moment.duration(ms);
   const days = Math.floor(dur.asDays());
-  return [
-    days > 0 && `${days}d`,
-    `${dur.hours()}h`,
-    `${dur.minutes()}m`,
-    `${dur.seconds()}s`,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  return [days > 0 && `${days}d`, `${dur.hours()}h`, `${dur.minutes()}m`, `${dur.seconds()}s`]
+    .filter(Boolean).join(" ");
 };
 
-// ─── remaining time label ─────────────────────────────────────────────────────
 const getRemainingLabel = (dueDate, status) => {
   if (status === "Completed") return { label: "Completed", type: "completed" };
   const diff = moment(dueDate).diff(moment());
   if (diff < 0) return { label: "Overdue", type: "overdue" };
   const dur = moment.duration(diff);
-  return {
-    label: `${dur.days()}d ${dur.hours()}h ${dur.minutes()}m`,
-    type: "pending",
-  };
+  return { label: `${dur.days()}d ${dur.hours()}h ${dur.minutes()}m`, type: "pending" };
 };
 
-// ─── stage pills ──────────────────────────────────────────────────────────────
+const remainingCls = { completed: "bg-green-100 text-green-700", overdue: "bg-red-100 text-red-700", pending: "bg-blue-100 text-blue-700" };
+
+// ── Sub-components ────────────────────────────────────────────────────────────
 const StagePills = ({ stages }) => {
-  if (!Array.isArray(stages) || !stages.length)
-    return <span className="no-data">No stages</span>;
+  if (!Array.isArray(stages) || !stages.length) return <span className="text-xs text-gray-400">No stages</span>;
   return (
     <div className="flex items-center gap-1 flex-wrap">
-      {stages.map((stg, i) => {
-        const name = typeof stg === "string" ? stg : stg.name;
-        const done = !!stg?.completed;
+      {stages.map((s, i) => {
+        const name = typeof s === "string" ? s : s.name;
+        const done = !!s?.completed;
         return (
-          <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-            <small
-              style={{
-                padding: "3px 8px",
-                borderRadius: 12,
-                fontSize: 11,
-                background: done ? "#e6ffed" : "#f3f4f6",
-                color: done ? "#097a3f" : "#444",
-                border: `1px solid ${done ? "#b7f0c6" : "#e0e0e0"}`,
-              }}
-            >
-              {done && "✓ "}
-              {name}
-            </small>
-            {i < stages.length - 1 && (
-              <span style={{ color: "#aaa", fontSize: 12 }}>→</span>
-            )}
-          </span>
+          <React.Fragment key={i}>
+            <span className={`px-2 py-0.5 text-xs rounded-full border ${done ? "bg-green-50 text-green-700 border-green-200" : "bg-gray-50 text-gray-600 border-gray-200"}`}>
+              {done && "✓ "}{name}
+            </span>
+            {i < stages.length - 1 && <span className="text-gray-300 text-xs">→</span>}
+          </React.Fragment>
         );
       })}
     </div>
   );
 };
 
-// ─── Assignee cell ────────────────────────────────────────────────────────────
 const AssigneeCell = ({ employee }) => {
-  if (!employee) return <span className="no-data">Unassigned</span>;
+  if (!employee) return <span className="text-xs text-gray-400">Unassigned</span>;
   return (
-    <div className="assignee-cell">
-      {employee.profile_pic ? (
-        <img
-          src={employee.profile_pic}
-          alt={employee.full_name}
-          className="assignee-avatar"
-        />
-      ) : (
-        <div className="assignee-avatar-placeholder">
-          {employee.full_name?.charAt(0).toUpperCase() || "?"}
+    <div className="flex items-center gap-1.5">
+      {employee.profile_pic
+        ? <img src={employee.profile_pic} alt={employee.full_name} className="w-6 h-6 rounded-full object-cover flex-shrink-0" />
+        : <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">{employee.full_name?.charAt(0).toUpperCase()}</div>
+      }
+      <span className="text-xs text-gray-700">{employee.full_name}</span>
+    </div>
+  );
+};
+
+// Custom date range modal (pure Tailwind)
+const DateRangeModal = ({ show, customDates, setCustomDates, onApply, onCancel }) => {
+  if (!show) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
+        <h3 className="text-base font-semibold text-gray-800 mb-4">Select Custom Date Range</h3>
+        <div className="space-y-4 mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
+            <input type="date" value={customDates.from}
+              onChange={(e) => setCustomDates((p) => ({ ...p, from: e.target.value }))}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+            <input type="date" value={customDates.to}
+              onChange={(e) => setCustomDates((p) => ({ ...p, to: e.target.value }))}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+          </div>
         </div>
-      )}
-      <span className="assignee-name">{employee.full_name}</span>
+        <div className="flex justify-end gap-3">
+          <button onClick={onCancel} className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">Cancel</button>
+          <button onClick={onApply} disabled={!customDates.from && !customDates.to}
+            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">Apply</button>
+        </div>
+      </div>
     </div>
   );
 };
 
-// ─── Pagination bar ───────────────────────────────────────────────────────────
-const Pagination = ({ pagination, onPageChange, onLimitChange, loading }) => {
-  const { page, totalPages, limit } = pagination;
-  if (totalPages <= 1 && limit === 15) return null;
-
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
-    .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
-    .reduce((acc, p, i, arr) => {
-      if (i > 0 && p - arr[i - 1] > 1) acc.push("…");
-      acc.push(p);
-      return acc;
-    }, []);
-
-  return (
-    <div className="flex items-center justify-center gap-2 py-4 flex-wrap">
-      <button
-        className="px-3 py-1 rounded border text-sm disabled:opacity-40"
-        onClick={() => onPageChange(page - 1)}
-        disabled={page <= 1 || loading}
-      >
-        ← Prev
-      </button>
-
-      {pages.map((p, i) =>
-        p === "…" ? (
-          <span key={`e${i}`} className="px-2 text-gray-400">…</span>
-        ) : (
-          <button
-            key={p}
-            onClick={() => onPageChange(p)}
-            disabled={loading}
-            className={`px-3 py-1 rounded border text-sm ${p === page
-                ? "bg-blue-600 text-white border-blue-600"
-                : "hover:bg-gray-100"
-              }`}
-          >
-            {p}
-          </button>
-        )
-      )}
-
-      <button
-        className="px-3 py-1 rounded border text-sm disabled:opacity-40"
-        onClick={() => onPageChange(page + 1)}
-        disabled={page >= totalPages || loading}
-      >
-        Next →
-      </button>
-
-      <select
-        className="ml-4 border rounded px-2 py-1 text-sm"
-        value={limit}
-        onChange={(e) => onLimitChange(Number(e.target.value))}
-      >
-        {[10, 15, 25, 50].map((n) => (
-          <option key={n} value={n}>
-            {n} / page
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-};
-
-// ─── Main component ───────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 const TimeTrackingDashboard = () => {
   const navigate = useNavigate();
-
-  // reference data — loaded once
   const [employees, setEmployees] = useState([]);
   const [empMap, setEmpMap] = useState({});
-
-  // server-driven data
   const [projects, setProjects] = useState([]);
   const [summary, setSummary] = useState({ totalProjects: 0, totalSubtasks: 0, totalTimeMs: 0 });
   const [pagination, setPagination] = useState({ page: 1, limit: 15, total: 0, totalPages: 1 });
-
-  // ui state
   const [loading, setLoading] = useState(true);
   const [openProject, setOpenProject] = useState(null);
 
-  // filter state
   const [projectSearch, setProjectSearch] = useState("");
   const [subtaskSearch, setSubtaskSearch] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState("");
@@ -189,65 +118,42 @@ const TimeTrackingDashboard = () => {
   const [customDates, setCustomDates] = useState({ from: "", to: "" });
   const [showCustomModal, setShowCustomModal] = useState(false);
 
-  // debounced searches
   const debouncedProjectSearch = useDebounce(projectSearch);
   const debouncedSubtaskSearch = useDebounce(subtaskSearch);
 
-  // ── load employees once ────────────────────────────────────────────────
   useEffect(() => {
-    axios
-      .get(`${API}/api/employee/get-all`)
-      .then((res) => {
-        setEmployees(res.data);
-        const map = {};
-        res.data.forEach((e) => { map[e._id] = e; });
-        setEmpMap(map);
-      })
-      .catch(console.error);
+    axios.get(`${API}/api/employee/get-all`).then((res) => {
+      setEmployees(res.data);
+      const map = {};
+      res.data.forEach((e) => { map[e._id] = e; });
+      setEmpMap(map);
+    }).catch(console.error);
   }, []);
 
-  // ── fetch time-tracking data ───────────────────────────────────────────
-  const fetchData = useCallback(
-    async (page = 1, limit = pagination.limit) => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          page,
-          limit,
-          range: selectedRange,
-          ...(debouncedProjectSearch && { search: debouncedProjectSearch }),
-          ...(debouncedSubtaskSearch && { subtaskSearch: debouncedSubtaskSearch }),
-          ...(selectedEmployee && { employee: selectedEmployee }),
-          ...(selectedRange === "custom" && customDates.from && { from: customDates.from }),
-          ...(selectedRange === "custom" && customDates.to && { to: customDates.to }),
-        });
+  const fetchData = useCallback(async (page = 1, limit = pagination.limit) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page, limit, range: selectedRange,
+        ...(debouncedProjectSearch && { search: debouncedProjectSearch }),
+        ...(debouncedSubtaskSearch && { subtaskSearch: debouncedSubtaskSearch }),
+        ...(selectedEmployee && { employee: selectedEmployee }),
+        ...(selectedRange === "custom" && customDates.from && { from: customDates.from }),
+        ...(selectedRange === "custom" && customDates.to && { to: customDates.to }),
+      });
+      const { data } = await axios.get(`${API}/api/time-tracking?${params}`);
+      setProjects(data.projects);
+      setSummary(data.summary);
+      setPagination({ ...data.pagination, limit });
+      setOpenProject(null);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
+  }, [debouncedProjectSearch, debouncedSubtaskSearch, selectedEmployee, selectedRange, customDates]); // eslint-disable-line
 
-        const { data } = await axios.get(`${API}/api/time-tracking?${params}`);
-        setProjects(data.projects);
-        setSummary(data.summary);
-        setPagination({ ...data.pagination, limit });
-        setOpenProject(null);
-      } catch (err) {
-        console.error("Fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [debouncedProjectSearch, debouncedSubtaskSearch, selectedEmployee, selectedRange, customDates]
-  );
-
-  // Re-fetch on any filter change, reset to page 1
-  useEffect(() => {
-    fetchData(1, pagination.limit);
-  }, [debouncedProjectSearch, debouncedSubtaskSearch, selectedEmployee, selectedRange, customDates]);
+  useEffect(() => { fetchData(1, pagination.limit); }, [debouncedProjectSearch, debouncedSubtaskSearch, selectedEmployee, selectedRange, customDates]); // eslint-disable-line
 
   const handleReset = () => {
-    setProjectSearch("");
-    setSubtaskSearch("");
-    setSelectedEmployee("");
-    setSelectedRange("all");
-    setCustomDates({ from: "", to: "" });
+    setProjectSearch(""); setSubtaskSearch(""); setSelectedEmployee(""); setSelectedRange("all"); setCustomDates({ from: "", to: "" });
   };
 
   const rangeLabels = [
@@ -261,323 +167,237 @@ const TimeTrackingDashboard = () => {
   if (loading && !projects.length) return <LoadingOverlay />;
 
   return (
-    <div className="dashboard-container">
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <section className="dashboard-header">
-        <div className="header-content">
-          <div className="header-left">
-            <button className="back-button" onClick={() => navigate("/")}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-            </button>
-            <h1 className="header-title">Subtasks Time Tracking</h1>
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-6 space-y-4">
+
+      {/* ── Header ── */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate("/")}
+            className="flex-shrink-0 w-9 h-9 flex items-center justify-center bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+          <div className="min-w-0">
+            <h1 className="text-base sm:text-xl font-semibold text-gray-800">Subtasks Time Tracking</h1>
+            <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">Track time spent by your team across tasks and projects</p>
           </div>
-          <p className="project-name">
-            Track time spent by your team across tasks and projects
-          </p>
         </div>
-      </section>
+      </div>
 
-      {/* ── Summary cards ───────────────────────────────────────────────── */}
-      <section className="stats-section">
-        <div className="stats-info">
-          <span className="stats-number">{summary.totalProjects}</span>
-          <span>Projects</span>
-        </div>
-        <div className="stats-info">
-          <span className="stats-number">{summary.totalSubtasks}</span>
-          <span>Subtasks with logs</span>
-        </div>
-        <div className="stats-info">
-          <span className="stats-number">{formatMs(summary.totalTimeMs)}</span>
-          <span>Total Time Tracked</span>
-        </div>
-      </section>
-
-      {/* ── Filters ─────────────────────────────────────────────────────── */}
-      <section className="table-container">
-        <div className="table-controls mb-4">
-          {/* Row 1 — search inputs */}
-          <div className="flex flex-wrap gap-3 mb-3">
-            {/* Project search */}
-            <div className="search-container flex items-center gap-2" style={{ flex: 1, minWidth: 200 }}>
-              <input
-                type="text"
-                placeholder="Search project name…"
-                value={projectSearch}
-                onChange={(e) => setProjectSearch(e.target.value)}
-                className="search-input"
-              />
-              <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-              </svg>
-            </div>
-
-            {/* Subtask search */}
-            <div className="search-container flex items-center gap-2" style={{ flex: 1, minWidth: 200 }}>
-              <input
-                type="text"
-                placeholder="Search subtask name…"
-                value={subtaskSearch}
-                onChange={(e) => setSubtaskSearch(e.target.value)}
-                className="search-input"
-              />
-              <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-              </svg>
-            </div>
-
-            {/* Employee filter */}
-            <select
-              value={selectedEmployee}
-              onChange={(e) => setSelectedEmployee(e.target.value)}
-              className="filter-select"
-              style={{ minWidth: 180 }}
-            >
-              <option value="">All Employees</option>
-              {employees.map((emp) => (
-                <option key={emp._id} value={emp._id}>{emp.full_name}</option>
-              ))}
-            </select>
-
-            {/* Reset */}
-            <button className="reset-button flex items-center gap-1" onClick={handleReset}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-                <path d="M21 3v5h-5" />
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-                <path d="M3 21v-5h5" />
-              </svg>
-              Reset
-            </button>
+      {/* ── Summary cards ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+        {[
+          { label: "Projects", value: summary.totalProjects },
+          { label: "Subtasks with logs", value: summary.totalSubtasks },
+          { label: "Total Time Tracked", value: formatMs(summary.totalTimeMs) },
+        ].map(({ label, value }) => (
+          <div key={label} className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-5 text-center">
+            <p className="text-base sm:text-2xl font-bold text-gray-800 leading-tight">{value}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{label}</p>
           </div>
+        ))}
+      </div>
 
-          {/* Row 2 — time range pills */}
-          <div className="filter-group flex items-center gap-2 flex-wrap">
-            <span className="filter-label font-medium text-sm text-gray-600">Time Range:</span>
-            <div className="filter-options flex gap-2 flex-wrap">
-              {rangeLabels.map(({ key, label }) => (
-                <button
-                  key={key}
-                  className={`filter-btn ${selectedRange === key ? "active" : ""}`}
-                  onClick={() => {
-                    if (key === "custom") {
-                      setShowCustomModal(true);
-                    } else {
-                      setSelectedRange(key);
-                    }
-                  }}
-                >
-                  {label}
-                  {key === "custom" && customDates.from && (
-                    <span className="ml-1 text-xs opacity-75">
-                      ({customDates.from} → {customDates.to || "…"})
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Result count */}
-          <p className="text-sm text-gray-500 mt-2">
-            Showing {projects.length} of {pagination.total} projects
-            {loading && <span className="ml-2 text-blue-500">↻ Updating…</span>}
-          </p>
+      {/* ── Filters ── */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-5">
+        {/* Search row */}
+        <div className="flex flex-col sm:flex-row gap-2 mb-3">
+          <input type="text" placeholder="🔍 Search project name…" value={projectSearch}
+            onChange={(e) => setProjectSearch(e.target.value)}
+            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+          <input type="text" placeholder="🔍 Search subtask name…" value={subtaskSearch}
+            onChange={(e) => setSubtaskSearch(e.target.value)}
+            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+          <select value={selectedEmployee} onChange={(e) => setSelectedEmployee(e.target.value)}
+            className="w-full sm:w-48 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500">
+            <option value="">All Employees</option>
+            {employees.map((e) => <option key={e._id} value={e._id}>{e.full_name}</option>)}
+          </select>
+          <button onClick={handleReset}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors whitespace-nowrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" />
+              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M3 21v-5h5" />
+            </svg>
+            Reset
+          </button>
         </div>
 
-        {/* ── Projects list ─────────────────────────────────────────────── */}
-        <div className="projects-list">
-          {projects.length === 0 && !loading && (
-            <div className="text-center py-12 text-gray-400">
-              No time-tracked projects found for the selected filters.
-            </div>
-          )}
+        {/* Time range pills */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-medium text-gray-500 flex-shrink-0">Time Range:</span>
+          <div className="flex gap-2 flex-wrap">
+            {rangeLabels.map(({ key, label }) => (
+              <button key={key}
+                onClick={() => key === "custom" ? setShowCustomModal(true) : setSelectedRange(key)}
+                className={`px-3 py-1 text-xs rounded-full border transition-colors whitespace-nowrap ${selectedRange === key
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+                  }`}>
+                {label}
+                {key === "custom" && customDates.from && (
+                  <span className="ml-1 opacity-75">({customDates.from}→{customDates.to || "…"})</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
 
-          {projects.map((project) => (
-            <div key={project._id} className="project-item">
-              {/* Project header row */}
-              <div
-                className={`project-header ${openProject === project._id ? "open" : ""}`}
-                onClick={() =>
-                  setOpenProject((prev) =>
-                    prev === project._id ? null : project._id
-                  )
-                }
-              >
-                <div className="project-info flex-1">
-                  <span className="project-name font-semibold">{project.project_name}</span>
-                  <span
-                    className={`ml-3 text-xs px-2 py-0.5 rounded-full ${project.status === "Completed"
-                        ? "bg-green-100 text-green-700"
-                        : project.status === "In Progress"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                  >
-                    {project.status}
-                  </span>
+        <p className="text-xs text-gray-400 mt-2">
+          Showing {projects.length} of {pagination.total} projects
+          {loading && <span className="ml-2 text-blue-500 animate-pulse">Updating…</span>}
+        </p>
+      </div>
+
+      {/* ── Projects list ── */}
+      <div className="space-y-2">
+        {projects.length === 0 && !loading && (
+          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-sm text-gray-400">
+            No time-tracked projects found for the selected filters.
+          </div>
+        )}
+
+        {projects.map((project) => (
+          <div key={project._id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {/* Project header — clickable accordion */}
+            <button
+              className="w-full flex items-center gap-3 px-4 py-3 sm:py-4 text-left hover:bg-gray-50 transition-colors"
+              onClick={() => setOpenProject((p) => p === project._id ? null : project._id)}>
+              <div className="flex-1 flex items-center justify-between gap-3 sm:flex-row flex-col">
+                <div className="flex items-center gap-3">
+                  {/* Chevron */}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                    className={`flex-shrink-0 text-gray-400 transition-transform duration-200 ${openProject === project._id ? "rotate-180" : ""}`}>
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+
+                  {/* Name + status */}
+                  <div className="flex-1 min-w-0 flex flex-wrap items-center gap-2">
+                    <span className="font-semibold text-sm sm:text-base text-gray-800 truncate">{project.project_name}</span>
+                    <span className={`px-2 py-0.5 text-xs rounded-full flex-shrink-0 ${project.status === "Completed" ? "bg-green-100 text-green-700"
+                      : project.status === "In Progress" ? "bg-blue-100 text-blue-700"
+                        : "bg-gray-100 text-gray-600"
+                      }`}>{project.status}</span>
+                  </div>
                 </div>
-
-                <div className="project-meta flex items-center gap-6 text-sm text-gray-600">
-                  <span>
-                    🗂 <strong>{project.subtaskCount}</strong> subtask
-                    {project.subtaskCount !== 1 && "s"}
-                  </span>
-                  <span>
-                    ⏱ <strong>{formatMs(project.totalTimeMs)}</strong>
-                  </span>
+                {/* Meta */}
+                <div className="flex items-center gap-3 sm:gap-6 text-xs sm:text-sm text-gray-500 flex-shrink-0">
+                  <span className="w-[80px] text-left"> Total: <strong className="text-gray-700">{project.subtaskCount}</strong></span>
+                  <span className="w-[160px] text-left">⏱ <strong className="text-gray-700">{formatMs(project.totalTimeMs)}</strong></span>
                 </div>
-
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  style={{
-                    transform:
-                      openProject === project._id
-                        ? "rotate(180deg)"
-                        : "rotate(0deg)",
-                    transition: "transform 0.2s",
-                    flexShrink: 0,
-                  }}
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
               </div>
+            </button>
 
-              {/* Expanded subtasks table */}
-              {openProject === project._id && (
-                <div className="subtasks-table-container">
-                  <table className="data-table">
-                    <thead>
+            {/* Expanded subtasks */}
+            {openProject === project._id && (
+              <div className="border-t border-gray-100">
+                {/* Desktop table */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-100 text-sm">
+                    <thead className="bg-gray-50">
                       <tr>
-                        <th>Subtask Name</th>
-                        <th>Stages</th>
-                        <th>Due Date</th>
-                        <th>Remaining</th>
-                        <th>Time Spent</th>
-                        <th>Assigned To</th>
+                        {["Subtask Name", "Stages", "Due Date", "Remaining", "Time Spent", "Assigned To"].map((h) => (
+                          <th key={h} className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
+                        ))}
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-50">
                       {project.subtasks.map((subtask) => {
                         const emp = empMap[subtask.assign_to?.toString()];
-                        const { label, type } = getRemainingLabel(
-                          subtask.due_date,
-                          subtask.status
-                        );
+                        const { label, type } = getRemainingLabel(subtask.due_date, subtask.status);
                         return (
-                          <tr key={subtask._id}>
-                            <td>
-                              <span
-                                className="task-name-text"
-                                title={subtask.task_name}
-                              >
-                                {subtask.task_name}
+                          <tr key={subtask._id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-4 py-3">
+                              <span className="block max-w-[200px] truncate text-gray-800 font-medium" title={subtask.task_name}>{subtask.task_name}</span>
+                            </td>
+                            <td className="px-4 py-3"><StagePills stages={subtask.stages} /></td>
+                            <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-600">
+                              {subtask.due_date ? moment(subtask.due_date).format("DD MMM YYYY") : "—"}
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full ${remainingCls[type]}`}>
+                                <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />{label}
                               </span>
                             </td>
-                            <td>
-                              <StagePills stages={subtask.stages} />
-                            </td>
-                            <td>
-                              <span className="date-cell">
-                                {subtask.due_date
-                                  ? moment(subtask.due_date).format("DD MMM YYYY")
-                                  : "-"}
-                              </span>
-                            </td>
-                            <td>
-                              <span
-                                className={`status-badge status-${type}`}
-                              >
-                                <span className="status-dot" />
-                                {label}
-                              </span>
-                            </td>
-                            <td>
-                              <span className="time-spent font-mono">
-                                {formatMs(subtask.timeSpentMs)}
-                              </span>
-                            </td>
-                            <td>
-                              <AssigneeCell employee={emp} />
-                            </td>
+                            <td className="px-4 py-3 font-mono text-xs text-gray-700 whitespace-nowrap">{formatMs(subtask.timeSpentMs)}</td>
+                            <td className="px-4 py-3"><AssigneeCell employee={emp} /></td>
                           </tr>
                         );
                       })}
                     </tbody>
                   </table>
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
 
-        {/* ── Pagination ────────────────────────────────────────────────── */}
-        <Pagination
-          pagination={pagination}
-          onPageChange={(p) => fetchData(p, pagination.limit)}
-          onLimitChange={(l) => fetchData(1, l)}
-          loading={loading}
-        />
-      </section>
+                {/* Mobile subtask cards */}
+                <div className="md:hidden p-3 space-y-2">
+                  {project.subtasks.map((subtask) => {
+                    const emp = empMap[subtask.assign_to?.toString()];
+                    const { label, type } = getRemainingLabel(subtask.due_date, subtask.status);
+                    return (
+                      <div key={subtask._id} className="bg-gray-50 rounded-lg p-3 border border-gray-200 space-y-2">
+                        <p className="font-medium text-sm text-gray-800">{subtask.task_name}</p>
+                        <div className="flex flex-wrap gap-2 text-xs">
+                          <span className="text-gray-500">
+                            📅 {subtask.due_date ? moment(subtask.due_date).format("DD MMM YYYY") : "—"}
+                          </span>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${remainingCls[type]}`}>
+                            <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />{label}
+                          </span>
+                          <span className="font-mono text-gray-600">⏱ {formatMs(subtask.timeSpentMs)}</span>
+                        </div>
+                        <StagePills stages={subtask.stages} />
+                        <AssigneeCell employee={emp} />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
 
-      {/* ── Custom date modal ────────────────────────────────────────────── */}
-      <Modal
-        show={showCustomModal}
-        onHide={() => setShowCustomModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Select Custom Date Range</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="custom-date-inputs flex flex-col gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">From</label>
-              <input
-                type="date"
-                className="form-control w-100"
-                value={customDates.from}
-                onChange={(e) =>
-                  setCustomDates((prev) => ({ ...prev, from: e.target.value }))
-                }
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">To</label>
-              <input
-                type="date"
-                className="form-control w-100"
-                value={customDates.to}
-                onChange={(e) =>
-                  setCustomDates((prev) => ({ ...prev, to: e.target.value }))
-                }
-              />
+      {/* ── Pagination ── */}
+      {(pagination.totalPages > 1 || pagination.limit !== 15) && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-xs text-gray-500 order-2 sm:order-1">
+              {projects.length} of {pagination.total} projects
+            </p>
+            <div className="flex gap-1.5 items-center order-1 sm:order-2 flex-wrap justify-center">
+              <button onClick={() => fetchData(pagination.page - 1, pagination.limit)} disabled={pagination.page <= 1 || loading}
+                className="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50 disabled:opacity-40 transition-colors">‹ Prev</button>
+
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === pagination.totalPages || Math.abs(p - pagination.page) <= 2)
+                .reduce((acc, p, i, arr) => { if (i > 0 && p - arr[i - 1] > 1) acc.push("…"); acc.push(p); return acc; }, [])
+                .map((p, i) => p === "…"
+                  ? <span key={`e${i}`} className="px-2 text-xs text-gray-400">…</span>
+                  : <button key={p} onClick={() => fetchData(p, pagination.limit)} disabled={loading}
+                    className={`w-8 h-7 text-xs rounded-lg border transition-colors ${p === pagination.page ? "bg-blue-600 text-white border-blue-600" : "bg-white hover:bg-gray-50 border-gray-200"}`}>
+                    {p}
+                  </button>
+                )}
+
+              <button onClick={() => fetchData(pagination.page + 1, pagination.limit)} disabled={pagination.page >= pagination.totalPages || loading}
+                className="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50 disabled:opacity-40 transition-colors">Next ›</button>
+
+              <select value={pagination.limit} onChange={(e) => fetchData(1, Number(e.target.value))}
+                className="ml-1 px-2 py-1.5 text-xs border border-gray-300 rounded-lg bg-white focus:ring-1 focus:ring-blue-500">
+                {[10, 15, 25, 50].map((n) => <option key={n} value={n}>{n}/page</option>)}
+              </select>
             </div>
           </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowCustomModal(false)}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            disabled={!customDates.from && !customDates.to}
-            onClick={() => {
-              setSelectedRange("custom");
-              setShowCustomModal(false);
-            }}
-          >
-            Apply
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        </div>
+      )}
+
+      {/* ── Custom date modal ── */}
+      <DateRangeModal
+        show={showCustomModal}
+        customDates={customDates}
+        setCustomDates={setCustomDates}
+        onApply={() => { setSelectedRange("custom"); setShowCustomModal(false); }}
+        onCancel={() => setShowCustomModal(false)}
+      />
     </div>
   );
 };
