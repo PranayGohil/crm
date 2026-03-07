@@ -296,10 +296,10 @@ const Subtasks = () => {
             <div className="mt-2 flex flex-wrap gap-2">
               {Object.entries(pageStats.byStage).map(([stage, count]) => (
                 <div key={stage} className={`px-3 py-1 text-sm font-medium rounded-full ${stage === "CAD Design" ? "bg-blue-100 text-blue-800"
-                    : stage === "SET Design" ? "bg-green-100 text-green-800"
-                      : stage === "Render" ? "bg-purple-100 text-purple-800"
-                        : stage === "QC" ? "bg-cyan-100 text-cyan-800"
-                          : "bg-gray-100 text-gray-800"
+                  : stage === "SET Design" ? "bg-green-100 text-green-800"
+                    : stage === "Render" ? "bg-purple-100 text-purple-800"
+                      : stage === "QC" ? "bg-cyan-100 text-cyan-800"
+                        : "bg-gray-100 text-gray-800"
                   }`}>
                   {count} {stage} Remaining
                 </div>
@@ -551,6 +551,7 @@ const Subtasks = () => {
                 <select value={bulkAssignTo} onChange={(e) => setBulkAssignTo(e.target.value)}
                   className="filter-select" style={{ maxWidth: 150 }}>
                   <option value="">👤 Assign To</option>
+                  <option key={user._id} value={user._id}>{user.full_name}</option>
                   {employees.map((e) => <option key={e._id} value={e._id}>{e.full_name}</option>)}
                 </select>
                 <select value={bulkPriority} onChange={(e) => setBulkPriority(e.target.value)}
