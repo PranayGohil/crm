@@ -1,3 +1,4 @@
+// Admin Panel - Client Details Page
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";

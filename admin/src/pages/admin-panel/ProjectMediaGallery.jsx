@@ -1,3 +1,4 @@
+// Admin Panel > Project Media Gallery
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";

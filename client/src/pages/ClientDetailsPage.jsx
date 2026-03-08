@@ -1,33 +1,37 @@
+// Client Panel > Client Details Page
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import LoadingOverlay from "../components/LoadingOverlay";
-import { Modal, Button } from "react-bootstrap";
+
+// ── Reusable label+value row (matches admin InfoRow) ───────────────────────
+const InfoRow = ({ label, children }) => (
+  <div>
+    <label className="block text-xs text-gray-500 mb-0.5">{label}</label>
+    <div className="font-medium text-gray-800 text-sm">{children}</div>
+  </div>
+);
 
 const ClientDetailsPage = () => {
   const navigate = useNavigate();
   const [client, setClient] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch client + subtasks
   useEffect(() => {
-    const storedUser = localStorage.getItem("clientUser");
-    const clientUser = storedUser ? JSON.parse(storedUser) : null;
-    console.log("Client ID:", clientUser?._id);
     const fetchClient = async () => {
+      setLoading(true);
       try {
+        const storedUser = localStorage.getItem("clientUser");
+        const clientUser = storedUser ? JSON.parse(storedUser) : null;
+
         const res = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/client/get/${clientUser?._id}`
         );
-        // also fetch subtasks for this client
         const subtasksRes = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/client/tasks/${res.data._id}`
         );
-        const clientData = res.data;
-        clientData.subtasks = subtasksRes.data || [];
-        setClient(clientData);
+        setClient({ ...res.data, subtasks: subtasksRes.data || [] });
       } catch (error) {
         console.error("Failed to fetch client:", error);
         toast.error("Failed to fetch client details");
@@ -39,7 +43,6 @@ const ClientDetailsPage = () => {
   }, []);
 
   if (loading) return <LoadingOverlay />;
-
   if (!client)
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -47,264 +50,148 @@ const ClientDetailsPage = () => {
       </div>
     );
 
-  // count subtasks by status
+  // ── Task counts ────────────────────────────────────────────────────────
   const subtasks = client.subtasks || [];
   const totalTasks = subtasks.length;
-
   const completed = subtasks.filter((t) => t.status === "Completed").length;
   const todo = subtasks.filter((t) => t.status === "To Do").length;
   const inProgress = subtasks.filter((t) => t.status === "In Progress").length;
   const paused = subtasks.filter((t) => t.status === "Paused").length;
   const blocked = subtasks.filter((t) => t.status === "Blocked").length;
-
-  const donePercent =
-    totalTasks > 0 ? Math.round((completed / totalTasks) * 100) : 0;
+  const donePercent = totalTasks > 0 ? Math.round((completed / totalTasks) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-6">
+
+      {/* ── Header ── */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+        <div className="flex flex-wrap gap-3 items-start sm:items-center justify-between">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center justify-center w-10 h-10 bg-gray-100 border border-gray-300 rounded-lg mr-4 hover:bg-gray-200 transition-colors"
+              className="flex-shrink-0 flex items-center justify-center w-9 h-9 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="m15 18-6-6 6-6" />
               </svg>
             </button>
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-800">
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-2xl font-semibold text-gray-800 truncate">
                 {client.full_name}
               </h1>
-              <div className="flex items-center mt-1">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                <span className="text-sm text-gray-600">Active</span>
-                <span className="mx-2 text-gray-400">•</span>
-                <span className="text-sm text-gray-600">
-                  Client ID: #{client._id}
-                </span>
+              <div className="flex flex-wrap items-center gap-1 mt-0.5 text-xs text-gray-500">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+                <span>Active</span>
+                <span>•</span>
+                <span className="truncate">ID: #{client._id}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        {/* Contact & Identity Information */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
+      {/* ── Contact & Company ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+
+        {/* Contact & Identity */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+          <h2 className="text-sm sm:text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
-            Contact & Identity Information
+            Contact &amp; Identity
           </h2>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Username
-                </label>
-                <p className="font-medium">{client.username}</p>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Email Address
-                </label>
-                <p className="font-medium">{client.email}</p>
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InfoRow label="Username">{client.username}</InfoRow>
+            <InfoRow label="Email">{client.email}</InfoRow>
+            <InfoRow label="Phone">{client.phone}</InfoRow>
+            <InfoRow label="Joining Date">
+              {new Date(client.joining_date).toLocaleDateString()}
+            </InfoRow>
+            <div className="sm:col-span-2">
+              <InfoRow label="Address">{client.address}</InfoRow>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Phone Number
-                </label>
-                <p className="font-medium">{client.phone}</p>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Joining Date
-                </label>
-                <p className="font-medium">
-                  {new Date(client.joining_date).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                Address
-              </label>
-              <p className="font-medium">{client.address}</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Preferred Contact Method
-                </label>
-                <p className="font-medium">Email</p>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Client Type
-                </label>
-                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                  {client.client_type}
-                </span>
-              </div>
-            </div>
+            <InfoRow label="Contact Method">Email</InfoRow>
+            <InfoRow label="Client Type">
+              <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs">
+                {client.client_type}
+              </span>
+            </InfoRow>
           </div>
         </div>
 
         {/* Company Information */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+          <h2 className="text-sm sm:text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-              <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+              <rect x="8" y="2" width="8" height="4" rx="1" />
             </svg>
             Company Information
           </h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                Company Name
-              </label>
-              <p className="font-medium">{client.company_name || "---"}</p>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                GST / VAT Number
-              </label>
-              <p className="font-medium">{client.gst_number || "---"}</p>
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                Website
-              </label>
+          <div className="space-y-3">
+            <InfoRow label="Company Name">{client.company_name || "—"}</InfoRow>
+            <InfoRow label="GST / VAT">{client.gst_number || "—"}</InfoRow>
+            <InfoRow label="Website">
               {client.website ? (
-                <a
-                  href={client.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-blue-600 hover:text-blue-800"
-                >
+                <a href={client.website} target="_blank" rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline break-all">
                   {client.website}
                 </a>
-              ) : (
-                <p className="font-medium">---</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                LinkedIn
-              </label>
+              ) : "—"}
+            </InfoRow>
+            <InfoRow label="LinkedIn">
               {client.linkedin ? (
-                <a
-                  href={client.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-blue-600 hover:text-blue-800"
-                >
+                <a href={client.linkedin} target="_blank" rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline break-all">
                   {client.linkedin}
                 </a>
-              ) : (
-                <p className="font-medium">---</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-1">
-                Additional Notes
-              </label>
-              <p className="font-medium">{client.additional_notes || "---"}</p>
-            </div>
+              ) : "—"}
+            </InfoRow>
+            <InfoRow label="Notes">{client.additional_notes || "—"}</InfoRow>
           </div>
         </div>
       </div>
 
-      {/* Task Summary */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
+      {/* ── Task Summary ── */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+        <h2 className="text-sm sm:text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" />
           </svg>
           Task Summary
         </h2>
 
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <p className="text-gray-600">
-              Total Tasks:{" "}
-              <span className="font-medium text-gray-800">{totalTasks}</span> /{" "}
-              <span className="font-medium text-gray-800">{completed}</span>{" "}
-              Completed
-            </p>
-            <span className="font-medium text-gray-800">{donePercent}%</span>
+        {/* Progress bar */}
+        <div className="mb-4">
+          <div className="flex justify-between items-center mb-1.5 text-xs">
+            <span className="text-gray-600">{completed} / {totalTasks} completed</span>
+            <span className="font-semibold text-gray-700">{donePercent}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <div
-              className="bg-green-500 h-2.5 rounded-full"
-              style={{ width: `${donePercent}%` }}
-            ></div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="bg-green-500 h-2 rounded-full transition-all" style={{ width: `${donePercent}%` }} />
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          <div className="bg-gray-50 p-4 rounded-lg text-center">
-            <p className="text-sm text-gray-600 mb-1">Total Tasks Assigned</p>
-            <p className="text-2xl font-bold text-gray-800">{totalTasks}</p>
-          </div>
-          <div className="bg-blue-50 p-4 rounded-lg text-center">
-            <p className="text-sm text-blue-600 mb-1">Tasks To Do</p>
-            <p className="text-2xl font-bold text-blue-800">{todo}</p>
-          </div>
-          <div className="bg-yellow-50 p-4 rounded-lg text-center">
-            <p className="text-sm text-yellow-600 mb-1">Tasks In Progress</p>
-            <p className="text-2xl font-bold text-yellow-800">{inProgress}</p>
-          </div>
-          <div className="bg-purple-50 p-4 rounded-lg text-center">
-            <p className="text-sm text-purple-600 mb-1">Tasks Paused</p>
-            <p className="text-2xl font-bold text-purple-800">{paused}</p>
-          </div>
-          <div className="bg-red-50 p-4 rounded-lg text-center">
-            <p className="text-sm text-red-600 mb-1">Tasks Blocked</p>
-            <p className="text-2xl font-bold text-red-800">{blocked}</p>
-          </div>
-          <div className="bg-green-50 p-4 rounded-lg text-center">
-            <p className="text-sm text-green-600 mb-1">Tasks Completed</p>
-            <p className="text-2xl font-bold text-green-800">{completed}</p>
-          </div>
+        {/* Stat tiles */}
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          {[
+            { label: "Total", value: totalTasks, bg: "bg-gray-50", text: "text-gray-800" },
+            { label: "To Do", value: todo, bg: "bg-blue-50", text: "text-blue-800" },
+            { label: "In Progress", value: inProgress, bg: "bg-yellow-50", text: "text-yellow-800" },
+            { label: "Paused", value: paused, bg: "bg-purple-50", text: "text-purple-800" },
+            { label: "Blocked", value: blocked, bg: "bg-red-50", text: "text-red-800" },
+            { label: "Completed", value: completed, bg: "bg-green-50", text: "text-green-800" },
+          ].map((s) => (
+            <div key={s.label} className={`p-3 rounded-lg text-center ${s.bg}`}>
+              <p className={`text-xs mb-1 ${s.text}`}>{s.label}</p>
+              <p className={`text-xl font-bold ${s.text}`}>{s.value}</p>
+            </div>
+          ))}
         </div>
       </div>
+
     </div>
   );
 };
