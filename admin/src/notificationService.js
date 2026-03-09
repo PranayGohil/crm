@@ -3,14 +3,18 @@
 
 class NotificationService {
   constructor() {
-    this.permission = Notification.permission;
+    if (typeof window !== "undefined" && "Notification" in window) {
+      this.permission = Notification.permission;
+    } else {
+      this.permission = "unsupported";
+    }
   }
 
   /**
    * Check if browser supports notifications
    */
   isSupported() {
-    return "Notification" in window;
+    return typeof window !== "undefined" && "Notification" in window;
   }
 
   /**
@@ -41,7 +45,7 @@ class NotificationService {
    * @param {Object} options - Notification options
    */
   show(title, options = {}) {
-    if (!this.isSupported()) {
+    if (!this.isSupported() || typeof Notification === "undefined") {
       console.warn("Notifications not supported");
       return null;
     }
