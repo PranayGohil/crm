@@ -147,7 +147,10 @@ export const addSubTask = async (req, res) => {
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
 
-    if (assign_to && connectedUsers[assign_to]) {
+    console.log("Sending notification to employee:", assign_to);
+    console.log("Connected users:", connectedUsers);
+    const socketId = connectedUsers.get(assign_to?.toString());
+    if (socketId) {
       const notification = await Notification.create({
         title: "New Task Assigned",
         description: `You have been assigned a new task: ${subTask.task_name}`,
@@ -159,7 +162,7 @@ export const addSubTask = async (req, res) => {
         created_by: admin._id,
         created_by_role: "admin",
       });
-      io.to(connectedUsers[assign_to]).emit("new_subtask", notification);
+      io.to(socketId).emit("new_subtask", notification);
     }
 
     res.status(200).json(subTask);
@@ -247,8 +250,9 @@ export const addBulkSubTasks = async (req, res) => {
 
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
+    const firstSocketId = connectedUsers.get(tasks[0].assign_to?.toString());
 
-    if (tasks[0].assign_to && connectedUsers[tasks[0].assign_to]) {
+    if (firstSocketId) {
       result.forEach(async (subtask) => {
         const notification = await Notification.create({
           title: "New Task Assigned",
@@ -261,11 +265,10 @@ export const addBulkSubTasks = async (req, res) => {
           created_by: admin?._id,
           created_by_role: "admin",
         });
-        if (subtask.assign_to && connectedUsers[subtask.assign_to]) {
-          io.to(connectedUsers[subtask.assign_to]).emit(
-            "new_subtask",
-            notification
-          );
+        const socketId = connectedUsers.get(subtask.assign_to?.toString());
+
+        if (socketId) {
+          io.to(socketId).emit("new_subtask", notification);
         }
       });
     }
@@ -334,6 +337,8 @@ export const updateSubTask = async (req, res) => {
     } = req.body;
 
     console.log("req.body", req.body);
+
+    const originalSubTask = await SubTask.findById(id);
 
     // ── Parse stages from "stages" field (frontend sends JSON string via FormData) ──
     let stageArray = [];
@@ -449,8 +454,9 @@ export const updateSubTask = async (req, res) => {
       const io = req.app.get("io");
       const connectedUsers = req.app.get("connectedUsers");
 
-      if (subTask.assign_to && connectedUsers[subTask.assign_to]) {
-        io.to(connectedUsers[subTask.assign_to]).emit(
+      const socketId = connectedUsers.get(subTask.assign_to?.toString());
+      if (socketId) {
+        io.to(socketId).emit(
           "subtask_updated",
           notification_to_previous_assignee
         );
@@ -470,8 +476,9 @@ export const updateSubTask = async (req, res) => {
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
 
-    if (updated.assign_to && connectedUsers[updated.assign_to]) {
-      io.to(connectedUsers[updated.assign_to]).emit("subtask_updated", notification);
+    const socketId = connectedUsers.get(updated.assign_to?.toString());
+    if (socketId) {
+      io.to(socketId).emit("subtask_updated", notification);
     }
     // ─────────────────────────────────────────────────────────────────
 
@@ -552,8 +559,9 @@ export const completeStage = async (req, res) => {
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
 
-    if (admin._id && connectedUsers[admin._id]) {
-      io.to(connectedUsers[admin._id]).emit("subtask_updated", notification);
+    const socketId = connectedUsers.get(admin._id.toString());
+    if (socketId) {
+      io.to(socketId).emit("subtask_updated", notification);
     }
 
     res.json(subtask);
@@ -578,6 +586,7 @@ export const deleteSubTask = async (req, res) => {
     }
     await SubTask.findByIdAndDelete(id);
 
+    const relatedInfo = await getRelatedInfo(subTask.project_id, subTask.assign_to);
     // 📝 LOG ACTIVITY
     const logger = new ActivityLogger(req);
     await logger.log('DELETE_SUBTASK', {
@@ -722,8 +731,9 @@ export const changeSubTaskStatus = async (req, res) => {
       const io = req.app.get("io");
       const connectedUsers = req.app.get("connectedUsers");
 
-      if (admin._id && connectedUsers[admin._id]) {
-        io.to(connectedUsers[admin._id]).emit("subtask_updated", notification);
+      const socketId = connectedUsers.get(admin._id.toString());
+      if (socketId) {
+        io.to(socketId).emit("subtask_updated", notification);
       }
     }
 
@@ -742,8 +752,9 @@ export const changeSubTaskStatus = async (req, res) => {
       const io = req.app.get("io");
       const connectedUsers = req.app.get("connectedUsers");
 
-      if (subtask.assign_to && connectedUsers[subtask.assign_to]) {
-        io.to(connectedUsers[subtask.assign_to]).emit(
+      const socketId = connectedUsers.get(subtask.assign_to?.toString());
+      if (socketId) {
+        io.to(socketId).emit(
           "subtask_updated",
           notification
         );
@@ -819,9 +830,9 @@ export const bulkUpdateSubtasks = async (req, res) => {
       const newAssigneeId = update.assign_to
         ? update.assign_to.toString()
         : null;
-
+      const socketIdOldEmployee = connectedUsers.get(oldAssigneeId);
       // 📢 Notify old assignee (if exists)
-      if (oldAssigneeId && connectedUsers[oldAssigneeId]) {
+      if (socketIdOldEmployee) {
         const oldNotification = await Notification.create({
           title: `Subtask Updated - ${task.task_name}`,
           description: `You are no longer assigned to subtask: ${task.task_name}`,
@@ -831,17 +842,18 @@ export const bulkUpdateSubtasks = async (req, res) => {
           receiver_id: oldAssigneeId,
           receiver_type: "employee",
         });
-        io.to(connectedUsers[oldAssigneeId]).emit(
+        io.to(socketIdOldEmployee).emit(
           "subtask_updated",
           oldNotification
         );
       }
 
       // 📢 Notify new assignee (if different from old)
+      const socketIdNewEmployee = connectedUsers.get(newAssigneeId);
       if (
         newAssigneeId &&
         newAssigneeId !== oldAssigneeId &&
-        connectedUsers[newAssigneeId]
+        socketIdNewEmployee
       ) {
         const newNotification = await Notification.create({
           title: `Subtask Updated - ${task.task_name}`,
@@ -852,7 +864,7 @@ export const bulkUpdateSubtasks = async (req, res) => {
           receiver_id: newAssigneeId,
           receiver_type: "employee",
         });
-        io.to(connectedUsers[newAssigneeId]).emit(
+        io.to(socketIdNewEmployee).emit(
           "subtask_updated",
           newNotification
         );
@@ -1004,8 +1016,9 @@ export const addComment = async (req, res) => {
         created_by: user_id,
         created_by_role: "employee",
       });
-      if (admin._id && connectedUsers[admin._id]) {
-        io.to(connectedUsers[admin._id]).emit("comment", adminNotification);
+      const socketId = connectedUsers.get(admin._id.toString());
+      if (admin._id && socketId) {
+        io.to(socketId).emit("comment", adminNotification);
       }
     } else {
       // Notify the employee about the new comment
@@ -1020,8 +1033,9 @@ export const addComment = async (req, res) => {
         created_by: user_id,
         created_by_role: "admin",
       });
-      if (updated.assign_to && connectedUsers[updated.assign_to]) {
-        io.to(connectedUsers[updated.assign_to]).emit(
+      const socketId = connectedUsers.get(updated.assign_to?.toString());
+      if (socketId) {
+        io.to(socketId).emit(
           "comment",
           employeeNotification
         );
@@ -1081,8 +1095,9 @@ export const addMedia = async (req, res) => {
         created_by: subtask.assign_to,
         created_by_role: "employee",
       });
-      if (admin._id && connectedUsers[admin._id]) {
-        io.to(connectedUsers[admin._id]).emit(
+      const socketId = connectedUsers.get(admin._id.toString());
+      if (admin._id && socketId) {
+        io.to(socketId).emit(
           "media_upload",
           adminNotification
         );
@@ -1099,8 +1114,9 @@ export const addMedia = async (req, res) => {
         created_by: admin._id,
         created_by_role: "admin",
       });
-      if (Assignee._id && connectedUsers[Assignee._id]) {
-        io.to(connectedUsers[Assignee._id]).emit(
+      const socketId = connectedUsers.get(Assignee._id.toString());
+      if (Assignee._id && socketId) {
+        io.to(socketId).emit(
           "media_upload",
           employeeNotification
         );
@@ -1167,8 +1183,9 @@ export const removeMedia = async (req, res) => {
         created_by: subtask.assign_to,
         created_by_role: "employee",
       });
-      if (admin._id && connectedUsers[admin._id]) {
-        io.to(connectedUsers[admin._id]).emit(
+      const socketId = connectedUsers.get(admin._id.toString());
+      if (admin._id && socketId) {
+        io.to(socketId).emit(
           "media_upload",
           adminNotification
         );
@@ -1186,8 +1203,9 @@ export const removeMedia = async (req, res) => {
         created_by: admin._id,
         created_by_role: "admin",
       });
-      if (Assignee._id && connectedUsers[Assignee._id]) {
-        io.to(connectedUsers[Assignee._id]).emit(
+      const socketId = connectedUsers.get(Assignee._id.toString());
+      if (socketId) {
+        io.to(socketId).emit(
           "media_upload",
           employeeNotification
         );

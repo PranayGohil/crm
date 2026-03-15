@@ -33,7 +33,12 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("adminUser"));
-    const s = io(process.env.REACT_APP_API_URL);
+    const s = io(process.env.REACT_APP_API_URL, {
+      transports: ["websocket"], 
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 2000,
+    });
     setSocket(s);
 
     if (storedUser) {
@@ -48,9 +53,8 @@ export const SocketProvider = ({ children }) => {
       // Show browser notification (only if page is not focused)
       if (document.hidden && notificationPermission === "granted") {
         // Generate unique tag for each notification to prevent overlap
-        const uniqueTag = `${notification.type}-${
-          notification.related_id || Date.now()
-        }-${Math.random().toString(36).substr(2, 9)}`;
+        const uniqueTag = `${notification.type}-${notification.related_id || Date.now()
+          }-${Math.random().toString(36).substr(2, 9)}`;
 
         notificationService.showWithAction(
           notification.title,

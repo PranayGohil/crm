@@ -33,7 +33,12 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("employeeUser"));
-    const s = io(process.env.REACT_APP_API_URL);
+    const s = io(process.env.REACT_APP_API_URL, {
+      transports: ["websocket"], 
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 2000,
+    });
     setSocket(s);
 
     if (storedUser) {

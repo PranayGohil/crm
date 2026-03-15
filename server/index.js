@@ -31,26 +31,26 @@ const io = new Server(server, {
 });
 
 export const emitToUser = (userId, event, data) => {
-  const socketId = connectedUsers[userId];
+  const socketId = connectedUsers.get(userId.toString());
   if (socketId && io) {
     io.to(socketId).emit(event, data);
   }
 };
 
-const connectedUsers = {}; // Track employees
+const connectedUsers = new Map();
 
 io.on("connection", (socket) => {
   socket.on("register", (employeeId) => {
-    connectedUsers[employeeId] = socket.id;
+    connectedUsers.set(employeeId.toString(), socket.id);
     console.log(
       `Employee ${employeeId} registered with socket ID ${socket.id}`
     );
   });
 
   socket.on("disconnect", () => {
-    for (let id in connectedUsers) {
-      if (connectedUsers[id] === socket.id) {
-        delete connectedUsers[id];
+    for (const [userId, sockId] of connectedUsers.entries()) {
+      if (sockId === socket.id) {
+        connectedUsers.delete(userId);
         break;
       }
     }
