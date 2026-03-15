@@ -25,9 +25,12 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*", // Replace with frontend domain in production
+    origin: "*",
     methods: ["GET", "POST"],
   },
+  transports: ["websocket", "polling"],
+  pingInterval: 25000,
+  pingTimeout: 60000
 });
 
 export const emitToUser = (userId, event, data) => {
@@ -40,6 +43,7 @@ export const emitToUser = (userId, event, data) => {
 const connectedUsers = new Map();
 
 io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
   socket.on("register", (employeeId) => {
     connectedUsers.set(employeeId.toString(), socket.id);
     console.log(
