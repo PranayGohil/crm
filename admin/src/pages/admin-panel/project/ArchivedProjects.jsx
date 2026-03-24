@@ -64,7 +64,7 @@ const ArchivedProjects = () => {
 
   const filteredProjects = projects.filter((p) => {
     const clientMatch = selectedClient.id === "All Client" || p.client_id === selectedClient.id;
-    const statusMatch = selectedStatus === "All Status" || p.status === selectedStatus;
+    const statusMatch = selectedStatus === "All Status" || p.status.toLowerCase() === selectedStatus.toLowerCase();
     const searchMatch = p.project_name.toLowerCase().includes(searchTerm.toLowerCase());
     return clientMatch && statusMatch && searchMatch;
   });

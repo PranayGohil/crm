@@ -49,7 +49,7 @@ const ClientProjectDetails = () => {
   }, [username]);
 
   const filteredProjects = projects.filter((project) => {
-    const statusMatch = selectedStatus === "All Status" || project.status === selectedStatus;
+    const statusMatch = selectedStatus === "All Status" || project.status.toLowerCase() === selectedStatus.toLowerCase();
     const searchMatch = project.project_name.toLowerCase().includes(searchTerm.toLowerCase());
     return statusMatch && searchMatch;
   });
