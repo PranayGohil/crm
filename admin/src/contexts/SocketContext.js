@@ -1,8 +1,9 @@
-// SocketContext.jsx
+// Admin Panel > SocketContext.jsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { toast } from "react-toastify";
+import axios from "axios";
 import notificationService from "../notificationService";
 
 const SocketContext = createContext();
@@ -31,18 +32,33 @@ export const SocketProvider = ({ children }) => {
     requestPermission();
   }, []);
 
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("adminUser"));
+  useEffect(async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    }
+    const response = await axios.get(
+      `${process.env.REACT_APP_API_URL}/api/admin/profile`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const user = response.data.admin;
+    console.log("Fetched admin profile:", user);
+
     const s = io(process.env.REACT_APP_API_URL, {
-      transports: ["websocket"], 
+      transports: ["websocket"],
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 2000,
     });
     setSocket(s);
 
-    if (storedUser) {
-      s.emit("register", storedUser._id);
+    if (user) {
+      s.emit("register", user._id);
+      console.log("Registered socket for admin:", user.username);
     }
 
     // Helper function to show both toast and browser notification

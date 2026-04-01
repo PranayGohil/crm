@@ -22,6 +22,30 @@ function sortStages(inputStages) {
   return FIXED_STAGE_ORDER.filter((stage) => uniqueStages.includes(stage));
 }
 
+// ─── Shared helper — notify all admins ────────────────────────────────────────
+const notifyAllAdmins = async (req, notificationData) => {
+  const io = req.app.get("io");
+  const connectedUsers = req.app.get("connectedUsers");
+
+  const admins = await Admin.find({ isActive: true });
+
+  for (const admin of admins) {
+    const notification = await Notification.create({
+      ...notificationData,
+      receiver_id: admin._id,
+      receiver_type: "admin",
+    });
+
+    const socketId = connectedUsers.get(admin._id.toString());
+    console.log(`Notifying admin ${admin.username} (ID: ${admin._id}) with socket ID: ${socketId}`);
+    console.log("Connected users map:", connectedUsers);
+    if (socketId) {
+      console.log("Notifying admin:", admin.username);
+      io.to(socketId).emit(notificationData.type, notification);
+    }
+  }
+};
+
 // Helper to get project and employee details for logging
 const getRelatedInfo = async (projectId, employeeId) => {
   const related = {};
@@ -149,7 +173,7 @@ export const addSubTask = async (req, res) => {
     const logger = new ActivityLogger(req);
     const relatedInfo = await getRelatedInfo(project_id, assign_to);
 
-    await logger.log('CREATE_SUBTASK', {
+    const logData = await logger.log('CREATE_SUBTASK', {
       entity: {
         id: subTask._id,
         name: task_name,
@@ -163,9 +187,9 @@ export const addSubTask = async (req, res) => {
       },
       description: `Created new subtask "${task_name}" for project "${project?.project_name || 'Unknown'}"`
     });
+    console.log("Activity log created:", logData);
 
     // Rest of your existing code (notifications, etc.)
-    const admin = await Admin.findOne({});
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
 
@@ -181,8 +205,8 @@ export const addSubTask = async (req, res) => {
         related_id: subTask._id,
         receiver_id: assign_to.toString(),
         receiver_type: "employee",
-        created_by: admin._id,
-        created_by_role: "admin",
+        created_by: logData.admin.id,
+        created_by_role: logData.admin.role,
       });
       io.to(socketId).emit("new_subtask", notification);
     }
@@ -251,7 +275,7 @@ export const addBulkSubTasks = async (req, res) => {
     const logger = new ActivityLogger(req);
     const relatedInfo = await getRelatedInfo(tasks[0].project_id, tasks[0].assign_to);
 
-    await logger.log('BULK_CREATE_SUBTASKS', {
+    const logData = await logger.log('BULK_CREATE_SUBTASKS', {
       entity: {
         type: 'subtask'
       },
@@ -264,12 +288,6 @@ export const addBulkSubTasks = async (req, res) => {
     });
 
     // ── Notifications (unchanged) ─────────────────────────────────────
-    const admin = await Admin.findOne({});
-    if (admin) {
-      console.log("Admin found:", admin._id);
-    } else {
-      console.log("No admin found in the database");
-    }
 
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
@@ -285,8 +303,8 @@ export const addBulkSubTasks = async (req, res) => {
           related_id: subtask._id,
           receiver_id: subtask.assign_to.toString(),
           receiver_type: "employee",
-          created_by: admin?._id,
-          created_by_role: "admin",
+          created_by: logData.admin?._id,
+          created_by_role: logData.admin?.role || "admin",
         });
         const socketId = connectedUsers.get(subtask.assign_to?.toString());
 
@@ -580,32 +598,16 @@ export const completeStage = async (req, res) => {
 
     await updateProjectStatus(subtask.project_id);
 
-    const admin = await Admin.findOne(); // Get the first admin in the collection
-    if (admin) {
-      console.log("Admin found:", admin._id);
-    } else {
-      console.log("No admin found in the database");
-    }
-
-    const notification = await Notification.create({
+    await notifyAllAdmins(req, {
       title: `${employee?.full_name} Completed a subtask ${subtask.task_name}`,
       description: `Completed a subtask: ${subtask.task_name}`,
       type: "subtask_updated",
       icon: employee?.profile_pic || null,
       related_id: subtask._id,
-      receiver_id: admin._id,
-      receiver_type: "admin",
       created_by: employee?._id,
       created_by_role: "employee",
     });
-    const io = req.app.get("io");
-    const connectedUsers = req.app.get("connectedUsers");
-
-    const socketId = connectedUsers.get(admin._id.toString());
-    if (socketId) {
-      io.to(socketId).emit("subtask_updated", notification);
-    }
-
+    
     res.json(subtask);
   } catch (err) {
     console.error("Error completing stage:", err);
@@ -748,8 +750,7 @@ export const changeSubTaskStatus = async (req, res) => {
     }
 
     // ✅ Send notification
-    const project = await Project.findById(subtask.project_id);
-    const userWhoChanged = await (userRole === "admin"
+    const userWhoChanged = await (userRole === "admin" || userRole === "superadmin" || userRole === "super-admin"
       ? Admin.findById(userId)
       : Employee.findById(userId));
 
@@ -757,30 +758,16 @@ export const changeSubTaskStatus = async (req, res) => {
       userWhoChanged?.full_name || userWhoChanged?.username || "Someone";
 
     if (userRole === "employee") {
-      const admin = await Admin.findOne(); // Get the first admin in the collection
-      if (admin) {
-        console.log("Admin found:", admin._id);
-      } else {
-        console.log("No admin found in the database");
-      }
-      const notification = await Notification.create({
-        title: `${userName} updated status of subtask ${subtask.task_name} to ${status}`,
+      console.log("Notifying admins about status change by employee");
+      await notifyAllAdmins(req, {
+        title: `${userName} updated status of subtask "${subtask.task_name}" to ${status}`,
         description: `Status changed to ${status}`,
         type: "subtask_updated",
         icon: userWhoChanged?.profile_pic || null,
         related_id: subtask._id,
-        receiver_id: admin._id,
-        receiver_type: "admin",
         created_by: userId,
         created_by_role: userRole,
       });
-      const io = req.app.get("io");
-      const connectedUsers = req.app.get("connectedUsers");
-
-      const socketId = connectedUsers.get(admin._id.toString());
-      if (socketId) {
-        io.to(socketId).emit("subtask_updated", notification);
-      }
     }
 
     if (userRole === "admin" && subtask.assign_to) {
@@ -1067,28 +1054,16 @@ export const addComment = async (req, res) => {
     const connectedUsers = req.app.get("connectedUsers");
 
     if (user_type === "employee") {
-      const admin = await Admin.findOne();
-      if (admin) {
-        console.log("Admin found:", admin._id);
-      } else {
-        console.log("No admin found in the database");
-      }
-      const adminNotification = await Notification.create({
+      await notifyAllAdmins(req, {
         title: `New Comment on Subtask ${updated.task_name}`,
         description: `${updated.comments[updated.comments.length - 1].user_id.full_name
           } commented: ${text}`,
         type: "comment",
         icon: "/SVG/comment-vec.svg",
         related_id: subtaskId,
-        receiver_id: admin._id,
-        receiver_type: "admin",
         created_by: user_id,
         created_by_role: "employee",
       });
-      const socketId = connectedUsers.get(admin._id.toString());
-      if (admin._id && socketId) {
-        io.to(socketId).emit("comment", adminNotification);
-      }
     } else {
       // Notify the employee about the new comment
       const employeeNotification = await Notification.create({
@@ -1142,35 +1117,19 @@ export const addMedia = async (req, res) => {
 
     await subtask.save();
 
-    const admin = await Admin.findOne();
-    if (admin) {
-      console.log("Admin found:", admin._id);
-    } else {
-      console.log("No admin found in the database");
-    }
-
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
 
     if (userType === "employee") {
-      const adminNotification = await Notification.create({
+      await notifyAllAdmins(req, {
         title: `New Media File Added on Subtask ${subtask.task_name}`,
         description: `${Assignee?.full_name} added media files`,
         type: "media_upload",
         icon: "/SVG/media-vec.svg",
         related_id: subtaskId,
-        receiver_id: admin._id,
-        receiver_type: "admin",
         created_by: subtask.assign_to,
         created_by_role: "employee",
       });
-      const socketId = connectedUsers.get(admin._id.toString());
-      if (admin._id && socketId) {
-        io.to(socketId).emit(
-          "media_upload",
-          adminNotification
-        );
-      }
     } else {
       const employeeNotification = await Notification.create({
         title: `New Media File Added on Subtask ${subtask.task_name}`,
@@ -1180,7 +1139,7 @@ export const addMedia = async (req, res) => {
         related_id: subtaskId,
         receiver_id: Assignee._id,
         receiver_type: "employee",
-        created_by: admin._id,
+        created_by: req.user.id,
         created_by_role: "admin",
       });
       const socketId = connectedUsers.get(Assignee._id.toString());
@@ -1230,35 +1189,19 @@ export const removeMedia = async (req, res) => {
 
     const Assignee = await Employee.findById(subtask.assign_to);
 
-    const admin = await Admin.findOne();
-    if (admin) {
-      console.log("Admin found:", admin._id);
-    } else {
-      console.log("No admin found in the database");
-    }
-
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");
 
     if (user_type === "employee") {
-      const adminNotification = await Notification.create({
+      await notifyAllAdmins(req, {
         title: `Media File Deleted on Subtask ${subtask.task_name}`,
         description: `${Assignee?.full_name} delete media files`,
         type: "media_upload",
         icon: "/SVG/media-vec.svg",
         related_id: subtaskId,
-        receiver_id: admin._id,
-        receiver_type: "admin",
         created_by: subtask.assign_to,
         created_by_role: "employee",
       });
-      const socketId = connectedUsers.get(admin._id.toString());
-      if (admin._id && socketId) {
-        io.to(socketId).emit(
-          "media_upload",
-          adminNotification
-        );
-      }
     } else {
       const employeeNotification = await Notification.create({
         title: `Media File Deleted on Subtask ${subtask.task_name}`,
@@ -1269,7 +1212,7 @@ export const removeMedia = async (req, res) => {
         related_id: subtaskId,
         receiver_id: Assignee._id,
         receiver_type: "employee",
-        created_by: admin._id,
+        created_by: req.user.id,
         created_by_role: "admin",
       });
       const socketId = connectedUsers.get(Assignee._id.toString());

@@ -1,4 +1,4 @@
-// SocketContext.jsx
+// Employee Panel > SocketContext.jsx
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";

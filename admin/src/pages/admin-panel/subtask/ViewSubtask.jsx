@@ -25,6 +25,7 @@ const ViewSubtask = () => {
   const [saving, setSaving] = useState(false);
 
   const [mediaItems, setMediaItems] = useState([]);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [mediaToRemove, setMediaToRemove] = useState(null);
 
@@ -256,10 +257,10 @@ const ViewSubtask = () => {
               ) : (
                 <div className="flex flex-wrap items-center gap-2">
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${subtask.status === "Completed" ? "bg-green-100 text-green-800" :
-                      subtask.status === "In Progress" ? "bg-blue-100 text-blue-800" : "bg-yellow-100 text-yellow-800"
+                    subtask.status === "In Progress" ? "bg-blue-100 text-blue-800" : "bg-yellow-100 text-yellow-800"
                     }`}>{subtask.status || "Unknown"}</span>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${subtask.priority === "High" ? "bg-red-100 text-red-800" :
-                      subtask.priority === "Medium" ? "bg-orange-100 text-orange-800" : "bg-blue-100 text-blue-800"
+                    subtask.priority === "Medium" ? "bg-orange-100 text-orange-800" : "bg-blue-100 text-blue-800"
                     }`}>{subtask.priority || "Unknown"}</span>
                   <button onClick={() => setIsEditing(true)}
                     className="px-3 py-1 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm">Edit</button>
@@ -345,22 +346,74 @@ const ViewSubtask = () => {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
                 {mediaItems.map((item, index) => (
-                  <div key={index} className="relative group">
-                    <img src={item.src} alt={item.alt} className="w-full h-28 sm:h-40 object-cover rounded-lg border border-gray-200" />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-lg">
-                      <div className="flex space-x-2">
-                        <a href={item.src} target="_blank" rel="noopener noreferrer" className="p-1.5 bg-white rounded-full hover:bg-gray-100">
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  <div
+                    key={index}
+                    className="relative overflow-hidden rounded-lg"
+                    onMouseEnter={() => setHoveredIndex(index)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                  >
+                    {/* Image */}
+                    <img
+                      src={item.src}
+                      alt={item.alt}
+                      className="w-full h-28 sm:h-40 object-cover rounded-lg border border-gray-200"
+                    />
+
+                    {/* Overlay */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "rgba(0,0,0,0.6)",
+                        opacity: hoveredIndex === index ? 1 : 0,
+                        transition: "opacity 0.3s ease",
+                        zIndex: 10,
+                      }}
+                    >
+                      <div style={{ display: "flex", gap: "8px" }}>
+
+                        {/* View */}
+                        <a
+                          href={item.src}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            padding: "8px",
+                            background: "#fff",
+                            borderRadius: "50%",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
                         </a>
-                        <button onClick={() => { setMediaToRemove(item.src); setShowRemoveModal(true); }} className="p-1.5 bg-white rounded-full hover:bg-gray-100">
-                          <svg className="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                        {/* Delete */}
+                        <button
+                          onClick={() => {
+                            setMediaToRemove(item.src);
+                            setShowRemoveModal(true);
+                          }}
+                          style={{
+                            padding: "8px",
+                            background: "#fff",
+                            borderRadius: "50%",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                               d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </button>
+
                       </div>
                     </div>
                   </div>
