@@ -23,6 +23,7 @@ const stageSchema = new mongoose.Schema({
     ref: "Employee",
     default: null,
   },
+  assign_at: { type: Date, default: null },
   completed_at: { type: Date, default: null },
 });
 

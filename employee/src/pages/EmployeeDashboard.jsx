@@ -279,6 +279,11 @@ const EmployeeDashboard = () => {
     return <span className="text-gray-400 text-xs">No stage</span>;
   };
 
+  const isAssignedToday = (date) => {
+    if (!date) return false;
+    return dayjs(date).isSame(dayjs(), "day");
+  };
+
   if (loading && !rawProjects.length) return <LoadingOverlay />;
 
   const dateFilters = ["All Time", "Today", "This Week", "This Month", "Custom"];
@@ -424,7 +429,7 @@ const EmployeeDashboard = () => {
                             <table className="min-w-full text-xs divide-y divide-gray-100">
                               <thead className="bg-gray-100">
                                 <tr>
-                                  {["Subtask Name", "Start", "End", "Priority", "Status", "Stage", "URL", "Timer", "Time Tracked", ""].map((h) => (
+                                  {["Subtask Name", "Assign at", "Start", "End", "Priority", "Status", "Stage", "URL", "Timer", "Time Tracked", ""].map((h) => (
                                     <th key={h} className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                                   ))}
                                 </tr>
@@ -435,8 +440,19 @@ const EmployeeDashboard = () => {
                                   return (
                                     <tr key={task._id} className={"hover:bg-blue-50 transition-colors " + (task.status === "In Progress" && runMs ? "bg-blue-50" : "")}>
                                       <td className="px-3 py-2 font-medium text-gray-800 max-w-[160px]">
-                                        <span className="block truncate" title={task.task_name}>{task.task_name}</span>
+                                        <div className="flex items-center gap-2">
+                                          <span className="block truncate" title={task.task_name}>
+                                            {task.task_name}
+                                          </span>
+
+                                          {isAssignedToday(task.stages[task.current_stage_index]?.assign_at) && (
+                                            <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-green-100 text-green-700">
+                                              NEW
+                                            </span>
+                                          )}
+                                        </div>
                                       </td>
+                                      <td className="px-3 py-2 whitespace-nowrap text-gray-600">{task.stages[task.current_stage_index]?.assign_at ? dayjs(task.stages[task.current_stage_index].assign_at).format("DD/MM/YY") : "—" ?? "No log"}</td>
                                       <td className="px-3 py-2 whitespace-nowrap text-gray-600">{task.assign_date ? dayjs(task.assign_date).format("DD/MM/YY") : "—"}</td>
                                       <td className="px-3 py-2 whitespace-nowrap text-gray-600">{task.due_date ? dayjs(task.due_date).format("DD/MM/YY") : "—"}</td>
                                       <td className="px-3 py-2"><span className={"px-2 py-0.5 rounded-full font-medium " + badge(priorityColor, task.priority)}>{task.priority}</span></td>
@@ -535,7 +551,15 @@ const EmployeeDashboard = () => {
                       return (
                         <div key={task._id} className={"rounded-xl border p-3 space-y-2 " + (task.status === "In Progress" && runMs ? "border-blue-200 bg-blue-50" : "border-gray-200 bg-white")}>
                           <div className="flex items-start justify-between gap-2">
-                            <p className="font-semibold text-sm text-gray-800">{task.task_name}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold text-sm text-gray-800">{task.task_name}</p>
+
+                              {isAssignedToday(task.stages[task.current_stage_index]?.assign_at) && (
+                                <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-green-100 text-green-700">
+                                  NEW
+                                </span>
+                              )}
+                            </div>
                             <Link to={`/subtask/view/${task._id}`} onClick={(e) => e.stopPropagation()}
                               className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-blue-50 transition-colors">
                               <img src="/SVG/eye-view.svg" alt="view" className="w-3.5 h-3.5" />

@@ -49,6 +49,27 @@ const getRelatedInfo = async (projectId, employeeId) => {
   return related;
 };
 
+// Helper to update project status based on subtasks
+const updateProjectStatus = async (projectId) => {
+  const subtasks = await SubTask.find({ project_id: projectId });
+
+  if (!subtasks.length) return;
+
+  const statuses = subtasks.map((t) => t.status);
+
+  let projectStatus = "To Do";
+
+  if (statuses.includes("Blocked")) {
+    projectStatus = "Blocked";
+  } else if (statuses.includes("In Progress")) {
+    projectStatus = "In Progress";
+  } else if (statuses.every((s) => s === "Completed")) {
+    projectStatus = "Completed";
+  }
+
+  await Project.findByIdAndUpdate(projectId, { status: projectStatus });
+};
+
 export const addSubTask = async (req, res) => {
   try {
     const {
@@ -95,6 +116,7 @@ export const addSubTask = async (req, res) => {
         completed: false,
         completed_by: null,
         completed_at: null,
+        assign_at: assign_to ? new Date() : null
       };
     });
 
@@ -205,6 +227,7 @@ export const addBulkSubTasks = async (req, res) => {
           completed: false,
           completed_by: null,
           completed_at: null,
+          assign_at: task.assign_to ? new Date() : null,
         };
       });
 
@@ -381,8 +404,8 @@ export const updateSubTask = async (req, res) => {
       task_name,
       description,
       url,
-      stages: stageArray,               // ← was "stage", now "stages" (matches model)
-      total_price,                       // ← recalculated
+      stages: stageArray,
+      total_price,
       priority,
       assign_to: assign_to ? new mongoose.Types.ObjectId(assign_to) : null,
       assign_date,
@@ -395,12 +418,29 @@ export const updateSubTask = async (req, res) => {
       updateData.media_files = req.files.map((file) => file.path);
     }
 
+
     const subTask = await SubTask.findById(id);
 
     const updated = await SubTask.findByIdAndUpdate(id, updateData, {
       new: true,
     });
     if (!updated) return res.status(404).json({ message: "Subtask not found" });
+
+    // 🔥 NEW: Handle assign_at when assignee changes
+    if (
+      assign_to &&
+      originalSubTask.assign_to?.toString() !== assign_to.toString()
+    ) {
+      const stageIndex = updated.current_stage_index;
+
+      if (stageIndex < updated.stages.length) {
+        // ✅ Avoid overwrite
+        if (!updated.stages[stageIndex].assign_at) {
+          updated.stages[stageIndex].assign_at = new Date();
+          await updated.save();
+        }
+      }
+    }
 
     // 📝 LOG ACTIVITY
     const logger = new ActivityLogger(req);
@@ -538,6 +578,8 @@ export const completeStage = async (req, res) => {
 
     await subtask.save();
 
+    await updateProjectStatus(subtask.project_id);
+
     const admin = await Admin.findOne(); // Get the first admin in the collection
     if (admin) {
       console.log("Admin found:", admin._id);
@@ -585,6 +627,8 @@ export const deleteSubTask = async (req, res) => {
         .json({ message: "Cannot delete a subtask that is In Progress" });
     }
     await SubTask.findByIdAndDelete(id);
+
+    await updateProjectStatus(subTask.project_id);
 
     const relatedInfo = await getRelatedInfo(subTask.project_id, subTask.assign_to);
     // 📝 LOG ACTIVITY
@@ -660,6 +704,8 @@ export const changeSubTaskStatus = async (req, res) => {
     // ✅ Update subtask status
     subtask.status = status;
     await subtask.save();
+
+    await updateProjectStatus(subtask.project_id);
 
     // 📝 LOG ACTIVITY (only if admin changed it)
     if (userRole === "admin") {
@@ -820,6 +866,29 @@ export const bulkUpdateSubtasks = async (req, res) => {
 
     // 2️⃣ Update them
     await SubTask.updateMany({ _id: { $in: ids } }, { $set: update });
+
+    // 🔥 NEW LOGIC: Handle assign_at for bulk assignment
+    if (update.assign_to) {
+      for (const task of updatedTasks) {
+        const oldAssigneeId = task.assign_to?.toString();
+        const newAssigneeId = update.assign_to.toString();
+
+        // ✅ Only if assignment changed
+        if (oldAssigneeId !== newAssigneeId) {
+          const freshTask = await SubTask.findById(task._id);
+
+          const stageIndex = freshTask.current_stage_index;
+
+          if (stageIndex < freshTask.stages.length) {
+            // ✅ Avoid overwrite
+            if (!freshTask.stages[stageIndex].assign_at) {
+              freshTask.stages[stageIndex].assign_at = new Date();
+              await freshTask.save();
+            }
+          }
+        }
+      }
+    }
 
     const io = req.app.get("io");
     const connectedUsers = req.app.get("connectedUsers");

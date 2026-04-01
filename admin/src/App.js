@@ -25,6 +25,7 @@ import ProjectMediaGallery from "./pages/admin-panel/ProjectMediaGallery";
 import EmployeeDashboard from "./pages/admin-panel/employee/EmployeeDashboard";
 import EmployeeProfileEdit from "./pages/admin-panel/employee/EmployeeProfileEdit";
 import TeamMemberProfile from "./pages/admin-panel/employee/TeamMemberProfile";
+import EmployeeActivityDashboard from "./pages/admin-panel/employee/EmployeeActivityDashboard";
 import EmployeeTimeTracking from "./pages/admin-panel/employee/EmployeeTimeTracking";
 import Subtasks from "./pages/admin-panel/subtask/Subtasks";
 import NotificationAdmin from "./pages/admin-panel/NotificationAdmin";
@@ -118,6 +119,10 @@ function App() {
           element={<EmployeeProfileEdit />}
         />
         <Route path="/employee/profile/:id" element={<TeamMemberProfile />} />
+        <Route
+          path="/employee/activity-history/:id"
+          element={<EmployeeActivityDashboard />}
+        />
         <Route
           path="/employee/timetracking/:id"
           element={<EmployeeTimeTracking />}

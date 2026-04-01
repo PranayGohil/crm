@@ -137,8 +137,8 @@ const TeamMemberProfile = () => {
               <h2 className="text-lg sm:text-2xl font-bold text-gray-800">{employee.full_name || "N/A"}</h2>
               <p className="text-sm text-gray-500">{employee.designation || "N/A"}</p>
               <span className={`inline-flex items-center mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${employee.status === "Active" ? "bg-green-100 text-green-800"
-                  : employee.status === "on-leave" ? "bg-yellow-100 text-yellow-800"
-                    : "bg-red-100 text-red-800"
+                : employee.status === "on-leave" ? "bg-yellow-100 text-yellow-800"
+                  : "bg-red-100 text-red-800"
                 }`}>
                 {employee.status === "Active" ? "Active" : employee.status === "Inactive" ? "Inactive" : "Blocked"}
               </span>
@@ -152,6 +152,15 @@ const TeamMemberProfile = () => {
                 Reported by: <span className="font-semibold">{employee.reporting_manager?.full_name || "N/A"}</span>
               </p>
             )}
+            <Link to={`/employee/activity-history/${employee._id}`}
+              className="flex items-center gap-2 border shadow-sm shadow-blue-200 py-2 px-3 rounded-lg text-sm text-blue-600 hover:text-blue-800 transition-colors w-fit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" >
+                <path d="M3 3v5h5" />
+                <path d="M3.05 13A9 9 0 1 0 6 6.3L3 8" />
+                <path d="M12 7v5l3 3" />
+              </svg>
+              View Activity History
+            </Link>
             <Link to={`/employee/timetracking/${employee._id}`}
               className="flex items-center gap-2 border shadow-sm shadow-blue-200 py-2 px-3 rounded-lg text-sm text-blue-600 hover:text-blue-800 transition-colors w-fit">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
