@@ -8,6 +8,7 @@ import {
   deleteClient,
   updateClient,
   updateClientByUsername,
+  toggleClientStatus,
   getClientTasks,
   getClientProjectsWithUsername,
   getClientsWithSubtasks,
@@ -24,6 +25,7 @@ clientRouter.post("/login", loginClient);
 clientRouter.delete("/delete/:id", deleteClient);
 clientRouter.put("/update/:id", updateClient);
 clientRouter.put("/update-username/:username", updateClientByUsername);
+clientRouter.put("/toggle-status/:id", toggleClientStatus);
 
 clientRouter.get("/tasks/:id", getClientTasks);
 clientRouter.get("/projects/:username", getClientProjectsWithUsername);

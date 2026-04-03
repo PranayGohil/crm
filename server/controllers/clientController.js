@@ -371,6 +371,23 @@ export const updateClientByUsername = async (req, res) => {
   }
 };
 
+export const toggleClientStatus = async (req, res) => {
+  try {
+    const client = await Client.findById(req.params.id);
+
+    if (!client) {
+      return res.status(404).json({ message: "Client not found" });
+    }
+
+    client.status = client.status === "active" ? "inactive" : "active";
+    await client.save();
+
+    res.json({ message: "Status updated", status: client.status });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
 export const deleteClient = async (req, res) => {
   try {
     console.log("deleteClient called");

@@ -61,6 +61,11 @@ const clientScheme = mongoose.Schema({
       },
     },
   ],
+  status: {
+    type: String,
+    enum: ["active", "inactive"],
+    default: "active",
+  },
   created_at: {
     type: Date,
     default: Date.now,

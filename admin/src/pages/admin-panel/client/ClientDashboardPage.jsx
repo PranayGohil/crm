@@ -9,6 +9,7 @@ const ClientDashboardPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [clients, setClients] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("All");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -30,11 +31,16 @@ const ClientDashboardPage = () => {
     fetchClients();
   }, []);
 
-  const filteredClients = clients.filter(
-    (client) =>
+  const filteredClients = clients.filter((client) => {
+    const matchesSearch =
       client.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      client.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "All" || client.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   if (loading) return <LoadingOverlay />;
 
@@ -109,7 +115,7 @@ const ClientDashboardPage = () => {
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
+      <div className="flex items-center justify-between bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6">
         <div className="relative max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,6 +129,17 @@ const ClientDashboardPage = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
+        </div>
+        <div className="flex gap-3">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="All">All Clients</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
         </div>
       </div>
 
@@ -156,9 +173,15 @@ const ClientDashboardPage = () => {
               <div key={client._id || client.username} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="p-4 sm:p-6">
                   {/* Client Header */}
-                  <div className="mb-4">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 truncate">{client.full_name}</h3>
-                    <p className="text-sm text-gray-500 truncate">{client.email}</p>
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <div>
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 truncate">{client.full_name}</h3>
+                      <p className="text-sm text-gray-500 truncate">{client.email}</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <div className={"w-2 h-2 rounded-full " + (client.status === "active" ? "bg-green-500" : "bg-gray-400")} />
+                      <span>{client.status.charAt(0).toUpperCase() + client.status.slice(1)}</span>
+                    </div>
                   </div>
 
                   {/* Join Date */}

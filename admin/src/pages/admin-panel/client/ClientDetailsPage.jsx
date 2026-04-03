@@ -50,6 +50,33 @@ const ClientDetailsPage = () => {
     }
   };
 
+  const handleToggleStatus = async () => {
+    try {
+      setLoading(true);
+
+      const res = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/client/toggle-status/${client._id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      setClient((prev) => ({
+        ...prev,
+        status: res.data.status,
+      }));
+
+      toast.success(`Client ${res.data.status}`);
+    } catch (error) {
+      toast.error("Failed to update status");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) return <LoadingOverlay />;
   if (!client) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -88,14 +115,35 @@ const ClientDetailsPage = () => {
             <div className="min-w-0">
               <h1 className="text-base sm:text-2xl font-semibold text-gray-800 truncate">{client.full_name}</h1>
               <div className="flex flex-wrap items-center gap-1 mt-0.5 text-xs text-gray-500">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                <span>Active</span>
+                <div className={"w-1.5 h-1.5 rounded-full " + (client.status === "active" ? "bg-green-500" : "bg-gray-400")} />
+                <span>{client.status.charAt(0).toUpperCase() + client.status.slice(1)}</span>
                 <span>•</span>
                 <span className="truncate">ID: #{client._id}</span>
               </div>
             </div>
           </div>
           <div className="flex gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <div className={"w-2 h-2 rounded-full " + (client.status === "active" ? "bg-green-500" : "bg-gray-400")} />
+              <span className="text-sm font-medium text-gray-600">
+                {client.status === "active" ? "Active" : "Inactive"}
+              </span>
+              <div
+                onClick={handleToggleStatus}
+                className={
+                  "w-12 h-6 flex items-center rounded-full p-1 cursor-pointer transition-all duration-300 " +
+                  (client.status === "active" ? "bg-green-500" : "bg-gray-300")
+                }
+              >
+                <div
+                  className={
+                    "bg-white w-4 h-4 rounded-full shadow-md transform transition-all duration-300 " +
+                    (client.status === "active" ? "translate-x-6" : "translate-x-0")
+                  }
+                />
+              </div>
+
+            </div>
             <Link to={`/client/edit/${client.username}`}
               className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

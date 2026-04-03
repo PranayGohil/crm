@@ -61,6 +61,19 @@ const DashboardMenu = ({ onClose }) => {
       ),
     },
     {
+      to: "/earnings-report",
+      label: "Earnings Report",
+      path: "/earnings-report",
+      icon: (
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 3v18h18M7 14l4-4 4 4 5-5"
+        />
+      ),
+    },
+    {
       to: "/time-tracking",
       label: "Team Time Tracking",
       path: "/time-tracking",
@@ -151,19 +164,6 @@ const DashboardMenu = ({ onClose }) => {
         />
       ),
     },
-    {
-      to: "/earnings-report",
-      label: "Earnings Report",
-      path: "/earnings-report",
-      icon: (
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M3 3v18h18M7 14l4-4 4 4 5-5"
-        />
-      ),
-    },
   ];
 
   return (
@@ -228,8 +228,8 @@ const DashboardMenu = ({ onClose }) => {
               to={item.to}
               onClick={handleLinkClick}
               className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive(item.path)
-                  ? "bg-blue-100 text-blue-600"
-                  : "text-gray-600 hover:bg-gray-100"
+                ? "bg-blue-100 text-blue-600"
+                : "text-gray-600 hover:bg-gray-100"
                 }`}
             >
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

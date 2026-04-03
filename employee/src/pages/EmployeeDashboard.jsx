@@ -386,6 +386,9 @@ const EmployeeDashboard = () => {
               {filteredProjects.map((project) => {
                 const pid = project._id?.toString();
                 const ps = subtasksByProject[pid] ?? [];
+                const hasNewTask = ps.some(task =>
+                  isAssignedToday(task.stages[task.current_stage_index]?.assign_at)
+                );
                 const hasRunning = ps.some((t) => t.status === "In Progress" && runningTimers[t._id]);
                 const totalMs = ps.reduce((acc, task) => {
                   let ms = 0;
@@ -398,7 +401,7 @@ const EmployeeDashboard = () => {
                 }, 0);
                 return (
                   <React.Fragment key={project._id}>
-                    <tr className={"hover:bg-gray-50 transition-colors " + (hasRunning ? "bg-blue-50" : "")}>
+                    <tr className={"hover:bg-gray-50 transition-colors " + (hasRunning ? "border-2 border-green-400 bg-green-50" : "")}>
                       <td className="px-4 py-3">
                         <button onClick={() => toggleTable(project._id)}
                           className={"w-7 h-7 flex items-center justify-center rounded-lg border hover:bg-gray-100 transition-all " + (expandedProjectId === project._id ? "bg-blue-50 border-blue-200" : "bg-white border-gray-200")}>
@@ -408,7 +411,17 @@ const EmployeeDashboard = () => {
                           </svg>
                         </button>
                       </td>
-                      <td className="px-4 py-3 font-medium text-gray-800 max-w-xs truncate">{project.project_name}</td>
+                      <td className="px-4 py-3 font-medium text-gray-800 max-w-xs truncate">
+                        <div className="flex items-center gap-2">
+                          <span className="truncate">{project.project_name}</span>
+
+                          {hasNewTask && (
+                            <span className="px-2 py-0.5 text-[10px] font-semibold rounded bg-red-600 text-white">
+                              NEW
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-4 py-3"><span className={"px-2 py-0.5 text-xs rounded-full font-medium " + badge(statusColor, project.status)}>{project.status}</span></td>
                       <td className="px-4 py-3 text-center text-gray-700">{ps.length}</td>
                       <td className="px-4 py-3 font-mono text-xs whitespace-nowrap text-gray-700">{formatDuration(totalMs)}</td>
@@ -434,11 +447,11 @@ const EmployeeDashboard = () => {
                                   ))}
                                 </tr>
                               </thead>
-                              <tbody className="divide-y divide-gray-50 bg-white">
+                              <tbody className=" bg-white">
                                 {ps.map((task) => {
                                   const { totalMs, runMs, anotherRunning, showC, displayStatus } = getSubtaskData(task);
                                   return (
-                                    <tr key={task._id} className={"hover:bg-blue-50 transition-colors " + (task.status === "In Progress" && runMs ? "bg-blue-50" : "")}>
+                                    <tr key={task._id} className={"hover:bg-blue-50 transition-colors " + (task.status === "In Progress" && runMs ? "border-2 border-green-400 bg-green-50" : "")}>
                                       <td className="px-3 py-2 font-medium text-gray-800 max-w-[160px]">
                                         <div className="flex items-center gap-2">
                                           <span className="block truncate" title={task.task_name}>
@@ -446,7 +459,7 @@ const EmployeeDashboard = () => {
                                           </span>
 
                                           {isAssignedToday(task.stages[task.current_stage_index]?.assign_at) && (
-                                            <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-green-100 text-green-700">
+                                            <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-red-600 text-white">
                                               NEW
                                             </span>
                                           )}
@@ -514,6 +527,9 @@ const EmployeeDashboard = () => {
           {filteredProjects.map((project) => {
             const pid = project._id?.toString();
             const ps = subtasksByProject[pid] ?? [];
+            const hasNewTask = ps.some(task =>
+              isAssignedToday(task.stages[task.current_stage_index]?.assign_at)
+            );
             const isOpen = expandedProjectId === project._id;
             const hasRunning = ps.some((t) => t.status === "In Progress" && runningTimers[t._id]);
             const totalMs = ps.reduce((acc, task) => {
@@ -523,14 +539,21 @@ const EmployeeDashboard = () => {
             }, 0);
 
             return (
-              <div key={project._id} className={hasRunning ? "bg-blue-50" : "bg-white"}>
+              <div key={project._id} className={hasRunning ? "border-2 border-green-400 bg-green-50" : "bg-white"}>
                 <button className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => toggleTable(project._id)}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
                     className={"flex-shrink-0 text-gray-400 transition-transform duration-200 " + (isOpen ? "rotate-180" : "")}>
                     <path d="m6 9 6 6 6-6" />
                   </svg>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-gray-800 truncate">{project.project_name}</p>
+                    <div className="relative">
+                      <p className="font-semibold text-sm text-gray-800 truncate">{project.project_name}</p>
+                      {hasNewTask && (
+                        <span className="absolute top-[-10px] left-[-45px] px-1.5 py-0.5 text-[10px] font-semibold rounded bg-red-600 text-white">
+                          NEW
+                        </span>
+                      )}
+                    </div>
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       <span className={"px-2 py-0.5 text-xs rounded-full font-medium " + badge(statusColor, project.status)}>{project.status}</span>
                       <span className={"px-2 py-0.5 text-xs rounded-full font-medium " + badge(priorityColor, project.priority)}>{project.priority}</span>
@@ -549,13 +572,13 @@ const EmployeeDashboard = () => {
                     {ps.map((task) => {
                       const { totalMs, runMs, anotherRunning, showC, displayStatus } = getSubtaskData(task);
                       return (
-                        <div key={task._id} className={"rounded-xl border p-3 space-y-2 " + (task.status === "In Progress" && runMs ? "border-blue-200 bg-blue-50" : "border-gray-200 bg-white")}>
+                        <div key={task._id} className={"rounded-xl p-3 space-y-2 " + (task.status === "In Progress" && runMs ? "border-2 border-green-400 bg-green-50" : "border-2 border-gray-200 bg-white")}>
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2">
-                              <p className="font-semibold text-sm text-gray-800">{task.task_name}</p>
+                              <span className="font-semibold text-sm text-gray-800">{task.task_name}</span>
 
                               {isAssignedToday(task.stages[task.current_stage_index]?.assign_at) && (
-                                <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-green-100 text-green-700">
+                                <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-red-600 text-white">
                                   NEW
                                 </span>
                               )}
