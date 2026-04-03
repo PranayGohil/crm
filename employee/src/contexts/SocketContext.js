@@ -34,7 +34,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("employeeUser"));
     const s = io(process.env.REACT_APP_API_URL, {
-      transports: ["websocket"], 
+      transports: ["polling", "websocket"], 
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 2000,

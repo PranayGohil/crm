@@ -49,7 +49,7 @@ export const SocketProvider = ({ children }) => {
     console.log("Fetched admin profile:", user);
 
     const s = io(process.env.REACT_APP_API_URL, {
-      transports: ["websocket"],
+      transports: ["polling", "websocket"],
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 2000,
