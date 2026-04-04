@@ -1,5 +1,5 @@
 // Admin Panel > SocketContext.jsx
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { toast } from "react-toastify";
@@ -17,6 +17,8 @@ export const SocketProvider = ({ children }) => {
   const [notificationPermission, setNotificationPermission] = useState(
     notificationService.getPermission()
   );
+  const notificationSound = new Audio("/sounds/notification.wav");
+  const canPlaySound = useRef(false);
 
   // Request notification permission on mount
   useEffect(() => {
@@ -31,6 +33,77 @@ export const SocketProvider = ({ children }) => {
 
     requestPermission();
   }, []);
+
+  useEffect(() => {
+    console.log("🎧 Setting up audio unlock listener...");
+
+    const unlockAudio = () => {
+      console.log("🖱️ Click detected - attempting to unlock audio...");
+      console.log("🔍 Audio state before unlock:", {
+        paused: notificationSound.paused,
+        currentTime: notificationSound.currentTime,
+        readyState: notificationSound.readyState,
+        src: notificationSound.src,
+      });
+
+      notificationSound
+        .play()
+        .then(() => {
+          console.log("✅ Audio unlocked successfully!");
+          notificationSound.pause();
+          notificationSound.currentTime = 0;
+          canPlaySound.current = true;
+          console.log("🔓 canPlaySound set to:", canPlaySound.current);
+        })
+        .catch((err) => {
+          console.warn("❌ Audio unlock failed:", err.message);
+          console.log("🔍 Error name:", err.name);
+        });
+
+      window.removeEventListener("click", unlockAudio);
+      console.log("🗑️ Unlock listener removed after first click");
+    };
+
+    window.addEventListener("click", unlockAudio);
+    console.log("👂 Unlock listener attached to window");
+
+    return () => {
+      console.log("🧹 Cleaning up unlock listener (useEffect cleanup)");
+      window.removeEventListener("click", unlockAudio);
+    };
+  }, []);
+
+  const playNotificationSound = () => {
+    console.log("🔔 playNotificationSound called");
+    console.log("🔍 canPlaySound.current:", canPlaySound.current);
+    console.log("🔍 Audio state:", {
+      paused: notificationSound.paused,
+      currentTime: notificationSound.currentTime,
+      readyState: notificationSound.readyState,
+      volume: notificationSound.volume,
+    });
+
+    if (!canPlaySound.current) {
+      console.warn("🚫 Sound blocked - audio not unlocked yet (user hasn't clicked anything)");
+      return;
+    }
+
+    notificationSound.currentTime = 0;
+    notificationSound
+      .play()
+      .then(() => {
+        console.log("✅ Sound played successfully!");
+      })
+      .catch((err) => {
+        console.warn("❌ Sound play failed:", err.message);
+        console.log("🔍 Error name:", err.name);
+        // If it failed, maybe unlock was lost - reset flag
+        if (err.name === "NotAllowedError") {
+          console.warn("🔒 NotAllowedError - resetting canPlaySound to false");
+          canPlaySound.current = false;
+        }
+      });
+  };
 
   useEffect(async () => {
     const token = localStorage.getItem("token");
@@ -63,6 +136,15 @@ export const SocketProvider = ({ children }) => {
 
     // Helper function to show both toast and browser notification
     const showNotification = (notification, type = "info") => {
+      console.log("📩 showNotification triggered:", {
+        title: notification.title,
+        type: notification.type,
+        related_id: notification.related_id,
+      });
+
+      console.log("🔊 About to call playNotificationSound...");
+      playNotificationSound();
+
       // Show toast notification
       toast[type](`${notification.title}`);
 
@@ -87,15 +169,11 @@ export const SocketProvider = ({ children }) => {
             },
           },
           () => {
-            // When user clicks the notification, focus window and navigate if needed
             window.focus();
-
-            // Optional: Navigate to specific page based on notification type
             if (
               notification.type === "subtask_updated" &&
               notification.related_id
             ) {
-              // You can use react-router navigation here
               navigate(`/subtask/view/${notification.related_id}`);
               console.log("Navigate to subtask:", notification.related_id);
             }
@@ -103,7 +181,6 @@ export const SocketProvider = ({ children }) => {
         );
       }
 
-      // Add to notifications state
       setNotifications((prev) => [notification, ...prev]);
     };
 
