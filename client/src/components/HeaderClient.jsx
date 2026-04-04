@@ -13,10 +13,10 @@ const HeaderClient = () => {
     <div className="bg-white px-6 py-3 flex flex-col sm:flex-row justify-between items-center">
       {/* Left Section - Logo + Title */}
       <div className="flex items-center gap-3">
-        <img src="/SVG/diamond-rich_teal.svg" alt="logo" className="w-8 h-8" />
+        <img src="/SVG/maulshree_logo.svg" alt="logo" className="w-[55px] h-[55px] flex-shrink-0" />
         <h1 className="text-lg font-semibold text-gray-800 m-0">
           {/* Maulshree Jewellery */}
-          Pixel Orbit
+          Maulshree Jewellery Rendering
         </h1>
       </div>
 

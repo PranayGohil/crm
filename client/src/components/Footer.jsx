@@ -11,7 +11,7 @@ const Footer = () => {
   return (
     <div className="footer_box">
       <p className="copyright_text">
-        &copy; <span>{year}</span> Pixel Orbit. All rights reserved.
+        &copy; <span>{year}</span> Maulshree Jewellery Rendering. All rights reserved.
       </p>
     </div>
   );

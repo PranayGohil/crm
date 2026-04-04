@@ -70,9 +70,9 @@ const HeaderAdmin = ({ onMenuToggle }) => {
 
         {/* Logo + Title */}
         <div className="flex items-center gap-2 min-w-0">
-          <img src="/SVG/diamond-rich_teal.svg" alt="logo" className="w-7 h-7 flex-shrink-0" />
+          <img src="/SVG/maulshree_logo.svg" alt="logo" className="w-[55px] h-[55px] flex-shrink-0" />
           <h1 className="text-base font-semibold text-gray-800 m-0 truncate hidden sm:block">
-            Pixel Orbit
+            Maulshree Jewellery Rendering
           </h1>
         </div>
       </div>
