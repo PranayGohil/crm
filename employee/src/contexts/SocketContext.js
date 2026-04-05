@@ -34,25 +34,25 @@ export const SocketProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    console.log("🎧 Setting up audio unlock listener...");
+    // console.log("🎧 Setting up audio unlock listener...");
 
     const unlockAudio = () => {
-      console.log("🖱️ Click detected - attempting to unlock audio...");
-      console.log("🔍 Audio state before unlock:", {
-        paused: notificationSound.paused,
-        currentTime: notificationSound.currentTime,
-        readyState: notificationSound.readyState,
-        src: notificationSound.src,
-      });
+      // console.log("🖱️ Click detected - attempting to unlock audio...");
+      // console.log("🔍 Audio state before unlock:", {
+      //   paused: notificationSound.paused,
+      //   currentTime: notificationSound.currentTime,
+      //   readyState: notificationSound.readyState,
+      //   src: notificationSound.src,
+      // });
 
       notificationSound
         .play()
         .then(() => {
-          console.log("✅ Audio unlocked successfully!");
+          // console.log("✅ Audio unlocked successfully!");
           notificationSound.pause();
           notificationSound.currentTime = 0;
           canPlaySound.current = true;
-          console.log("🔓 canPlaySound set to:", canPlaySound.current);
+          // console.log("🔓 canPlaySound set to:", canPlaySound.current);
         })
         .catch((err) => {
           console.warn("❌ Audio unlock failed:", err.message);
@@ -60,27 +60,19 @@ export const SocketProvider = ({ children }) => {
         });
 
       window.removeEventListener("click", unlockAudio);
-      console.log("🗑️ Unlock listener removed after first click");
+      // console.log("🗑️ Unlock listener removed after first click");
     };
 
     window.addEventListener("click", unlockAudio);
-    console.log("👂 Unlock listener attached to window");
+    // console.log("👂 Unlock listener attached to window");
 
     return () => {
-      console.log("🧹 Cleaning up unlock listener (useEffect cleanup)");
+      // console.log("🧹 Cleaning up unlock listener (useEffect cleanup)");
       window.removeEventListener("click", unlockAudio);
     };
   }, []);
 
   const playNotificationSound = () => {
-    console.log("🔔 playNotificationSound called");
-    console.log("🔍 canPlaySound.current:", canPlaySound.current);
-    console.log("🔍 Audio state:", {
-      paused: notificationSound.paused,
-      currentTime: notificationSound.currentTime,
-      readyState: notificationSound.readyState,
-      volume: notificationSound.volume,
-    });
 
     if (!canPlaySound.current) {
       console.warn("🚫 Sound blocked - audio not unlocked yet (user hasn't clicked anything)");
@@ -91,7 +83,7 @@ export const SocketProvider = ({ children }) => {
     notificationSound
       .play()
       .then(() => {
-        console.log("✅ Sound played successfully!");
+        // console.log("✅ Sound played successfully!");
       })
       .catch((err) => {
         console.warn("❌ Sound play failed:", err.message);
@@ -120,13 +112,13 @@ export const SocketProvider = ({ children }) => {
 
     // Helper function to show both toast and browser notification
     const showNotification = (notification, type = "info") => {
-      console.log("📩 showNotification triggered:", {
-        title: notification.title,
-        type: notification.type,
-        related_id: notification.related_id,
-      });
+      // console.log("📩 showNotification triggered:", {
+      //   title: notification.title,
+      //   type: notification.type,
+      //   related_id: notification.related_id,
+      // });
 
-      console.log("🔊 About to call playNotificationSound...");
+      // console.log("🔊 About to call playNotificationSound...");
       playNotificationSound();
 
 
@@ -159,7 +151,6 @@ export const SocketProvider = ({ children }) => {
             ) {
               // You can use react-router navigation here
               navigate(`/subtask/view/${notification.related_id}`);
-              console.log("Navigate to subtask:", notification.related_id);
             }
           }
         );
