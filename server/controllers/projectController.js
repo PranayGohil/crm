@@ -39,6 +39,7 @@ export const addProject = async (req, res) => {
       assign_to,
       assign_date,
       due_date,
+      stages,
       priority,
       description,
       status,
@@ -56,6 +57,7 @@ export const addProject = async (req, res) => {
       assign_to,
       assign_date,
       due_date,
+      stages,
       priority,
       description,
       status,
@@ -80,6 +82,7 @@ export const addProject = async (req, res) => {
       },
       relatedTo: relatedInfo,
       metadata: {
+        stages,
         priority,
         status,
         assignees: assign_to?.length || 0,

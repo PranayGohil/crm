@@ -209,12 +209,12 @@ const ProjectDetails = () => {
           ) : (
             <div className="flex flex-wrap items-center gap-2">
               <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${project.status === "Completed" ? "bg-green-100 text-green-800"
-                  : project.status === "In Progress" ? "bg-blue-100 text-blue-800"
-                    : "bg-yellow-100 text-yellow-800"
+                : project.status === "In Progress" ? "bg-blue-100 text-blue-800"
+                  : "bg-yellow-100 text-yellow-800"
                 }`}>{project.status || "Unknown"}</span>
               <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${project.priority === "High" ? "bg-red-100 text-red-800"
-                  : project.priority === "Medium" ? "bg-orange-100 text-orange-800"
-                    : "bg-blue-100 text-blue-800"
+                : project.priority === "Medium" ? "bg-orange-100 text-orange-800"
+                  : "bg-blue-100 text-blue-800"
                 }`}>{project.priority || "Unknown"}</span>
               <button onClick={() => setIsEditing(true)}
                 className="px-3 py-1.5 text-xs sm:text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
@@ -230,6 +230,27 @@ const ProjectDetails = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
           <h3 className="text-sm sm:text-base font-semibold text-gray-800 mb-4">Project Overview</h3>
           <div className="space-y-3 text-sm">
+            {/* Inside the space-y-3 overview list, after the Status row */}
+            {project.stages?.length > 0 && (
+              <div className="flex justify-between items-start">
+                <span className="text-gray-500">Stages:</span>
+                <div className="flex flex-wrap gap-1 justify-end">
+                  {project.stages.map((stage) => {
+                    const stageStyles = {
+                      "CAD Design": "bg-purple-100 text-purple-700",
+                      "SET Design": "bg-indigo-100 text-indigo-700",
+                      "Render": "bg-teal-100   text-teal-700",
+                    };
+                    return (
+                      <span key={stage}
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${stageStyles[stage] || "bg-gray-100 text-gray-600"}`}>
+                        {stage}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             {[
               { label: "Start Date", val: project.assign_date ? new Date(project.assign_date).toLocaleDateString() : "N/A" },
               { label: "Due Date", val: project.due_date ? new Date(project.due_date).toLocaleDateString() : "N/A" },

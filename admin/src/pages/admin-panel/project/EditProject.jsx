@@ -25,6 +25,13 @@ const EditProject = () => {
   const [existingFiles, setExistingFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [currency, setCurrency] = useState("INR");
+  const [stages, setStages] = useState([]);
+
+  const toggleStage = (stage) => {
+    setStages((prev) =>
+      prev.includes(stage) ? prev.filter((s) => s !== stage) : [...prev, stage]
+    );
+  };
 
   const formik = useFormik({
     initialValues: { project_name: "", client_id: "", client_name: "", assign_date: "", due_date: "", priority: "" },
@@ -42,14 +49,14 @@ const EditProject = () => {
       try {
         const formData = new FormData();
         formData.append("data", JSON.stringify({
-          ...values,
+          ...values, stages,
           content: { ...values.content, items, total_price: totalPrice, description: projectDescription, currency, existing_files: existingFiles },
         }));
         selectedFiles.forEach((f) => formData.append("files", f));
         const res = await axios.put(`${process.env.REACT_APP_API_URL}/api/project/update/${projectId}`, formData, {
           headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
-        if (res.data.success) { toast.success("Project updated successfully"); navigate("/project/dashboard"); }
+        if (res.data.success) { toast.success("Project updated successfully"); navigate(-1); }
         else toast.error("Failed to update project");
       } catch { toast.error("Something went wrong!"); }
       finally { setLoading(false); setIsSubmitting(false); }
@@ -75,6 +82,7 @@ const EditProject = () => {
         setTotalPrice(p.content[0]?.total_price || 0);
         setProjectDescription(p.content[0]?.description || "");
         setCurrency(p.content[0]?.currency || "INR");
+        setStages(p.stages || []);
         setExistingFiles(p.content[0]?.uploaded_files || []);
       } catch { toast.error("Failed to load project"); }
       finally { setLoading(false); }
@@ -178,6 +186,33 @@ const EditProject = () => {
             {touched.assign_date && errors.assign_date && <p className="text-red-600 text-xs mt-1">{errors.assign_date}</p>}
             {touched.due_date && errors.due_date && <p className="text-red-600 text-xs mt-1">{errors.due_date}</p>}
           </div>
+        </div>
+
+        {/* Stages */}
+        <div>
+          <label className={labelCls}>Project Stages</label>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { value: "CAD Design", active: "bg-purple-100 text-purple-800 border-purple-300" },
+              { value: "SET Design", active: "bg-indigo-100 text-indigo-800 border-indigo-300" },
+              { value: "Render", active: "bg-teal-100   text-teal-800   border-teal-300" },
+            ].map(({ value, active }) => (
+              <button
+                key={value}
+                type="button"
+                className={`px-4 py-2 text-sm rounded-lg border transition-colors ${stages.includes(value) ? active : "bg-gray-100 text-gray-700 border-gray-300"
+                  }`}
+                onClick={() => toggleStage(value)}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+          {stages.length > 0 && (
+            <p className="text-xs text-gray-500 mt-1">
+              Selected: {stages.join(", ")}
+            </p>
+          )}
         </div>
 
         {/* Priority */}

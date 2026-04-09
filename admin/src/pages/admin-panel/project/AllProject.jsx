@@ -15,6 +15,7 @@ const AllProject = () => {
   const [projectSubtasks, setProjectSubtasks] = useState({});
   const [employees, setEmployees] = useState({});
   const [loading, setLoading] = useState(false);
+  const [selectedStage, setSelectedStage] = useState("All Stages");
 
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}/api/client/get-all`)
@@ -65,7 +66,8 @@ const AllProject = () => {
     const clientMatch = selectedClient.id === "All Client" || p.client_id === selectedClient._id;
     const statusMatch = selectedStatus === "All Status" || p.status.toLowerCase() === selectedStatus.toLowerCase();
     const searchMatch = p.project_name.toLowerCase().includes(searchTerm.toLowerCase());
-    return clientMatch && statusMatch && searchMatch;
+    const stageMatch = selectedStage === "All Stages" || (p.stages || []).includes(selectedStage);
+    return clientMatch && statusMatch && searchMatch && stageMatch;
   });
 
   if (loading) return <LoadingOverlay />;
@@ -129,9 +131,17 @@ const AllProject = () => {
               <option value="All Status">All Status</option>
               {statusOptions.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
+            <select value={selectedStage}
+              onChange={(e) => setSelectedStage(e.target.value)}
+              className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white">
+              <option value="All Stages">All Stages</option>
+              {["CAD Design", "SET Design", "Render"].map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
             <button
               className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              onClick={() => { setSelectedClient({ id: "All Client", name: "All Client" }); setSelectedStatus("All Status"); setSearchTerm(""); }}>
+              onClick={() => { setSelectedClient({ id: "All Client", name: "All Client" }); setSelectedStatus("All Status"); setSelectedStage("All Stages"); setSearchTerm(""); }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
                 <path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M3 21v-5h5" />

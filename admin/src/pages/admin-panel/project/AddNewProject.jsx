@@ -22,6 +22,7 @@ const AddNewProject = () => {
   const [projectDescription, setProjectDescription] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [currency, setCurrency] = useState("INR");
+  const [stages, setStages] = useState([]);
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -43,6 +44,12 @@ const AddNewProject = () => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  const toggleStage = (stage) => {
+    setStages((prev) =>
+      prev.includes(stage) ? prev.filter((s) => s !== stage) : [...prev, stage]
+    );
+  };
+
   const formik = useFormik({
     initialValues: { project_name: "", client_id: "", client_name: "", assign_date: "", due_date: "", priority: "" },
     validationSchema: Yup.object({
@@ -58,7 +65,7 @@ const AddNewProject = () => {
       try {
         const formData = new FormData();
         formData.append("data", JSON.stringify({
-          ...values, assign_to: [], tasks: [], status: "To do",
+          ...values, assign_to: [], tasks: [], status: "To do", stages,
           content: { items, total_price: totalPrice, description: projectDescription, currency },
         }));
         selectedFiles.forEach((file) => formData.append("files", file));
@@ -153,6 +160,33 @@ const AddNewProject = () => {
             {touched.assign_date && errors.assign_date && <p className="text-red-600 text-xs mt-1">{errors.assign_date}</p>}
             {touched.due_date && errors.due_date && <p className="text-red-600 text-xs mt-1">{errors.due_date}</p>}
           </div>
+        </div>
+
+        {/* Stages */}
+        <div>
+          <label className={labelCls}>Project Stages</label>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { value: "CAD Design", active: "bg-purple-100 text-purple-800 border-purple-300" },
+              { value: "SET Design", active: "bg-indigo-100 text-indigo-800 border-indigo-300" },
+              { value: "Render", active: "bg-teal-100   text-teal-800   border-teal-300" },
+            ].map(({ value, active }) => (
+              <button
+                key={value}
+                type="button"
+                className={`px-4 py-2 text-sm rounded-lg border transition-colors ${stages.includes(value) ? active : "bg-gray-100 text-gray-700 border-gray-300"
+                  }`}
+                onClick={() => toggleStage(value)}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+          {stages.length > 0 && (
+            <p className="text-xs text-gray-500 mt-1">
+              Selected: {stages.join(", ")}
+            </p>
+          )}
         </div>
 
         {/* Priority */}

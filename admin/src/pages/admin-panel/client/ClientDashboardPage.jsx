@@ -31,16 +31,19 @@ const ClientDashboardPage = () => {
     fetchClients();
   }, []);
 
-  const filteredClients = clients.filter((client) => {
-    const matchesSearch =
-      client.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "All" || client.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
+  const filteredClients = clients
+    .filter((client) => {
+      const matchesSearch =
+        client.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.email?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === "All" || client.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      if (a.status === "active" && b.status !== "active") return -1;
+      if (a.status !== "active" && b.status === "active") return 1;
+      return 0;
+    });
 
   if (loading) return <LoadingOverlay />;
 
@@ -180,7 +183,7 @@ const ClientDashboardPage = () => {
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-500">
                       <div className={"w-2 h-2 rounded-full " + (client.status === "active" ? "bg-green-500" : "bg-gray-400")} />
-                      <span>{client.status.charAt(0).toUpperCase() + client.status.slice(1)}</span>
+                      <span>{client.status ? client.status.charAt(0).toUpperCase() + client.status.slice(1) : "N/A"}</span>
                     </div>
                   </div>
 

@@ -89,6 +89,24 @@ const ProjectCard = ({ filteredProjects, projectSubtasks, loading, employees }) 
               </span>
             </div>
 
+            {project.stages?.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2 mb-1">
+                {project.stages.map((stage) => {
+                  const stageStyles = {
+                    "CAD Design": "bg-purple-100 text-purple-700 border-purple-200",
+                    "SET Design": "bg-indigo-100 text-indigo-700 border-indigo-200",
+                    "Render": "bg-teal-100   text-teal-700   border-teal-200",
+                  };
+                  return (
+                    <span key={stage}
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${stageStyles[stage] || "bg-gray-100 text-gray-600 border-gray-200"}`}>
+                      {stage}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+
             <div className="project-client">
               <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />

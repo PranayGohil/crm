@@ -12,6 +12,7 @@ const projectSchema = mongoose.Schema(
     ],
     assign_date: Date,
     due_date: Date,
+    stages: [String],
     priority: String,
     status: String,
     description: String,
