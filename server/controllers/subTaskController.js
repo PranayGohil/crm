@@ -8,6 +8,7 @@ import ActivityLogger from "../utils/activityLogger.js";
 
 import mongoose from "mongoose";
 import cloudinary from "../config/cloudinary.js";
+import { getProjectPermissionQuery, canAdminAccessProject } from "../utils/projectPermissions.js";
 
 const FIXED_STAGE_ORDER = [
   "CAD Design",
@@ -114,6 +115,13 @@ export const addSubTask = async (req, res) => {
 
     // Fetch project and client info
     const project = await Project.findById(project_id);
+    if (!project) return res.status(404).json({ success: false, message: "Project not found" });
+
+    // ── PERMISSION CHECK ──
+    if (!canAdminAccessProject(req.user, project)) {
+      return res.status(403).json({ success: false, message: "Access denied. You don't have permission to manage this project's tasks." });
+    }
+
     let clientStagePricing = [];
 
     if (project?.client_id) {
@@ -225,12 +233,14 @@ export const addBulkSubTasks = async (req, res) => {
     console.log("Received tasks:", tasks);
 
     const project = await Project.findById(tasks[0].project_id);
-    let clientStagePricing = [];
+    if (!project) return res.status(404).json({ success: false, message: "Project not found" });
 
-    if (project?.client_id) {
-      const client = await Client.findById(project.client_id);
-      clientStagePricing = client?.stage_pricing || [];
+    // ── PERMISSION CHECK ──
+    if (!canAdminAccessProject(req.user, project)) {
+      return res.status(403).json({ success: false, message: "Access denied. You don't have permission to manage this project's tasks." });
     }
+
+    let clientStagePricing = [];
 
     const tasksWithObjectIds = tasks.map((task) => {
       const parsedStages = Array.isArray(task.stages) ? task.stages : [];
@@ -324,7 +334,55 @@ export const addBulkSubTasks = async (req, res) => {
 // Get all subtasks
 export const getSubTasks = async (req, res) => {
   try {
-    const subTasks = await SubTask.find();
+    const subTasks = await SubTask.aggregate([
+      {
+        $lookup: {
+          from: "projects",
+          localField: "project_id",
+          foreignField: "_id",
+          as: "project",
+        },
+      },
+      { $unwind: { path: "$project", preserveNullAndEmptyArrays: true } },
+      // ── PERMISSION FILTER ──
+      ...(req.user.role !== "super-admin" ? [
+        {
+          $match: {
+            "project.stages": { $in: req.user.manage_stages || [] }
+          }
+        }
+      ] : []),
+      {
+        $lookup: {
+          from: "clients",
+          let: { cid: "$project.client_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: [{ $toString: "$_id" }, "$$cid"],
+                },
+              },
+            },
+            { $project: { status: 1 } },
+          ],
+          as: "client_info",
+        },
+      },
+      {
+        $addFields: {
+          client_status: { $ifNull: [{ $arrayElemAt: ["$client_info.status", 0] }, "active"] },
+        },
+      },
+      {
+        $addFields: {
+          status_weight: {
+            $cond: { if: { $eq: ["$client_status", "inactive"] }, then: 1, else: 0 },
+          },
+        },
+      },
+      { $sort: { status_weight: 1, createdAt: -1 } },
+    ]);
     res.status(200).json(subTasks);
   } catch (error) {
     console.error("Error fetching subtasks:", error);
@@ -336,6 +394,13 @@ export const getSubTasks = async (req, res) => {
 export const getSubtasksByProjectId = async (req, res) => {
   try {
     const { projectId } = req.params;
+    const project = await Project.findById(projectId);
+    if (!project) return res.status(404).json({ message: "Project not found" });
+
+    if (!canAdminAccessProject(req.user, project)) {
+      return res.status(403).json({ success: false, message: "Access denied." });
+    }
+
     const subtasks = await SubTask.find({ project_id: projectId });
     res.status(200).json(subtasks);
   } catch (error) {
@@ -350,9 +415,14 @@ export const getSubTaskInfo = async (req, res) => {
     const { id } = req.params;
     const subTask = await SubTask.findById(id)
       .populate("comments.user_id", "full_name profile_pic")
-    console.log("subTask", subTask);
+      .populate("project_id");
+    
     if (!subTask) {
       return res.status(404).json({ error: "Subtask not found" });
+    }
+
+    if (!canAdminAccessProject(req.user, subTask.project_id)) {
+      return res.status(403).json({ success: false, message: "Access denied." });
     }
     res.status(200).json(subTask);
   } catch (error) {
@@ -379,7 +449,12 @@ export const updateSubTask = async (req, res) => {
 
     console.log("req.body", req.body);
 
-    const originalSubTask = await SubTask.findById(id);
+    const originalSubTask = await SubTask.findById(id).populate("project_id");
+    if (!originalSubTask) return res.status(404).json({ message: "Subtask not found" });
+
+    if (!canAdminAccessProject(req.user, originalSubTask.project_id)) {
+      return res.status(403).json({ success: false, message: "Access denied." });
+    }
 
     // ── Parse stages from "stages" field (frontend sends JSON string via FormData) ──
     let stageArray = [];
@@ -619,9 +694,13 @@ export const completeStage = async (req, res) => {
 export const deleteSubTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const subTask = await SubTask.findById(id);
+    const subTask = await SubTask.findById(id).populate("project_id");
     if (!subTask) {
       return res.status(404).json({ message: "Subtask not found" });
+    }
+
+    if (!canAdminAccessProject(req.user, subTask.project_id)) {
+      return res.status(403).json({ success: false, message: "Access denied." });
     }
     if (subTask.status === "In Progress") {
       return res

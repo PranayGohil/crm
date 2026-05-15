@@ -24,12 +24,16 @@ const ClientDetailsPage = () => {
       try {
         const storedUser = localStorage.getItem("clientUser");
         const clientUser = storedUser ? JSON.parse(storedUser) : null;
+        const token = clientUser?.token;
+        const headers = { Authorization: `Bearer ${token}` };
 
         const res = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/client/get/${clientUser?._id}`
+          `${process.env.REACT_APP_API_URL}/api/client/get/${clientUser?._id}`,
+          { headers }
         );
         const subtasksRes = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/client/tasks/${res.data._id}`
+          `${process.env.REACT_APP_API_URL}/api/client/tasks/${res.data._id}`,
+          { headers }
         );
         setClient({ ...res.data, subtasks: subtasksRes.data || [] });
       } catch (error) {

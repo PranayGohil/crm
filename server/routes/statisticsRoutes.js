@@ -14,3 +14,4 @@ statisticsRouter.get("/recent-projects", RecentProjects);
 statisticsRouter.get("/department-capacities", getDepartmentCapacities);
 
 export default statisticsRouter;
+

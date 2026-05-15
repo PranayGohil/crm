@@ -19,9 +19,10 @@ const SubtaskLogs = () => {
     const fetchSubtaskData = async () => {
       try {
         setLoading(true);
-        const subtaskRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/get/${subtaskId}`);
+        const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
+        const subtaskRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/get/${subtaskId}`, { headers });
         setSubtask(subtaskRes.data);
-        const employeesRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`);
+        const employeesRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`, { headers });
         const empMap = {};
         employeesRes.data.forEach((emp) => { empMap[emp._id] = emp; });
         setEmployees(empMap);

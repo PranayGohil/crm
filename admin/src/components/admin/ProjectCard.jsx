@@ -26,7 +26,9 @@ const ProjectCard = ({ filteredProjects, projectSubtasks, loading, employees }) 
       try {
         const results = await Promise.all(
           ids.map((id) =>
-            axios.get(`${process.env.REACT_APP_API_URL}/api/client/get/${id}`)
+            axios.get(`${process.env.REACT_APP_API_URL}/api/client/get/${id}`, {
+              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+            })
               .then((res) => ({ id, name: res.data.full_name }))
               .catch(() => ({ id, name: "Unknown Client" }))
           )

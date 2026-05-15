@@ -18,7 +18,10 @@ const TeamMemberProfile = () => {
     const fetchEmployee = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get/${id}`);
+        const u = JSON.parse(localStorage.getItem("employeeUser"));
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get/${id}`, {
+          headers: { Authorization: `Bearer ${u?.token}` }
+        });
         setEmployee(res.data);
       } catch (err) {
         console.error("Failed to fetch employee:", err);

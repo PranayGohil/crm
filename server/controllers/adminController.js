@@ -9,7 +9,9 @@ const generateToken = (admin) => {
   return jwt.sign(
     {
       id: admin._id,
-      role: admin.role
+      role: admin.role,
+      sales_permissions: admin.sales_permissions || [],
+      manage_stages: admin.manage_stages || []
     },
     process.env.JWT_SECRET,
     { expiresIn: "90d" }
@@ -72,7 +74,9 @@ export const adminLogin = async (req, res) => {
         username: admin.username,
         email: admin.email,
         profile_pic: admin.profile_pic,
-        role: admin.role
+        role: admin.role,
+        sales_permissions: admin.sales_permissions || [],
+        manage_stages: admin.manage_stages || []
       },
     });
   } catch (err) {
@@ -102,7 +106,7 @@ export const getAllAdmins = async (req, res) => {
 // Create new admin (super-admin only)
 export const createAdmin = async (req, res) => {
   try {
-    const { username, email, password, phone } = req.body;
+    const { username, email, password, phone, sales_permissions, manage_stages } = req.body;
 
     // Check if admin already exists
     const existingAdmin = await Admin.findOne({
@@ -125,12 +129,36 @@ export const createAdmin = async (req, res) => {
       };
     }
 
+    let parsedPermissions = [];
+    if (sales_permissions) {
+      try {
+        parsedPermissions = typeof sales_permissions === 'string' 
+          ? JSON.parse(sales_permissions) 
+          : sales_permissions;
+      } catch (e) {
+        console.error("Parse sales_permissions error:", e);
+      }
+    }
+
+    let parsedStages = [];
+    if (manage_stages) {
+      try {
+        parsedStages = typeof manage_stages === 'string' 
+          ? JSON.parse(manage_stages) 
+          : manage_stages;
+      } catch (e) {
+        console.error("Parse manage_stages error:", e);
+      }
+    }
+
     // Create new admin (always create as 'admin' role, never as super-admin)
     const newAdmin = new Admin({
       username,
       email,
       password,
       phone,
+      sales_permissions: parsedPermissions,
+      manage_stages: parsedStages,
       role: 'admin', // Always set to admin when creating new
       createdBy: req.user.id,
       ...profilePicData
@@ -187,7 +215,7 @@ export const createAdmin = async (req, res) => {
 export const updateAdmin = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, email, phone, isActive } = req.body;
+    const { username, email, phone, isActive, sales_permissions, manage_stages, role } = req.body;
 
     const admin = await Admin.findById(id);
     if (!admin) {
@@ -211,14 +239,37 @@ export const updateAdmin = async (req, res) => {
       email: admin.email,
       phone: admin.phone,
       isActive: admin.isActive,
-      profile_pic: admin.profile_pic
+      profile_pic: admin.profile_pic,
+      sales_permissions: admin.sales_permissions,
+      manage_stages: admin.manage_stages
     };
 
     // Update fields
     if (username) admin.username = username;
     if (email) admin.email = email;
     if (phone) admin.phone = phone;
+    if (role) admin.role = role;
     if (typeof isActive === 'boolean') admin.isActive = isActive;
+    
+    if (sales_permissions) {
+      try {
+        admin.sales_permissions = typeof sales_permissions === 'string' 
+          ? JSON.parse(sales_permissions) 
+          : sales_permissions;
+      } catch (e) {
+        console.error("Parse sales_permissions error:", e);
+      }
+    }
+
+    if (manage_stages) {
+      try {
+        admin.manage_stages = typeof manage_stages === 'string' 
+          ? JSON.parse(manage_stages) 
+          : manage_stages;
+      } catch (e) {
+        console.error("Parse manage_stages error:", e);
+      }
+    }
 
     if (req.file) {
       // Delete old Cloudinary image

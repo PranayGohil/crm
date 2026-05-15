@@ -4,6 +4,7 @@ import Employee from "../models/employeeModel.js";
 import Client from "../models/clientModel.js";
 import ActivityLogger from "../utils/activityLogger.js";
 import mongoose from "mongoose";
+import { getProjectPermissionQuery, canAdminAccessProject } from "../utils/projectPermissions.js";
 
 // Helper function to get related info for logging
 const getRelatedInfo = async (clientId, employeeIds = []) => {
@@ -102,13 +103,87 @@ export const addProject = async (req, res) => {
 };
 
 export const getProjects = async (req, res) => {
-  const projects = await Project.find({ isArchived: false });
-  res.status(200).json(projects);
+  try {
+    const permissionQuery = getProjectPermissionQuery(req.user);
+    const projects = await Project.aggregate([
+      { $match: { isArchived: false, ...permissionQuery } },
+      {
+        $lookup: {
+          from: "clients",
+          let: { cid: "$client_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: [{ $toString: "$_id" }, "$$cid"],
+                },
+              },
+            },
+            { $project: { status: 1 } },
+          ],
+          as: "client_info",
+        },
+      },
+      {
+        $addFields: {
+          client_status: { $ifNull: [{ $arrayElemAt: ["$client_info.status", 0] }, "active"] },
+        },
+      },
+      {
+        $addFields: {
+          status_weight: {
+            $cond: { if: { $eq: ["$client_status", "inactive"] }, then: 1, else: 0 },
+          },
+        },
+      },
+      { $sort: { status_weight: 1, createdAt: -1 } },
+    ]);
+    res.status(200).json(projects);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 export const getProjectWithArchived = async (req, res) => {
-  const projects = await Project.find({});
-  res.status(200).json(projects);
+  try {
+    const permissionQuery = getProjectPermissionQuery(req.user);
+    const projects = await Project.aggregate([
+      { $match: permissionQuery },
+      {
+        $lookup: {
+          from: "clients",
+          let: { cid: "$client_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: [{ $toString: "$_id" }, "$$cid"],
+                },
+              },
+            },
+            { $project: { status: 1 } },
+          ],
+          as: "client_info",
+        },
+      },
+      {
+        $addFields: {
+          client_status: { $ifNull: [{ $arrayElemAt: ["$client_info.status", 0] }, "active"] },
+        },
+      },
+      {
+        $addFields: {
+          status_weight: {
+            $cond: { if: { $eq: ["$client_status", "inactive"] }, then: 1, else: 0 },
+          },
+        },
+      },
+      { $sort: { status_weight: 1, createdAt: -1 } },
+    ]);
+    res.status(200).json(projects);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 export const updateProject = async (req, res) => {
@@ -130,6 +205,13 @@ export const updateProject = async (req, res) => {
     };
 
     const originalProject = await Project.findById(req.params.id);
+    if (!originalProject) {
+      return res.status(404).json({ success: false, message: "Project not found" });
+    }
+
+    if (!canAdminAccessProject(req.user, originalProject)) {
+      return res.status(403).json({ success: false, message: "Access denied. You don't have permission to manage this project's stages." });
+    }
 
     const updatedProject = await Project.findByIdAndUpdate(req.params.id, updatedFields, { new: true });
 
@@ -180,6 +262,15 @@ export const updateProject = async (req, res) => {
 export const deleteProject = async (req, res) => {
   try {
     const { id } = req.params;
+
+    const p = await Project.findById(id);
+    if (!p) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    if (!canAdminAccessProject(req.user, p)) {
+      return res.status(403).json({ success: false, message: "Access denied. You don't have permission to delete this project." });
+    }
 
     // Find subtasks related to this project
     const subtasks = await SubTask.find({ project_id: id });
@@ -252,6 +343,10 @@ export const getProjectInfo = async (req, res) => {
         .json({ success: false, message: "Project not found" });
     }
 
+    if (!canAdminAccessProject(req.user, project)) {
+      return res.status(403).json({ success: false, message: "Access denied. You don't have permission to view this project." });
+    }
+
     res.status(200).json({ success: true, project });
   } catch (error) {
     console.error("Error fetching project info:", error);
@@ -274,6 +369,10 @@ export const changeProjectStatus = async (req, res) => {
     const project = await Project.findById(projectId);
     if (!project) {
       return res.status(404).json({ message: "Project not found." });
+    }
+
+    if (!canAdminAccessProject(req.user, project)) {
+      return res.status(403).json({ success: false, message: "Access denied." });
     }
 
     const oldStatus = project.status;
@@ -331,6 +430,10 @@ export const changeProjectPriority = async (req, res) => {
     const project = await Project.findById(projectId);
     if (!project) {
       return res.status(404).json({ message: "Project not found." });
+    }
+
+    if (!canAdminAccessProject(req.user, project)) {
+      return res.status(403).json({ success: false, message: "Access denied." });
     }
 
     const oldPriority = project.priority;
@@ -392,6 +495,10 @@ export const addProjectContent = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Project not found" });
+    }
+
+    if (!canAdminAccessProject(req.user, project)) {
+      return res.status(403).json({ success: false, message: "Access denied." });
     }
 
     console.log("Project found:", project);
@@ -464,7 +571,8 @@ export const getAllProjectsWithTasks = async (req, res) => {
     const skip = (Number(page) - 1) * Number(limit);
 
     // ── 1. Build project-level match ──────────────────────────────────
-    const projectMatch = { isArchived: false };
+    const permissionQuery = getProjectPermissionQuery(req.user);
+    const projectMatch = { isArchived: false, ...permissionQuery };
 
     if (search) {
       projectMatch.project_name = { $regex: search, $options: "i" };
@@ -500,6 +608,37 @@ export const getAllProjectsWithTasks = async (req, res) => {
     // ── 3. Aggregation pipeline ───────────────────────────────────────
     const pipeline = [
       { $match: projectMatch },
+
+      // Join client info to get status for sorting
+      {
+        $lookup: {
+          from: "clients",
+          let: { cid: "$client_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: [{ $toString: "$_id" }, "$$cid"],
+                },
+              },
+            },
+            { $project: { status: 1 } },
+          ],
+          as: "client_info",
+        },
+      },
+      {
+        $addFields: {
+          client_status: { $ifNull: [{ $arrayElemAt: ["$client_info.status", 0] }, "active"] },
+        },
+      },
+      {
+        $addFields: {
+          status_weight: {
+            $cond: { if: { $eq: ["$client_status", "inactive"] }, then: 1, else: 0 },
+          },
+        },
+      },
 
       // Join subtasks — filter them in the pipeline so we only pull
       // the fields we actually render in the table.
@@ -546,7 +685,7 @@ export const getAllProjectsWithTasks = async (req, res) => {
       Project.aggregate([...pipeline, { $count: "total" }]),
       Project.aggregate([
         ...pipeline,
-        { $sort: { createdAt: -1 } },
+        { $sort: { status_weight: 1, createdAt: -1 } },
         { $skip: skip },
         { $limit: Number(limit) },
         // Only send project fields the table renders
@@ -554,6 +693,7 @@ export const getAllProjectsWithTasks = async (req, res) => {
           $project: {
             project_name: 1,
             client_id: 1,
+            client_status: 1,
             assign_date: 1,
             due_date: 1,
             priority: 1,
@@ -648,6 +788,35 @@ export const getProjectsForReportingManager = async (req, res) => {
       { $match: projectMatch },
       {
         $lookup: {
+          from: "clients",
+          let: { cid: "$client_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: [{ $toString: "$_id" }, "$$cid"],
+                },
+              },
+            },
+            { $project: { status: 1 } },
+          ],
+          as: "client_info",
+        },
+      },
+      {
+        $addFields: {
+          client_status: { $ifNull: [{ $arrayElemAt: ["$client_info.status", 0] }, "active"] },
+        },
+      },
+      {
+        $addFields: {
+          status_weight: {
+            $cond: { if: { $eq: ["$client_status", "inactive"] }, then: 1, else: 0 },
+          },
+        },
+      },
+      {
+        $lookup: {
           from: "subtasks",
           let: { pid: "$_id" },
           pipeline: subtaskPipeline,
@@ -661,12 +830,12 @@ export const getProjectsForReportingManager = async (req, res) => {
       Project.aggregate([...pipeline, { $count: "total" }]),
       Project.aggregate([
         ...pipeline,
-        { $sort: { createdAt: -1 } },
+        { $sort: { status_weight: 1, createdAt: -1 } },
         { $skip: skip },
         { $limit: Number(limit) },
         {
           $project: {
-            project_name: 1, client_id: 1,
+            project_name: 1, client_id: 1, client_status: 1,
             assign_date: 1, due_date: 1,
             priority: 1, status: 1, subtasks: 1,
           },
@@ -693,10 +862,16 @@ export const bulkUpdate = async (req, res) => {
   const { ids, field, value } = req.body;
 
   try {
-    // Get projects before update
-    const projects = await Project.find({ _id: { $in: ids } });
+    const permissionQuery = getProjectPermissionQuery(req.user);
+    // Get projects before update - filter by permission
+    const projects = await Project.find({ _id: { $in: ids }, ...permissionQuery });
+    const allowedIds = projects.map(p => p._id);
 
-    await Project.updateMany({ _id: { $in: ids } }, { [field]: value });
+    if (allowedIds.length === 0) {
+      return res.status(403).json({ success: false, message: "No authorized projects found for bulk update." });
+    }
+
+    await Project.updateMany({ _id: { $in: allowedIds } }, { [field]: value });
 
     // 📝 LOG ACTIVITY
     const logger = new ActivityLogger(req);
@@ -728,11 +903,17 @@ export const bulkDelete = async (req, res) => {
   const { ids } = req.body;
 
   try {
-    // Get projects before deletion
-    const projects = await Project.find({ _id: { $in: ids } });
+    const permissionQuery = getProjectPermissionQuery(req.user);
+    // Get projects before deletion - filter by permission
+    const projects = await Project.find({ _id: { $in: ids }, ...permissionQuery });
+    const allowedIds = projects.map(p => p._id);
 
-    await Project.deleteMany({ _id: { $in: ids } });
-    await SubTask.deleteMany({ project_id: { $in: ids } });
+    if (allowedIds.length === 0) {
+      return res.status(403).json({ success: false, message: "No authorized projects found for bulk deletion." });
+    }
+
+    await Project.deleteMany({ _id: { $in: allowedIds } });
+    await SubTask.deleteMany({ project_id: { $in: allowedIds } });
 
     // 📝 LOG ACTIVITY
     const logger = new ActivityLogger(req);
@@ -762,6 +943,18 @@ export const archiveProject = async (req, res) => {
     const project = await Project.findById(projectId);
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
+    }
+
+    if (!canAdminAccessProject(req.user, project)) {
+      return res.status(403).json({ success: false, message: "Access denied." });
+    }
+
+    // ── NEW BUSINESS RULE: ONLY COMPLETED PROJECTS CAN BE ARCHIVED ──────────
+    if (project.status !== "Completed") {
+      return res.status(400).json({
+        success: false,
+        message: "Only completed projects can be archived"
+      });
     }
 
     const updatedProject = await Project.findByIdAndUpdate(
@@ -801,6 +994,10 @@ export const unarchiveProject = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
+    if (!canAdminAccessProject(req.user, project)) {
+      return res.status(403).json({ success: false, message: "Access denied." });
+    }
+
     const updatedProject = await Project.findByIdAndUpdate(
       projectId,
       { isArchived: false, archivedAt: null },
@@ -831,7 +1028,8 @@ export const unarchiveProject = async (req, res) => {
 
 export const getArchivedProjects = async (req, res) => {
   try {
-    const projects = await Project.find({ isArchived: true });
+    const permissionQuery = getProjectPermissionQuery(req.user);
+    const projects = await Project.find({ isArchived: true, ...permissionQuery });
     res.json(projects);
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
 const AuthContext = createContext();
 
@@ -9,19 +10,38 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setUser({
-          ...decoded,
-          token
-        });
-      } catch (error) {
-        localStorage.removeItem("token");
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          // First set basic info from token to show UI quickly
+          const decoded = jwtDecode(token);
+          setUser({ ...decoded, token });
+
+          // Then fetch full profile for latest permissions/data
+          const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/profile`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          if (res.data.success) {
+            setUser({
+              ...decoded,
+              ...res.data.admin,
+              token
+            });
+          }
+        } catch (error) {
+          console.error("Auth initialization error:", error);
+          if (error.response?.status === 401) {
+            localStorage.removeItem("token");
+            setUser(null);
+          }
+        }
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+
+    fetchProfile();
   }, []);
 
   const login = (data) => {

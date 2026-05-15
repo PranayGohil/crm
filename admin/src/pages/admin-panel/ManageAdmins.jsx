@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../contexts/AuthContext";
 import LoadingOverlay from "../../components/admin/LoadingOverlay";
-import { FaEdit, FaTrash, FaPlus, FaUserShield, FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaUserShield, FaUser, FaEye, FaEyeSlash, FaCheckSquare, FaSquare } from "react-icons/fa";
+import { SALES_PERMISSIONS, PROJECT_STAGES } from "../../constants";
 
 const inputCls = "w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
 const labelCls = "block text-sm font-medium text-gray-700 mb-1";
@@ -15,7 +16,14 @@ const ManageAdmins = () => {
     const [showModal, setShowModal] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [editingAdmin, setEditingAdmin] = useState(null);
-    const [formData, setFormData] = useState({ username: "", email: "", password: "", phone: "" });
+    const [formData, setFormData] = useState({ 
+        username: "", 
+        email: "", 
+        password: "", 
+        phone: "",
+        sales_permissions: [],
+        manage_stages: []
+    });
     const [profilePic, setProfilePic] = useState(null);
 
     useEffect(() => { fetchAdmins(); }, []);
@@ -42,7 +50,13 @@ const ManageAdmins = () => {
         try {
             const token = localStorage.getItem("token");
             const fd = new FormData();
-            Object.keys(formData).forEach((k) => { if (formData[k]) fd.append(k, formData[k]); });
+            Object.keys(formData).forEach((k) => { 
+                if (k === "sales_permissions" || k === "manage_stages") {
+                    fd.append(k, JSON.stringify(formData[k]));
+                } else if (formData[k]) {
+                    fd.append(k, formData[k]); 
+                }
+            });
             if (profilePic) fd.append("profile_pic", profilePic);
 
             const url = editingAdmin
@@ -56,7 +70,7 @@ const ManageAdmins = () => {
             if (res.data.success) {
                 setShowModal(false);
                 setEditingAdmin(null);
-                setFormData({ username: "", email: "", password: "", phone: "" });
+                setFormData({ username: "", email: "", password: "", phone: "", sales_permissions: [], manage_stages: [] });
                 setProfilePic(null);
                 fetchAdmins();
             }
@@ -80,7 +94,14 @@ const ManageAdmins = () => {
 
     const openEditModal = (admin) => {
         setEditingAdmin(admin);
-        setFormData({ username: admin.username, email: admin.email, phone: admin.phone || "", password: "" });
+        setFormData({ 
+            username: admin.username, 
+            email: admin.email, 
+            phone: admin.phone || "", 
+            password: "",
+            sales_permissions: admin.sales_permissions || [],
+            manage_stages: admin.manage_stages || []
+        });
         setShowModal(true);
     };
 
@@ -96,7 +117,7 @@ const ManageAdmins = () => {
                         <button
                             onClick={() => {
                                 setEditingAdmin(null);
-                                setFormData({ username: "", email: "", password: "", phone: "" });
+                                setFormData({ username: "", email: "", password: "", phone: "", sales_permissions: [], manage_stages: [] });
                                 setProfilePic(null);
                                 setShowModal(true);
                             }}
@@ -200,6 +221,71 @@ const ManageAdmins = () => {
                                 <label className={labelCls}>Phone</label>
                                 <input type="text" name="phone" value={formData.phone} onChange={handleInputChange}
                                     className={inputCls} />
+                            </div>
+
+                            <div>
+                                <label className={labelCls}>Sales Permissions</label>
+                                <div className="space-y-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                    <label className="flex items-center gap-2 cursor-pointer group">
+                                        <input 
+                                            type="checkbox" 
+                                            className="hidden"
+                                            checked={formData.sales_permissions.includes(SALES_PERMISSIONS.MUKHWAS)}
+                                            onChange={(e) => {
+                                                const perms = e.target.checked 
+                                                    ? [...formData.sales_permissions, SALES_PERMISSIONS.MUKHWAS]
+                                                    : formData.sales_permissions.filter(p => p !== SALES_PERMISSIONS.MUKHWAS);
+                                                setFormData({ ...formData, sales_permissions: perms });
+                                            }}
+                                        />
+                                        {formData.sales_permissions.includes(SALES_PERMISSIONS.MUKHWAS) 
+                                            ? <FaCheckSquare className="text-blue-600" /> 
+                                            : <FaSquare className="text-gray-300" />}
+                                        <span className="text-sm text-gray-700">Mukhwas Sales</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer group">
+                                        <input 
+                                            type="checkbox" 
+                                            className="hidden"
+                                            checked={formData.sales_permissions.includes(SALES_PERMISSIONS.BREELIQ)}
+                                            onChange={(e) => {
+                                                const perms = e.target.checked 
+                                                    ? [...formData.sales_permissions, SALES_PERMISSIONS.BREELIQ]
+                                                    : formData.sales_permissions.filter(p => p !== SALES_PERMISSIONS.BREELIQ);
+                                                setFormData({ ...formData, sales_permissions: perms });
+                                            }}
+                                        />
+                                        {formData.sales_permissions.includes(SALES_PERMISSIONS.BREELIQ) 
+                                            ? <FaCheckSquare className="text-blue-600" /> 
+                                            : <FaSquare className="text-gray-300" />}
+                                        <span className="text-sm text-gray-700">Breeliq Sales</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className={labelCls}>Stage Permissions</label>
+                                <div className="grid grid-cols-2 gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                    {PROJECT_STAGES.map(stage => (
+                                        <label key={stage} className="flex items-center gap-2 cursor-pointer group">
+                                            <input 
+                                                type="checkbox" 
+                                                className="hidden"
+                                                checked={formData.manage_stages.includes(stage)}
+                                                onChange={(e) => {
+                                                    const stages = e.target.checked 
+                                                        ? [...formData.manage_stages, stage]
+                                                        : formData.manage_stages.filter(s => s !== stage);
+                                                    setFormData({ ...formData, manage_stages: stages });
+                                                }}
+                                            />
+                                            {formData.manage_stages.includes(stage) 
+                                                ? <FaCheckSquare className="text-blue-600" /> 
+                                                : <FaSquare className="text-gray-300" />}
+                                            <span className="text-sm text-gray-700">{stage}</span>
+                                        </label>
+                                    ))}
+                                </div>
                             </div>
 
                             <div className="flex justify-end gap-3 pt-2">

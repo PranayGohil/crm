@@ -19,9 +19,11 @@ import {
   stopTimer,
 } from "../controllers/subTaskController.js";
 import upload from "../middlewares/upload.js";
-import { verifyToken } from "../middlewares/auth.js";
+import { protectAny } from "../middlewares/auth.js";
 
 const subTaskRouter = express.Router();
+
+subTaskRouter.use(protectAny);
 
 subTaskRouter.get("/get-all", getSubTasks);
 subTaskRouter.get("/project/:projectId", getSubtasksByProjectId);
@@ -44,14 +46,15 @@ subTaskRouter.post("/add-comment/:subtaskId", addComment);
 
 subTaskRouter.post(
   "/add-media/:subtaskId",
-  verifyToken,
+  
   upload.array("media_files", 10), // "media_file" must match FormData key in frontend
   addMedia
 );
 
-subTaskRouter.post("/remove-media/:subtaskId", verifyToken, removeMedia);
+subTaskRouter.post("/remove-media/:subtaskId",  removeMedia);
 
 subTaskRouter.put("/subtask/start-timer/:subtaskId", startTimer);
 subTaskRouter.put("/subtask/stop-timer/:subtaskId", stopTimer);
 
 export default subTaskRouter;
+

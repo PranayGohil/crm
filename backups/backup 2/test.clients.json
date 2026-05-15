@@ -1,0 +1,2167 @@
+[{
+  "_id": {
+    "$oid": "6894239a8c338a6ab91d03d1"
+  },
+  "full_name": "Azzure",
+  "email": "Azzure@123",
+  "phone": "+1 (732) 532-7595",
+  "joining_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "Azzure",
+  "client_type": "design",
+  "password": "Azzure@123",
+  "company_name": "Azzure Diamond",
+  "gst_number": "",
+  "business_phone": "+1 (732) 532-7595",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-07T03:55:06.185Z"
+  },
+  "__v": 1,
+  "status": "inactive",
+  "stage_pricing": []
+},
+{
+  "_id": {
+    "$oid": "68946c258c338a6ab925f4aa"
+  },
+  "full_name": "umairbhai",
+  "email": "mair@gimail.com",
+  "phone": "+1(516)7102307",
+  "joining_date": {
+    "$date": "2025-08-07T00:00:00.000Z"
+  },
+  "address": "NewYork,USA",
+  "username": "UMAIR",
+  "client_type": "design",
+  "password": "Umair@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-07T09:04:37.619Z"
+  },
+  "__v": 1,
+  "status": "active",
+  "stage_pricing": []
+},
+{
+  "_id": {
+    "$oid": "68958edc8c338a6ab92c9564"
+  },
+  "full_name": "DEZA",
+  "email": "deza.here@gmail.com",
+  "phone": "9909580666",
+  "joining_date": {
+    "$date": "2025-08-01T00:00:00.000Z"
+  },
+  "address": "Mota varachha,Surat",
+  "username": "Deza",
+  "client_type": "Design + render ",
+  "password": "Khushal@1695",
+  "company_name": "DEZA",
+  "gst_number": "",
+  "business_phone": "9909580666",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-08T05:45:00.807Z"
+  },
+  "__v": 1,
+  "status": "active",
+  "stage_pricing": []
+},
+{
+  "_id": {
+    "$oid": "689abbe84dfb81c1e07f78a4"
+  },
+  "full_name": "Aaron bhai",
+  "email": "Aaron@gmail.com",
+  "phone": "+1(619)8089782",
+  "joining_date": {
+    "$date": "2025-08-01T00:00:00.000Z"
+  },
+  "address": "usa",
+  "username": "Aronbhai",
+  "client_type": "Design + render ",
+  "password": "Aron@123",
+  "company_name": "Aaron",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-12T03:58:32.683Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68ae8de61cabf4931dc6414e"
+  },
+  "full_name": "Janak Suhagiya",
+  "email": "jweldimexport@gmail.com",
+  "phone": "+919924799099",
+  "joining_date": {
+    "$date": "2025-08-15T00:00:00.000Z"
+  },
+  "address": "Surat",
+  "username": "janaksuhagiya",
+  "client_type": "Surat",
+  "password": "Janak@1234",
+  "company_name": "Gurukrupa Gems",
+  "gst_number": "",
+  "business_phone": "9924799099",
+  "website": "http://gurukrupagems.co/",
+  "linkedin": "",
+  "business_address": "House no 7-8/1st floor gayatri bag society opp. surat store varachha road,surat gujarat ",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-27T04:47:34.659Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68ae92f41cabf4931dc64bc2"
+  },
+  "full_name": "khushalbhai",
+  "email": "deza@gmail.com",
+  "phone": "9909580666",
+  "joining_date": {
+    "$date": "2025-08-20T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "DEZA",
+  "client_type": "creative",
+  "password": "Khushal@1695",
+  "company_name": "deza",
+  "gst_number": "",
+  "business_phone": "9909580666",
+  "website": "",
+  "linkedin": "",
+  "business_address": "surat",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-27T05:09:08.453Z"
+  },
+  "__v": 1,
+  "status": "inactive",
+  "stage_pricing": []
+},
+{
+  "_id": {
+    "$oid": "68ae9dad1cabf4931dc65ec2"
+  },
+  "full_name": "abhishek jain",
+  "email": "abhishek@gmail.com",
+  "phone": "99789 17994",
+  "joining_date": {
+    "$date": "2025-08-13T00:00:00.000Z"
+  },
+  "address": "Indor",
+  "username": "Abhishek",
+  "client_type": "render ",
+  "password": "Abhishek@123",
+  "company_name": "abhishek jain",
+  "gst_number": "",
+  "business_phone": "99789 17994",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-27T05:54:53.582Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68aecd6f1cabf4931dc6a99e"
+  },
+  "full_name": "SAMPLE ",
+  "email": "axaybhalala@gmail.com",
+  "phone": "8320972601",
+  "joining_date": {
+    "$date": "2025-08-27T00:00:00.000Z"
+  },
+  "address": "SURAT",
+  "username": "AXAY",
+  "client_type": "SEMPLE",
+  "password": "AXAY@123",
+  "company_name": "ABC",
+  "gst_number": "",
+  "business_phone": "8320972601",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-27T09:18:39.359Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68b01e191cabf4931dc6e1c3"
+  },
+  "full_name": "Suraj Podar",
+  "email": "Surajbhai@123",
+  "phone": "+32 473 56 57 58",
+  "joining_date": {
+    "$date": "2025-08-15T00:00:00.000Z"
+  },
+  "address": "Belgium",
+  "username": "Surajbhai",
+  "client_type": "cad and render",
+  "password": "Surajbhai@123",
+  "company_name": "Uniglow BV",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-28T09:15:05.622Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68b0407f1cabf4931dc70774"
+  },
+  "full_name": "Akash thesiya",
+  "email": "Akash@123",
+  "phone": "+1 (628) 219-4774",
+  "joining_date": {
+    "$date": "2025-08-28T00:00:00.000Z"
+  },
+  "address": "UK",
+  "username": "Akash",
+  "client_type": "render",
+  "password": "Akash@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-28T11:41:51.033Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68b041021cabf4931dc70810"
+  },
+  "full_name": "Chintanbhai",
+  "email": "Chintan@123",
+  "phone": "+44 20 7916 3138",
+  "joining_date": {
+    "$date": "2025-08-15T00:00:00.000Z"
+  },
+  "address": "UK",
+  "username": "Cintanbhai",
+  "client_type": "cad and render",
+  "password": "Cintanbhai@123",
+  "company_name": "Diamond doves",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-28T11:44:02.100Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68b0480a1cabf4931dc72185"
+  },
+  "full_name": "~RICHARD FLEURY",
+  "email": "Richard@123",
+  "phone": "+33 6 64 26 38 91",
+  "joining_date": {
+    "$date": "2025-08-05T00:00:00.000Z"
+  },
+  "address": "france",
+  "username": "Richard",
+  "client_type": "cad and render",
+  "password": "Richard@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-28T12:14:02.537Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68b04cb31cabf4931dc72a69"
+  },
+  "full_name": "Roland",
+  "email": "Roland@123",
+  "phone": "+1 (626) 422-7480",
+  "joining_date": {
+    "$date": "2025-08-28T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "Roland",
+  "client_type": "cad",
+  "password": "Roland@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-28T12:33:55.805Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68b04dfc1cabf4931dc72d97"
+  },
+  "full_name": "Richa kediya",
+  "email": "Richakediya@123",
+  "phone": "+91 98709 99101",
+  "joining_date": {
+    "$date": "2025-08-15T00:00:00.000Z"
+  },
+  "address": "Rajsthan",
+  "username": "Richa",
+  "client_type": "cad and render",
+  "password": "Richa@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-28T12:39:24.462Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68b26d3be984d4a8fb41039d"
+  },
+  "full_name": "vahan ",
+  "email": "vahan@gmail.com",
+  "phone": "+1 (646) 538-0808",
+  "joining_date": {
+    "$date": "2025-01-01T00:00:00.000Z"
+  },
+  "address": "newyourk",
+  "username": "vahan",
+  "client_type": "ring ",
+  "password": "Vahan@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-30T03:17:15.986Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68b2890ee984d4a8fb41839e"
+  },
+  "full_name": "Marchell",
+  "email": "marchell@gmail.com",
+  "phone": "+1 (646) 509-1819",
+  "joining_date": {
+    "$date": "2025-08-08T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "Marchell",
+  "client_type": "ring",
+  "password": "Marchell@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-30T05:15:58.565Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68b291b1e984d4a8fb41ad19"
+  },
+  "full_name": "kojo",
+  "email": "kojo@123gmail.com",
+  "phone": "+91 97468 67738",
+  "joining_date": {
+    "$date": "2025-08-01T00:00:00.000Z"
+  },
+  "address": "surat ",
+  "username": "Kojo",
+  "client_type": "rinder ",
+  "password": "Kojo@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-08-30T05:52:49.521Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68b5251ce984d4a8fb436ead"
+  },
+  "full_name": "troy weber",
+  "email": "troy@123",
+  "phone": "+1 (916) 792-4360",
+  "joining_date": {
+    "$date": "2025-07-15T00:00:00.000Z"
+  },
+  "address": "abc",
+  "username": "Troyweber",
+  "client_type": "ring",
+  "password": "Troyweber@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-01T04:46:20.106Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68b5294ae984d4a8fb438e5b"
+  },
+  "full_name": "smit bhai",
+  "email": "smitbhai@gmail.com",
+  "phone": "7779024070",
+  "joining_date": {
+    "$date": "2025-09-01T00:00:00.000Z"
+  },
+  "address": "india",
+  "username": "smitbhai",
+  "client_type": "sample",
+  "password": "Smitbhai@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-01T05:04:10.153Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68b67c83e984d4a8fb47a339"
+  },
+  "full_name": "bhavy",
+  "email": "bhavy@gmail.com",
+  "phone": "836 907 0346",
+  "joining_date": {
+    "$date": "2025-08-15T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Bhavy",
+  "client_type": "design",
+  "password": "Bhavy@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-02T05:11:31.611Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68ba6140e984d4a8fb4e3933"
+  },
+  "full_name": "jemish bhai",
+  "email": "jemish@123",
+  "phone": "+91 89052 17517",
+  "joining_date": {
+    "$date": "2025-09-04T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "jemishbhai",
+  "client_type": "cad+render ",
+  "password": "Vivek@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-05T04:04:16.083Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68bea8938e4b1f73d2294f9e"
+  },
+  "full_name": "Ansh bhai jodhani",
+  "email": "ansh@gmail.com",
+  "phone": "+1 (862) 295-8906",
+  "joining_date": {
+    "$date": "2025-08-11T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Ansh",
+  "client_type": "cad+render",
+  "password": "Ansh@123",
+  "company_name": "jodhani Export ",
+  "gst_number": "",
+  "business_phone": "+1 (862) 295-8906",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-08T09:57:39.413Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c108a98e4b1f73d22b9718"
+  },
+  "full_name": "Breeliq ",
+  "email": "breeliq@123",
+  "phone": "9316851484",
+  "joining_date": {
+    "$date": "2025-07-02T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Breeliq",
+  "client_type": "cad+render ",
+  "password": "Breeliq@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-10T05:12:09.368Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c1406f8e4b1f73d22f9894"
+  },
+  "full_name": "Abdullah",
+  "email": "Abdullah@gmail.com",
+  "phone": "+20 12 23433239",
+  "joining_date": {
+    "$date": "2025-07-16T00:00:00.000Z"
+  },
+  "address": "Egypt",
+  "username": "Abdullah",
+  "client_type": "cad +render ",
+  "password": "Abdullah@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-10T09:10:07.356Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c259a88e4b1f73d2331d6f"
+  },
+  "full_name": "Minal jewel",
+  "email": "minal@gmail.com",
+  "phone": "+91 93720 87359",
+  "joining_date": {
+    "$date": "2025-03-11T00:00:00.000Z"
+  },
+  "address": "bombay",
+  "username": "Minal",
+  "client_type": "Render ",
+  "password": "Minal@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-11T05:10:00.494Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c2bca477ebe84022e96869"
+  },
+  "full_name": "jwalin",
+  "email": "jwalin@gmail.com",
+  "phone": "+91 95588 12094",
+  "joining_date": {
+    "$date": "2025-08-01T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Jwalin",
+  "client_type": "render ",
+  "password": "Jwalin@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-11T12:12:20.491Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c3ac1977ebe84022ec819a"
+  },
+  "full_name": "Ayush",
+  "email": "Ayush@gmail.com",
+  "phone": "+91 90580 00555",
+  "joining_date": {
+    "$date": "2025-08-01T00:00:00.000Z"
+  },
+  "address": "Surat",
+  "username": "Ayush",
+  "client_type": "render",
+  "password": "Ayush@123",
+  "company_name": "VED Jwels",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-12T05:14:01.993Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c3e63d77ebe84022ef591a"
+  },
+  "full_name": "ENGRAVE",
+  "email": "ENGRAVE@gmail.com",
+  "phone": "33 6 07 94 44 48",
+  "joining_date": {
+    "$date": "2025-09-12T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "ENGRAVE",
+  "client_type": "render",
+  "password": "ENGRAVE@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-12T09:22:05.878Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c4fb1d77ebe84022f1dfee"
+  },
+  "full_name": "Neha",
+  "email": "Neha@gmail.com",
+  "phone": "+91 85278 85944",
+  "joining_date": {
+    "$date": "2025-09-11T00:00:00.000Z"
+  },
+  "address": "Bombay",
+  "username": "Neha",
+  "client_type": "render",
+  "password": "Neha@123",
+  "company_name": "NOD",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-13T05:03:25.407Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c505e477ebe84022f2823c"
+  },
+  "full_name": "Raj jain",
+  "email": "Rajjain@gmail.com",
+  "phone": "+91 97690 54305",
+  "joining_date": {
+    "$date": "2025-09-13T00:00:00.000Z"
+  },
+  "address": "Delhi",
+  "username": "Raj",
+  "client_type": "cad with render",
+  "password": "Rajjain@123",
+  "company_name": "Dintara",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-13T05:49:24.609Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c5317e77ebe84022f4dd0d"
+  },
+  "full_name": "Ring",
+  "email": "Magda@gmail.com",
+  "phone": "91 93168 51484",
+  "joining_date": {
+    "$date": "2025-09-13T00:00:00.000Z"
+  },
+  "address": "gujrat",
+  "username": "Magda",
+  "client_type": "render sample",
+  "password": "Magda@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-13T08:55:26.557Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c5346a77ebe84022f52f22"
+  },
+  "full_name": "Magda",
+  "email": "Magda@12gmail.com",
+  "phone": "91 93168 51484",
+  "joining_date": {
+    "$date": "2025-09-13T00:00:00.000Z"
+  },
+  "address": "Gujrat",
+  "username": "Magda1",
+  "client_type": "sample",
+  "password": "Magda@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-13T09:07:54.123Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c538c477ebe84022f56aa9"
+  },
+  "full_name": "Zeev Milman For Watch",
+  "email": "Zeev@gmail.com",
+  "phone": "+1 (212) 960-3398",
+  "joining_date": {
+    "$date": "2025-09-13T00:00:00.000Z"
+  },
+  "address": "us",
+  "username": "ZeevMilman",
+  "client_type": "diamond pesting",
+  "password": "ZeevMilman@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-13T09:26:28.689Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c79b9377ebe84022fa985d"
+  },
+  "full_name": "Umairbhai",
+  "email": "Umair@gmail.com",
+  "phone": "+1 (516) 710-2307",
+  "joining_date": {
+    "$date": "2025-09-15T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "Umair",
+  "client_type": "cad",
+  "password": "Umair@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-15T04:52:35.988Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c7a52677ebe84022fc4006"
+  },
+  "full_name": "Moinbhai",
+  "email": "Moin@gmail.com",
+  "phone": "+1 (847) 505-5547",
+  "joining_date": {
+    "$date": "2025-09-15T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "Moinbhai",
+  "client_type": "cad",
+  "password": "Moinbhai@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-15T05:33:26.069Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c7aa3a77ebe84022fcebee"
+  },
+  "full_name": "Feniy Roy",
+  "email": "fenilroy@gmail.com",
+  "phone": "+91 96246 09503",
+  "joining_date": {
+    "$date": "2025-09-15T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Fenilbhai",
+  "client_type": "render",
+  "password": "Fenilbhai@123",
+  "company_name": "Kinnara jewels",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-15T05:55:06.702Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68c902ed77ebe840220854cc"
+  },
+  "full_name": "pareshbhai",
+  "email": "pareshbhai@123",
+  "phone": "+91 81414 66677",
+  "joining_date": {
+    "$date": "2025-09-16T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Miki",
+  "client_type": "render ",
+  "password": "Miki@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-16T06:25:49.596Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68ca37ad77ebe840220cbaaa"
+  },
+  "full_name": "yashitraj",
+  "email": "yashitraj@gmail.com",
+  "phone": "+91 93168 51484",
+  "joining_date": {
+    "$date": "2025-09-17T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "Yashitraj",
+  "client_type": "cad",
+  "password": "Yashitraj@567",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-17T04:23:09.958Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68ca431e77ebe840220da2e3"
+  },
+  "full_name": "Vahan",
+  "email": "Vahan@gmail.com",
+  "phone": "+1 (347) 323-3488",
+  "joining_date": {
+    "$date": "2025-09-17T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "Vahan",
+  "client_type": "render",
+  "password": "Vahan@789",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-17T05:11:58.322Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68ca4f3077ebe840220eebdf"
+  },
+  "full_name": "Kishan vaghasiya",
+  "email": "Kishanvaghasiya@gmail.com",
+  "phone": "+1 (551) 244-4245",
+  "joining_date": {
+    "$date": "2025-09-17T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "Kishan",
+  "client_type": "render",
+  "password": "Kishan@897",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-17T06:03:28.618Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68ca55af77ebe84022116987"
+  },
+  "full_name": "Maulshree creative",
+  "email": "Maulshree@gmail.com",
+  "phone": "91 93168 51484",
+  "joining_date": {
+    "$date": "2025-09-17T00:00:00.000Z"
+  },
+  "address": "Surat",
+  "username": "Maulshree",
+  "client_type": "Reels",
+  "password": "Maulshree@345",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-17T06:31:11.787Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68ca7d4f77ebe8402216948f"
+  },
+  "full_name": "Mitul bhadani",
+  "email": "Mitul@gmail.com",
+  "phone": "+1 (973) 619-2492",
+  "joining_date": {
+    "$date": "2025-09-17T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "Mitul",
+  "client_type": "render",
+  "password": "Mitul@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-17T09:20:15.734Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68caa05677ebe84022197ec2"
+  },
+  "full_name": "Budhha",
+  "email": "Budhha@gmail.com",
+  "phone": "+91 93168 51484",
+  "joining_date": {
+    "$date": "2025-09-18T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "Budhha",
+  "client_type": "render",
+  "password": "Budhha@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-17T11:49:42.154Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68ccf483ff8b529b01c12f4f"
+  },
+  "full_name": "Dhavalbhai",
+  "email": "dhaval@1gmail.com",
+  "phone": "+91 98799 98190",
+  "joining_date": {
+    "$date": "2025-09-01T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Dhaval",
+  "client_type": "Render",
+  "password": "Dhaval@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-19T06:13:23.442Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68d0cea6ff8b529b01d5c806"
+  },
+  "full_name": "Miki jewel",
+  "email": "miki@123gmail.com",
+  "phone": "+91 81550 59000",
+  "joining_date": {
+    "$date": "2025-09-22T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "miki",
+  "client_type": "render ",
+  "password": "Miki@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-22T04:20:54.666Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68d0d0efff8b529b01d5f4f3"
+  },
+  "full_name": "kishan vaghasiya",
+  "email": "kishan@123gmail.com",
+  "phone": "+1 (551) 244-4245",
+  "joining_date": {
+    "$date": "2025-09-22T00:00:00.000Z"
+  },
+  "address": "US",
+  "username": "kishan",
+  "client_type": "render",
+  "password": "Kishan@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-22T04:30:39.158Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68d290b4ff8b529b01e8c277"
+  },
+  "full_name": "RAJPURUSH",
+  "email": "RAJPURUSH@123GMAIL.COM",
+  "phone": "8866487117",
+  "joining_date": {
+    "$date": "2025-09-22T00:00:00.000Z"
+  },
+  "address": "SURAT",
+  "username": "RAJPURUSH",
+  "client_type": "DESIGN",
+  "password": "Rajpurush@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-23T12:21:08.487Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68d4bf0eff8b529b01eed9c2"
+  },
+  "full_name": "vatsal savani",
+  "email": "vatsal@123gmail.com",
+  "phone": "+91 85919 48599",
+  "joining_date": {
+    "$date": "2025-09-01T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "vatsalsavani",
+  "client_type": "render",
+  "password": "Vatsalsavani@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-25T04:03:26.786Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68d64229ff8b529b010674a6"
+  },
+  "full_name": "abhishek",
+  "email": "abhishek1@gmail.com",
+  "phone": "+91 94617 87084",
+  "joining_date": {
+    "$date": "2025-09-23T00:00:00.000Z"
+  },
+  "address": "dilhi",
+  "username": "abhishek",
+  "client_type": "render",
+  "password": "Abhishek@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-26T07:35:05.025Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68d65238ff8b529b0109cb53"
+  },
+  "full_name": "Gurukrupa",
+  "email": "Gurukrupa1@gmail.com",
+  "phone": "+91 99247 99099",
+  "joining_date": {
+    "$date": "2025-09-11T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "janak",
+  "client_type": "Render ",
+  "password": "Janak@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-26T08:43:36.079Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68db5e2fff8b529b0130d596"
+  },
+  "full_name": "rohan",
+  "email": "rohan@123.gmail.com",
+  "phone": "+91 90515 15222",
+  "joining_date": {
+    "$date": "2025-09-30T00:00:00.000Z"
+  },
+  "address": "delhi ",
+  "username": "Rohan",
+  "client_type": "render ",
+  "password": "Rohan@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-30T04:35:59.770Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "68dba399ff8b529b0137e1bf"
+  },
+  "full_name": "GOVIND",
+  "email": "govind@123.gmail.com",
+  "phone": "8852041321",
+  "joining_date": {
+    "$date": "2025-09-29T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Govind",
+  "client_type": "render",
+  "password": "Govind@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-09-30T09:32:09.050Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "69083309bf521e139fb98081"
+  },
+  "full_name": "Harsh vyas",
+  "email": "harsh@123gmail.com",
+  "phone": "8866487117",
+  "joining_date": {
+    "$date": "2025-11-01T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Harshvyas",
+  "client_type": "render",
+  "password": "Hello@1234",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-11-03T04:43:53.484Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "69083cc4bf521e139fb9833b"
+  },
+  "full_name": "Tinch",
+  "email": "tinch@123gmail.com",
+  "phone": "91 77188 29472",
+  "joining_date": {
+    "$date": "2025-10-15T00:00:00.000Z"
+  },
+  "address": "sutar",
+  "username": "Tinch",
+  "client_type": "Render",
+  "password": "Tinch@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-11-03T05:25:24.269Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "69097887bf521e139fb9a560"
+  },
+  "full_name": "abhaybhai",
+  "email": "abhay@123gmail.com",
+  "phone": "+91 73311 09100",
+  "joining_date": {
+    "$date": "2025-11-04T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "abhaybhai",
+  "client_type": "render",
+  "password": "Abhay@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-11-04T03:52:39.020Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "6909939fbf521e139fbc3df8"
+  },
+  "full_name": "Lavishtag",
+  "email": "lavishtag@123gmail.com",
+  "phone": "+91 89176 17346",
+  "joining_date": {
+    "$date": "2025-11-04T00:00:00.000Z"
+  },
+  "address": "sutar",
+  "username": "Lavishtag",
+  "client_type": "design +Render",
+  "password": "Lavishtag@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-11-04T05:48:15.722Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "69099cdabf521e139fbcc7e2"
+  },
+  "full_name": "evera",
+  "email": "evera@123gmail.com",
+  "phone": "9316851484",
+  "joining_date": {
+    "$date": "2025-11-04T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "evera",
+  "client_type": "design - render",
+  "password": "Evera@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-11-04T06:27:38.202Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "691400ccbf521e139ff65f7b"
+  },
+  "full_name": "nishtha",
+  "email": "nishtha@123gmail.com",
+  "phone": "+91 85916 55961",
+  "joining_date": {
+    "$date": "2025-11-11T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Nishtha",
+  "client_type": "render",
+  "password": "Nishtha@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-11-12T03:36:44.326Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "6915b54cbf521e139f075010"
+  },
+  "full_name": "JYOTI JAIN",
+  "email": "jyoti@gmail.com",
+  "phone": "+91 97164 88270",
+  "joining_date": {
+    "$date": "2025-11-13T00:00:00.000Z"
+  },
+  "address": "SURAT",
+  "username": "jyotijain",
+  "client_type": "render ",
+  "password": "Jyoti@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-11-13T10:39:08.591Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "6916e9cebf521e139f19e0f8"
+  },
+  "full_name": "Naitikbhai",
+  "email": "Naitik@gmail.com",
+  "phone": "+61 410 058 909",
+  "joining_date": {
+    "$date": "2025-11-14T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Naitik",
+  "client_type": "surat",
+  "password": "Naitik@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-11-14T08:35:26.280Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "691c19cddcdcc4b148b4829d"
+  },
+  "full_name": "kamal bhai ",
+  "email": "kamal@123gmail.com",
+  "phone": "99201 24624",
+  "joining_date": {
+    "$date": "2025-11-18T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Kamal",
+  "client_type": "render ",
+  "password": "Kamal@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-11-18T07:01:33.492Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "69253593dcdcc4b148ef62f6"
+  },
+  "full_name": "LAKHAN BHAI",
+  "email": "lakhan@123gmail.com",
+  "phone": "+91 7498 696 794",
+  "joining_date": {
+    "$date": "2025-11-25T00:00:00.000Z"
+  },
+  "address": "SURAT",
+  "username": "Lakhanbhai",
+  "client_type": "render ",
+  "password": "Lakhan@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-11-25T04:50:27.910Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "692d40f1dcdcc4b14816249d"
+  },
+  "full_name": "Hardik bhatiya",
+  "email": "Hardik@gmail.com",
+  "phone": "+91 79900 39257",
+  "joining_date": {
+    "$date": "2025-12-01T00:00:00.000Z"
+  },
+  "address": "Surat",
+  "username": "Hardik",
+  "client_type": "render",
+  "password": "Hardik@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-12-01T07:17:05.096Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "692e7337dcdcc4b148232d06"
+  },
+  "full_name": "shubham gupta",
+  "email": "shubham@123gmail.com",
+  "phone": "+91 90019 92708",
+  "joining_date": {
+    "$date": "2025-12-02T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "shubhamgupta",
+  "client_type": "render",
+  "password": "Shubham@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-12-02T05:03:51.856Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "69315d2edcdcc4b14859adf0"
+  },
+  "full_name": "leo",
+  "email": "leo@123.gmail.com",
+  "phone": "+1 (917) 709-4661",
+  "joining_date": {
+    "$date": "2024-05-04T00:00:00.000Z"
+  },
+  "address": "us",
+  "username": "leo",
+  "client_type": "design",
+  "password": "Leo@1234",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-12-04T10:06:38.225Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "693259e8dcdcc4b14864bb88"
+  },
+  "full_name": "cezary",
+  "email": "cezary@123gmail.com",
+  "phone": "8866487117",
+  "joining_date": {
+    "$date": "2025-12-05T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "Cezary",
+  "client_type": "render",
+  "password": "Cezary@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-12-05T04:04:56.027Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "6937a922dcdcc4b148c3af9e"
+  },
+  "full_name": "BAXI",
+  "email": "baxi@123gmail.com",
+  "phone": "+91 88666 33756",
+  "joining_date": {
+    "$date": "2025-12-09T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "baxi",
+  "client_type": "render",
+  "password": "Baxi@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-12-09T04:44:18.008Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "6937acdedcdcc4b148c5b637"
+  },
+  "full_name": "paradox",
+  "email": "paradox@123gmail.com",
+  "phone": "+33 6 51 50 52 03",
+  "joining_date": {
+    "$date": "2025-12-09T00:00:00.000Z"
+  },
+  "address": "France",
+  "username": "paradox",
+  "client_type": "design -render ",
+  "password": "Paradox@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-12-09T05:00:14.674Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "693a9a41dcdcc4b1481a24b3"
+  },
+  "full_name": "NAITIK BHAI",
+  "email": "naitik@123gmail.com",
+  "phone": "+61 410 058 909",
+  "joining_date": {
+    "$date": "2025-12-11T00:00:00.000Z"
+  },
+  "address": "SURAT ",
+  "username": "naitik",
+  "client_type": "rendere",
+  "password": "Hello@1234",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-12-11T10:17:37.879Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "6943894bdcdcc4b148e2b9af"
+  },
+  "full_name": "test by meet",
+  "email": "meetusat7@gmail.com",
+  "phone": "75545245",
+  "joining_date": {
+    "$date": "2025-12-19T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "test",
+  "client_type": "aasdf",
+  "password": "Test@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-12-18T04:55:39.026Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "694433addcdcc4b148f1da56"
+  },
+  "full_name": "Test Client",
+  "email": "testcl@gmail.com",
+  "phone": "1234567890",
+  "joining_date": {
+    "$date": "2025-12-17T00:00:00.000Z"
+  },
+  "address": "aqaaaaa",
+  "username": "testcl",
+  "client_type": "aa",
+  "password": "Hello@1234",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-12-18T17:02:37.631Z"
+  },
+  "__v": 0,
+  "stage_pricing": [
+    {
+      "stage_name": "CAD Design",
+      "price": 111,
+      "_id": {
+        "$oid": "69a4a0f1ff0c099092a9682d"
+      }
+    },
+    {
+      "stage_name": "SET Design",
+      "price": 222,
+      "_id": {
+        "$oid": "69a4a0f1ff0c099092a9682e"
+      }
+    },
+    {
+      "stage_name": "Render",
+      "price": 0,
+      "_id": {
+        "$oid": "69a4a0f1ff0c099092a9682f"
+      }
+    },
+    {
+      "stage_name": "QC",
+      "price": 0,
+      "_id": {
+        "$oid": "69a4a0f1ff0c099092a96830"
+      }
+    },
+    {
+      "stage_name": "Delivery",
+      "price": 11,
+      "_id": {
+        "$oid": "69a4a0f1ff0c099092a96831"
+      }
+    }
+  ],
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "694cb950dcdcc4b14884344f"
+  },
+  "full_name": "hardik bhai ",
+  "email": "hardik@gmail.com",
+  "phone": " 79847 94155",
+  "joining_date": {
+    "$date": "2025-12-25T00:00:00.000Z"
+  },
+  "address": "surat",
+  "username": "hardik",
+  "client_type": "render ",
+  "password": "Hardik@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2025-12-25T04:10:56.469Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "6964c1d5dcdcc4b14875c0ce"
+  },
+  "full_name": "NIKUNJ BHAI",
+  "email": "NIKUNJ@123GMAIL.COM",
+  "phone": "9316851484",
+  "joining_date": {
+    "$date": "2026-01-12T00:00:00.000Z"
+  },
+  "address": "SURAT",
+  "username": "nikunjbhai",
+  "client_type": "render",
+  "password": "Nikunj@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2026-01-12T09:41:41.614Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "696b4a8adcdcc4b148ed45d6"
+  },
+  "full_name": "Saloni",
+  "email": "Saloni@gmail.com",
+  "phone": "+91 95120 78459",
+  "joining_date": {
+    "$date": "2026-01-17T00:00:00.000Z"
+  },
+  "address": "Surat",
+  "username": "Saloni",
+  "client_type": "cad",
+  "password": "Saloni@123",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "created_at": {
+    "$date": "2026-01-17T08:38:34.761Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "69a49f4fff0c099092a9653d"
+  },
+  "full_name": "Test Client 0002",
+  "email": "testclient0001@gmail.com",
+  "phone": "+919825086914",
+  "joining_date": {
+    "$date": "2026-03-01T00:00:00.000Z"
+  },
+  "address": "Opp Juni Society, Juna Tavara, Bharuch",
+  "username": "testclient0001",
+  "client_type": "Jweller",
+  "password": "Hello@1234",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "stage_pricing": [
+    {
+      "stage_name": "CAD Design",
+      "price": 1000,
+      "_id": {
+        "$oid": "69ac06e10d274e3022d2e5c7"
+      }
+    },
+    {
+      "stage_name": "SET Design",
+      "price": 200,
+      "_id": {
+        "$oid": "69ac06e10d274e3022d2e5c8"
+      }
+    },
+    {
+      "stage_name": "Render",
+      "price": 400,
+      "_id": {
+        "$oid": "69ac06e10d274e3022d2e5c9"
+      }
+    },
+    {
+      "stage_name": "QC",
+      "price": 500,
+      "_id": {
+        "$oid": "69ac06e10d274e3022d2e5ca"
+      }
+    },
+    {
+      "stage_name": "Delivery",
+      "price": 150,
+      "_id": {
+        "$oid": "69ac06e10d274e3022d2e5cb"
+      }
+    }
+  ],
+  "created_at": {
+    "$date": "2026-03-01T20:19:27.835Z"
+  },
+  "__v": 0,
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "69a94a75ecf276c4d21f4c2f"
+  },
+  "full_name": "max",
+  "email": "maxmustermann@gmail.com",
+  "phone": "+911234567890",
+  "joining_date": {
+    "$date": "2026-03-04T00:00:00.000Z"
+  },
+  "address": "Ireland",
+  "username": "maxmustermann",
+  "client_type": "Client",
+  "password": "Hello@1234",
+  "company_name": "",
+  "gst_number": "",
+  "business_phone": "",
+  "website": "",
+  "linkedin": "",
+  "business_address": "",
+  "additional_notes": "",
+  "stage_pricing": [
+    {
+      "stage_name": "CAD Design",
+      "price": 0,
+      "_id": {
+        "$oid": "69a94a75ecf276c4d21f4c30"
+      }
+    },
+    {
+      "stage_name": "SET Design",
+      "price": 0,
+      "_id": {
+        "$oid": "69a94a75ecf276c4d21f4c31"
+      }
+    },
+    {
+      "stage_name": "Render",
+      "price": 0,
+      "_id": {
+        "$oid": "69a94a75ecf276c4d21f4c32"
+      }
+    },
+    {
+      "stage_name": "QC",
+      "price": 0,
+      "_id": {
+        "$oid": "69a94a75ecf276c4d21f4c33"
+      }
+    },
+    {
+      "stage_name": "Delivery",
+      "price": 0,
+      "_id": {
+        "$oid": "69a94a75ecf276c4d21f4c34"
+      }
+    }
+  ],
+  "created_at": {
+    "$date": "2026-03-05T09:18:45.303Z"
+  },
+  "__v": 0,
+  "status": "active"
+}]

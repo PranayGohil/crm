@@ -1,0 +1,658 @@
+[{
+  "_id": {
+    "$oid": "6899a6964dfb81c1e07f4ab5"
+  },
+  "username": "Tamanna",
+  "password": "Tamanna@123",
+  "full_name": "Tamanna Ukani",
+  "designation": "Render Artist",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "9924876577",
+  "email": "tamannaukani@gmail.com",
+  "home_address": "B-404,sahjanand residency, valak patiya,surat",
+  "dob": {
+    "$date": "2005-03-02T00:00:00.000Z"
+  },
+  "emergency_contact": "9510736394",
+  "capacity": 10,
+  "department": "Render",
+  "date_of_joining": {
+    "$date": "2024-06-11T00:00:00.000Z"
+  },
+  "monthly_salary": 15000,
+  "employement_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b568d6e984d4a8fb457cb1"
+  },
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-11T08:15:18.302Z"
+  },
+  "__v": 1,
+  "employment_type": "Full-time",
+  "manage_stages": [
+    "Render",
+    "SET Design",
+    "Delivery",
+    "QC"
+  ]
+},
+{
+  "_id": {
+    "$oid": "68af520f1cabf4931dc6b143"
+  },
+  "username": "Krishna",
+  "password": "Krishna@123",
+  "full_name": "Krishna Prajapati",
+  "designation": "Render Artist",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "9099323538",
+  "email": "nareshvprajapati.64@gmail.com",
+  "home_address": "B-77, raj nandni umra gam, velenja, surat",
+  "dob": {
+    "$date": "2008-10-19T00:00:00.000Z"
+  },
+  "emergency_contact": "9099323538",
+  "capacity": 10,
+  "department": "Render",
+  "date_of_joining": {
+    "$date": "2025-08-01T00:00:00.000Z"
+  },
+  "monthly_salary": 8000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b0107b1cabf4931dc6dd43"
+  },
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-27T18:44:31.188Z"
+  },
+  "__v": 1,
+  "manage_stages": []
+},
+{
+  "_id": {
+    "$oid": "68b006771cabf4931dc6d91d"
+  },
+  "username": "Chandan",
+  "password": "Chandan@123",
+  "full_name": "Chandan Shekhada",
+  "designation": "CAD Designer",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "shekhadachandan@gmail.com",
+  "home_address": "surat",
+  "dob": {
+    "$date": "2003-04-30T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 4,
+  "department": "CAD Design",
+  "date_of_joining": {
+    "$date": "2025-04-30T00:00:00.000Z"
+  },
+  "monthly_salary": 12000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b00c1b1cabf4931dc6db95"
+  },
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-28T07:34:15.740Z"
+  },
+  "__v": 1,
+  "manage_stages": []
+},
+{
+  "_id": {
+    "$oid": "68b0073e1cabf4931dc6d988"
+  },
+  "username": "Ashmita",
+  "password": "Ashmita@123",
+  "full_name": "ASMITA MAVANI",
+  "designation": "Render Artist",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "ashmitamavani804@gmail.com",
+  "home_address": "mota varachha",
+  "dob": {
+    "$date": "1990-11-10T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 10,
+  "department": "Render",
+  "date_of_joining": {
+    "$date": "2025-03-17T00:00:00.000Z"
+  },
+  "monthly_salary": 11500,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b0107b1cabf4931dc6dd43"
+  },
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-28T07:37:34.961Z"
+  },
+  "__v": 1,
+  "manage_stages": []
+},
+{
+  "_id": {
+    "$oid": "68b008801cabf4931dc6d9fc"
+  },
+  "username": "Drashti",
+  "password": "Drashti@123",
+  "full_name": "Drashti Savaliya",
+  "designation": "Render Artist",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "savaliyadrashti60@gmail.com",
+  "home_address": "Surat",
+  "dob": {
+    "$date": "2004-12-19T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 10,
+  "department": "Render",
+  "date_of_joining": {
+    "$date": "2025-01-01T00:00:00.000Z"
+  },
+  "monthly_salary": 11000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b0107b1cabf4931dc6dd43"
+  },
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-28T07:42:56.073Z"
+  },
+  "__v": 1,
+  "manage_stages": []
+},
+{
+  "_id": {
+    "$oid": "68b00b091cabf4931dc6dae9"
+  },
+  "username": "Kavita",
+  "password": "Kavita@123",
+  "full_name": "Kavita Bogha ",
+  "designation": "CAD Designer",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "boghakavita179@gmail.com",
+  "home_address": "surat",
+  "dob": {
+    "$date": "2005-09-17T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 2,
+  "department": "CAD Design",
+  "date_of_joining": {
+    "$date": "2024-11-11T00:00:00.000Z"
+  },
+  "monthly_salary": 14000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b00c1b1cabf4931dc6db95"
+  },
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-28T07:53:45.303Z"
+  },
+  "__v": 1,
+  "manage_stages": []
+},
+{
+  "_id": {
+    "$oid": "68b00b891cabf4931dc6db40"
+  },
+  "username": "Krina",
+  "password": "Krina@123",
+  "full_name": "Krina Vaghasiya",
+  "designation": "CAD Designer",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "vaghasiyak634@gmil.com",
+  "home_address": "surat",
+  "dob": {
+    "$date": "2004-11-02T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 3,
+  "department": "CAD Design",
+  "date_of_joining": {
+    "$date": "2025-05-01T00:00:00.000Z"
+  },
+  "monthly_salary": 10000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b00c1b1cabf4931dc6db95"
+  },
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-28T07:55:53.235Z"
+  },
+  "__v": 1,
+  "manage_stages": []
+},
+{
+  "_id": {
+    "$oid": "68b00c1b1cabf4931dc6db95"
+  },
+  "username": "Mohisha",
+  "password": "Mohisha@123",
+  "full_name": "Mohisha Zalavadiya",
+  "designation": "CAD Designer",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "mohishazalavadiya98@gmail.com",
+  "home_address": "surat",
+  "dob": {
+    "$date": "2025-02-24T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 6,
+  "department": "CAD Design",
+  "date_of_joining": {
+    "$date": "2024-04-15T00:00:00.000Z"
+  },
+  "monthly_salary": 17000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b011171cabf4931dc6dda8"
+  },
+  "is_manager": true,
+  "created_at": {
+    "$date": "2025-08-28T07:58:19.776Z"
+  },
+  "__v": 2,
+  "manage_stages": [
+    "CAD Design",
+    "SET Design"
+  ]
+},
+{
+  "_id": {
+    "$oid": "68b00ebf1cabf4931dc6dc44"
+  },
+  "username": "Riddhi",
+  "password": "Riddhi@123",
+  "full_name": "Riddhi Nada",
+  "designation": "CAD Designer",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "riddhinada123@gmail.com",
+  "home_address": "surat",
+  "dob": {
+    "$date": "2003-09-29T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 5,
+  "department": "CAD Design",
+  "date_of_joining": {
+    "$date": "2025-07-15T00:00:00.000Z"
+  },
+  "monthly_salary": 8000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b00c1b1cabf4931dc6db95"
+  },
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-28T08:09:35.950Z"
+  },
+  "__v": 1,
+  "manage_stages": []
+},
+{
+  "_id": {
+    "$oid": "68b00f321cabf4931dc6dc9d"
+  },
+  "username": "Ruchita",
+  "password": "Ruchita@123",
+  "full_name": "Ruchita Sangani",
+  "designation": "CAD Designer",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "ruchitasangani15@gmail.com",
+  "home_address": "surat",
+  "dob": {
+    "$date": "2004-01-15T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 3,
+  "department": "CAD Design",
+  "date_of_joining": {
+    "$date": "2025-07-15T00:00:00.000Z"
+  },
+  "monthly_salary": 8000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b00c1b1cabf4931dc6db95"
+  },
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-28T08:11:30.561Z"
+  },
+  "__v": 1,
+  "manage_stages": []
+},
+{
+  "_id": {
+    "$oid": "68b00fba1cabf4931dc6dcea"
+  },
+  "username": "Tanisha",
+  "password": "Tanisha@123",
+  "full_name": "Tanisha Dobariya",
+  "designation": "CAD Designer",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "divyeshdobariya45@gamil.com",
+  "home_address": "surat",
+  "dob": {
+    "$date": "2007-01-08T00:00:00.000Z"
+  },
+  "emergency_contact": "",
+  "capacity": null,
+  "department": "CAD Design",
+  "date_of_joining": {
+    "$date": "2025-05-01T00:00:00.000Z"
+  },
+  "monthly_salary": 10000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b00c1b1cabf4931dc6db95"
+  },
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-28T08:13:46.668Z"
+  },
+  "__v": 1,
+  "manage_stages": []
+},
+{
+  "_id": {
+    "$oid": "68b0107b1cabf4931dc6dd43"
+  },
+  "username": "Nency",
+  "password": "Nency@123",
+  "full_name": "Nency Lathiya",
+  "designation": "Render Artist",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "nencybalar089@gmail.com",
+  "home_address": "surat",
+  "dob": {
+    "$date": "2001-12-14T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 10,
+  "department": "Render",
+  "date_of_joining": {
+    "$date": "2025-03-22T00:00:00.000Z"
+  },
+  "monthly_salary": 11500,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b011171cabf4931dc6dda8"
+  },
+  "is_manager": true,
+  "created_at": {
+    "$date": "2025-08-28T08:16:59.823Z"
+  },
+  "__v": 2,
+  "manage_stages": [
+    "Render",
+    "SET Design"
+  ]
+},
+{
+  "_id": {
+    "$oid": "68b011171cabf4931dc6dda8"
+  },
+  "username": "Sarika",
+  "password": "Sarika@123",
+  "full_name": "Sarika Akbari",
+  "designation": "CEO",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "sarikabhadani2612@gmail.com",
+  "home_address": "surat",
+  "dob": {
+    "$date": "1995-12-26T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 1,
+  "department": "Render",
+  "date_of_joining": {
+    "$date": "2023-08-01T00:00:00.000Z"
+  },
+  "monthly_salary": 20000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68ae98931cabf4931dc65767"
+  },
+  "is_manager": true,
+  "created_at": {
+    "$date": "2025-08-28T08:19:35.214Z"
+  },
+  "__v": 1,
+  "manage_stages": [
+    "Render"
+  ]
+},
+{
+  "_id": {
+    "$oid": "68b011d71cabf4931dc6de0a"
+  },
+  "username": "ELVIE",
+  "password": "Elvie@123",
+  "full_name": "ELVIE MENDAPARA",
+  "designation": "HR",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "elviepatel98@gmail.com",
+  "home_address": "surat",
+  "dob": {
+    "$date": "1999-01-08T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 1,
+  "department": "Render",
+  "date_of_joining": {
+    "$date": "2025-06-01T00:00:00.000Z"
+  },
+  "monthly_salary": 16000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b011171cabf4931dc6dda8"
+  },
+  "is_manager": true,
+  "created_at": {
+    "$date": "2025-08-28T08:22:47.283Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68b013871cabf4931dc6de63"
+  },
+  "username": "Chandani",
+  "password": "Chandani@123",
+  "full_name": "Chandani Jagani",
+  "designation": "HOD Breeliq",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "8866487117",
+  "email": "chandanimanavadariya007@gmai.com",
+  "home_address": "surat",
+  "dob": {
+    "$date": "1998-04-24T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 10,
+  "department": "Render",
+  "date_of_joining": {
+    "$date": "2025-03-21T00:00:00.000Z"
+  },
+  "monthly_salary": 10000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b011d71cabf4931dc6de0a"
+  },
+  "is_manager": false,
+  "created_at": {
+    "$date": "2025-08-28T08:29:59.189Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68b568d6e984d4a8fb457cb1"
+  },
+  "username": "Dhruvi",
+  "password": "Dhruvi@123",
+  "full_name": "Dhruvi kalkani",
+  "designation": "Creative Render",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "7433910371",
+  "email": "sarojkalkani@gmail.com",
+  "home_address": "98,sai samrudhdhivila socity, umra gam, velenja,",
+  "dob": {
+    "$date": "2006-02-09T00:00:00.000Z"
+  },
+  "emergency_contact": "8866487117",
+  "capacity": 2,
+  "department": "Render",
+  "date_of_joining": {
+    "$date": "2024-05-07T00:00:00.000Z"
+  },
+  "monthly_salary": 15000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b011171cabf4931dc6dda8"
+  },
+  "is_manager": true,
+  "created_at": {
+    "$date": "2025-09-01T09:35:18.364Z"
+  },
+  "__v": 1,
+  "manage_stages": [
+    "Render"
+  ]
+},
+{
+  "_id": {
+    "$oid": "690adae3bf521e139fc05046"
+  },
+  "username": "Yashvi",
+  "password": "Yashvi@123",
+  "full_name": "Yashvi golakiya ",
+  "designation": "HOD Design",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "7283866093",
+  "email": "Yashvi@gmail.com",
+  "home_address": "surat",
+  "dob": {
+    "$date": "2005-05-06T00:00:00.000Z"
+  },
+  "emergency_contact": "7283866093",
+  "capacity": 2,
+  "department": "CAD Design",
+  "date_of_joining": {
+    "$date": "2025-11-03T00:00:00.000Z"
+  },
+  "monthly_salary": 8000,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b00c1b1cabf4931dc6db95"
+  },
+  "is_manager": false,
+  "manage_stages": [],
+  "created_at": {
+    "$date": "2025-11-05T05:04:35.422Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69a4b2ff72e2c580aa82f1ad"
+  },
+  "username": "testcad",
+  "password": "Hello@1234",
+  "full_name": "Test CAD",
+  "designation": "HOD Design",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "1111111111",
+  "email": "testcad@gmail.com",
+  "home_address": "11ddfdfd",
+  "dob": {
+    "$date": "2026-03-01T00:00:00.000Z"
+  },
+  "emergency_contact": "",
+  "capacity": 3,
+  "department": "CAD Design",
+  "date_of_joining": {
+    "$date": "2026-03-02T00:00:00.000Z"
+  },
+  "monthly_salary": 1111111,
+  "employment_type": "Full-time",
+  "reporting_manager": null,
+  "is_manager": false,
+  "manage_stages": [],
+  "created_at": {
+    "$date": "2026-03-01T21:43:27.715Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69a94ac0ecf276c4d21f4d18"
+  },
+  "username": "max",
+  "password": "Hello@1234",
+  "full_name": "Max",
+  "designation": "Creative Render",
+  "status": "Inactive",
+  "profile_pic": null,
+  "phone": "+917858586965",
+  "email": "max@gmail.com",
+  "home_address": "Ireland",
+  "dob": {
+    "$date": "2000-03-05T00:00:00.000Z"
+  },
+  "emergency_contact": "",
+  "capacity": null,
+  "department": "Test Dep",
+  "date_of_joining": {
+    "$date": "2026-03-04T00:00:00.000Z"
+  },
+  "monthly_salary": -3,
+  "employment_type": "Full-time",
+  "reporting_manager": {
+    "$oid": "68b00c1b1cabf4931dc6db95"
+  },
+  "is_manager": false,
+  "manage_stages": [],
+  "created_at": {
+    "$date": "2026-03-05T09:20:00.819Z"
+  },
+  "__v": 0
+}]

@@ -1,0 +1,110 @@
+[{
+  "_id": {
+    "$oid": "688f5cc3258843332c94343b"
+  },
+  "username": "vivek",
+  "password": "Hello@1234",
+  "email": "admin@crm.com",
+  "phone": "1234567890",
+  "profile_pic": "https://res.cloudinary.com/dzugqh19d/image/upload/v1756359499/crm/employees/1756359498325-profile_pic.jpg",
+  "profile_pic_public_id": "crm/employees/1756359498325-profile_pic",
+  "createdAt": {
+    "$date": "2026-03-02T19:28:53.959Z"
+  },
+  "isActive": true,
+  "lastLogin": {
+    "$date": "2026-04-13T14:16:37.551Z"
+  },
+  "role": "super-admin",
+  "updatedAt": {
+    "$date": "2026-04-13T14:16:37.552Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69a5c53775ff2f2a48c7de60"
+  },
+  "username": "superadmin",
+  "password": "SuperAdmin@123",
+  "email": "superadmin@example.com",
+  "phone": "1234567890",
+  "role": "super-admin",
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-03-02T17:13:27.361Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-13T05:26:14.989Z"
+  },
+  "__v": 0,
+  "lastLogin": {
+    "$date": "2026-04-13T05:26:14.988Z"
+  },
+  "profile_pic": "https://res.cloudinary.com/dzugqh19d/image/upload/v1772474168/crm/employees/1772474165156-profile_pic.jpg",
+  "profile_pic_public_id": "crm/employees/1772474165156-profile_pic"
+},
+{
+  "_id": {
+    "$oid": "69aabb5e0a05cb3fe35b1fbb"
+  },
+  "username": "pranaygohil",
+  "password": "Hello@1234",
+  "email": "pranay@gmail.com",
+  "phone": "1234567890",
+  "role": "admin",
+  "createdBy": {
+    "$oid": "69a5c53775ff2f2a48c7de60"
+  },
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-03-06T11:32:46.214Z"
+  },
+  "updatedAt": {
+    "$date": "2026-03-06T11:34:06.441Z"
+  },
+  "__v": 0,
+  "profile_pic": "https://res.cloudinary.com/dzugqh19d/image/upload/v1772796805/crm/employees/1772796800127-profile_pic.jpg",
+  "profile_pic_public_id": "crm/employees/1772796800127-profile_pic"
+},
+{
+  "_id": {
+    "$oid": "69dc7d2abbf4cde298ecfd33"
+  },
+  "username": "aaaa",
+  "password": "Hello@1234",
+  "email": "aaa@aa.aa",
+  "phone": "1111111111",
+  "role": "admin",
+  "createdBy": {
+    "$oid": "69a5c53775ff2f2a48c7de60"
+  },
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-04-13T05:20:42.214Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-13T05:20:42.214Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69dc7d7dbbf4cde298edd44a"
+  },
+  "username": "bbbb",
+  "password": "Hello@1234",
+  "email": "b@b.com",
+  "phone": "2222222222",
+  "role": "admin",
+  "createdBy": {
+    "$oid": "688f5cc3258843332c94343b"
+  },
+  "isActive": true,
+  "createdAt": {
+    "$date": "2026-04-13T05:22:05.074Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-13T05:22:05.075Z"
+  },
+  "__v": 0
+}]

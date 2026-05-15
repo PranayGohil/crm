@@ -4,6 +4,7 @@ import axios from "axios";
 import ProjectCard from "../../../components/admin/ProjectCard.jsx";
 import { statusOptions } from "../../../options.js";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
+import SearchableSelect from "../../../components/common/SearchableSelect";
 
 const ClientProjectDetails = () => {
   const { username } = useParams();
@@ -22,20 +23,21 @@ const ClientProjectDetails = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const projectRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/projects/${username}`);
+        const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
+        const projectRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/projects/${username}`, { headers });
         const fetchedProjects = projectRes.data.projects;
         setProjects(fetchedProjects);
 
         const subtasksMap = {};
         await Promise.all(
           fetchedProjects.map(async (project) => {
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/project/${project._id}`);
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/project/${project._id}`, { headers });
             subtasksMap[project._id] = res.data;
           })
         );
         setProjectSubtasks(subtasksMap);
 
-        const employeeRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`);
+        const employeeRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`, { headers });
         const empMap = {};
         employeeRes.data.forEach((e) => { empMap[e._id] = e; });
         setEmployees(empMap);
@@ -101,14 +103,15 @@ const ClientProjectDetails = () => {
           </div>
 
           {/* Status filter */}
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-          >
-            <option value="All Status">All Status</option>
-            {statuses.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
+          <div className="w-36">
+            <SearchableSelect
+              placeholder="All Status"
+              value={selectedStatus !== "All Status" ? { value: selectedStatus, label: selectedStatus } : null}
+              onChange={(opt) => setSelectedStatus(opt ? opt.value : "All Status")}
+              options={[{ value: "All Status", label: "All Status" }, ...statuses.map((s) => ({ value: s, label: s }))]}
+              isClearable={false}
+            />
+          </div>
 
           {/* Reset */}
           <button

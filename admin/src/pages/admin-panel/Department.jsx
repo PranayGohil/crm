@@ -14,7 +14,9 @@ const Department = () => {
   const fetchDepartments = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/department/get-all`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/department/get-all`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
       setDepartments(res.data.departments);
     } catch (err) {
       console.error("Failed to fetch departments", err);

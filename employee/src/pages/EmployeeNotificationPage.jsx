@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSocket } from "../contexts/SocketContext";
+import SearchableSelect from "../components/SearchableSelect";
 
 /* ─── constants ────────────────────────────────────────────────────────────── */
 const FILTERS = [
@@ -118,7 +119,8 @@ const EmployeeNotificationPage = () => {
     const run = async () => {
       setLoading(true);
       try {
-        const headers = { Authorization: `Bearer ${localStorage.getItem("employeeToken")}` };
+        const userObj = JSON.parse(localStorage.getItem("employeeUser"));
+        const headers = { Authorization: `Bearer ${userObj?.token}` };
         const params = { receiver_id: employeeId, receiver_type: "employee" };
 
         const res = await axios.get(
@@ -277,15 +279,14 @@ const EmployeeNotificationPage = () => {
                 <span className="text-sm text-gray-600 whitespace-nowrap">
                   Page {currentPage} of {totalPages || 1}
                 </span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {PAGE_SIZES.map((size) => (
-                    <option key={size} value={size}>Show {size}</option>
-                  ))}
-                </select>
+                <div className="w-32">
+                  <SearchableSelect
+                    value={{ value: pageSize, label: `Show ${pageSize}` }}
+                    onChange={(opt) => { setPageSize(Number(opt.value)); setCurrentPage(1); }}
+                    options={PAGE_SIZES.map((size) => ({ value: size, label: `Show ${size}` }))}
+                    isClearable={false}
+                  />
+                </div>
               </div>
             </div>
           </div>

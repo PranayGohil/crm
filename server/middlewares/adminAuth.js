@@ -19,8 +19,22 @@ export const protectAdmin = async (req, res, next) => {
 };
 
 export const superAdminOnly = (req, res, next) => {
-    if (req.admin.role !== "superadmin") {
+    if (req.admin.role !== "super-admin") {
         return res.status(403).json({ message: "Super Admin access only" });
     }
     next();
+};
+
+export const canManageBrandSales = (req, res, next) => {
+    const brand = req.body?.brand || req.query?.brand;
+    if (!brand) return res.status(400).json({ success: false, message: "Brand is required" });
+
+    if (req.admin.role === "super-admin") return next();
+
+    const permission = brand === "Mukhwas" ? "manage_mukhwas_sales" : "manage_breeliq_sales";
+    if (req.admin.sales_permissions && req.admin.sales_permissions.includes(permission)) {
+        return next();
+    }
+
+    res.status(403).json({ message: `Access denied. You don't have permission to manage ${brand} sales.` });
 };

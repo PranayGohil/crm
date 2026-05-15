@@ -17,12 +17,13 @@ const ClientDetailsPage = () => {
     const fetchClient = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/get-username/${id}`);
-        const subtasksRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/tasks/${res.data._id}`);
+        const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/get-username/${id}`, { headers });
+        const subtasksRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/tasks/${res.data._id}`, { headers });
         const clientData = { ...res.data, subtasks: subtasksRes.data || [] };
         setClient(clientData);
 
-        const earningsRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/earnings-report/${res.data._id}`);
+        const earningsRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/earnings-report/${res.data._id}`, { headers });
         setEarnings(earningsRes.data);
       } catch (error) {
         console.error("Failed to fetch client:", error);

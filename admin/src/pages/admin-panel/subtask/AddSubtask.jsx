@@ -7,6 +7,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
+import EmployeeSearchableSelect from "../../../components/common/EmployeeSearchableSelect";
 import { stageOptions, priorityOptions } from "../../../options";
 
 const AddSubtask = () => {
@@ -50,19 +51,20 @@ const AddSubtask = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
         const empRes = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/employee/get-all`
+          `${process.env.REACT_APP_API_URL}/api/employee/get-all`, { headers }
         );
         setEmployees(empRes.data);
 
         const projectRes = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`
+          `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`, { headers }
         );
         const clientId = projectRes.data.project?.client_id;
 
         if (clientId) {
           const clientRes = await axios.get(
-            `${process.env.REACT_APP_API_URL}/api/client/get/${clientId}`
+            `${process.env.REACT_APP_API_URL}/api/client/get/${clientId}`, { headers }
           );
           setClientStagePricing(clientRes.data?.stage_pricing || []);
         }
@@ -316,14 +318,12 @@ const AddSubtask = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Assign To</label>
-                  <Field as="select" name="assign_to"
-                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base">
-                    <option value="">Select Assign To</option>
-                    {employees.map((emp) => (
-                      <option key={emp._id} value={emp._id}>{emp.full_name}</option>
-                    ))}
-                  </Field>
+                  <EmployeeSearchableSelect
+                    label="Assign To"
+                    placeholder="Select Assign To"
+                    value={values.assign_to ? { value: values.assign_to, label: employees.find(e => e._id === values.assign_to)?.full_name || "Selected Employee" } : null}
+                    onChange={(opt) => setFieldValue("assign_to", opt ? opt.value : "")}
+                  />
                 </div>
 
                 <div>
@@ -510,14 +510,12 @@ const AddSubtask = () => {
                   </div>
 
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Assign To</label>
-                    <Field as="select" name="bulkAssignTo"
-                      className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base">
-                      <option value="">Select Assign To</option>
-                      {employees.map((emp) => (
-                        <option key={emp._id} value={emp._id}>{emp.full_name}</option>
-                      ))}
-                    </Field>
+                    <EmployeeSearchableSelect
+                      label="Assign To"
+                      placeholder="Select Assign To"
+                      value={values.bulkAssignTo ? { value: values.bulkAssignTo, label: employees.find(e => e._id === values.bulkAssignTo)?.full_name || "Selected Employee" } : null}
+                      onChange={(opt) => setFieldValue("bulkAssignTo", opt ? opt.value : "")}
+                    />
                   </div>
 
                   <div>

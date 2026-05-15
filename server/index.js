@@ -16,6 +16,7 @@ import designationRouter from "./routes/designationRoutes.js";
 import departmentRouter from "./routes/departmentRoutes.js";
 import timetrackingRouter from "./routes/timetrackingRoutes.js";
 import activityLogRouter from "./routes/activityLogRoutes.js";
+import salesRouter from "./routes/salesRoutes.js";
 
 const app = express();
 const port = 3001;
@@ -81,6 +82,7 @@ app.use("/api/designation", designationRouter);
 app.use("/api/department", departmentRouter);
 app.use("/api/time-tracking", timetrackingRouter);
 app.use("/api/activity-logs", activityLogRouter);
+app.use("/api/sales", salesRouter);
 
 // Start server
 server.listen(port, () => console.log(`App listening on port ${port}!`));

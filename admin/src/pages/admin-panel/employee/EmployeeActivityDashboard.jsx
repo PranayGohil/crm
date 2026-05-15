@@ -7,6 +7,7 @@ import {
   useDebounce,
   RANGE_OPTIONS,
 } from "../../../hooks/useEmployeeData";
+import SearchableSelect from "../../../components/common/SearchableSelect";
 
 const API = process.env.REACT_APP_API_URL;
 
@@ -103,10 +104,14 @@ const PaginationBar = ({ pagination, onPageChange, onLimitChange, loading }) => 
           className="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50 disabled:opacity-40 transition-colors">
           Next
         </button>
-        <select value={limit} onChange={(e) => onLimitChange(Number(e.target.value))}
-          className="ml-1 px-2 py-1.5 text-xs border border-gray-300 rounded-lg bg-white focus:ring-1 focus:ring-blue-500">
-          {[20, 50, 100].map((n) => <option key={n} value={n}>{n}/page</option>)}
-        </select>
+        <div className="w-24 ml-1">
+          <SearchableSelect
+            value={{ value: limit, label: `${limit}/page` }}
+            onChange={(opt) => onLimitChange(Number(opt.value))}
+            options={[20, 50, 100].map((n) => ({ value: n, label: `${n}/page` }))}
+            isClearable={false}
+          />
+        </div>
       </div>
     </div>
   );
@@ -143,7 +148,9 @@ const EmployeeActivityDashboard = () => {
         ...(selectedRange === "custom" && customDates.from && { from: customDates.from }),
         ...(selectedRange === "custom" && customDates.to && { to: customDates.to }),
       });
-      const { data } = await axios.get(`${API}/api/employee/activity-history/${employeeId}?${params}`);
+      const { data } = await axios.get(`${API}/api/employee/activity-history/${employeeId}?${params}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
       setActivities(data.activities);
       setStats(data.stats);
       setUniqueProjects(data.uniqueProjects ?? []);
@@ -229,12 +236,12 @@ const EmployeeActivityDashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Activity Type</label>
-            <select value={activityType} onChange={(e) => setActivityType(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500">
-              {ACTIVITY_TYPES.map(({ key, label }) => (
-                <option key={key} value={key}>{label}</option>
-              ))}
-            </select>
+            <SearchableSelect
+              value={ACTIVITY_TYPES.find(a => a.key === activityType) ? { value: activityType, label: ACTIVITY_TYPES.find(a => a.key === activityType).label } : null}
+              onChange={(opt) => setActivityType(opt ? opt.value : "all")}
+              options={ACTIVITY_TYPES.map(({ key, label }) => ({ value: key, label }))}
+              isClearable={false}
+            />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Search Project</label>

@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import SearchableSelect from "../../components/common/SearchableSelect";
 
 /* ─── constants ──────────────────────────────────────────────────────────── */
 const ACTION_CATEGORIES = {
@@ -438,20 +439,19 @@ const ActivityLogs = () => {
                             {/* Action Type */}
                             <div className="sm:col-span-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Action Type</label>
-                                <select
-                                    value={filters.action}
-                                    onChange={(e) => setFilters((f) => ({ ...f, action: e.target.value }))}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                                >
-                                    <option value="">All Actions</option>
-                                    {Object.entries(ACTION_CATEGORIES).map(([category, actions]) => (
-                                        <optgroup key={category} label={category}>
-                                            {actions.map((action) => (
-                                                <option key={action.value} value={action.value}>{action.label}</option>
-                                            ))}
-                                        </optgroup>
-                                    ))}
-                                </select>
+                                <SearchableSelect
+                                    placeholder="All Actions"
+                                    value={filters.action ? { value: filters.action, label: Object.values(ACTION_CATEGORIES).flat().find(a => a.value === filters.action)?.label || filters.action } : null}
+                                    onChange={(opt) => setFilters((f) => ({ ...f, action: opt ? opt.value : "" }))}
+                                    options={[
+                                        { value: "", label: "All Actions" },
+                                        ...Object.entries(ACTION_CATEGORIES).map(([category, actions]) => ({
+                                            label: category,
+                                            options: actions.map(a => ({ value: a.value, label: a.label }))
+                                        }))
+                                    ]}
+                                    isClearable={false}
+                                />
                             </div>
 
                             {/* Admin (super-admin only) */}
@@ -460,45 +460,39 @@ const ActivityLogs = () => {
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         <FaUserShield className="inline mr-1" /> Admin
                                     </label>
-                                    <select
-                                        value={filters.adminId}
-                                        onChange={(e) => setFilters((f) => ({ ...f, adminId: e.target.value }))}
-                                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                                    >
-                                        <option value="">All Admins</option>
-                                        {admins.map((admin) => (
-                                            <option key={admin._id} value={admin._id}>{admin.username} ({admin.role})</option>
-                                        ))}
-                                    </select>
+                                    <SearchableSelect
+                                        placeholder="All Admins"
+                                        value={filters.adminId ? { value: filters.adminId, label: admins.find(a => a._id === filters.adminId) ? `${admins.find(a => a._id === filters.adminId).username} (${admins.find(a => a._id === filters.adminId).role})` : filters.adminId } : null}
+                                        onChange={(opt) => setFilters((f) => ({ ...f, adminId: opt ? opt.value : "" }))}
+                                        options={[
+                                            { value: "", label: "All Admins" },
+                                            ...admins.map((admin) => ({ value: admin._id, label: `${admin.username} (${admin.role})` }))
+                                        ]}
+                                        isClearable={false}
+                                    />
                                 </div>
                             )}
 
                             {/* Entity Type */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Entity Type</label>
-                                <select
-                                    value={filters.entityType}
-                                    onChange={(e) => setFilters((f) => ({ ...f, entityType: e.target.value }))}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                                >
-                                    {ENTITY_TYPES.map((type) => (
-                                        <option key={type.value} value={type.value}>{type.label}</option>
-                                    ))}
-                                </select>
+                                <SearchableSelect
+                                    value={{ value: filters.entityType, label: ENTITY_TYPES.find(t => t.value === filters.entityType)?.label || "All Entities" }}
+                                    onChange={(opt) => setFilters((f) => ({ ...f, entityType: opt ? opt.value : "" }))}
+                                    options={ENTITY_TYPES.map((type) => ({ value: type.value, label: type.label }))}
+                                    isClearable={false}
+                                />
                             </div>
 
                             {/* Severity */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Severity</label>
-                                <select
-                                    value={filters.severity}
-                                    onChange={(e) => setFilters((f) => ({ ...f, severity: e.target.value }))}
-                                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                                >
-                                    {SEVERITY_LEVELS.map((level) => (
-                                        <option key={level.value} value={level.value}>{level.label}</option>
-                                    ))}
-                                </select>
+                                <SearchableSelect
+                                    value={{ value: filters.severity, label: SEVERITY_LEVELS.find(l => l.value === filters.severity)?.label || "All Severities" }}
+                                    onChange={(opt) => setFilters((f) => ({ ...f, severity: opt ? opt.value : "" }))}
+                                    options={SEVERITY_LEVELS.map((level) => ({ value: level.value, label: level.label }))}
+                                    isClearable={false}
+                                />
                             </div>
 
                             {/* Search */}

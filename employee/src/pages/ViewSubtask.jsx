@@ -4,6 +4,7 @@ import axios from "axios";
 import LoadingOverlay from "../components/LoadingOverlay";
 import { toast } from "react-toastify";
 import { statusOptions, priorityOptions } from "../options";
+import SearchableSelect from "../components/SearchableSelect";
 import { Modal, Button } from "react-bootstrap";
 import { useSocket } from "../contexts/SocketContext";
 
@@ -42,8 +43,12 @@ const ViewSubtask = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
+      const user = JSON.parse(localStorage.getItem("employeeUser"));
+      const headers = { Authorization: `Bearer ${user?.token}` };
+      
       const { data: subtaskData } = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/subtask/get/${subtaskId}`
+        `${process.env.REACT_APP_API_URL}/api/subtask/get/${subtaskId}`,
+        { headers }
       );
       setSubtask(subtaskData);
       setComments(subtaskData.comments || []);
@@ -56,13 +61,15 @@ const ViewSubtask = () => {
       setMediaItems(items);
 
       const { data: projectData } = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/project/get/${subtaskData.project_id}`
+        `${process.env.REACT_APP_API_URL}/api/project/get/${subtaskData.project_id}`,
+        { headers }
       );
       setProject(projectData.project);
 
       if (subtaskData.assign_to) {
         const { data: employeeData } = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/employee/get/${subtaskData.assign_to}`
+          `${process.env.REACT_APP_API_URL}/api/employee/get/${subtaskData.assign_to}`,
+          { headers }
         );
         setAssignedEmployee(employeeData);
       }
@@ -78,8 +85,10 @@ const ViewSubtask = () => {
 
   const fetchAdminProfile = async () => {
     try {
+      const user = JSON.parse(localStorage.getItem("employeeUser"));
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/admin/profile-for-employee`
+        `${process.env.REACT_APP_API_URL}/api/admin/profile-for-employee`,
+        { headers: { Authorization: `Bearer ${user?.token}` } }
       );
       setAdmin(res.data.admin);
     } catch (error) {
@@ -126,13 +135,15 @@ const ViewSubtask = () => {
   const handleUpdate = async () => {
     try {
       setSaving(true);
+      const user = JSON.parse(localStorage.getItem("employeeUser"));
       await axios.put(
         `${process.env.REACT_APP_API_URL}/api/subtask/change-status/${subtaskId}`,
         {
           status: editingStatus,
           userId: employeeId,
           userRole: "employee",
-        }
+        },
+        { headers: { Authorization: `Bearer ${user?.token}` } }
       );
 
       toast.success("Subtask updated successfully!");
@@ -209,9 +220,11 @@ const ViewSubtask = () => {
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
     try {
+      const user = JSON.parse(localStorage.getItem("employeeUser"));
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/subtask/add-comment/${subtaskId}`,
-        { user_type: "employee", user_id: employeeId, text: newComment }
+        { user_type: "employee", user_id: employeeId, text: newComment },
+        { headers: { Authorization: `Bearer ${user?.token}` } }
       );
       setComments(data.comments);
       setNewComment("");
@@ -318,17 +331,15 @@ const ViewSubtask = () => {
 
                 {isEditing ? (
                   <div className="flex flex-wrap items-center gap-2">
-                    <select
-                      value={editingStatus}
-                      onChange={(e) => setEditingStatus(e.target.value)}
-                      className="px-2 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                      disabled={saving}
-                    >
-                      <option value="">Status</option>
-                      {statusOptions.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
+                    <div className="w-40">
+                      <SearchableSelect
+                        placeholder="Status"
+                        value={editingStatus ? { value: editingStatus, label: editingStatus } : null}
+                        onChange={(opt) => setEditingStatus(opt ? opt.value : "")}
+                        options={statusOptions.map((s) => ({ value: s, label: s }))}
+                        isDisabled={saving}
+                      />
+                    </div>
                     <div className="flex gap-2">
                       <button
                         onClick={handleUpdate}

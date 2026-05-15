@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
+import SearchableSelect from "../../../components/common/SearchableSelect";
 
 const ClientDashboardPage = () => {
   const navigate = useNavigate();
@@ -17,7 +18,9 @@ const ClientDashboardPage = () => {
     const fetchClients = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/with-subtasks`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/with-subtasks`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
         setClients(res.data);
         setError(null);
       } catch (error) {
@@ -133,16 +136,17 @@ const ClientDashboardPage = () => {
             className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-        <div className="flex gap-3">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="All">All Clients</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
+        <div className="flex gap-3 w-36">
+          <SearchableSelect
+            value={{ value: statusFilter, label: statusFilter === "All" ? "All Clients" : statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1) }}
+            onChange={(opt) => setStatusFilter(opt ? opt.value : "All")}
+            options={[
+              { value: "All", label: "All Clients" },
+              { value: "active", label: "Active" },
+              { value: "inactive", label: "Inactive" },
+            ]}
+            isClearable={false}
+          />
         </div>
       </div>
 

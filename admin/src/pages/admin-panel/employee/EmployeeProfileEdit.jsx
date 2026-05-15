@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { stageOptions } from "../../../options";
+import EmployeeSearchableSelect from "../../../components/common/EmployeeSearchableSelect";
 
 const employmentTypes = ["Full-time", "Part-time"];
 const inputCls = "w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
@@ -54,7 +55,9 @@ const EmployeeProfileEdit = () => {
     const fetchEmployee = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get/${employeeId}`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get/${employeeId}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
         const data = res.data;
         setInitialValues({
           ...data,
@@ -71,9 +74,10 @@ const EmployeeProfileEdit = () => {
   }, [employeeId]); // eslint-disable-line
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}/api/employee/managers`).then((r) => { if (r.data.success) setManagers(r.data.data); }).catch(console.error);
-    axios.get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`).then((r) => { if (r.data.success) setDesignations(r.data.designations); }).catch(console.error);
-    axios.get(`${process.env.REACT_APP_API_URL}/api/department/get-all`).then((r) => { if (r.data.success) setDepartments(r.data.departments); }).catch(console.error);
+    const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
+    axios.get(`${process.env.REACT_APP_API_URL}/api/employee/managers`, { headers }).then((r) => { if (r.data.success) setManagers(r.data.data); }).catch(console.error);
+    axios.get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`, { headers }).then((r) => { if (r.data.success) setDesignations(r.data.designations); }).catch(console.error);
+    axios.get(`${process.env.REACT_APP_API_URL}/api/department/get-all`, { headers }).then((r) => { if (r.data.success) setDepartments(r.data.departments); }).catch(console.error);
   }, []);
 
   const handleFileChange = (e, setFieldValue) => {
@@ -191,11 +195,12 @@ const EmployeeProfileEdit = () => {
                   <ErrorMessage name="employment_type" component="div" className={errCls} />
                 </div>
                 <div>
-                  <label className={labelCls}>Reporting Manager</label>
-                  <Field as="select" name="reporting_manager" className={inputCls}>
-                    <option value="">Select Reporting Manager</option>
-                    {managers.map((m) => m._id !== employeeId && <option key={m._id} value={m._id}>{m.full_name}</option>)}
-                  </Field>
+                  <EmployeeSearchableSelect
+                    label="Reporting Manager"
+                    placeholder="Select Reporting Manager"
+                    value={values.reporting_manager ? { value: values.reporting_manager, label: managers.find(m => m._id === values.reporting_manager)?.full_name || "Selected Manager" } : null}
+                    onChange={(opt) => setFieldValue("reporting_manager", opt ? opt.value : "")}
+                  />
                 </div>
                 <div><label className={labelCls}>Date of Joining</label><Field type="date" name="date_of_joining" className={inputCls} /><ErrorMessage name="date_of_joining" component="div" className={errCls} /></div>
                 <div><label className={labelCls}>Monthly Salary</label><Field type="number" name="monthly_salary" className={inputCls} /><ErrorMessage name="monthly_salary" component="div" className={errCls} /></div>

@@ -20,14 +20,18 @@ const ProjectDetails = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        const user = JSON.parse(localStorage.getItem("employeeUser"));
+        const headers = { Authorization: `Bearer ${user?.token}` };
         const projectRes = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`
+          `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`,
+          { headers }
         );
         const proj = projectRes.data.project;
         setProject(proj);
 
         const subtasksRes = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/subtask/project/${projectId}`
+          `${process.env.REACT_APP_API_URL}/api/subtask/project/${projectId}`,
+          { headers }
         );
         setSubTasks(subtasksRes.data || []);
       } catch (err) {

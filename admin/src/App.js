@@ -60,6 +60,7 @@ import EarningsReport from "./pages/admin-panel/EarningsReport";
 import NotificationSettings from "./NotificationSettings";
 
 import ActivityLogs from "./pages/admin-panel/ActivityLogs";
+import SalesPanel from "./pages/admin-panel/SalesPanel";
 
 function App() {
   return (
@@ -154,11 +155,11 @@ function App() {
 
         <Route path="/manage-admins" element={<ManageAdmins />} />
 
-        <Route
-          path="/notification-settings"
+        <Route path="/notification-settings"
           element={<NotificationSettings />}
         />
         <Route path="/activity-logs" element={<ActivityLogs />} />
+        <Route path="/sales-panel" element={<SalesPanel />} />
       </Route>
 
       <Route path="/" element={<Plain_layout />}>

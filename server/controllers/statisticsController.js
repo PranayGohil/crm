@@ -78,17 +78,67 @@ export const Summary = async (req, res) => {
 
 export const UpcomingDueDates = async (req, res) => {
   try {
-    const tasks = await SubTask.find({ status: { $ne: "Completed" } }) // filter out Completed
-      .sort({ due_date: 1 })
-      .populate({
-        path: "project_id",
-        select: "project_name due_date",
-      })
-      .populate({
-        path: "assign_to",
-        select: "full_name profile_pic",
-      })
-      .lean();
+    const tasks = await SubTask.aggregate([
+      { $match: { status: { $ne: "Completed" } } },
+      {
+        $lookup: {
+          from: "projects",
+          localField: "project_id",
+          foreignField: "_id",
+          as: "project_id",
+        },
+      },
+      { $unwind: { path: "$project_id", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "clients",
+          let: { cid: "$project_id.client_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: [{ $toString: "$_id" }, "$$cid"] },
+              },
+            },
+            { $project: { status: 1 } },
+          ],
+          as: "client_info",
+        },
+      },
+      {
+        $addFields: {
+          client_status: { $ifNull: [{ $arrayElemAt: ["$client_info.status", 0] }, "active"] },
+        },
+      },
+      {
+        $addFields: {
+          status_weight: {
+            $cond: { if: { $eq: ["$client_status", "inactive"] }, then: 1, else: 0 },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "employees",
+          localField: "assign_to",
+          foreignField: "_id",
+          as: "assign_to",
+        },
+      },
+      { $unwind: { path: "$assign_to", preserveNullAndEmptyArrays: true } },
+      { $sort: { status_weight: 1, due_date: 1 } },
+      {
+        $project: {
+          task_name: 1,
+          due_date: 1,
+          status: 1,
+          priority: 1,
+          "project_id.project_name": 1,
+          "project_id.due_date": 1,
+          "assign_to.full_name": 1,
+          "assign_to.profile_pic": 1,
+        },
+      },
+    ]);
 
     res.json(tasks);
   } catch (error) {
@@ -252,3 +302,4 @@ export const countWorkingDaysBetween = (start, end) => {
   const days = eachDayOfInterval({ start, end });
   return days.filter((d) => !isSunday(d)).length;
 };
+

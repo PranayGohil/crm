@@ -7,8 +7,9 @@ import axios from "axios";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { useSocket } from "../contexts/SocketContext";
-import { statusOptions, priorityOptions } from "../options";
+import { stageOptions, priorityOptions, statusOptions } from "../options";
 import LoadingOverlay from "../components/LoadingOverlay";
+import SearchableSelect from "../components/SearchableSelect";
 
 dayjs.extend(duration);
 const API = process.env.REACT_APP_API_URL;
@@ -89,10 +90,14 @@ const PaginationBar = ({ pagination, onPageChange, onLimitChange, loading }) => 
           )}
           <button onClick={() => onPageChange(page + 1)} disabled={page >= totalPages || loading}
             className="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50 disabled:opacity-40">Next</button>
-          <select value={limit} onChange={(e) => onLimitChange(Number(e.target.value))}
-            className="ml-1 px-2 py-1.5 text-xs border border-gray-300 rounded-lg bg-white">
-            {PAGE_SIZE_OPTIONS.map((n) => <option key={n} value={n}>{n}/page</option>)}
-          </select>
+          <div className="w-24 ml-1">
+            <SearchableSelect
+              value={{ value: limit, label: `${limit}/page` }}
+              onChange={(opt) => onLimitChange(Number(opt.value))}
+              options={PAGE_SIZE_OPTIONS.map((n) => ({ value: n, label: `${n}/page` }))}
+              isClearable={false}
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -128,8 +133,9 @@ const EmployeeDashboard = () => {
 
   useEffect(() => {
     if (!currentEmployeeId) return;
+    const userObj = JSON.parse(localStorage.getItem("employeeUser"));
     axios.get(`${API}/api/employee/get/${currentEmployeeId}`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      headers: { Authorization: `Bearer ${userObj?.token}` },
     }).then((r) => setUser(r.data)).catch(console.error);
   }, [currentEmployeeId]);
 
@@ -138,8 +144,10 @@ const EmployeeDashboard = () => {
     setLoading(true);
     try {
       const fp = buildFilterDates(selectedFilter, customRange);
+      const userObj = JSON.parse(localStorage.getItem("employeeUser"));
       const { data } = await axios.get(`${API}/api/employee/dashboard/${currentEmployeeId}`, {
         params: { ...fp, page: pageOverride ?? pagination.page, limit: limitOverride ?? pagination.limit },
+        headers: { Authorization: `Bearer ${userObj?.token}` },
       });
       setRawSubtasks(data.subtasks ?? []);
       setRawProjects(data.projects ?? []);
@@ -224,14 +232,22 @@ const EmployeeDashboard = () => {
     setSelectedTask(null);
     try {
       const u = JSON.parse(localStorage.getItem("employeeUser"));
-      await axios.put(`${API}/api/subtask/change-status/${task._id}`, { status, userId: u._id, userRole: "employee" });
+      const token = u?.token;
+      await axios.put(`${API}/api/subtask/change-status/${task._id}`, 
+        { status, userId: u._id, userRole: "employee" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       fetchRef.current();
     } catch (err) { toast.error(err.response?.data?.message ?? "Failed to change status."); }
   }, []);
 
   const completeStage = useCallback(async (task) => {
     try {
-      await axios.put(`${API}/api/subtask/complete-stage/${task._id}`);
+      const u = JSON.parse(localStorage.getItem("employeeUser"));
+      const token = u?.token;
+      await axios.put(`${API}/api/subtask/complete-stage/${task._id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       toast.success("Stage marked as completed!");
       fetchRef.current();
     } catch { toast.error("Failed to complete stage"); }
@@ -349,19 +365,23 @@ const EmployeeDashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Filter by Status</label>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500">
-              <option value="All">All Status</option>
-              {statusOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-            </select>
+            <SearchableSelect
+              placeholder="All Status"
+              value={statusFilter === "All" ? { value: "All", label: "All Status" } : { value: statusFilter, label: statusFilter }}
+              onChange={(opt) => setStatusFilter(opt ? opt.value : "All")}
+              options={[{ value: "All", label: "All Status" }, ...statusOptions.map((o) => ({ value: o, label: o }))]}
+              isClearable={false}
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Filter by Priority</label>
-            <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500">
-              <option value="All">All Priority</option>
-              {priorityOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-            </select>
+            <SearchableSelect
+              placeholder="All Priority"
+              value={priorityFilter === "All" ? { value: "All", label: "All Priority" } : { value: priorityFilter, label: priorityFilter }}
+              onChange={(opt) => setPriorityFilter(opt ? opt.value : "All")}
+              options={[{ value: "All", label: "All Priority" }, ...priorityOptions.map((o) => ({ value: o, label: o }))]}
+              isClearable={false}
+            />
           </div>
         </div>
       </div>
@@ -472,10 +492,13 @@ const EmployeeDashboard = () => {
                                       <td className="px-3 py-2">
                                         {showC && !task.currentStageAssignedToEmployee
                                           ? <span className={"px-2 py-0.5 rounded-full font-medium " + badge(statusColor, displayStatus)}>{displayStatus}</span>
-                                          : <select value={displayStatus} onChange={(e) => handleChangeStatus(task, e.target.value)}
-                                            className={"px-2 py-1 rounded-lg border text-xs font-medium focus:ring-1 focus:ring-blue-500 " + badge(statusColor, displayStatus)}>
-                                            {statusOptions.map((s) => <option key={s} value={s}>{s}</option>)}
-                                          </select>
+                                          : <div className="w-32"><SearchableSelect
+                                              value={{ value: displayStatus, label: displayStatus }}
+                                              onChange={(opt) => handleChangeStatus(task, opt ? opt.value : "")}
+                                              options={statusOptions.map((s) => ({ value: s, label: s }))}
+                                              isClearable={false}
+                                              menuPosition="fixed"
+                                            /></div>
                                         }
                                       </td>
                                       <td className="px-3 py-2 max-w-[160px]">{getStages(task)}</td>
@@ -593,10 +616,13 @@ const EmployeeDashboard = () => {
                             <span className={"px-2 py-0.5 rounded-full font-medium " + badge(priorityColor, task.priority)}>{task.priority}</span>
                             {showC && !task.currentStageAssignedToEmployee
                               ? <span className={"px-2 py-0.5 rounded-full font-medium " + badge(statusColor, displayStatus)}>{displayStatus}</span>
-                              : <select value={displayStatus} onChange={(e) => handleChangeStatus(task, e.target.value)}
-                                className={"px-2 py-0.5 rounded-lg border text-xs font-medium focus:ring-1 focus:ring-blue-500 " + badge(statusColor, displayStatus)}>
-                                {statusOptions.map((s) => <option key={s} value={s}>{s}</option>)}
-                              </select>
+                              : <div className="w-32"><SearchableSelect
+                                  value={{ value: displayStatus, label: displayStatus }}
+                                  onChange={(opt) => handleChangeStatus(task, opt ? opt.value : "")}
+                                  options={statusOptions.map((s) => ({ value: s, label: s }))}
+                                  isClearable={false}
+                                  menuPosition="fixed"
+                                /></div>
                             }
                           </div>
 

@@ -26,8 +26,13 @@ const ClientDashboard = () => {
         setLoading(true);
         const username = localStorage.getItem("clientUsername");
 
+        const u = JSON.parse(localStorage.getItem("clientUser"));
+        const token = u?.token;
+        const headers = { Authorization: `Bearer ${token}` };
+
         const projectRes = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/client/projects/${username}`
+          `${process.env.REACT_APP_API_URL}/api/client/projects/${username}`,
+          { headers }
         );
         const fetchedProjects = projectRes.data.projects;
         setProjects(fetchedProjects);
@@ -36,7 +41,8 @@ const ClientDashboard = () => {
         await Promise.all(
           fetchedProjects.map(async (project) => {
             const res = await axios.get(
-              `${process.env.REACT_APP_API_URL}/api/subtask/project/${project._id}`
+              `${process.env.REACT_APP_API_URL}/api/subtask/project/${project._id}`,
+              { headers }
             );
             subtasksMap[project._id] = res.data;
           })
@@ -44,7 +50,8 @@ const ClientDashboard = () => {
         setProjectSubtasks(subtasksMap);
 
         const employeeRes = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/employee/get-all`
+          `${process.env.REACT_APP_API_URL}/api/employee/get-all`,
+          { headers }
         );
         const empMap = {};
         employeeRes.data.forEach((e) => { empMap[e._id] = e; });

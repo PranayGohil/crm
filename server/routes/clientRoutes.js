@@ -12,11 +12,13 @@ import {
   getClientTasks,
   getClientProjectsWithUsername,
   getClientsWithSubtasks,
-  getClientEarningsReport
+  getClientEarningsReport,
+  searchClients
 } from "../controllers/clientController.js";
 
 const clientRouter = express.Router();
 
+clientRouter.get("/search", searchClients);
 clientRouter.get("/get-all", getClients);
 clientRouter.get("/get/:id", getClientInfo);
 clientRouter.get("/get-username/:username", getClientByUsername);

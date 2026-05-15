@@ -159,6 +159,43 @@ export const getClients = async (req, res) => {
   }
 };
 
+export const searchClients = async (req, res) => {
+  try {
+    const { q, page = 1, limit = 20 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const query = {};
+    if (q) {
+      query.$or = [
+        { full_name: { $regex: q, $options: "i" } },
+        { company_name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { username: { $regex: q, $options: "i" } },
+      ];
+    }
+
+    const clients = await Client.find(query)
+      .sort({ full_name: 1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await Client.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      clients,
+      pagination: {
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Error in searchClients:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 export const getClientInfo = async (req, res) => {
   try {
     const { id } = req.params;

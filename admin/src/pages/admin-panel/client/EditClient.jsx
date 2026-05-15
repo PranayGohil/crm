@@ -67,7 +67,9 @@ const EditClient = () => {
     const fetchClient = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/get-username/${id}`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/get-username/${id}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
         const client = res.data;
         const mergedStagePricing = STAGE_OPTIONS.map((stage) => {
           const existing = client.stage_pricing?.find((p) => p.stage_name === stage);

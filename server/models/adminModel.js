@@ -24,6 +24,15 @@ const adminSchema = new mongoose.Schema({
     enum: ['super-admin', 'admin'],
     default: 'admin'
   },
+  sales_permissions: [{
+    type: String,
+    enum: ['manage_mukhwas_sales', 'manage_breeliq_sales'],
+    default: []
+  }],
+  manage_stages: [{
+    type: String,
+    default: []
+  }],
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Admin'

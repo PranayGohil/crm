@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-table";
 import LoadingOverlay from "../components/LoadingOverlay";
 import { stageOptions, statusOptions } from "../options";
+import SearchableSelect from "../components/SearchableSelect";
 
 // ── Badge colour maps ───────────────────────────────────────────────────────
 const statusClass = {
@@ -112,9 +113,12 @@ const SubtaskDashboardContainer = () => {
   const fetchSubtasks = async () => {
     setLoading(true);
     try {
+      const u = JSON.parse(localStorage.getItem("clientUser"));
+      const token = u?.token;
+      const headers = { Authorization: `Bearer ${token}` };
       const [subtaskRes, projectRes] = await Promise.all([
-        axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/project/${projectId}`),
-        axios.get(`${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`),
+        axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/project/${projectId}`, { headers }),
+        axios.get(`${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`, { headers }),
       ]);
       setProject(projectRes.data.project);
 
@@ -203,10 +207,13 @@ const SubtaskDashboardContainer = () => {
       },
       meta: {
         filterComponent: ({ column }) => (
-          <select value={column.getFilterValue() ?? ""} onChange={(e) => column.setFilterValue(e.target.value || undefined)} className={selectCls}>
-            <option value="">All</option>
-            {stageOptions.map((o, i) => <option key={i} value={o}>{o}</option>)}
-          </select>
+          <SearchableSelect
+            value={column.getFilterValue() ? { value: column.getFilterValue(), label: column.getFilterValue() } : null}
+            onChange={(opt) => column.setFilterValue(opt ? opt.value : undefined)}
+            options={[{ value: "", label: "All" }, ...stageOptions.map((o) => ({ value: o, label: o }))]}
+            placeholder="All"
+            isClearable={false}
+          />
         ),
       },
     }),
@@ -226,10 +233,13 @@ const SubtaskDashboardContainer = () => {
       filterFn: "equals",
       meta: {
         filterComponent: ({ column }) => (
-          <select value={column.getFilterValue() ?? ""} onChange={(e) => column.setFilterValue(e.target.value || undefined)} className={selectCls}>
-            <option value="">All</option>
-            {statusOptions.map((o, i) => <option key={i} value={o}>{o}</option>)}
-          </select>
+          <SearchableSelect
+            value={column.getFilterValue() ? { value: column.getFilterValue(), label: column.getFilterValue() } : null}
+            onChange={(opt) => column.setFilterValue(opt ? opt.value : undefined)}
+            options={[{ value: "", label: "All" }, ...statusOptions.map((o) => ({ value: o, label: o }))]}
+            placeholder="All"
+            isClearable={false}
+          />
         ),
       },
     }),
@@ -343,13 +353,14 @@ const SubtaskDashboardContainer = () => {
               </svg>
               Reset
             </button>
-            <select
-              value={table.getState().pagination.pageSize}
-              onChange={(e) => table.setPageSize(Number(e.target.value))}
-              className="px-2 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
-            >
-              {[10, 20, 50, 100].map((n) => <option key={n} value={n}>Show {n}</option>)}
-            </select>
+            <div className="w-28">
+              <SearchableSelect
+                value={{ value: table.getState().pagination.pageSize, label: `Show ${table.getState().pagination.pageSize}` }}
+                onChange={(opt) => table.setPageSize(Number(opt.value))}
+                options={[10, 20, 50, 100].map((n) => ({ value: n, label: `Show ${n}` }))}
+                isClearable={false}
+              />
+            </div>
           </div>
         </div>
       </div>

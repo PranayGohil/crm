@@ -14,7 +14,9 @@ const Designation = () => {
   const fetchDesignations = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
       setDesignations(res.data.designations);
     } catch (err) {
       console.error("Failed to fetch designations", err);

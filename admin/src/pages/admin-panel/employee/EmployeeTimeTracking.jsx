@@ -30,9 +30,11 @@ const EmployeeTimeTracking = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        const token = localStorage.getItem("token");
+        const headers = { Authorization: `Bearer ${token}` };
         const [projRes, subRes] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all-archived`),
-          axios.get(`${process.env.REACT_APP_API_URL}/api/employee/tasks/${employeeId}`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all-archived`, { headers }),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/employee/tasks/${employeeId}`, { headers }),
         ]);
         setProjects(projRes.data);
         setSubtasks(subRes.data);

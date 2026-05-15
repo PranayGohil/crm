@@ -14,11 +14,13 @@ import {
   getEmployeeCompletedTasks,
   getEmployeeActivityHistory,
   getEmployeeTimeTracking,
+  searchEmployees,
 } from "../controllers/employeeController.js";
 import upload from "../middlewares/upload.js";
 
 const employeeRouter = express.Router();
 
+employeeRouter.get("/search", searchEmployees);
 employeeRouter.post("/check-username", checkUsernameAvailability);
 employeeRouter.post("/add", upload.single("profile_pic"), addEmployee);
 employeeRouter.get("/get-all", getEmployees);

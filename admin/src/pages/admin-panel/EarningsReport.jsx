@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
+import ClientSearchableSelect from "../../components/common/ClientSearchableSelect";
+import SearchableSelect from "../../components/common/SearchableSelect";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -6,6 +8,7 @@ import {
     XAxis, YAxis, CartesianGrid, Tooltip, Legend,
     ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
+import { BRANDS } from "../../constants";
 
 /* ─── formatters ─────────────────────────────────────────────────────────── */
 const fmt = (n) => `₹${(n || 0).toLocaleString("en-IN")}`;
@@ -105,6 +108,10 @@ const EarningsReport = () => {
     const [employees, setEmployees] = useState({});
     const [clients, setClients] = useState({});
     const [projects, setProjects] = useState({});
+    const [salesEntries, setSalesEntries] = useState([]);
+    const [monthlyTargets, setMonthlyTargets] = useState([]);
+
+    const [selectedBrand, setSelectedBrand] = useState("all");
 
     const [activeTab, setActiveTab] = useState("overview");
     const [dateRange, setDateRange] = useState("all");
@@ -114,15 +121,32 @@ const EarningsReport = () => {
     const [timelineSearch, setTimelineSearch] = useState("");
     const [timelinePage, setTimelinePage] = useState(1);
 
+    const visibleTabs = useMemo(() => {
+        const isSalesBrand = selectedBrand === "Mukhwas" || selectedBrand === "Breeliq";
+        if (isSalesBrand) {
+            return TABS.filter(t => t.key !== "stages" && t.key !== "clients");
+        }
+        return TABS;
+    }, [selectedBrand]);
+
+    useEffect(() => {
+        if (!visibleTabs.find(t => t.key === activeTab)) {
+            setActiveTab("overview");
+        }
+    }, [visibleTabs, activeTab]);
+
     useEffect(() => {
         const load = async () => {
             setLoading(true);
             try {
-                const [stRes, empRes, cliRes, projRes] = await Promise.all([
-                    axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/get-all`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/api/client/get-all`),
-                    axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all`),
+                const token = localStorage.getItem("token");
+                const headers = { Authorization: `Bearer ${token}` };
+                const [stRes, empRes, cliRes, projRes, salesRes] = await Promise.all([
+                    axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/get-all`, { headers }),
+                    axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`, { headers }),
+                    axios.get(`${process.env.REACT_APP_API_URL}/api/client/get-all`, { headers }),
+                    axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all`, { headers }),
+                    axios.get(`${process.env.REACT_APP_API_URL}/api/sales/report-data`, { headers }),
                 ]);
                 const empMap = {};
                 (empRes.data || []).forEach((e) => { empMap[e._id] = e; });
@@ -134,6 +158,11 @@ const EarningsReport = () => {
                 setClients(cliMap);
                 setProjects(projMap);
                 setSubtasks(stRes.data || []);
+                
+                if (salesRes.data?.success) {
+                    setSalesEntries(salesRes.data.entries || []);
+                    setMonthlyTargets(salesRes.data.targets || []);
+                }
             } catch (err) {
                 console.error("EarningsReport load error:", err);
             } finally {
@@ -144,6 +173,9 @@ const EarningsReport = () => {
     }, []);
 
     const filtered = useMemo(() => {
+        // Subtasks are only for Maulshree
+        if (selectedBrand !== "all" && selectedBrand !== "Maulshree") return [];
+
         let list = subtasks.filter((s) => (s.total_price || 0) > 0);
 
         if (dateRange === "custom") {
@@ -158,11 +190,10 @@ const EarningsReport = () => {
                 });
             }
         } else if (dateRange !== "all") {
+            const now = new Date();
             if (dateRange === "today") {
-                const start = new Date();
-                start.setHours(0, 0, 0, 0);
-                const end = new Date();
-                end.setHours(23, 59, 59, 999);
+                const start = new Date(); start.setHours(0, 0, 0, 0);
+                const end = new Date(); end.setHours(23, 59, 59, 999);
                 list = list.filter((s) => {
                     const d = new Date(s.assign_date || s.createdAt);
                     return d >= start && d <= end;
@@ -181,18 +212,109 @@ const EarningsReport = () => {
             list = list.filter((s) => projects[s.project_id]?.client_id === selectedClient);
         }
         return list;
-    }, [subtasks, dateRange, customFrom, customTo, selectedClient, projects]);
+    }, [subtasks, dateRange, customFrom, customTo, selectedClient, projects, selectedBrand]);
+
+    const filteredSales = useMemo(() => {
+        if (selectedBrand === "Maulshree") return [];
+        
+        let list = salesEntries;
+        if (selectedBrand !== "all") {
+            list = list.filter(s => s.brand === selectedBrand);
+        }
+
+        if (dateRange === "custom") {
+            if (customFrom || customTo) {
+                const from = customFrom ? new Date(customFrom) : null;
+                const to = customTo ? new Date(customTo + "T23:59:59.999") : null;
+                list = list.filter((s) => {
+                    const d = new Date(s.date);
+                    if (from && d < from) return false;
+                    if (to && d > to) return false;
+                    return true;
+                });
+            }
+        } else if (dateRange !== "all") {
+            if (dateRange === "today") {
+                const start = new Date(); start.setHours(0, 0, 0, 0);
+                const end = new Date(); end.setHours(23, 59, 59, 999);
+                list = list.filter((s) => {
+                    const d = new Date(s.date);
+                    return d >= start && d <= end;
+                });
+            } else {
+                const cutoff = new Date();
+                if (dateRange === "week") cutoff.setDate(cutoff.getDate() - 7);
+                if (dateRange === "month") cutoff.setMonth(cutoff.getMonth() - 1);
+                if (dateRange === "quarter") cutoff.setMonth(cutoff.getMonth() - 3);
+                if (dateRange === "year") cutoff.setFullYear(cutoff.getFullYear() - 1);
+                list = list.filter((s) => new Date(s.date) >= cutoff);
+            }
+        }
+        return list;
+    }, [salesEntries, dateRange, customFrom, customTo, selectedBrand]);
+
+    const filteredTargets = useMemo(() => {
+        if (selectedBrand === "Maulshree") return [];
+        let list = monthlyTargets;
+        if (selectedBrand !== "all") {
+            list = list.filter(t => t.brand === selectedBrand);
+        }
+        
+        // Filter targets by date range
+        // For simple ranges (today/week/month), we just include the relevant months
+        // This is a bit complex since targets are monthly.
+        // We'll approximate by checking if the month/year falls in the range.
+        const now = new Date();
+        const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        if (dateRange === "all") return list;
+        if (dateRange === "month" || dateRange === "today" || dateRange === "week") {
+            return list.filter(t => t.month === now.getMonth() && t.year === now.getFullYear());
+        }
+        if (dateRange === "quarter") {
+            const threeMonthsAgo = new Date(); threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 2);
+            return list.filter(t => {
+                const d = new Date(t.year, t.month, 1);
+                return d >= new Date(threeMonthsAgo.getFullYear(), threeMonthsAgo.getMonth(), 1);
+            });
+        }
+        if (dateRange === "year") {
+            return list.filter(t => t.year === now.getFullYear());
+        }
+        if (dateRange === "custom") {
+            const from = customFrom ? new Date(customFrom) : null;
+            const to = customTo ? new Date(customTo) : null;
+            return list.filter(t => {
+                const d = new Date(t.year, t.month, 1);
+                if (from && d < new Date(from.getFullYear(), from.getMonth(), 1)) return false;
+                if (to && d > new Date(to.getFullYear(), to.getMonth(), 1)) return false;
+                return true;
+            });
+        }
+        return list;
+    }, [monthlyTargets, dateRange, customFrom, customTo, selectedBrand]);
 
     const summary = useMemo(() => {
-        const totalValue = filtered.reduce((s, t) => s + (t.total_price || 0), 0);
-        const earnedValue = filtered.reduce((s, t) => s + (t.earned_amount || 0), 0);
+        // Maulshree totals
+        const stTotalValue = filtered.reduce((s, t) => s + (t.total_price || 0), 0);
+        const stEarnedValue = filtered.reduce((s, t) => s + (t.earned_amount || 0), 0);
+        
+        // Sales totals
+        const salesEarnedValue = filteredSales.reduce((s, t) => s + (t.amount || 0), 0);
+        const salesTotalValue = filteredTargets.reduce((s, t) => s + (t.target_amount || 0), 0);
+
+        const totalValue = stTotalValue + salesTotalValue;
+        const earnedValue = stEarnedValue + salesEarnedValue;
+        
         const pendingValue = totalValue - earnedValue;
         const percent = totalValue > 0 ? Math.round((earnedValue / totalValue) * 100) : 0;
-        return { totalValue, earnedValue, pendingValue, percent, totalTasks: filtered.length };
-    }, [filtered]);
+        return { totalValue, earnedValue, pendingValue, percent, totalTasks: filtered.length + filteredSales.length };
+    }, [filtered, filteredSales, filteredTargets]);
 
     const monthlyData = useMemo(() => {
         const map = {};
+        
+        // Subtasks (Maulshree)
         filtered.forEach((s) => {
             (s.stages || []).filter((st) => st.completed && st.completed_at).forEach((st) => {
                 const d = new Date(st.completed_at);
@@ -208,11 +330,36 @@ const EarningsReport = () => {
             const earned = (s.stages || []).filter((st) => st.completed).reduce((a, st) => a + (st.price || 0), 0);
             map[key].pending += Math.max(0, (s.total_price || 0) - earned);
         });
+
+        // Sales Entries (Mukhwas/Breeliq)
+        filteredSales.forEach((s) => {
+            const d = new Date(s.date);
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+            const label = d.toLocaleString("default", { month: "short", year: "2-digit" });
+            if (!map[key]) map[key] = { month: label, earned: 0, pending: 0 };
+            map[key].earned += s.amount || 0;
+        });
+
+        // Add pending from targets
+        filteredTargets.forEach((t) => {
+            const key = `${t.year}-${String(t.month + 1).padStart(2, "0")}`;
+            const label = new Date(t.year, t.month).toLocaleString("default", { month: "short", year: "2-digit" });
+            if (!map[key]) map[key] = { month: label, earned: 0, pending: 0 };
+            
+            // Calculate achieved for this specific brand/month to find pending
+            const achievedInMonth = salesEntries
+                .filter(s => s.brand === t.brand && new Date(s.date).getMonth() === t.month && new Date(s.date).getFullYear() === t.year)
+                .reduce((a, s) => a + (s.amount || 0), 0);
+            
+            map[key].pending += Math.max(0, t.target_amount - achievedInMonth);
+        });
+
         return Object.keys(map).sort().map((k) => map[k]);
-    }, [filtered]);
+    }, [filtered, filteredSales, filteredTargets, salesEntries]);
 
     const stageData = useMemo(() => {
         const map = {};
+        // Subtask stages
         filtered.forEach((s) => {
             (s.stages || []).forEach((st) => {
                 const name = st.name || st;
@@ -222,22 +369,41 @@ const EarningsReport = () => {
                 if (st.completed) { map[name].earned += st.price || 0; map[name].completedCount += 1; }
             });
         });
+        // Sales entries as a stage
+        filteredSales.forEach((s) => {
+            const name = "Sales Entry";
+            if (!map[name]) map[name] = { stage: name, total: 0, earned: 0, count: 0, completedCount: 0 };
+            map[name].total += s.amount || 0;
+            map[name].earned += s.amount || 0;
+            map[name].count += 1;
+            map[name].completedCount += 1;
+        });
         return Object.values(map);
-    }, [filtered]);
+    }, [filtered, filteredSales]);
 
     const employeeData = useMemo(() => {
         const map = {};
+        // Subtask earnings
         filtered.forEach((s) => {
             (s.stages || []).filter((st) => st.completed && st.completed_by).forEach((st) => {
                 const id = String(st.completed_by);
                 const emp = employees[id];
-                if (!map[id]) map[id] = { id, name: emp?.full_name || "Unknown", earned: 0, stages: 0, profile_pic: emp?.profile_pic };
+                if (!map[id]) map[id] = { id, name: emp?.full_name || emp?.username || "Unknown", earned: 0, stages: 0, profile_pic: emp?.profile_pic };
                 map[id].earned += st.price || 0;
                 map[id].stages += 1;
             });
         });
+        // Sales earnings
+        filteredSales.forEach((s) => {
+            if (!s.created_by) return;
+            const id = typeof s.created_by === 'object' ? s.created_by._id : String(s.created_by);
+            const name = typeof s.created_by === 'object' ? s.created_by.username : (employees[id]?.full_name || "Unknown");
+            if (!map[id]) map[id] = { id, name, earned: 0, stages: 0, profile_pic: employees[id]?.profile_pic };
+            map[id].earned += s.amount || 0;
+            map[id].stages += 1;
+        });
         return Object.values(map).sort((a, b) => b.earned - a.earned);
-    }, [filtered, employees]);
+    }, [filtered, filteredSales, employees]);
 
     const clientData = useMemo(() => {
         const map = {};
@@ -255,6 +421,7 @@ const EarningsReport = () => {
 
     const timeline = useMemo(() => {
         const events = [];
+        // Subtask events
         filtered.forEach((s) => {
             const proj = projects[s.project_id];
             const client = clients[proj?.client_id];
@@ -267,13 +434,29 @@ const EarningsReport = () => {
                     taskName: s.task_name,
                     projectName: proj?.project_name || "—",
                     clientName: client?.full_name || "—",
-                    employeeName: emp?.full_name || "—",
+                    employeeName: emp?.full_name || emp?.username || "—",
                     employeePic: emp?.profile_pic,
+                    brand: "Maulshree"
                 });
             });
         });
+        // Sales events
+        filteredSales.forEach((s) => {
+            const emp = typeof s.created_by === 'object' ? s.created_by : employees[String(s.created_by)];
+            events.push({
+                date: new Date(s.date),
+                stageName: "Sales Entry",
+                price: s.amount || 0,
+                taskName: `Sale for ${s.brand}`,
+                projectName: s.brand,
+                clientName: "—",
+                employeeName: emp?.username || emp?.full_name || "—",
+                employeePic: emp?.profile_pic,
+                brand: s.brand
+            });
+        });
         return events.sort((a, b) => b.date - a.date);
-    }, [filtered, projects, clients, employees]);
+    }, [filtered, filteredSales, projects, clients, employees]);
 
     const filteredTimeline = useMemo(() => {
         if (!timelineSearch) return timeline;
@@ -291,6 +474,7 @@ const EarningsReport = () => {
         downloadCSV(
             timeline.map((e) => ({
                 Date: e.date.toLocaleDateString("en-IN"),
+                Brand: e.brand,
                 Stage: e.stageName, Amount: e.price, Task: e.taskName,
                 Project: e.projectName, Client: e.clientName, "Completed By": e.employeeName,
             })),
@@ -345,22 +529,28 @@ const EarningsReport = () => {
 
                     {/* Filter Controls */}
                     <div className="flex flex-wrap items-center gap-2">
-                        <select
-                            value={dateRange}
-                            onChange={(e) => {
-                                setDateRange(e.target.value);
-                                if (e.target.value !== "custom") { setCustomFrom(""); setCustomTo(""); }
-                            }}
-                            className="text-xs sm:text-sm border border-gray-300 rounded-lg px-2 sm:px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
-                        >
-                            <option value="all">All Time</option>
-                            <option value="today">Today</option>
-                            <option value="week">Last 7 Days</option>
-                            <option value="month">Last Month</option>
-                            <option value="quarter">Last Quarter</option>
-                            <option value="year">Last Year</option>
-                            <option value="custom">Custom Range</option>
-                        </select>
+                        <div className="w-40">
+                            <SearchableSelect
+                                value={dateRange ? { 
+                                    value: dateRange, 
+                                    label: { "all": "All Time", "today": "Today", "week": "Last 7 Days", "month": "Last Month", "quarter": "Last Quarter", "year": "Last Year", "custom": "Custom Range" }[dateRange] 
+                                } : null}
+                                onChange={(opt) => {
+                                    setDateRange(opt ? opt.value : "all");
+                                    if (opt && opt.value !== "custom") { setCustomFrom(""); setCustomTo(""); }
+                                }}
+                                options={[
+                                    { value: "all", label: "All Time" },
+                                    { value: "today", label: "Today" },
+                                    { value: "week", label: "Last 7 Days" },
+                                    { value: "month", label: "Last Month" },
+                                    { value: "quarter", label: "Last Quarter" },
+                                    { value: "year", label: "Last Year" },
+                                    { value: "custom", label: "Custom Range" }
+                                ]}
+                                isClearable={false}
+                            />
+                        </div>
 
                         {/* Custom date pickers */}
                         {dateRange === "custom" && (
@@ -382,16 +572,28 @@ const EarningsReport = () => {
                             </div>
                         )}
 
-                        <select
-                            value={selectedClient}
-                            onChange={(e) => setSelectedClient(e.target.value)}
-                            className="text-xs sm:text-sm border border-gray-300 rounded-lg px-2 sm:px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
-                        >
-                            <option value="all">All Clients</option>
-                            {Object.values(clients).map((c) => (
-                                <option key={c._id} value={c._id}>{c.full_name}</option>
-                            ))}
-                        </select>
+                        <div className="w-40">
+                            <SearchableSelect
+                                value={{ value: selectedBrand, label: selectedBrand === "all" ? "All Brands" : selectedBrand }}
+                                onChange={(opt) => setSelectedBrand(opt ? opt.value : "all")}
+                                options={[
+                                    { value: "all", label: "All Brands" },
+                                    { value: "Maulshree", label: "Maulshree" },
+                                    ...BRANDS.map(b => ({ value: b, label: b }))
+                                ]}
+                                isClearable={false}
+                            />
+                        </div>
+
+                        <div className="w-full sm:w-64">
+                            <ClientSearchableSelect
+                                placeholder="All Clients"
+                                label={null}
+                                isClearable
+                                value={selectedClient !== "all" ? { value: selectedClient, label: clients[selectedClient]?.full_name || "Selected Client" } : null}
+                                onChange={(opt) => setSelectedClient(opt ? opt.value : "all")}
+                            />
+                        </div>
 
                         <button
                             onClick={dlTimeline}
@@ -450,7 +652,7 @@ const EarningsReport = () => {
                 {/* Tabs */}
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
                     <div className="flex border-b border-gray-200 overflow-x-auto scrollbar-hide">
-                        {TABS.map((tab) => (
+                        {visibleTabs.map((tab) => (
                             <button
                                 key={tab.key}
                                 onClick={() => setActiveTab(tab.key)}
@@ -587,8 +789,8 @@ const EarningsReport = () => {
                                                 <table className="w-full text-sm" style={{ minWidth: "640px" }}>
                                                     <thead>
                                                         <tr className="border-b border-gray-100">
-                                                            {["Date", "Stage", "Task", "Project", "Client", "Completed By", "Amount"].map((h, i) => (
-                                                                <th key={i} className={`py-2.5 px-2 sm:px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider ${i === 6 ? "text-right" : "text-left"}`}>
+                                                            {["Date", "Brand", "Stage", "Task", "Project", "Client", "Completed By", "Amount"].map((h, i) => (
+                                                                <th key={i} className={`py-2.5 px-2 sm:px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider ${i === 7 ? "text-right" : "text-left"}`}>
                                                                     {h}
                                                                 </th>
                                                             ))}
@@ -601,6 +803,15 @@ const EarningsReport = () => {
                                                                 <tr key={i} className="hover:bg-gray-50 transition-colors">
                                                                     <td className="py-2.5 px-2 sm:px-3 text-gray-500 whitespace-nowrap text-xs">
                                                                         {event.date.toLocaleDateString("en-IN")}
+                                                                    </td>
+                                                                    <td className="py-2.5 px-2 sm:px-3">
+                                                                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                                                            event.brand === 'Maulshree' ? 'bg-blue-50 text-blue-600' :
+                                                                            event.brand === 'Mukhwas' ? 'bg-orange-50 text-orange-600' :
+                                                                            'bg-purple-50 text-purple-600'
+                                                                        }`}>
+                                                                            {event.brand}
+                                                                        </span>
                                                                     </td>
                                                                     <td className="py-2.5 px-2 sm:px-3">
                                                                         <span className="inline-flex text-xs font-medium px-2 py-0.5 rounded-full text-white whitespace-nowrap" style={{ background: color }}>

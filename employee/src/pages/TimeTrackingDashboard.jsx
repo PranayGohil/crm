@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 import LoadingOverlay from "../components/LoadingOverlay";
+import SearchableSelect from "../components/SearchableSelect";
 
 const PROJECTS_PER_PAGE_OPTIONS = [5, 10, 20, 50];
 const DEFAULT_PAGE_SIZE = 10;
@@ -104,10 +105,12 @@ const TimeTrackingDashboard = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
+        const userObj = JSON.parse(localStorage.getItem("employeeUser"));
+        const headers = { Authorization: `Bearer ${userObj?.token}` };
         const [projRes, subRes, empRes] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all-archived`),
-          axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/get-all`),
-          axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/project/get-all-archived`, { headers }),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/get-all`, { headers }),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`, { headers }),
         ]);
         const myEmployees = empRes.data.filter((emp) => emp.reporting_manager?._id === user._id);
         const myEmployeeIds = myEmployees.map((emp) => emp._id);
@@ -255,11 +258,15 @@ const TimeTrackingDashboard = () => {
 
         {/* Employee filter + search row */}
         <div className="flex flex-col sm:flex-row gap-2">
-          <select value={selectedEmployeeId} onChange={(e) => setSelectedEmployeeId(e.target.value)}
-            className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500">
-            <option value="All">All Employees</option>
-            {employees.map((emp) => <option key={emp._id} value={emp._id}>{emp.full_name}</option>)}
-          </select>
+          <div className="flex-1">
+            <SearchableSelect
+              placeholder="All Employees"
+              value={selectedEmployeeId === "All" ? { value: "All", label: "All Employees" } : { value: selectedEmployeeId, label: employees.find((e) => e._id === selectedEmployeeId)?.full_name || "Selected Employee" }}
+              onChange={(opt) => setSelectedEmployeeId(opt ? opt.value : "All")}
+              options={[{ value: "All", label: "All Employees" }, ...employees.map((emp) => ({ value: emp._id, label: emp.full_name }))]}
+              isClearable={false}
+            />
+          </div>
 
           <div className="relative flex-1">
             <input type="text" placeholder="🔍 Search project name…" value={projectSearch}
@@ -402,10 +409,14 @@ const TimeTrackingDashboard = () => {
               <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
                 className="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50 disabled:opacity-40 transition-colors">Next ›</button>
 
-              <select value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))}
-                className="ml-1 px-2 py-1.5 text-xs border border-gray-300 rounded-lg bg-white focus:ring-1 focus:ring-blue-500">
-                {PROJECTS_PER_PAGE_OPTIONS.map((n) => <option key={n} value={n}>{n} projects</option>)}
-              </select>
+              <div className="w-32 ml-1">
+                <SearchableSelect
+                  value={{ value: pageSize, label: `${pageSize} projects` }}
+                  onChange={(opt) => setPageSize(Number(opt.value))}
+                  options={PROJECTS_PER_PAGE_OPTIONS.map((n) => ({ value: n, label: `${n} projects` }))}
+                  isClearable={false}
+                />
+              </div>
             </div>
           </div>
         </div>

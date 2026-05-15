@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { stageOptions } from "../../../options";
+import EmployeeSearchableSelect from "../../../components/common/EmployeeSearchableSelect";
 
 const employmentTypes = ["Full-time", "Part-time"];
 
@@ -62,9 +63,10 @@ const CreateEmployeeProfile = () => {
   });
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_API_URL}/api/employee/managers`).then((r) => { if (r.data.success) setManagers(r.data.data); }).catch(console.error);
-    axios.get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`).then((r) => { if (r.data.success) setDesignations(r.data.designations); }).catch(console.error);
-    axios.get(`${process.env.REACT_APP_API_URL}/api/department/get-all`).then((r) => { if (r.data.success) setDepartments(r.data.departments); }).catch(console.error);
+    const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
+    axios.get(`${process.env.REACT_APP_API_URL}/api/employee/managers`, { headers }).then((r) => { if (r.data.success) setManagers(r.data.data); }).catch(console.error);
+    axios.get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`, { headers }).then((r) => { if (r.data.success) setDesignations(r.data.designations); }).catch(console.error);
+    axios.get(`${process.env.REACT_APP_API_URL}/api/department/get-all`, { headers }).then((r) => { if (r.data.success) setDepartments(r.data.departments); }).catch(console.error);
   }, []);
 
   const handleFileChange = (e, setFieldValue) => {
@@ -223,12 +225,12 @@ const CreateEmployeeProfile = () => {
                   <ErrorMessage name="employment_type" component="div" className={errCls} />
                 </div>
                 <div>
-                  <label className={labelCls}>Reporting Manager</label>
-                  <Field as="select" name="reporting_manager" className={inputCls}>
-                    <option value="">Select Reporting Manager</option>
-                    {managers.map((m) => <option key={m._id} value={m._id}>{m.full_name}</option>)}
-                  </Field>
-                  <ErrorMessage name="reporting_manager" component="div" className={errCls} />
+                  <EmployeeSearchableSelect
+                    label="Reporting Manager"
+                    placeholder="Select Reporting Manager"
+                    value={values.reporting_manager ? { value: values.reporting_manager, label: managers.find(m => m._id === values.reporting_manager)?.full_name || "Selected Manager" } : null}
+                    onChange={(opt) => setFieldValue("reporting_manager", opt ? opt.value : "")}
+                  />
                 </div>
                 <div>
                   <label className={labelCls}>Date of Joining</label>

@@ -20,8 +20,13 @@ const ViewSubtask = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
+      const u = JSON.parse(localStorage.getItem("clientUser"));
+      const token = u?.token;
+      const headers = { Authorization: `Bearer ${token}` };
+
       const { data: subtaskData } = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/subtask/get/${subtaskId}`
+        `${process.env.REACT_APP_API_URL}/api/subtask/get/${subtaskId}`,
+        { headers }
       );
       setSubtask(subtaskData);
       setMediaItems(
@@ -29,7 +34,8 @@ const ViewSubtask = () => {
       );
 
       const { data: projectData } = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/project/get/${subtaskData.project_id}`
+        `${process.env.REACT_APP_API_URL}/api/project/get/${subtaskData.project_id}`,
+        { headers }
       );
       setProject(projectData.project);
     } catch (error) {

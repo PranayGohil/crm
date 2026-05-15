@@ -59,7 +59,9 @@ const EmployeeDashboard = () => {
     const fetchEmployees = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
         const data = res.data;
         setEmployees(data);
         setFilteredEmployees(data);

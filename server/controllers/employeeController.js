@@ -218,6 +218,46 @@ export const getEmployees = async (req, res) => {
   }
 };
 
+export const searchEmployees = async (req, res) => {
+  try {
+    const { q, page = 1, limit = 20 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const query = {};
+    if (q) {
+      query.$or = [
+        { full_name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { department: { $regex: q, $options: "i" } },
+        { username: { $regex: q, $options: "i" } },
+      ];
+    }
+
+    const employees = await Employee.find(
+      query,
+      "_id full_name email status designation department profile_pic"
+    )
+      .sort({ full_name: 1 })
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await Employee.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      employees,
+      pagination: {
+        total,
+        page: Number(page),
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Error in searchEmployees:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 export const getMultipleEmployees = async (req, res) => {
   try {
     const ids = req.query.ids?.split(",");
@@ -477,10 +517,52 @@ export const deleteEmployee = async (req, res) => {
 export const getEmployeeTasks = async (req, res) => {
   try {
     const { employeeId } = req.params;
+    const empObjId = new mongoose.Types.ObjectId(employeeId);
 
-    const subtasks = await SubTask.find({
-      $or: [{ assign_to: employeeId }, { "stages.completed_by": employeeId }],
-    }).populate("project_id");
+    const subtasks = await SubTask.aggregate([
+      {
+        $match: {
+          $or: [{ assign_to: empObjId }, { "stages.completed_by": empObjId }],
+        },
+      },
+      {
+        $lookup: {
+          from: "projects",
+          localField: "project_id",
+          foreignField: "_id",
+          as: "project_id",
+        },
+      },
+      { $unwind: { path: "$project_id", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "clients",
+          let: { cid: "$project_id.client_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: [{ $toString: "$_id" }, "$$cid"] },
+              },
+            },
+            { $project: { status: 1 } },
+          ],
+          as: "client_info",
+        },
+      },
+      {
+        $addFields: {
+          client_status: { $ifNull: [{ $arrayElemAt: ["$client_info.status", 0] }, "active"] },
+        },
+      },
+      {
+        $addFields: {
+          status_weight: {
+            $cond: { if: { $eq: ["$client_status", "inactive"] }, then: 1, else: 0 },
+          },
+        },
+      },
+      { $sort: { status_weight: 1, createdAt: -1 } },
+    ]);
 
     res.json(subtasks);
   } catch (error) {
@@ -509,22 +591,56 @@ export const getEmployeeDashboardData = async (req, res) => {
     const skip = (Number(page) - 1) * Number(limit);
 
     // ── 1. Single query replacing two separate finds + JS dedup ───────
-    //
-    // Before:
-    //   const assignedSubtasks = await SubTask.find({ assign_to: employeeId })
-    //   const stageSubtasks    = await SubTask.find({ "stages.completed_by": employeeId })
-    //   let allSubtasks = [...assignedSubtasks, ...stageSubtasks.filter(dedup)]
-    //   const projects  = await Project.find({ _id: { $in: uniqueProjectIds } })
-    //
-    // After: one query, projects already populated
-    const allSubtasks = await SubTask.find({
-      $or: [
-        { assign_to: empObjId },
-        { "stages.completed_by": empObjId },
-      ],
-    })
-      .populate("project_id", "project_name status priority assign_date due_date client_id")
-      .lean(); // lean = plain JS objects, no Mongoose overhead
+    const allSubtasks = await SubTask.aggregate([
+      {
+        $match: {
+          $or: [
+            { assign_to: empObjId },
+            { "stages.completed_by": empObjId },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: "projects",
+          localField: "project_id",
+          foreignField: "_id",
+          as: "project_id",
+        },
+      },
+      { $unwind: { path: "$project_id", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "clients",
+          let: { cid: "$project_id.client_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: [{ $toString: "$_id" }, "$$cid"] },
+              },
+            },
+            { $project: { status: 1 } },
+          ],
+          as: "client_info",
+        },
+      },
+      {
+        $addFields: {
+          client_status: { $ifNull: [{ $arrayElemAt: ["$client_info.status", 0] }, "active"] },
+        },
+      },
+      {
+        $addFields: {
+          status_weight: {
+            $cond: { if: { $eq: ["$client_status", "inactive"] }, then: 1, else: 0 },
+          },
+          // Propgate weight to project_id for easier sorting in JS
+          "project_id.status_weight": {
+            $cond: { if: { $eq: ["$client_status", "inactive"] }, then: 1, else: 0 },
+          },
+        },
+      },
+    ]);
 
     // ── 2. Compute global stats across ALL subtasks (not paginated) ───
     //
@@ -601,7 +717,18 @@ export const getEmployeeDashboardData = async (req, res) => {
 
     const allProjectEntries = [...projectMap.values()];
 
-    // ── 5. Paginate at project level ──────────────────────────────────
+    // ── 5. Sort projects by client status weight first ────────────────
+    allProjectEntries.sort((a, b) => {
+      const wA = a.project.status_weight || 0;
+      const wB = b.project.status_weight || 0;
+      if (wA !== wB) return wA - wB;
+      // Secondary sort: Newest projects first
+      const dateA = a.project.createdAt ? new Date(a.project.createdAt) : 0;
+      const dateB = b.project.createdAt ? new Date(b.project.createdAt) : 0;
+      return dateB - dateA;
+    });
+
+    // ── 6. Paginate at project level ──────────────────────────────────
     const totalProjects = allProjectEntries.length;
     const paginatedEntries = allProjectEntries.slice(skip, skip + Number(limit));
 
@@ -672,12 +799,39 @@ export const getEmployeeCompletedTasks = async (req, res) => {
           let: { pid: "$project_id" },
           pipeline: [
             { $match: { $expr: { $eq: ["$_id", "$$pid"] } } },
-            { $project: { project_name: 1 } },
+            { $project: { project_name: 1, client_id: 1 } },
           ],
           as: "project",
         },
       },
       { $unwind: { path: "$project", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "clients",
+          let: { cid: "$project.client_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: [{ $toString: "$_id" }, "$$cid"] },
+              },
+            },
+            { $project: { status: 1 } },
+          ],
+          as: "client_info",
+        },
+      },
+      {
+        $addFields: {
+          client_status: { $ifNull: [{ $arrayElemAt: ["$client_info.status", 0] }, "active"] },
+        },
+      },
+      {
+        $addFields: {
+          status_weight: {
+            $cond: { if: { $eq: ["$client_status", "inactive"] }, then: 1, else: 0 },
+          },
+        },
+      },
       {
         $addFields: {
           // Filter to only stages completed by this employee within date range
@@ -733,9 +887,10 @@ export const getEmployeeCompletedTasks = async (req, res) => {
           priority: 1,
           status: 1,
           timeSpentMs: 1,
+          status_weight: 1,
         },
       },
-      { $sort: { completed_at: -1 } },
+      { $sort: { status_weight: 1, completed_at: -1 } },
     ]);
 
     // Attach formatted time and group by project
@@ -751,6 +906,7 @@ export const getEmployeeCompletedTasks = async (req, res) => {
         grouped[pid] = {
           project_id: pid,
           project_name: row.project_name ?? "Unknown",
+          status_weight: row.status_weight || 0,
           tasks: [],
           totalTimeMs: 0,
         };
@@ -769,6 +925,13 @@ export const getEmployeeCompletedTasks = async (req, res) => {
     });
 
     const projects = Object.values(grouped);
+    // ── Sort projects by client status weight ─────────────────────────
+    projects.sort((a, b) => {
+      if (a.status_weight !== b.status_weight) return a.status_weight - b.status_weight;
+      // Secondary sort: alphabetical?
+      return (a.project_name || "").localeCompare(b.project_name || "");
+    });
+
     const totalTasks = subtasks.length;
 
     // Paginate at the project level

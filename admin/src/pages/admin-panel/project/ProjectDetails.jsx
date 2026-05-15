@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { statusOptions, priorityOptions } from "../../../options";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
+import SearchableSelect from "../../../components/common/SearchableSelect";
 
 // Reusable confirmation modal
 const ConfirmModal = ({ show, title, message, onConfirm, onCancel, confirmLabel = "Confirm", confirmCls = "bg-red-600 hover:bg-red-700" }) => {
@@ -48,18 +49,21 @@ const ProjectDetails = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const projectRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`);
+        const token = localStorage.getItem("token");
+        const headers = { Authorization: `Bearer ${token}` };
+        
+        const projectRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`, { headers });
         const proj = projectRes.data.project;
         setProject(proj);
         setEditingStatus(proj.status || "");
         setEditingPriority(proj.priority || "");
 
         if (proj.client_id) {
-          const clientRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/get/${proj.client_id}`);
+          const clientRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/get/${proj.client_id}`, { headers });
           setClient(clientRes.data);
         }
 
-        const subtasksRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/project/${projectId}`);
+        const subtasksRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/project/${projectId}`, { headers });
         setSubTasks(subtasksRes.data || []);
       } catch (err) {
         console.error(err);
@@ -107,7 +111,9 @@ const ProjectDetails = () => {
     try {
       await axios.put(`${process.env.REACT_APP_API_URL}/api/project/archive/${projectId}`, {}, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
       toast.success("Project archived successfully."); navigate("/project/dashboard");
-    } catch { toast.error("Failed to archive project."); }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to archive project.");
+    }
   };
 
   const handleUnarchive = async () => {
@@ -140,7 +146,11 @@ const ProjectDetails = () => {
           {/* Action buttons — wrap on mobile */}
           <div className="flex flex-wrap gap-2 flex-shrink-0">
             <button
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm border border-red-400 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+              disabled={!project.isArchived && project.status !== "Completed"}
+              title={!project.isArchived && project.status !== "Completed" ? "Only completed projects can be archived" : ""}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm border rounded-lg transition-colors 
+                ${project.isArchived ? "border-blue-400 text-blue-600 hover:bg-blue-50" : "border-red-400 text-red-600 hover:bg-red-50"} 
+                disabled:opacity-50 disabled:cursor-not-allowed`}
               onClick={() => project.isArchived ? setShowUnarchiveModal(true) : setShowArchiveModal(true)}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M5 8h14M5 8a2 2 0 1 1 0-4h14a2 2 0 1 1 0 4M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8m-9 4h4" />
@@ -187,16 +197,24 @@ const ProjectDetails = () => {
 
           {isEditing ? (
             <div className="flex flex-wrap items-center gap-2">
-              <select value={editingStatus} onChange={(e) => setEditingStatus(e.target.value)} disabled={saving}
-                className="px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                <option value="">Status</option>
-                {statusOptions.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-              <select value={editingPriority} onChange={(e) => setEditingPriority(e.target.value)} disabled={saving}
-                className="px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                <option value="">Priority</option>
-                {priorityOptions.map((p) => <option key={p} value={p}>{p}</option>)}
-              </select>
+              <div className="w-36">
+                <SearchableSelect
+                  placeholder="Status"
+                  value={editingStatus ? { value: editingStatus, label: editingStatus } : null}
+                  onChange={(opt) => setEditingStatus(opt ? opt.value : "")}
+                  options={statusOptions.map((s) => ({ value: s, label: s }))}
+                  isDisabled={saving}
+                />
+              </div>
+              <div className="w-36">
+                <SearchableSelect
+                  placeholder="Priority"
+                  value={editingPriority ? { value: editingPriority, label: editingPriority } : null}
+                  onChange={(opt) => setEditingPriority(opt ? opt.value : "")}
+                  options={priorityOptions.map((p) => ({ value: p, label: p }))}
+                  isDisabled={saving}
+                />
+              </div>
               <button onClick={handleUpdate} disabled={saving}
                 className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
                 {saving ? "Saving…" : "Update"}

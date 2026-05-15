@@ -20,7 +20,9 @@ const EarningsWidget = () => {
         const fetchData = async () => {
             try {
                 const res = await axios.get(
-                    `${process.env.REACT_APP_API_URL}/api/subtask/get-all`
+                    `${process.env.REACT_APP_API_URL}/api/subtask/get-all`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+                    }
                 );
                 setSubtasks(res.data || []);
             } catch (err) {

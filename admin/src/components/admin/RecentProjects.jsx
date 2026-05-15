@@ -13,16 +13,17 @@ const RecentProjects = () => {
     const fetchRecentProjectsAndRelated = async () => {
       setLoading(true);
       try {
+        const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
         // 1) Fetch recent projects
         const res = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/statistics/recent-projects`
+          `${process.env.REACT_APP_API_URL}/api/statistics/recent-projects`, { headers }
         );
         setProjects(res.data);
 
         // 2) Fetch subtasks for these projects
         const subtaskPromises = res.data.map((project) =>
           axios.get(
-            `${process.env.REACT_APP_API_URL}/api/subtask/project/${project._id}`
+            `${process.env.REACT_APP_API_URL}/api/subtask/project/${project._id}`, { headers }
           )
         );
         const subtaskResponses = await Promise.all(subtaskPromises);
@@ -46,7 +47,7 @@ const RecentProjects = () => {
         if (allEmployeeIds.size > 0) {
           const employeeRes = await axios.get(
             `${process.env.REACT_APP_API_URL}/api/employee/get-multiple`,
-            { params: { ids: Array.from(allEmployeeIds).join(",") } }
+            { params: { ids: Array.from(allEmployeeIds).join(",") }, headers }
           );
           const empMap = {};
           employeeRes.data.forEach((e) => {

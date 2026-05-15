@@ -101,7 +101,10 @@ const EmployeeCompletedTasks = () => {
           ...(selectedRange === "custom" && customDates.from && { from: customDates.from }),
           ...(selectedRange === "custom" && customDates.to && { to: customDates.to }),
         });
-        const { data } = await axios.get(`${API}/api/employee/completed-tasks/${employeeId}?${params}`);
+        const user = JSON.parse(localStorage.getItem("employeeUser"));
+        const { data } = await axios.get(`${API}/api/employee/completed-tasks/${employeeId}?${params}`, {
+          headers: { Authorization: `Bearer ${user?.token}` }
+        });
         setProjects(data.projects);
         setSummary(data.summary);
         setPagination({ ...data.pagination, limit });

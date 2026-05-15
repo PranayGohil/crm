@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { stageOptions, priorityOptions, statusOptions } from "../options";
 import LoadingOverlay from "../components/LoadingOverlay";
+import SearchableSelect from "../components/SearchableSelect";
 
 dayjs.extend(duration);
 
@@ -126,9 +127,12 @@ const Subtasks = () => {
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
 
   useEffect(() => {
+    if (!managerId) return;
+    const token = user?.token;
+    const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      axios.get(`${API}/api/client/get-all`),
-      axios.get(`${API}/api/employee/get-all`),
+      axios.get(`${API}/api/client/get-all`, { headers }),
+      axios.get(`${API}/api/employee/get-all`, { headers }),
     ])
       .then(([cl, em]) => {
         setClients(cl.data);
@@ -149,7 +153,10 @@ const Subtasks = () => {
         ...(filters.stage && { stage: filters.stage }),
         ...(filters.employee && { employee: filters.employee }),
       });
-      const { data } = await axios.get(`${API}/api/project/manager/${managerId}?${params}`);
+      const token = user?.token;
+      const { data } = await axios.get(`${API}/api/project/manager/${managerId}?${params}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setProjects(data.projects);
       setPagination({ ...data.pagination, limit });
       setOpenRow(null);
@@ -205,7 +212,10 @@ const Subtasks = () => {
     if (!Object.keys(update).length) return toast.info("No changes selected.");
     setLoading(true);
     try {
-      await axios.put(`${API}/api/subtask/bulk-update`, { ids: selectedTaskIds, update });
+      const token = user?.token;
+      await axios.put(`${API}/api/subtask/bulk-update`, { ids: selectedTaskIds, update }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       toast.success("Changes applied!");
       setBulkAssignTo(""); setBulkPriority(""); setSelectedTaskIds([]);
       fetchProjects(pagination.page, pagination.limit);
@@ -217,7 +227,10 @@ const Subtasks = () => {
     if (!selectedTaskIds.length) return;
     setLoading(true);
     try {
-      await axios.post(`${API}/api/subtask/bulk-delete`, { ids: selectedTaskIds });
+      const token = user?.token;
+      await axios.post(`${API}/api/subtask/bulk-delete`, { ids: selectedTaskIds }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       toast.success("Deleted!");
       setSelectedTaskIds([]); setShowBulkDeleteModal(false);
       fetchProjects(pagination.page, pagination.limit);
@@ -321,42 +334,34 @@ const Subtasks = () => {
 
         {/* Filter dropdowns — collapsible on mobile */}
         {showFilters && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-wrap gap-2 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-            <select
-              value={filters.status}
-              onChange={(e) => setFilters((p) => ({ ...p, status: e.target.value }))}
-              className="filter-select text-xs sm:text-sm"
-            >
-              <option value="">All Status</option>
-              {statusOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-            </select>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+            <SearchableSelect
+              placeholder="All Status"
+              value={filters.status ? { value: filters.status, label: filters.status } : null}
+              onChange={(opt) => setFilters((p) => ({ ...p, status: opt ? opt.value : "" }))}
+              options={statusOptions.map((o) => ({ value: o, label: o }))}
+            />
 
-            <select
-              value={filters.priority}
-              onChange={(e) => setFilters((p) => ({ ...p, priority: e.target.value }))}
-              className="filter-select text-xs sm:text-sm"
-            >
-              <option value="">All Priority</option>
-              {priorityOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-            </select>
+            <SearchableSelect
+              placeholder="All Priority"
+              value={filters.priority ? { value: filters.priority, label: filters.priority } : null}
+              onChange={(opt) => setFilters((p) => ({ ...p, priority: opt ? opt.value : "" }))}
+              options={priorityOptions.map((o) => ({ value: o, label: o }))}
+            />
 
-            <select
-              value={filters.stage}
-              onChange={(e) => setFilters((p) => ({ ...p, stage: e.target.value }))}
-              className="filter-select text-xs sm:text-sm"
-            >
-              <option value="">All Stages</option>
-              {stageOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-            </select>
+            <SearchableSelect
+              placeholder="All Stages"
+              value={filters.stage ? { value: filters.stage, label: filters.stage } : null}
+              onChange={(opt) => setFilters((p) => ({ ...p, stage: opt ? opt.value : "" }))}
+              options={stageOptions.map((o) => ({ value: o, label: o }))}
+            />
 
-            <select
-              value={filters.employee}
-              onChange={(e) => setFilters((p) => ({ ...p, employee: e.target.value }))}
-              className="filter-select text-xs sm:text-sm"
-            >
-              <option value="">All Team Members</option>
-              {employees.map((e) => <option key={e._id} value={e._id}>{e.full_name}</option>)}
-            </select>
+            <SearchableSelect
+              placeholder="All Team Members"
+              value={filters.employee ? { value: filters.employee, label: employees.find(e => e._id === filters.employee)?.full_name || "Selected Employee" } : null}
+              onChange={(opt) => setFilters((p) => ({ ...p, employee: opt ? opt.value : "" }))}
+              options={employees.map((e) => ({ value: e._id, label: e.full_name }))}
+            />
           </div>
         )}
 
@@ -614,13 +619,14 @@ const Subtasks = () => {
               disabled={pagination.page >= pagination.totalPages || loading}
             >Next →</button>
 
-            <select
-              className="ml-2 border rounded px-2 py-1 text-xs sm:text-sm"
-              value={pagination.limit}
-              onChange={(e) => fetchProjects(1, Number(e.target.value))}
-            >
-              {[10, 20, 50].map((n) => <option key={n} value={n}>{n}/pg</option>)}
-            </select>
+            <div className="w-24 ml-2">
+              <SearchableSelect
+                value={{ value: pagination.limit, label: `${pagination.limit}/pg` }}
+                onChange={(opt) => fetchProjects(1, Number(opt.value))}
+                options={[10, 20, 50].map((n) => ({ value: n, label: `${n}/pg` }))}
+                isClearable={false}
+              />
+            </div>
           </div>
         )}
 
@@ -632,25 +638,22 @@ const Subtasks = () => {
                 <span className="bulk-count">{selectedTaskIds.length}</span> selected
               </span>
               <div className="bulk-controls" style={{ flexWrap: "wrap", gap: "6px" }}>
-                <select
-                  value={bulkAssignTo}
-                  onChange={(e) => setBulkAssignTo(e.target.value)}
-                  className="filter-select"
-                  style={{ maxWidth: 140, fontSize: "13px" }}
-                >
-                  <option value="">👤 Assign</option>
-                  <option key={user._id} value={user._id}>{user.full_name}</option>
-                  {employees.map((e) => <option key={e._id} value={e._id}>{e.full_name}</option>)}
-                </select>
-                <select
-                  value={bulkPriority}
-                  onChange={(e) => setBulkPriority(e.target.value)}
-                  className="filter-select"
-                  style={{ maxWidth: 140, fontSize: "13px" }}
-                >
-                  <option value="">⚡ Priority</option>
-                  {priorityOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-                </select>
+                <div className="w-48">
+                  <SearchableSelect
+                    placeholder="👤 Assign"
+                    value={bulkAssignTo ? { value: bulkAssignTo, label: employees.find(e => e._id === bulkAssignTo)?.full_name || user.full_name } : null}
+                    onChange={(opt) => setBulkAssignTo(opt ? opt.value : "")}
+                    options={[{ value: user._id, label: user.full_name }, ...employees.map((e) => ({ value: e._id, label: e.full_name }))]}
+                  />
+                </div>
+                <div className="w-48">
+                  <SearchableSelect
+                    placeholder="⚡ Priority"
+                    value={bulkPriority ? { value: bulkPriority, label: bulkPriority } : null}
+                    onChange={(opt) => setBulkPriority(opt ? opt.value : "")}
+                    options={priorityOptions.map((o) => ({ value: o, label: o }))}
+                  />
+                </div>
                 <button
                   onClick={handleBulkUpdate}
                   className="bulk-btn bulk-btn-primary"

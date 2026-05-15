@@ -15,7 +15,10 @@ const ProjectMediaGallery = () => {
   useEffect(() => {
     const fetchProjectMedia = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`);
+        const u = JSON.parse(localStorage.getItem("clientUser"));
+        const token = u?.token;
+        const headers = { Authorization: `Bearer ${token}` };
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`, { headers });
         if (res.data.success && res.data.project?.content[0]?.uploaded_files) {
           setUploadedFiles(res.data.project.content[0].uploaded_files);
         } else {

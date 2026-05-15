@@ -8,7 +8,9 @@ import {
   getSortedRowModel, getPaginationRowModel, flexRender, createColumnHelper,
 } from "@tanstack/react-table";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
-import { stageOptions, priorityOptions, statusOptions } from "../../../options";
+import EmployeeSearchableSelect from "../../../components/common/EmployeeSearchableSelect";
+import SearchableSelect from "../../../components/common/SearchableSelect";
+import { priorityOptions, stageOptions, statusOptions } from "../../../options";
 
 // ── Reusable confirm modal ──────────────────────────────────────────────────
 const ConfirmModal = ({ show, title, children, onConfirm, onCancel }) => {
@@ -164,9 +166,11 @@ const SubtaskDashboardContainer = () => {
   const fetchSubtasks = async () => {
     setLoading(true);
     try {
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
       const [subtaskRes, projectRes] = await Promise.all([
-        axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/project/${projectId}`),
-        axios.get(`${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`),
+        axios.get(`${process.env.REACT_APP_API_URL}/api/subtask/project/${projectId}`, { headers }),
+        axios.get(`${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`, { headers }),
       ]);
       setProject(projectRes.data.project);
       const normalized = subtaskRes.data.map((t) => {
@@ -188,7 +192,10 @@ const SubtaskDashboardContainer = () => {
 
   useEffect(() => {
     fetchSubtasks();
-    axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`)
+    const token = localStorage.getItem("token");
+    axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
       .then((r) => setEmployees(r.data))
       .catch(console.error);
   }, [projectId]); // eslint-disable-line
@@ -207,7 +214,6 @@ const SubtaskDashboardContainer = () => {
   };
 
   const columnHelper = createColumnHelper();
-  const selectCls = "w-full px-2 py-1 text-xs border border-gray-200 rounded-md bg-white focus:ring-1 focus:ring-blue-400 mt-1";
 
   const columns = useMemo(() => [
     columnHelper.display({
@@ -255,10 +261,15 @@ const SubtaskDashboardContainer = () => {
       filterFn: "equals",
       meta: {
         filterComponent: ({ column }) => (
-          <select value={column.getFilterValue() ?? ""} onChange={(e) => column.setFilterValue(e.target.value || undefined)} className={selectCls}>
-            <option value="">All</option>
-            {priorityOptions.map((o, i) => <option key={i} value={o}>{o}</option>)}
-          </select>
+          <div style={{ minWidth: "120px" }}>
+            <SearchableSelect
+              value={column.getFilterValue() ? { value: column.getFilterValue(), label: column.getFilterValue() } : null}
+              onChange={(opt) => column.setFilterValue(opt ? opt.value : undefined)}
+              options={priorityOptions.map((o) => ({ value: o, label: o }))}
+              placeholder="All"
+              menuPosition="fixed"
+            />
+          </div>
         ),
       },
     }),
@@ -290,10 +301,15 @@ const SubtaskDashboardContainer = () => {
       },
       meta: {
         filterComponent: ({ column }) => (
-          <select value={column.getFilterValue() ?? ""} onChange={(e) => column.setFilterValue(e.target.value || undefined)} className={selectCls}>
-            <option value="">All</option>
-            {stageOptions.map((o, i) => <option key={i} value={o}>{o}</option>)}
-          </select>
+          <div style={{ minWidth: "120px" }}>
+            <SearchableSelect
+              value={column.getFilterValue() ? { value: column.getFilterValue(), label: column.getFilterValue() } : null}
+              onChange={(opt) => column.setFilterValue(opt ? opt.value : undefined)}
+              options={stageOptions.map((o) => ({ value: o, label: o }))}
+              placeholder="All"
+              menuPosition="fixed"
+            />
+          </div>
         ),
       },
     }),
@@ -312,10 +328,15 @@ const SubtaskDashboardContainer = () => {
       filterFn: "equals",
       meta: {
         filterComponent: ({ column }) => (
-          <select value={column.getFilterValue() ?? ""} onChange={(e) => column.setFilterValue(e.target.value || undefined)} className={selectCls}>
-            <option value="">All</option>
-            {statusOptions.map((o, i) => <option key={i} value={o}>{o}</option>)}
-          </select>
+          <div style={{ minWidth: "120px" }}>
+            <SearchableSelect
+              value={column.getFilterValue() ? { value: column.getFilterValue(), label: column.getFilterValue() } : null}
+              onChange={(opt) => column.setFilterValue(opt ? opt.value : undefined)}
+              options={statusOptions.map((o) => ({ value: o, label: o }))}
+              placeholder="All"
+              menuPosition="fixed"
+            />
+          </div>
         ),
       },
     }),
@@ -357,10 +378,15 @@ const SubtaskDashboardContainer = () => {
       filterFn: "equals",
       meta: {
         filterComponent: ({ column }) => (
-          <select value={column.getFilterValue() ?? ""} onChange={(e) => column.setFilterValue(e.target.value || undefined)} className={selectCls}>
-            <option value="">All</option>
-            {employees.map((e) => <option key={e._id} value={e._id}>{e.full_name}</option>)}
-          </select>
+          <div className="mt-1">
+            <EmployeeSearchableSelect
+              placeholder="All"
+              label={null}
+              isClearable
+              value={column.getFilterValue() ? { value: column.getFilterValue(), label: employees.find(e => e._id === column.getFilterValue())?.full_name || "Selected Employee" } : null}
+              onChange={(opt) => column.setFilterValue(opt ? opt.value : undefined)}
+            />
+          </div>
         ),
       },
     }),
@@ -567,11 +593,14 @@ const SubtaskDashboardContainer = () => {
               </svg>
               Reset
             </button>
-            <select value={table.getState().pagination.pageSize}
-              onChange={(e) => table.setPageSize(Number(e.target.value))}
-              className="px-2 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500">
-              {[10, 20, 50, 100].map((n) => <option key={n} value={n}>Show {n}</option>)}
-            </select>
+            <div className="w-32">
+              <SearchableSelect
+                value={{ value: table.getState().pagination.pageSize, label: `Show ${table.getState().pagination.pageSize}` }}
+                onChange={(opt) => table.setPageSize(Number(opt.value))}
+                options={[10, 20, 50, 100].map((n) => ({ value: n, label: `Show ${n}` }))}
+                isClearable={false}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -674,16 +703,24 @@ const SubtaskDashboardContainer = () => {
                 <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full mr-1">{selectedTaskIds.length}</span>
                 selected
               </span>
-              <select value={bulkAssignTo} onChange={(e) => setBulkAssignTo(e.target.value)}
-                className="flex-1 min-w-[120px] px-2 py-1.5 text-xs bg-gray-800 text-white border border-gray-700 rounded-lg focus:ring-1 focus:ring-blue-500">
-                <option value="">👤 Assign To</option>
-                {employees.map((e) => <option key={e._id} value={e._id}>{e.full_name}</option>)}
-              </select>
-              <select value={bulkPriority} onChange={(e) => setBulkPriority(e.target.value)}
-                className="flex-1 min-w-[120px] px-2 py-1.5 text-xs bg-gray-800 text-white border border-gray-700 rounded-lg focus:ring-1 focus:ring-blue-500">
-                <option value="">⚡ Priority</option>
-                {priorityOptions.map((o, i) => <option key={i} value={o}>{o}</option>)}
-              </select>
+              <div className="flex-1 min-w-[150px]">
+                <EmployeeSearchableSelect
+                  placeholder="👤 Assign To"
+                  label={null}
+                  isClearable
+                  value={bulkAssignTo ? { value: bulkAssignTo, label: employees.find(e => e._id === bulkAssignTo)?.full_name || "Selected Employee" } : null}
+                  onChange={(opt) => setBulkAssignTo(opt ? opt.value : "")}
+                />
+              </div>
+              <div className="flex-1 min-w-[120px]">
+                <SearchableSelect
+                  placeholder="⚡ Priority"
+                  value={bulkPriority ? { value: bulkPriority, label: bulkPriority } : null}
+                  onChange={(opt) => setBulkPriority(opt ? opt.value : "")}
+                  options={priorityOptions.map((o) => ({ value: o, label: o }))}
+                  menuPosition="fixed"
+                />
+              </div>
               <button onClick={handleBulkUpdateAll} disabled={!bulkAssignTo && !bulkPriority}
                 className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-40 transition-colors whitespace-nowrap">
                 ✓ Apply

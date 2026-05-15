@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { SALES_PERMISSIONS } from "../../constants";
 
 const DashboardMenu = ({ onClose }) => {
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
@@ -152,6 +155,25 @@ const DashboardMenu = ({ onClose }) => {
       ),
     },
     {
+      to: "/sales-panel",
+      label: "Sales Panel",
+      path: "/sales-panel",
+      condition:
+        user?.role === "super-admin" ||
+        user?.sales_permissions?.some(
+          (p) =>
+            p === SALES_PERMISSIONS.MUKHWAS || p === SALES_PERMISSIONS.BREELIQ,
+        ),
+      icon: (
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      ),
+    },
+    {
       to: "/notification-settings",
       label: "Notification Settings",
       path: "/notification-settings",
@@ -168,8 +190,9 @@ const DashboardMenu = ({ onClose }) => {
 
   return (
     <div
-      className={`flex flex-col relative justify-between bg-white border-r border-gray-200 transition-all duration-300 ${collapsed ? "w-20" : "w-64"
-        } h-screen`}
+      className={`flex flex-col relative justify-between bg-white border-r border-gray-200 transition-all duration-300 ${
+        collapsed ? "w-20" : "w-64"
+      } h-screen`}
     >
       {/* Mobile Close Button (visible on small screens only) */}
       <button
@@ -177,8 +200,18 @@ const DashboardMenu = ({ onClose }) => {
         className="absolute top-4 right-4 z-50 lg:hidden p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"
         aria-label="Close menu"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
       </button>
 
@@ -190,13 +223,19 @@ const DashboardMenu = ({ onClose }) => {
         >
           <div className="flex justify-center items-center">
             <svg
-              className={`w-3 h-5 text-gray-600 transition-transform duration-300 ${collapsed ? "rotate-180" : ""
-                }`}
+              className={`w-3 h-5 text-gray-600 transition-transform duration-300 ${
+                collapsed ? "rotate-180" : ""
+              }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </div>
         </button>
@@ -205,7 +244,12 @@ const DashboardMenu = ({ onClose }) => {
       {/* Logo / Brand */}
       <div className="flex items-center gap-3 px-4 py-4 border-b border-gray-200">
         <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
-          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-5 h-5 text-blue-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -215,31 +259,42 @@ const DashboardMenu = ({ onClose }) => {
           </svg>
         </div>
         {!collapsed && (
-          <span className="text-lg font-semibold text-gray-800 truncate">Dashboard Pro</span>
+          <span className="text-lg font-semibold text-gray-800 truncate">
+            Dashboard Pro
+          </span>
         )}
       </div>
 
       {/* Nav Links */}
       <div className="flex flex-col flex-1 overflow-y-auto py-4">
         <div className="px-2 flex flex-col gap-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              onClick={handleLinkClick}
-              className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${isActive(item.path)
-                ? "bg-blue-100 text-blue-600"
-                : "text-gray-600 hover:bg-gray-100"
+          {navItems.map((item) => {
+            if (item.condition === false) return null;
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={handleLinkClick}
+                className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all mx-2 ${
+                  isActive(item.path)
+                    ? "bg-blue-100 text-blue-600"
+                    : "text-gray-600 hover:bg-gray-100"
                 }`}
-            >
-              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {item.icon}
-              </svg>
-              {!collapsed && (
-                <span className="font-medium truncate">{item.label}</span>
-              )}
-            </Link>
-          ))}
+              >
+                <svg
+                  className="w-5 h-5 flex-shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  {item.icon}
+                </svg>
+                {!collapsed && (
+                  <span className="font-medium truncate">{item.label}</span>
+                )}
+              </Link>
+            );
+          })}
         </div>
       </div>
 
@@ -249,7 +304,12 @@ const DashboardMenu = ({ onClose }) => {
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-3 text-gray-600 hover:bg-gray-100 rounded-lg w-full transition-all"
         >
-          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-5 h-5 flex-shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

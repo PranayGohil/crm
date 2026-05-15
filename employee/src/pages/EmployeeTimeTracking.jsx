@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 import LoadingOverlay from "../components/LoadingOverlay";
+import SearchableSelect from "../components/SearchableSelect";
 import {
   formatMs,
   getRemainingLabel,
@@ -90,10 +91,14 @@ const PaginationBar = ({ pagination, onPageChange, onLimitChange, loading }) => 
           )}
           <button onClick={() => onPageChange(page + 1)} disabled={page >= totalPages || loading}
             className="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50 disabled:opacity-40 transition-colors">Next</button>
-          <select value={limit} onChange={(e) => onLimitChange(Number(e.target.value))}
-            className="ml-1 px-2 py-1.5 text-xs border border-gray-300 rounded-lg bg-white">
-            {[10, 20, 25, 50].map((n) => <option key={n} value={n}>{n}/page</option>)}
-          </select>
+          <div className="w-24 ml-1">
+            <SearchableSelect
+              value={{ value: limit, label: `${limit}/page` }}
+              onChange={(opt) => onLimitChange(Number(opt.value))}
+              options={[10, 20, 25, 50].map((n) => ({ value: n, label: `${n}/page` }))}
+              isClearable={false}
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -169,7 +174,10 @@ const EmployeeTimeTracking = () => {
         ...(selectedRange === "custom" && customDates.from && { from: customDates.from }),
         ...(selectedRange === "custom" && customDates.to && { to: customDates.to }),
       });
-      const { data } = await axios.get(API + "/api/employee/time-tracking/" + employeeId + "?" + params);
+      const user = JSON.parse(localStorage.getItem("employeeUser"));
+      const { data } = await axios.get(API + "/api/employee/time-tracking/" + employeeId + "?" + params, {
+        headers: { Authorization: `Bearer ${user?.token}` }
+      });
       setProjects(data.projects); setSummary(data.summary);
       setPagination({ ...data.pagination, limit }); setOpenTable(null);
     } catch (err) { console.error(err); } finally { setLoading(false); }
@@ -310,7 +318,10 @@ export const ManagerTimeTracking = () => {
   const [projectSearch, setProjectSearch] = useState("");
 
   useEffect(() => {
-    axios.get(API + "/api/employee/get-all").then((res) => {
+    const userObj = JSON.parse(localStorage.getItem("employeeUser"));
+    axios.get(API + "/api/employee/get-all", {
+      headers: { Authorization: `Bearer ${userObj?.token}` }
+    }).then((res) => {
       const team = res.data.filter((e) => e.reporting_manager?._id === managerId);
       setEmployees(team);
       const map = {}; team.forEach((e) => { map[e._id] = e; });
@@ -329,7 +340,10 @@ export const ManagerTimeTracking = () => {
         ...(selectedRange === "custom" && customDates.from && { from: customDates.from }),
         ...(selectedRange === "custom" && customDates.to && { to: customDates.to }),
       });
-      const { data } = await axios.get(API + "/api/time-tracking?" + params);
+      const userObj = JSON.parse(localStorage.getItem("employeeUser"));
+      const { data } = await axios.get(API + "/api/time-tracking?" + params, {
+        headers: { Authorization: `Bearer ${userObj?.token}` }
+      });
       setProjects(data.projects); setSummary(data.summary);
       setPagination({ ...data.pagination, limit }); setOpenTable(null);
     } catch (err) { console.error(err); } finally { setLoading(false); }
@@ -409,11 +423,14 @@ export const ManagerTimeTracking = () => {
           <input type="text" placeholder="Search project..." value={projectSearch}
             onChange={(e) => setProjectSearch(e.target.value)}
             className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
-          <select value={selectedEmployee} onChange={(e) => setSelectedEmployee(e.target.value)}
-            className="flex-1 sm:max-w-xs px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500">
-            <option value="">All Team Members</option>
-            {employees.map((e) => <option key={e._id} value={e._id}>{e.full_name}</option>)}
-          </select>
+          <div className="flex-1 sm:max-w-xs">
+            <SearchableSelect
+              placeholder="All Team Members"
+              value={selectedEmployee ? { value: selectedEmployee, label: employees.find((e) => e._id === selectedEmployee)?.full_name || "Selected Employee" } : null}
+              onChange={(opt) => setSelectedEmployee(opt ? opt.value : "")}
+              options={employees.map((e) => ({ value: e._id, label: e.full_name }))}
+            />
+          </div>
         </div>
         <div>
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Time Range</p>
