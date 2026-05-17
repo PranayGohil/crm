@@ -90,7 +90,7 @@ export const getTimeTrackingData = async (req, res) => {
         };
 
         if (employee) {
-            subtaskMatch.assign_to = new mongoose.Types.ObjectId(employee);
+            subtaskMatch["time_logs.user_id"] = new mongoose.Types.ObjectId(employee);
         }
 
         if (subtaskSearch) {
@@ -137,6 +137,9 @@ export const getTimeTrackingData = async (req, res) => {
                                                 ? [{ $lte: ["$$log.start_time", dateFilter.$lte] }]
                                                 : []),
                                         ]
+                                        : []),
+                                    ...(employee
+                                        ? [{ $eq: ["$$log.user_id", new mongoose.Types.ObjectId(employee)] }]
                                         : []),
                                 ],
                             },

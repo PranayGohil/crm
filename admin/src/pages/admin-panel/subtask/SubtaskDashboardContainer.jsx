@@ -710,6 +710,7 @@ const SubtaskDashboardContainer = () => {
                   isClearable
                   value={bulkAssignTo ? { value: bulkAssignTo, label: employees.find(e => e._id === bulkAssignTo)?.full_name || "Selected Employee" } : null}
                   onChange={(opt) => setBulkAssignTo(opt ? opt.value : "")}
+                  menuPlacement="top"
                 />
               </div>
               <div className="flex-1 min-w-[120px]">
@@ -719,6 +720,7 @@ const SubtaskDashboardContainer = () => {
                   onChange={(opt) => setBulkPriority(opt ? opt.value : "")}
                   options={priorityOptions.map((o) => ({ value: o, label: o }))}
                   menuPosition="fixed"
+                  menuPlacement="top"
                 />
               </div>
               <button onClick={handleBulkUpdateAll} disabled={!bulkAssignTo && !bulkPriority}

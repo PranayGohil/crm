@@ -680,7 +680,7 @@ const TimeTrackingDashboard = () => {
                 Next ›
               </button>
 
-              <div className="w-24 ml-1">
+              <div className="w-28 ml-1">
                 <SearchableSelect
                   value={{
                     value: pagination.limit,
@@ -692,6 +692,7 @@ const TimeTrackingDashboard = () => {
                     label: `${n}/page`,
                   }))}
                   isClearable={false}
+                  menuPlacement="top"
                 />
               </div>
             </div>

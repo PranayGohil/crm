@@ -1004,7 +1004,7 @@ const Subtasks = () => {
               Next →
             </button>
 
-            <div className="w-24 ml-2">
+            <div className="w-28 ml-2">
               <SearchableSelect
                 value={{
                   value: pagination.limit,
@@ -1019,6 +1019,7 @@ const Subtasks = () => {
                   label: `${n}/pg`,
                 }))}
                 isClearable={false}
+                menuPlacement="top"
               />
             </div>
           </div>
@@ -1055,6 +1056,7 @@ const Subtasks = () => {
                         : null
                     }
                     onChange={(opt) => setBulkAssignTo(opt ? opt.value : "")}
+                    menuPlacement="top"
                   />
                 </div>
                 <div className="w-40">
@@ -1070,6 +1072,7 @@ const Subtasks = () => {
                       value: o,
                       label: o,
                     }))}
+                    menuPlacement="top"
                   />
                 </div>
                 <button

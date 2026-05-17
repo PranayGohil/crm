@@ -90,12 +90,13 @@ const PaginationBar = ({ pagination, onPageChange, onLimitChange, loading }) => 
           )}
           <button onClick={() => onPageChange(page + 1)} disabled={page >= totalPages || loading}
             className="px-3 py-1.5 text-xs rounded-lg border bg-white hover:bg-gray-50 disabled:opacity-40">Next</button>
-          <div className="w-24 ml-1">
+          <div className="w-28 ml-1">
             <SearchableSelect
               value={{ value: limit, label: `${limit}/page` }}
               onChange={(opt) => onLimitChange(Number(opt.value))}
               options={PAGE_SIZE_OPTIONS.map((n) => ({ value: n, label: `${n}/page` }))}
               isClearable={false}
+              menuPlacement="top"
             />
           </div>
         </div>

@@ -50,8 +50,51 @@ const downloadCSV = (rows, filename) => {
     const a = Object.assign(document.createElement("a"), {
         href: URL.createObjectURL(new Blob([csv], { type: "text/csv" })),
         download: filename,
+        download: filename,
     });
     a.click();
+};
+
+const isDateInRange = (dateString, dateRange, customFrom, customTo) => {
+    if (!dateString) return false;
+    const d = new Date(dateString);
+    if (isNaN(d)) return false;
+    
+    if (dateRange === "all") return true;
+    if (dateRange === "custom") {
+        if (!customFrom && !customTo) return true;
+        const from = customFrom ? new Date(customFrom) : null;
+        if (from) from.setHours(0, 0, 0, 0);
+        const to = customTo ? new Date(customTo) : null;
+        if (to) to.setHours(23, 59, 59, 999);
+        
+        if (from && d < from) return false;
+        if (to && d > to) return false;
+        return true;
+    }
+    
+    const now = new Date();
+    if (dateRange === "today") {
+        const start = new Date(now); start.setHours(0, 0, 0, 0);
+        const end = new Date(now); end.setHours(23, 59, 59, 999);
+        return d >= start && d <= end;
+    }
+    
+    const cutoff = new Date(now);
+    if (dateRange === "week") {
+        cutoff.setDate(cutoff.getDate() - 7);
+        cutoff.setHours(0, 0, 0, 0);
+    } else if (dateRange === "month") {
+        cutoff.setMonth(cutoff.getMonth() - 1);
+        cutoff.setHours(0, 0, 0, 0);
+    } else if (dateRange === "quarter") {
+        cutoff.setMonth(cutoff.getMonth() - 3);
+        cutoff.setHours(0, 0, 0, 0);
+    } else if (dateRange === "year") {
+        cutoff.setFullYear(cutoff.getFullYear() - 1);
+        cutoff.setHours(0, 0, 0, 0);
+    }
+    return d >= cutoff;
 };
 
 /* ─── sub-components ─────────────────────────────────────────────────────── */
@@ -178,34 +221,15 @@ const EarningsReport = () => {
 
         let list = subtasks.filter((s) => (s.total_price || 0) > 0);
 
-        if (dateRange === "custom") {
-            if (customFrom || customTo) {
-                const from = customFrom ? new Date(customFrom) : null;
-                const to = customTo ? new Date(customTo + "T23:59:59.999") : null;
-                list = list.filter((s) => {
-                    const d = new Date(s.assign_date || s.createdAt);
-                    if (from && d < from) return false;
-                    if (to && d > to) return false;
-                    return true;
-                });
-            }
-        } else if (dateRange !== "all") {
-            const now = new Date();
-            if (dateRange === "today") {
-                const start = new Date(); start.setHours(0, 0, 0, 0);
-                const end = new Date(); end.setHours(23, 59, 59, 999);
-                list = list.filter((s) => {
-                    const d = new Date(s.assign_date || s.createdAt);
-                    return d >= start && d <= end;
-                });
-            } else {
-                const cutoff = new Date();
-                if (dateRange === "week") cutoff.setDate(cutoff.getDate() - 7);
-                if (dateRange === "month") cutoff.setMonth(cutoff.getMonth() - 1);
-                if (dateRange === "quarter") cutoff.setMonth(cutoff.getMonth() - 3);
-                if (dateRange === "year") cutoff.setFullYear(cutoff.getFullYear() - 1);
-                list = list.filter((s) => new Date(s.assign_date || s.createdAt) >= cutoff);
-            }
+        if (dateRange !== "all") {
+            list = list.filter((s) => {
+                const createdInRange = isDateInRange(s.assign_date || s.createdAt, dateRange, customFrom, customTo);
+                let hasStageInRange = false;
+                if (s.stages && s.stages.length) {
+                    hasStageInRange = s.stages.some(st => st.completed && isDateInRange(st.completed_at, dateRange, customFrom, customTo));
+                }
+                return createdInRange || hasStageInRange;
+            });
         }
 
         if (selectedClient !== "all") {
@@ -222,33 +246,8 @@ const EarningsReport = () => {
             list = list.filter(s => s.brand === selectedBrand);
         }
 
-        if (dateRange === "custom") {
-            if (customFrom || customTo) {
-                const from = customFrom ? new Date(customFrom) : null;
-                const to = customTo ? new Date(customTo + "T23:59:59.999") : null;
-                list = list.filter((s) => {
-                    const d = new Date(s.date);
-                    if (from && d < from) return false;
-                    if (to && d > to) return false;
-                    return true;
-                });
-            }
-        } else if (dateRange !== "all") {
-            if (dateRange === "today") {
-                const start = new Date(); start.setHours(0, 0, 0, 0);
-                const end = new Date(); end.setHours(23, 59, 59, 999);
-                list = list.filter((s) => {
-                    const d = new Date(s.date);
-                    return d >= start && d <= end;
-                });
-            } else {
-                const cutoff = new Date();
-                if (dateRange === "week") cutoff.setDate(cutoff.getDate() - 7);
-                if (dateRange === "month") cutoff.setMonth(cutoff.getMonth() - 1);
-                if (dateRange === "quarter") cutoff.setMonth(cutoff.getMonth() - 3);
-                if (dateRange === "year") cutoff.setFullYear(cutoff.getFullYear() - 1);
-                list = list.filter((s) => new Date(s.date) >= cutoff);
-            }
+        if (dateRange !== "all") {
+            list = list.filter((s) => isDateInRange(s.date, dateRange, customFrom, customTo));
         }
         return list;
     }, [salesEntries, dateRange, customFrom, customTo, selectedBrand]);
@@ -297,11 +296,14 @@ const EarningsReport = () => {
     const summary = useMemo(() => {
         // Maulshree totals
         const stTotalValue = filtered.reduce((s, t) => s + (t.total_price || 0), 0);
-        const stEarnedValue = filtered.reduce((s, t) => s + (t.earned_amount || 0), 0);
+        const stEarnedValue = filtered.reduce((s, t) => {
+            const earnedInRange = (t.stages || []).filter(st => st.completed && isDateInRange(st.completed_at, dateRange, customFrom, customTo)).reduce((sum, st) => sum + (st.price || 0), 0);
+            return s + earnedInRange;
+        }, 0);
         
         // Sales totals
         const salesEarnedValue = filteredSales.reduce((s, t) => s + (t.amount || 0), 0);
-        const salesTotalValue = filteredTargets.reduce((s, t) => s + (t.target_amount || 0), 0);
+        const salesTotalValue = salesEarnedValue; // Treat direct sales as 100% completed contracts
 
         const totalValue = stTotalValue + salesTotalValue;
         const earnedValue = stEarnedValue + salesEarnedValue;
@@ -309,26 +311,27 @@ const EarningsReport = () => {
         const pendingValue = totalValue - earnedValue;
         const percent = totalValue > 0 ? Math.round((earnedValue / totalValue) * 100) : 0;
         return { totalValue, earnedValue, pendingValue, percent, totalTasks: filtered.length + filteredSales.length };
-    }, [filtered, filteredSales, filteredTargets]);
+    }, [filtered, filteredSales, dateRange, customFrom, customTo]);
 
     const monthlyData = useMemo(() => {
         const map = {};
         
         // Subtasks (Maulshree)
         filtered.forEach((s) => {
-            (s.stages || []).filter((st) => st.completed && st.completed_at).forEach((st) => {
+            let sEarnedInRange = 0;
+            (s.stages || []).filter((st) => st.completed && st.completed_at && isDateInRange(st.completed_at, dateRange, customFrom, customTo)).forEach((st) => {
                 const d = new Date(st.completed_at);
                 const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
                 const label = d.toLocaleString("default", { month: "short", year: "2-digit" });
                 if (!map[key]) map[key] = { month: label, earned: 0, pending: 0 };
                 map[key].earned += st.price || 0;
+                sEarnedInRange += st.price || 0;
             });
             const d = new Date(s.assign_date || s.createdAt);
             const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
             const label = d.toLocaleString("default", { month: "short", year: "2-digit" });
             if (!map[key]) map[key] = { month: label, earned: 0, pending: 0 };
-            const earned = (s.stages || []).filter((st) => st.completed).reduce((a, st) => a + (st.price || 0), 0);
-            map[key].pending += Math.max(0, (s.total_price || 0) - earned);
+            map[key].pending += Math.max(0, (s.total_price || 0) - sEarnedInRange);
         });
 
         // Sales Entries (Mukhwas/Breeliq)
@@ -340,22 +343,8 @@ const EarningsReport = () => {
             map[key].earned += s.amount || 0;
         });
 
-        // Add pending from targets
-        filteredTargets.forEach((t) => {
-            const key = `${t.year}-${String(t.month + 1).padStart(2, "0")}`;
-            const label = new Date(t.year, t.month).toLocaleString("default", { month: "short", year: "2-digit" });
-            if (!map[key]) map[key] = { month: label, earned: 0, pending: 0 };
-            
-            // Calculate achieved for this specific brand/month to find pending
-            const achievedInMonth = salesEntries
-                .filter(s => s.brand === t.brand && new Date(s.date).getMonth() === t.month && new Date(s.date).getFullYear() === t.year)
-                .reduce((a, s) => a + (s.amount || 0), 0);
-            
-            map[key].pending += Math.max(0, t.target_amount - achievedInMonth);
-        });
-
         return Object.keys(map).sort().map((k) => map[k]);
-    }, [filtered, filteredSales, filteredTargets, salesEntries]);
+    }, [filtered, filteredSales, dateRange, customFrom, customTo]);
 
     const stageData = useMemo(() => {
         const map = {};
@@ -364,9 +353,16 @@ const EarningsReport = () => {
             (s.stages || []).forEach((st) => {
                 const name = st.name || st;
                 if (!map[name]) map[name] = { stage: name, total: 0, earned: 0, count: 0, completedCount: 0 };
-                map[name].total += st.price || 0;
-                map[name].count += 1;
-                if (st.completed) { map[name].earned += st.price || 0; map[name].completedCount += 1; }
+                
+                if (st.completed && isDateInRange(st.completed_at, dateRange, customFrom, customTo)) {
+                    map[name].total += st.price || 0;
+                    map[name].count += 1;
+                    map[name].earned += st.price || 0;
+                    map[name].completedCount += 1;
+                } else if (!st.completed && isDateInRange(s.assign_date || s.createdAt, dateRange, customFrom, customTo)) {
+                    map[name].total += st.price || 0;
+                    map[name].count += 1;
+                }
             });
         });
         // Sales entries as a stage
@@ -379,13 +375,13 @@ const EarningsReport = () => {
             map[name].completedCount += 1;
         });
         return Object.values(map);
-    }, [filtered, filteredSales]);
+    }, [filtered, filteredSales, dateRange, customFrom, customTo]);
 
     const employeeData = useMemo(() => {
         const map = {};
         // Subtask earnings
         filtered.forEach((s) => {
-            (s.stages || []).filter((st) => st.completed && st.completed_by).forEach((st) => {
+            (s.stages || []).filter((st) => st.completed && st.completed_by && isDateInRange(st.completed_at, dateRange, customFrom, customTo)).forEach((st) => {
                 const id = String(st.completed_by);
                 const emp = employees[id];
                 if (!map[id]) map[id] = { id, name: emp?.full_name || emp?.username || "Unknown", earned: 0, stages: 0, profile_pic: emp?.profile_pic };
@@ -403,7 +399,7 @@ const EarningsReport = () => {
             map[id].stages += 1;
         });
         return Object.values(map).sort((a, b) => b.earned - a.earned);
-    }, [filtered, filteredSales, employees]);
+    }, [filtered, filteredSales, employees, dateRange, customFrom, customTo]);
 
     const clientData = useMemo(() => {
         const map = {};
@@ -411,13 +407,16 @@ const EarningsReport = () => {
             const proj = projects[s.project_id];
             if (!proj?.client_id) return;
             const cid = proj.client_id;
+            
+            const earnedInRange = (s.stages || []).filter(st => st.completed && isDateInRange(st.completed_at, dateRange, customFrom, customTo)).reduce((a, st) => a + (st.price || 0), 0);
+            
             if (!map[cid]) map[cid] = { name: clients[cid]?.full_name || "Unknown", total: 0, earned: 0, pending: 0 };
             map[cid].total += s.total_price || 0;
-            map[cid].earned += s.earned_amount || 0;
-            map[cid].pending += (s.total_price || 0) - (s.earned_amount || 0);
+            map[cid].earned += earnedInRange;
+            map[cid].pending += (s.total_price || 0) - earnedInRange;
         });
         return Object.values(map).sort((a, b) => b.total - a.total);
-    }, [filtered, projects, clients]);
+    }, [filtered, projects, clients, dateRange, customFrom, customTo]);
 
     const timeline = useMemo(() => {
         const events = [];
@@ -425,7 +424,7 @@ const EarningsReport = () => {
         filtered.forEach((s) => {
             const proj = projects[s.project_id];
             const client = clients[proj?.client_id];
-            (s.stages || []).filter((st) => st.completed && st.completed_at).forEach((st) => {
+            (s.stages || []).filter((st) => st.completed && st.completed_at && isDateInRange(st.completed_at, dateRange, customFrom, customTo)).forEach((st) => {
                 const emp = employees[String(st.completed_by)];
                 events.push({
                     date: new Date(st.completed_at),
@@ -456,7 +455,7 @@ const EarningsReport = () => {
             });
         });
         return events.sort((a, b) => b.date - a.date);
-    }, [filtered, filteredSales, projects, clients, employees]);
+    }, [filtered, filteredSales, projects, clients, employees, dateRange, customFrom, customTo]);
 
     const filteredTimeline = useMemo(() => {
         if (!timelineSearch) return timeline;

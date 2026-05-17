@@ -619,12 +619,13 @@ const Subtasks = () => {
               disabled={pagination.page >= pagination.totalPages || loading}
             >Next →</button>
 
-            <div className="w-24 ml-2">
+            <div className="w-28 ml-2">
               <SearchableSelect
                 value={{ value: pagination.limit, label: `${pagination.limit}/pg` }}
                 onChange={(opt) => fetchProjects(1, Number(opt.value))}
                 options={[10, 20, 50].map((n) => ({ value: n, label: `${n}/pg` }))}
                 isClearable={false}
+                menuPlacement="top"
               />
             </div>
           </div>
@@ -644,6 +645,7 @@ const Subtasks = () => {
                     value={bulkAssignTo ? { value: bulkAssignTo, label: employees.find(e => e._id === bulkAssignTo)?.full_name || user.full_name } : null}
                     onChange={(opt) => setBulkAssignTo(opt ? opt.value : "")}
                     options={[{ value: user._id, label: user.full_name }, ...employees.map((e) => ({ value: e._id, label: e.full_name }))]}
+                    menuPlacement="top"
                   />
                 </div>
                 <div className="w-48">
@@ -652,6 +654,7 @@ const Subtasks = () => {
                     value={bulkPriority ? { value: bulkPriority, label: bulkPriority } : null}
                     onChange={(opt) => setBulkPriority(opt ? opt.value : "")}
                     options={priorityOptions.map((o) => ({ value: o, label: o }))}
+                    menuPlacement="top"
                   />
                 </div>
                 <button

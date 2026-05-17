@@ -594,9 +594,50 @@ export const getEmployeeDashboardData = async (req, res) => {
     const allSubtasks = await SubTask.aggregate([
       {
         $match: {
-          $or: [
-            { assign_to: empObjId },
-            { "stages.completed_by": empObjId },
+          $and: [
+            {
+              $or: [
+                { assign_to: empObjId },
+                { "stages.completed_by": empObjId },
+                { "time_logs.user_id": empObjId },
+              ],
+            },
+            ...(start && end
+              ? [
+                  {
+                    $or: [
+                      {
+                        $and: [
+                          { assign_to: empObjId },
+                          { status: { $ne: "Completed" } },
+                        ],
+                      },
+                      {
+                        stages: {
+                          $elemMatch: {
+                            completed_by: empObjId,
+                            completed_at: { $gte: start, $lte: end },
+                          },
+                        },
+                      },
+                      {
+                        time_logs: {
+                          $elemMatch: {
+                            user_id: empObjId,
+                            start_time: { $gte: start, $lte: end },
+                          },
+                        },
+                      },
+                      {
+                        $and: [
+                          { assign_to: empObjId },
+                          { assign_date: { $gte: start, $lte: end } },
+                        ]
+                      }
+                    ],
+                  },
+                ]
+              : []),
           ],
         },
       },
