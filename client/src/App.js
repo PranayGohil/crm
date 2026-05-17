@@ -27,8 +27,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <Routes>
+      {/* Protected Routes */}
       <Route
-        path="/"
         element={
           <ProtectedRoute>
             <Layout_client />
@@ -51,12 +51,14 @@ function App() {
           element={<ProjectMediaGallery />}
         />
         <Route
-          path="ClientAdminNotificationPage"
+          path="/ClientAdminNotificationPage"
           element={<ClientAdminNotificationPage />}
         />
         <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
       </Route>
-      <Route path="/" element={<Plain_layout />}>
+
+      {/* Public Routes */}
+      <Route element={<Plain_layout />}>
         <Route path="/login" element={<LoginPage />} />
       </Route>
     </Routes>

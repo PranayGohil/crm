@@ -345,7 +345,13 @@ export const getSubTasks = async (req, res) => {
       },
       { $unwind: { path: "$project", preserveNullAndEmptyArrays: true } },
       // ── PERMISSION FILTER ──
-      ...(req.user.role !== "super-admin" ? [
+      ...(req.user.role === "client" ? [
+        {
+          $match: {
+            "project.client_id": req.user._id.toString()
+          }
+        }
+      ] : req.user.role !== "super-admin" ? [
         {
           $match: {
             "project.stages": { $in: req.user.manage_stages || [] }

@@ -145,10 +145,10 @@ const ProjectCard = ({ filteredProjects, projectSubtasks, loading, employees }) 
             </div>
 
             <div className="project-actions">
-              <Link to={`/project/subtask-dashboard/${project._id}`} className="action-btn view-btn">
+              <Link to={`/subtasks/${project._id}`} className="action-btn view-btn">
                 View Subtasks
               </Link>
-              <Link to={`/project/details/${project._id}`} className="action-btn primary-btn">
+              <Link to={`/project-details/${project._id}`} className="action-btn primary-btn">
                 View Project
               </Link>
             </div>

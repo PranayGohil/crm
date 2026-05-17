@@ -2,6 +2,7 @@
 import jwt from "jsonwebtoken";
 import Admin from "../models/adminModel.js";
 import Employee from "../models/employeeModel.js";
+import Client from "../models/clientModel.js";
 
 export const verifyToken = (req, res, next) => {
     const token = req.header("Authorization")?.replace("Bearer ", "");
@@ -45,8 +46,19 @@ export const protectAny = async (req, res, next) => {
         // Check Employee
         user = await Employee.findById(decoded.id);
         if (user) {
+            user.role = "employee";
             req.user = user;
             req.employee = user; // Set req.employee for clarity
+            req.isAdmin = false;
+            return next();
+        }
+
+        // Check Client
+        user = await Client.findById(decoded.id);
+        if (user) {
+            user.role = "client";
+            req.user = user;
+            req.client = user; // Set req.client for clarity
             req.isAdmin = false;
             return next();
         }

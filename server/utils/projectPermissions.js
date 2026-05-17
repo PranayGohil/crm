@@ -8,8 +8,15 @@
 export const getProjectPermissionQuery = (user) => {
     if (!user) return { _id: null }; // No access if no user
     
+    const role = user.role || (user.constructor?.modelName ? user.constructor.modelName.toLowerCase() : undefined);
+    
     // Super admins have full access
-    if (user.role === 'super-admin') return {};
+    if (role === 'super-admin') return {};
+    
+    // Clients have access only to their own projects
+    if (role === 'client') {
+        return { client_id: user._id?.toString() };
+    }
     
     // For others (Admins or Employees), check stage permissions
     return {
@@ -18,15 +25,23 @@ export const getProjectPermissionQuery = (user) => {
 };
 
 /**
- * Checks if a user (Admin or Employee) has access to a specific project.
+ * Checks if a user (Admin, Employee, or Client) has access to a specific project.
  * Super admins always have access.
+ * Clients have access if the project belongs to them.
  * Others have access if there's an intersection between project stages and manage_stages.
  */
 export const canAdminAccessProject = (user, project) => {
     if (!user) return false;
     
+    const role = user.role || (user.constructor?.modelName ? user.constructor.modelName.toLowerCase() : undefined);
+    
     // Super admins always have access
-    if (user.role === 'super-admin') return true;
+    if (role === 'super-admin') return true;
+    
+    // Clients have access if the project belongs to them
+    if (role === 'client') {
+        return project.client_id?.toString() === user._id?.toString();
+    }
     
     const userStages = user.manage_stages || [];
     const projectStages = project.stages || [];
