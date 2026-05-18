@@ -33,8 +33,9 @@ const ViewSubtask = () => {
         (subtaskData.media_files || []).map((file) => ({ src: file, alt: file }))
       );
 
+      const projectIdVal = subtaskData.project_id?._id || subtaskData.project_id;
       const { data: projectData } = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/project/get/${subtaskData.project_id}`,
+        `${process.env.REACT_APP_API_URL}/api/project/get/${projectIdVal}`,
         { headers }
       );
       setProject(projectData.project);

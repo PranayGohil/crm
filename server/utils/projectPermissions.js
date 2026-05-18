@@ -18,9 +18,12 @@ export const getProjectPermissionQuery = (user) => {
         return { client_id: user._id?.toString() };
     }
     
-    // For others (Admins or Employees), check stage permissions
+    // For others (Admins or Employees), check stage permissions OR project assignment
     return {
-        stages: { $in: user.manage_stages || [] }
+        $or: [
+            { stages: { $in: user.manage_stages || [] } },
+            { "assign_to.id": user._id?.toString() }
+        ]
     };
 };
 
@@ -28,7 +31,7 @@ export const getProjectPermissionQuery = (user) => {
  * Checks if a user (Admin, Employee, or Client) has access to a specific project.
  * Super admins always have access.
  * Clients have access if the project belongs to them.
- * Others have access if there's an intersection between project stages and manage_stages.
+ * Others have access if they are assigned to the project or there's an intersection between project stages and manage_stages.
  */
 export const canAdminAccessProject = (user, project) => {
     if (!user) return false;
@@ -42,6 +45,10 @@ export const canAdminAccessProject = (user, project) => {
     if (role === 'client') {
         return project.client_id?.toString() === user._id?.toString();
     }
+    
+    // Employees/Admins have access if they are explicitly assigned to the project
+    const isAssigned = project.assign_to?.some(assignee => assignee.id?.toString() === user._id?.toString());
+    if (isAssigned) return true;
     
     const userStages = user.manage_stages || [];
     const projectStages = project.stages || [];

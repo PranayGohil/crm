@@ -46,6 +46,6 @@ projectRouter.delete("/bulk-delete", protectAdmin, bulkDelete);
 projectRouter.put("/archive/:projectId", protectAdmin, archiveProject);
 projectRouter.put("/unarchive/:projectId", protectAdmin, unarchiveProject);
 projectRouter.get("/get-archived", protectAdmin, getArchivedProjects);
-projectRouter.get("/get-all-archived", protectAdmin, getProjectWithArchived);
+projectRouter.get("/get-all-archived", getProjectWithArchived);
 
 export default projectRouter;

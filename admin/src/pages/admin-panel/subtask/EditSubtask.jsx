@@ -51,9 +51,10 @@ const EditSubtask = () => {
         setEmployees(empRes.data);
         const subtask = subtaskRes.data;
 
-        if (subtask.project_id) {
+          if (subtask.project_id) {
+          const projectIdVal = subtask.project_id?._id || subtask.project_id;
           const projectRes = await axios.get(
-            `${process.env.REACT_APP_API_URL}/api/project/get/${subtask.project_id}`, { headers }
+            `${process.env.REACT_APP_API_URL}/api/project/get/${projectIdVal}`, { headers }
           );
           const clientId = projectRes.data.project?.client_id;
           if (clientId) {

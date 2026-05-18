@@ -344,7 +344,28 @@ export const getProjectInfo = async (req, res) => {
     }
 
     if (!canAdminAccessProject(req.user, project)) {
-      return res.status(403).json({ success: false, message: "Access denied. You don't have permission to view this project." });
+      // Find reportees of this user
+      const reportees = await Employee.find({ reporting_manager: req.user._id }).select("_id");
+      const allowedAssignees = [req.user._id, ...reportees.map(r => r._id)];
+      const manageStages = req.user.manage_stages || [];
+
+      // Query subtasks of this project to see if any matches manager dashboard access conditions
+      const subtasks = await SubTask.find({ project_id: id });
+      const isAllowed = subtasks.some(task => {
+        // Check if assigned to manager or their team
+        const isAssigned = allowedAssignees.some(empId => empId?.toString() === task.assign_to?.toString());
+        if (isAssigned) return true;
+
+        // Check if active stage is in manager's manage_stages
+        const activeStageName = task.stages?.[task.current_stage_index]?.name;
+        if (activeStageName && manageStages.includes(activeStageName)) return true;
+
+        return false;
+      });
+
+      if (!isAllowed) {
+        return res.status(403).json({ success: false, message: "Access denied. You don't have permission to view this project." });
+      }
     }
 
     res.status(200).json({ success: true, project });

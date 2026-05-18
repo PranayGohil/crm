@@ -403,11 +403,29 @@ export const getSubtasksByProjectId = async (req, res) => {
     const project = await Project.findById(projectId);
     if (!project) return res.status(404).json({ message: "Project not found" });
 
+    const subtasks = await SubTask.find({ project_id: projectId });
+
     if (!canAdminAccessProject(req.user, project)) {
-      return res.status(403).json({ success: false, message: "Access denied." });
+      // Find reportees of this user
+      const reportees = await Employee.find({ reporting_manager: req.user._id }).select("_id");
+      const allowedAssignees = [req.user._id?.toString(), ...reportees.map(r => r._id?.toString())];
+      const manageStages = req.user.manage_stages || [];
+
+      const isAllowed = subtasks.some(task => {
+        const isAssigned = allowedAssignees.includes(task.assign_to?.toString());
+        if (isAssigned) return true;
+
+        const activeStageName = task.stages?.[task.current_stage_index]?.name;
+        if (activeStageName && manageStages.includes(activeStageName)) return true;
+
+        return false;
+      });
+
+      if (!isAllowed) {
+        return res.status(403).json({ success: false, message: "Access denied." });
+      }
     }
 
-    const subtasks = await SubTask.find({ project_id: projectId });
     res.status(200).json(subtasks);
   } catch (error) {
     console.error("Error fetching subtasks:", error);
@@ -428,7 +446,18 @@ export const getSubTaskInfo = async (req, res) => {
     }
 
     if (!canAdminAccessProject(req.user, subTask.project_id)) {
-      return res.status(403).json({ success: false, message: "Access denied." });
+      // Find reportees of this user
+      const reportees = await Employee.find({ reporting_manager: req.user._id }).select("_id");
+      const allowedAssignees = [req.user._id?.toString(), ...reportees.map(r => r._id?.toString())];
+      const manageStages = req.user.manage_stages || [];
+
+      const isAssigned = allowedAssignees.includes(subTask.assign_to?.toString());
+      const activeStageName = subTask.stages?.[subTask.current_stage_index]?.name;
+      const hasStageMatch = activeStageName && manageStages.includes(activeStageName);
+
+      if (!isAssigned && !hasStageMatch) {
+        return res.status(403).json({ success: false, message: "Access denied." });
+      }
     }
     res.status(200).json(subTask);
   } catch (error) {
