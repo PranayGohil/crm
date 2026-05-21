@@ -8,17 +8,32 @@ import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import EmployeeSearchableSelect from "../../../components/common/EmployeeSearchableSelect";
 import { stageOptions, priorityOptions } from "../../../options";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const EditSubtask = () => {
   const { subtaskId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const gateStages = (stagesList) => {
+    if (!user) return stagesList;
+    if (user.role === "super-admin") return stagesList;
+    return stagesList.filter(s => (user.manage_stages || []).includes(s));
+  };
+
   const [loading, setLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [mediaPreviews, setMediaPreviews] = useState([]);
   const [mediaFiles, setMediaFiles] = useState([]);
   const [clientStagePricing, setClientStagePricing] = useState([]);
   const [currentActiveStage, setCurrentActiveStage] = useState([]);  // current running stage for employee filtering
-  const [projectStages, setProjectStages] = useState(stageOptions);
+  const [projectStages, setProjectStages] = useState(() => gateStages(stageOptions));
+
+  useEffect(() => {
+    if (user) {
+      setProjectStages(prev => gateStages(prev));
+    }
+  }, [user]); // eslint-disable-line
 
   const singleSchema = Yup.object({
     task_name: Yup.string().required("Subtask name is required"),
@@ -60,7 +75,7 @@ const EditSubtask = () => {
           );
           const p = projectRes.data.project;
           const pStages = p?.stages || [];
-          setProjectStages(pStages.length > 0 ? pStages : stageOptions);
+          setProjectStages(gateStages(pStages.length > 0 ? pStages : stageOptions));
 
           const clientId = p?.client_id;
           if (clientId) {

@@ -9,9 +9,18 @@ import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import EmployeeSearchableSelect from "../../../components/common/EmployeeSearchableSelect";
 import { stageOptions, priorityOptions } from "../../../options";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const AddSubtask = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const gateStages = (stagesList) => {
+    if (!user) return stagesList;
+    if (user.role === "super-admin") return stagesList;
+    return stagesList.filter(s => (user.manage_stages || []).includes(s));
+  };
+
   const [loading, setLoading] = useState(false);
   const [employees, setEmployees] = useState([]);
   const { projectId } = useParams();
@@ -21,7 +30,13 @@ const AddSubtask = () => {
   const [activeTab, setActiveTab] = useState("single"); // "single" | "bulk"
 
   const [clientStagePricing, setClientStagePricing] = useState([]);
-  const [projectStages, setProjectStages] = useState(stageOptions);
+  const [projectStages, setProjectStages] = useState(() => gateStages(stageOptions));
+
+  useEffect(() => {
+    if (user) {
+      setProjectStages(prev => gateStages(prev));
+    }
+  }, [user]); // eslint-disable-line
 
   const singleSchema = Yup.object({
     task_name: Yup.string().required("Subtask name is required"),
@@ -64,7 +79,7 @@ const AddSubtask = () => {
         const project = projectRes.data.project;
         const clientId = project?.client_id;
         const pStages = project?.stages || [];
-        setProjectStages(pStages.length > 0 ? pStages : stageOptions);
+        setProjectStages(gateStages(pStages.length > 0 ? pStages : stageOptions));
 
         if (clientId) {
           const clientRes = await axios.get(

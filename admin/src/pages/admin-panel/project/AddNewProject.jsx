@@ -8,6 +8,7 @@ import { PROJECT_STAGES } from "../../../constants";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import ClientSearchableSelect from "../../../components/common/ClientSearchableSelect";
 import SearchableSelect from "../../../components/common/SearchableSelect";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const inputCls =
   "w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
@@ -15,6 +16,13 @@ const labelCls = "block text-sm font-medium text-gray-700 mb-1";
 
 const AddNewProject = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const gateStages = (stagesList) => {
+    if (!user) return stagesList;
+    if (user.role === "super-admin") return stagesList;
+    return stagesList.filter(s => (user.manage_stages || []).includes(s));
+  };
 
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([{ name: "", quantity: 0, price: 0 }]);
@@ -23,7 +31,13 @@ const AddNewProject = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [currency, setCurrency] = useState("INR");
   const [stages, setStages] = useState([]);
-  const [availableStages, setAvailableStages] = useState(PROJECT_STAGES);
+  const [availableStages, setAvailableStages] = useState(() => gateStages(PROJECT_STAGES));
+
+  useEffect(() => {
+    if (user) {
+      setAvailableStages(prev => gateStages(prev));
+    }
+  }, [user]); // eslint-disable-line
 
   const toggleStage = (stage) => {
     setStages((prev) =>
@@ -187,7 +201,7 @@ const AddNewProject = () => {
                 setFieldValue("client_name", option ? option.data?.full_name || "" : "");
                 const clientStages = option?.data?.stages || [];
                 const allowedStages = clientStages.length > 0 ? clientStages : PROJECT_STAGES;
-                setAvailableStages(allowedStages);
+                setAvailableStages(gateStages(allowedStages));
                 setStages([]);
               }}
               error={touched.client_id && errors.client_id}
