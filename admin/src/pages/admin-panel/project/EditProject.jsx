@@ -26,6 +26,7 @@ const EditProject = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [currency, setCurrency] = useState("INR");
   const [stages, setStages] = useState([]);
+  const [availableStages, setAvailableStages] = useState(PROJECT_STAGES);
 
   const toggleStage = (stage) => {
     setStages((prev) =>
@@ -124,6 +125,19 @@ const EditProject = () => {
         setCurrency(p.content[0]?.currency || "INR");
         setStages(p.stages || []);
         setExistingFiles(p.content[0]?.uploaded_files || []);
+
+        if (p.client_id) {
+          const clientRes = await axios.get(
+            `${process.env.REACT_APP_API_URL}/api/client/get/${p.client_id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          const clientStages = clientRes.data?.stages || [];
+          setAvailableStages(clientStages.length > 0 ? clientStages : PROJECT_STAGES);
+        }
       } catch {
         toast.error("Failed to load project");
       } finally {
@@ -216,7 +230,11 @@ const EditProject = () => {
               value={values.client_id ? { value: values.client_id, label: values.client_name } : null}
               onChange={(option) => {
                 setFieldValue("client_id", option ? option.value : "");
-                setFieldValue("client_name", option ? option.data.full_name : "");
+                setFieldValue("client_name", option ? option.data?.full_name || "" : "");
+                const clientStages = option?.data?.stages || [];
+                const allowedStages = clientStages.length > 0 ? clientStages : PROJECT_STAGES;
+                setAvailableStages(allowedStages);
+                setStages([]);
               }}
               error={touched.client_id && errors.client_id}
             />
@@ -274,7 +292,7 @@ const EditProject = () => {
         <div>
           <label className={labelCls}>Project Stages</label>
           <div className="flex flex-wrap gap-2">
-            {PROJECT_STAGES.map((value) => (
+            {availableStages.map((value) => (
               <button
                 key={value}
                 type="button"

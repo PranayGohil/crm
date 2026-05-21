@@ -172,6 +172,26 @@ const Subtasks = () => {
   const [bulkPriority, setBulkPriority] = useState("");
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
 
+  // Derive the current active stage (first non-completed) for each selected subtask.
+  // Used to filter the assign dropdown to only show eligible employees.
+  const selectedStageNames = useMemo(() => {
+    const allSubtasks = projects.flatMap((p) => p.subtasks ?? []);
+    const names = new Set();
+    selectedTaskIds.forEach((id) => {
+      const subtask = allSubtasks.find((s) => s._id === id);
+      if (subtask?.stages) {
+        const activeStage = subtask.stages.find((stg) => !stg.completed);
+        if (activeStage) names.add(typeof activeStage === "string" ? activeStage : activeStage.name);
+      }
+    });
+    return Array.from(names);
+  }, [selectedTaskIds, projects]);
+
+  // When active stages change, clear any previously chosen employee (may no longer be valid)
+  useEffect(() => {
+    setBulkAssignTo("");
+  }, [selectedStageNames.join(",")]);	// eslint-disable-line
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const headers = { Authorization: `Bearer ${token}` };
@@ -1042,9 +1062,11 @@ const Subtasks = () => {
               >
                 <div className="w-40">
                   <EmployeeSearchableSelect
+                    key={selectedStageNames.join(",") || "no-stages"}
                     placeholder="👤 Assign"
                     label={null}
                     isClearable
+                    stages={selectedStageNames}
                     value={
                       bulkAssignTo
                         ? {

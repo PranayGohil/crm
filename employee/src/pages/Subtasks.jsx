@@ -126,6 +126,34 @@ const Subtasks = () => {
   const [bulkPriority, setBulkPriority] = useState("");
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
 
+  // Derive the current active stage (first non-completed) for each selected subtask.
+  // Used to filter the assign dropdown to only show eligible employees.
+  const selectedStageNames = useMemo(() => {
+    const allSubtasks = projects.flatMap((p) => p.subtasks ?? []);
+    const names = new Set();
+    selectedTaskIds.forEach((id) => {
+      const subtask = allSubtasks.find((s) => s._id === id);
+      if (subtask?.stages) {
+        const activeStage = subtask.stages.find((stg) => !stg.completed);
+        if (activeStage) names.add(typeof activeStage === "string" ? activeStage : activeStage.name);
+      }
+    });
+    return Array.from(names);
+  }, [selectedTaskIds, projects]);
+
+  // When active stages change, clear any previously chosen employee (may no longer be valid)
+  useEffect(() => {
+    setBulkAssignTo("");
+  }, [selectedStageNames.join(",")]); // eslint-disable-line
+
+  // Employees filtered by ALL required stages (for bulk assign dropdown)
+  const eligibleEmployees = useMemo(() => {
+    if (!selectedStageNames.length) return employees;
+    return employees.filter((e) =>
+      selectedStageNames.every((stage) => e.manage_stages?.includes(stage))
+    );
+  }, [employees, selectedStageNames]);
+
   useEffect(() => {
     if (!managerId) return;
     const token = user?.token;
@@ -641,10 +669,11 @@ const Subtasks = () => {
               <div className="bulk-controls" style={{ flexWrap: "wrap", gap: "6px" }}>
                 <div className="w-48">
                   <SearchableSelect
+                    key={selectedStageNames.join(",") || "no-stages"}
                     placeholder="👤 Assign"
-                    value={bulkAssignTo ? { value: bulkAssignTo, label: employees.find(e => e._id === bulkAssignTo)?.full_name || user.full_name } : null}
+                    value={bulkAssignTo ? { value: bulkAssignTo, label: eligibleEmployees.find(e => e._id === bulkAssignTo)?.full_name || user.full_name } : null}
                     onChange={(opt) => setBulkAssignTo(opt ? opt.value : "")}
-                    options={[{ value: user._id, label: user.full_name }, ...employees.map((e) => ({ value: e._id, label: e.full_name }))]}
+                    options={[{ value: user._id, label: user.full_name }, ...eligibleEmployees.map((e) => ({ value: e._id, label: e.manage_stages?.length ? `${e.full_name} (${e.manage_stages.join(", ")})` : e.full_name }))]}
                     menuPlacement="top"
                   />
                 </div>

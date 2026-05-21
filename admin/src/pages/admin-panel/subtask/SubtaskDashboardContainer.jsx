@@ -471,6 +471,33 @@ const SubtaskDashboardContainer = () => {
     [rowSelection, subtasks]
   );
 
+  // Derive the CURRENT ACTIVE stage (first non-completed stage) from each selected subtask.
+  // Only employees who can work on those specific running stages will appear in the assign dropdown.
+  const selectedStageNames = useMemo(() => {
+    const names = new Set();
+    Object.keys(rowSelection)
+      .filter((k) => rowSelection[k])
+      .forEach((i) => {
+        const subtask = subtasks[parseInt(i)];
+        if (subtask?.stages) {
+          // Find the first stage that is NOT yet completed — that's the active one
+          const activeStage = subtask.stages.find((s) => !s.completed);
+          if (activeStage) {
+            const name = typeof activeStage === "string" ? activeStage : activeStage.name;
+            if (name) names.add(name);
+          }
+        }
+      });
+    return Array.from(names);
+  }, [rowSelection, subtasks]);
+
+  // When the required stages change (user selects/deselects subtasks), clear any previously
+  // picked employee — they may no longer be valid for the new stage combination.
+  useEffect(() => {
+    setBulkAssignTo("");
+  }, [selectedStageNames.join(",")]); // eslint-disable-line
+
+
   const handleBulkUpdateAll = async () => {
     if (selectedTaskIds.length === 0) return;
     const update = {};
@@ -705,9 +732,11 @@ const SubtaskDashboardContainer = () => {
               </span>
               <div className="flex-1 min-w-[150px]">
                 <EmployeeSearchableSelect
+                  key={selectedStageNames.join(",") || "no-stages"}
                   placeholder="👤 Assign To"
                   label={null}
                   isClearable
+                  stages={selectedStageNames}
                   value={bulkAssignTo ? { value: bulkAssignTo, label: employees.find(e => e._id === bulkAssignTo)?.full_name || "Selected Employee" } : null}
                   onChange={(opt) => setBulkAssignTo(opt ? opt.value : "")}
                   menuPlacement="top"

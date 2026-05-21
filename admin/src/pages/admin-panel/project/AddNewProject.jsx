@@ -23,6 +23,7 @@ const AddNewProject = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [currency, setCurrency] = useState("INR");
   const [stages, setStages] = useState([]);
+  const [availableStages, setAvailableStages] = useState(PROJECT_STAGES);
 
   const toggleStage = (stage) => {
     setStages((prev) =>
@@ -183,7 +184,11 @@ const AddNewProject = () => {
               value={values.client_id ? { value: values.client_id, label: values.client_name } : null}
               onChange={(option) => {
                 setFieldValue("client_id", option ? option.value : "");
-                setFieldValue("client_name", option ? option.data.full_name : "");
+                setFieldValue("client_name", option ? option.data?.full_name || "" : "");
+                const clientStages = option?.data?.stages || [];
+                const allowedStages = clientStages.length > 0 ? clientStages : PROJECT_STAGES;
+                setAvailableStages(allowedStages);
+                setStages([]);
               }}
               error={touched.client_id && errors.client_id}
             />
@@ -242,7 +247,7 @@ const AddNewProject = () => {
         <div>
           <label className={labelCls}>Project Stages</label>
           <div className="flex flex-wrap gap-2">
-            {PROJECT_STAGES.map((value) => (
+            {availableStages.map((value) => (
               <button
                 key={value}
                 type="button"

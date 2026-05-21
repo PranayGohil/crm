@@ -33,6 +33,7 @@ const CreateNewClient = () => {
       username: "", client_type: "", password: "", confirm_password: "",
       company_name: "", gst_number: "", business_phone: "", website: "",
       linkedin: "", business_address: "", additional_notes: "",
+      stages: [],
       stage_pricing: STAGE_OPTIONS.map((stage) => ({ stage_name: stage, price: 0 })),
     },
     validationSchema: Yup.object({
@@ -131,7 +132,7 @@ const CreateNewClient = () => {
               </Field>
               <Field label="Password" error={touched.password && errors.password}>
                 <div className="relative">
-                  <input type={showPassword ? "text" : "password"} name="password" value={values.password} onChange={handleChange} placeholder="********" disabled={isSubmitting} className={inputCls} />
+                   <input type={showPassword ? "text" : "password"} name="password" value={values.password} onChange={handleChange} placeholder="********" disabled={isSubmitting} className={inputCls} />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
@@ -148,24 +149,64 @@ const CreateNewClient = () => {
             </div>
           </section>
 
+          {/* ── Select Client Stages ── */}
+          <section className="pt-6 border-t border-gray-200">
+            <h2 className="text-base sm:text-xl font-semibold text-gray-800 mb-1">Select Client Stages</h2>
+            <p className="text-xs sm:text-sm text-gray-500 mb-4">Choose which stages apply to this client. Only selected stages can have pricing configured.</p>
+            <div className="flex flex-wrap gap-2">
+              {STAGE_OPTIONS.map((value) => {
+                const isSelected = values.stages.includes(value);
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                      isSelected
+                        ? "bg-blue-100 text-blue-800 border-blue-300"
+                        : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+                    }`}
+                    onClick={() => {
+                      if (isSelected) {
+                        setFieldValue("stages", values.stages.filter((s) => s !== value));
+                      } else {
+                        setFieldValue("stages", [...values.stages, value]);
+                      }
+                    }}
+                  >
+                    {value}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
           {/* ── Stage Pricing ── */}
           <section className="pt-6 border-t border-gray-200">
             <h2 className="text-base sm:text-xl font-semibold text-gray-800 mb-1">Stage Pricing</h2>
             <p className="text-xs sm:text-sm text-gray-500 mb-4">Default prices per stage — auto-filled when creating subtasks.</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-              {values.stage_pricing.map((item, index) => (
-                <div key={item.stage_name} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
-                  <label className="block text-xs font-medium text-gray-700 mb-1.5">{item.stage_name}</label>
-                  <div className="relative">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
-                    <input type="number" min="0" value={item.price}
-                      onChange={(e) => setFieldValue(`stage_pricing[${index}].price`, parseFloat(e.target.value) || 0)}
-                      disabled={isSubmitting}
-                      className="w-full pl-6 pr-2 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="0" />
-                  </div>
-                </div>
-              ))}
-            </div>
+            {values.stages.length === 0 ? (
+              <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                ⚠️ Please select at least one stage above to configure pricing.
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                {values.stage_pricing.map((item, index) => {
+                  if (!values.stages.includes(item.stage_name)) return null;
+                  return (
+                    <div key={item.stage_name} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                      <label className="block text-xs font-medium text-gray-700 mb-1.5">{item.stage_name}</label>
+                      <div className="relative">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
+                        <input type="number" min="0" value={item.price}
+                          onChange={(e) => setFieldValue(`stage_pricing[${index}].price`, parseFloat(e.target.value) || 0)}
+                          disabled={isSubmitting}
+                          className="w-full pl-6 pr-2 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="0" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </section>
 
           {/* ── Additional Details ── */}

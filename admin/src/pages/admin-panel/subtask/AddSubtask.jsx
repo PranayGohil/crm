@@ -21,6 +21,7 @@ const AddSubtask = () => {
   const [activeTab, setActiveTab] = useState("single"); // "single" | "bulk"
 
   const [clientStagePricing, setClientStagePricing] = useState([]);
+  const [projectStages, setProjectStages] = useState(stageOptions);
 
   const singleSchema = Yup.object({
     task_name: Yup.string().required("Subtask name is required"),
@@ -60,7 +61,10 @@ const AddSubtask = () => {
         const projectRes = await axios.get(
           `${process.env.REACT_APP_API_URL}/api/project/get/${projectId}`, { headers }
         );
-        const clientId = projectRes.data.project?.client_id;
+        const project = projectRes.data.project;
+        const clientId = project?.client_id;
+        const pStages = project?.stages || [];
+        setProjectStages(pStages.length > 0 ? pStages : stageOptions);
 
         if (clientId) {
           const clientRes = await axios.get(
@@ -252,7 +256,7 @@ const AddSubtask = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Stage & Price</label>
                   <div className="space-y-2">
-                    {stageOptions.map((opt) => {
+                    {projectStages.map((opt) => {
                       const isChecked = values.stages.includes(opt);
                       return (
                         <div key={opt} className="flex items-center gap-2 sm:gap-3">
@@ -318,12 +322,19 @@ const AddSubtask = () => {
                 </div>
 
                 <div>
-                  <EmployeeSearchableSelect
-                    label="Assign To"
-                    placeholder="Select Assign To"
-                    value={values.assign_to ? { value: values.assign_to, label: employees.find(e => e._id === values.assign_to)?.full_name || "Selected Employee" } : null}
-                    onChange={(opt) => setFieldValue("assign_to", opt ? opt.value : "")}
-                  />
+                  {/* Only show employees permitted for the FIRST (upcoming) stage */}
+                  {(() => {
+                    const firstStage = projectStages.find((s) => values.stages.includes(s));
+                    return (
+                      <EmployeeSearchableSelect
+                        label="Assign To"
+                        placeholder="Select Assign To"
+                        stages={firstStage ? [firstStage] : []}
+                        value={values.assign_to ? { value: values.assign_to, label: employees.find(e => e._id === values.assign_to)?.full_name || "Selected Employee" } : null}
+                        onChange={(opt) => setFieldValue("assign_to", opt ? opt.value : "")}
+                      />
+                    );
+                  })()}
                 </div>
 
                 <div>
@@ -444,7 +455,7 @@ const AddSubtask = () => {
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Stage & Price</label>
                     <div className="space-y-2">
-                      {stageOptions.map((opt) => {
+                      {projectStages.map((opt) => {
                         const isChecked = values.bulkStage.includes(opt);
                         return (
                           <div key={opt} className="flex items-center gap-2 sm:gap-3">
@@ -510,12 +521,19 @@ const AddSubtask = () => {
                   </div>
 
                   <div className="mb-4">
-                    <EmployeeSearchableSelect
-                      label="Assign To"
-                      placeholder="Select Assign To"
-                      value={values.bulkAssignTo ? { value: values.bulkAssignTo, label: employees.find(e => e._id === values.bulkAssignTo)?.full_name || "Selected Employee" } : null}
-                      onChange={(opt) => setFieldValue("bulkAssignTo", opt ? opt.value : "")}
-                    />
+                    {/* Only show employees permitted for the FIRST (upcoming) bulk stage */}
+                    {(() => {
+                      const firstBulkStage = projectStages.find((s) => values.bulkStage.includes(s));
+                      return (
+                        <EmployeeSearchableSelect
+                          label="Assign To"
+                          placeholder="Select Assign To"
+                          stages={firstBulkStage ? [firstBulkStage] : []}
+                          value={values.bulkAssignTo ? { value: values.bulkAssignTo, label: employees.find(e => e._id === values.bulkAssignTo)?.full_name || "Selected Employee" } : null}
+                          onChange={(opt) => setFieldValue("bulkAssignTo", opt ? opt.value : "")}
+                        />
+                      );
+                    })()}
                   </div>
 
                   <div>

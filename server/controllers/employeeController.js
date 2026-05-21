@@ -108,7 +108,7 @@ export const addEmployee = async (req, res) => {
         ? new mongoose.Types.ObjectId(reporting_manager) // 👈 ensure it’s saved as ObjectId
         : null,
       is_manager,
-      manage_stages: is_manager ? manage_stages || [] : [],
+      manage_stages: manage_stages || [],
     });
 
     await newEmployee.save();
@@ -207,9 +207,15 @@ export const loginEmployee = async (req, res) => {
 
 export const getEmployees = async (req, res) => {
   try {
+    const { stages } = req.query;
+    const query = {};
+    if (stages) {
+      const stageList = stages.split(",").map((s) => s.trim()).filter(Boolean);
+      if (stageList.length) query.manage_stages = { $all: stageList };
+    }
     const employees = await Employee.find(
-      {},
-      "_id full_name email status designation department phone monthly_salary profile_pic is_manager reporting_manager"
+      query,
+      "_id full_name email status designation department phone monthly_salary profile_pic is_manager reporting_manager manage_stages"
     ).populate("reporting_manager", "full_name _id");
     res.status(200).json(employees);
   } catch (error) {
@@ -220,7 +226,7 @@ export const getEmployees = async (req, res) => {
 
 export const searchEmployees = async (req, res) => {
   try {
-    const { q, page = 1, limit = 20 } = req.query;
+    const { q, stages, page = 1, limit = 20 } = req.query;
     const skip = (page - 1) * limit;
 
     const query = {};
@@ -232,10 +238,15 @@ export const searchEmployees = async (req, res) => {
         { username: { $regex: q, $options: "i" } },
       ];
     }
+    // If stages param is provided, only return employees who can work on ALL of those stages
+    if (stages) {
+      const stageList = stages.split(",").map((s) => s.trim()).filter(Boolean);
+      if (stageList.length) query.manage_stages = { $all: stageList };
+    }
 
     const employees = await Employee.find(
       query,
-      "_id full_name email status designation department profile_pic"
+      "_id full_name email status designation department profile_pic manage_stages"
     )
       .sort({ full_name: 1 })
       .skip(skip)
@@ -367,7 +378,7 @@ export const editEmployee = async (req, res) => {
     if (typeof is_manager !== "undefined") {
       employee.is_manager = typeof is_manager === "string" ? is_manager === "true" : !!is_manager;
     }
-    employee.manage_stages = employee.is_manager ? manage_stages || [] : [];
+    employee.manage_stages = manage_stages || [];
 
     // Profile pic
     if (req.file) {

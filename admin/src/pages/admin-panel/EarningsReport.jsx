@@ -3,6 +3,7 @@ import ClientSearchableSelect from "../../components/common/ClientSearchableSele
 import SearchableSelect from "../../components/common/SearchableSelect";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../../contexts/AuthContext";
 import {
     BarChart, Bar, AreaChart, Area,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend,
@@ -145,6 +146,7 @@ const ExportBtn = ({ onClick }) => (
 /* ─── main ───────────────────────────────────────────────────────────────── */
 const EarningsReport = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     const [loading, setLoading] = useState(true);
     const [subtasks, setSubtasks] = useState([]);
@@ -155,6 +157,7 @@ const EarningsReport = () => {
     const [monthlyTargets, setMonthlyTargets] = useState([]);
 
     const [selectedBrand, setSelectedBrand] = useState("all");
+    const [selectedStage, setSelectedStage] = useState("all");
 
     const [activeTab, setActiveTab] = useState("overview");
     const [dateRange, setDateRange] = useState("all");
@@ -163,6 +166,58 @@ const EarningsReport = () => {
     const [selectedClient, setSelectedClient] = useState("all");
     const [timelineSearch, setTimelineSearch] = useState("");
     const [timelinePage, setTimelinePage] = useState(1);
+
+    const stageOptions = useMemo(() => {
+        const set = new Set();
+        subtasks.forEach(s => {
+            (s.stages || []).forEach(st => {
+                const name = typeof st === "string" ? st : st.name;
+                if (name) {
+                    if (user?.role === "super-admin" || (user?.manage_stages || []).includes(name)) {
+                        set.add(name);
+                    }
+                }
+            });
+        });
+        return [
+            { value: "all", label: "All Stages" },
+            ...Array.from(set).map(name => ({ value: name, label: name }))
+        ];
+    }, [subtasks, user]);
+
+    const brandOptions = useMemo(() => {
+        const options = [
+            { value: "all", label: "All Brands" },
+            { value: "Maulshree", label: "Maulshree" }
+        ];
+        
+        const permittedBrands = [];
+        if (user?.role === "super-admin") {
+            permittedBrands.push(...BRANDS);
+        } else {
+            const perms = user?.sales_permissions || [];
+            if (perms.includes("manage_mukhwas_sales")) permittedBrands.push("Mukhwas");
+            if (perms.includes("manage_breeliq_sales")) permittedBrands.push("Breeliq");
+        }
+
+        permittedBrands.forEach(b => {
+            options.push({ value: b, label: b });
+        });
+        
+        return options;
+    }, [user]);
+
+    useEffect(() => {
+        if (brandOptions && !brandOptions.some(opt => opt.value === selectedBrand)) {
+            setSelectedBrand("all");
+        }
+    }, [brandOptions, selectedBrand]);
+
+    useEffect(() => {
+        if (selectedBrand !== "all" && selectedBrand !== "Maulshree") {
+            setSelectedStage("all");
+        }
+    }, [selectedBrand]);
 
     const visibleTabs = useMemo(() => {
         const isSalesBrand = selectedBrand === "Mukhwas" || selectedBrand === "Breeliq";
@@ -219,16 +274,52 @@ const EarningsReport = () => {
         // Subtasks are only for Maulshree
         if (selectedBrand !== "all" && selectedBrand !== "Maulshree") return [];
 
-        let list = subtasks.filter((s) => (s.total_price || 0) > 0);
+        let list = subtasks;
+
+        // If not super-admin, restrict to subtasks that have at least one permitted stage
+        if (user?.role !== "super-admin") {
+            const permitted = user?.manage_stages || [];
+            list = list.filter(s => (s.stages || []).some(st => permitted.includes(st.name || st)));
+        }
+
+        // If a specific stage is selected, the subtask must have that stage
+        if (selectedStage !== "all") {
+            list = list.filter(s => (s.stages || []).some(st => (st.name || st) === selectedStage));
+        }
+
+        // Must have some price
+        list = list.filter((s) => {
+            if (selectedStage !== "all") {
+                const targetStg = (s.stages || []).find(st => (st.name || st) === selectedStage);
+                return (targetStg?.price || 0) > 0;
+            }
+            // If selectedStage is "all", it must have some price in permitted stages
+            const permitted = user?.role === "super-admin" ? null : (user?.manage_stages || []);
+            return (s.stages || []).some(st => {
+                if (permitted && !permitted.includes(st.name || st)) return false;
+                return (st.price || 0) > 0;
+            });
+        });
 
         if (dateRange !== "all") {
             list = list.filter((s) => {
-                const createdInRange = isDateInRange(s.assign_date || s.createdAt, dateRange, customFrom, customTo);
-                let hasStageInRange = false;
-                if (s.stages && s.stages.length) {
-                    hasStageInRange = s.stages.some(st => st.completed && isDateInRange(st.completed_at, dateRange, customFrom, customTo));
+                const permitted = user?.role === "super-admin" ? null : (user?.manage_stages || []);
+                if (selectedStage !== "all") {
+                    const createdInRange = isDateInRange(s.assign_date || s.createdAt, dateRange, customFrom, customTo);
+                    const targetStg = (s.stages || []).find(st => (st.name || st) === selectedStage);
+                    const stageInRange = targetStg?.completed && isDateInRange(targetStg.completed_at, dateRange, customFrom, customTo);
+                    return createdInRange || stageInRange;
+                } else {
+                    const createdInRange = isDateInRange(s.assign_date || s.createdAt, dateRange, customFrom, customTo);
+                    let hasStageInRange = false;
+                    if (s.stages && s.stages.length) {
+                        hasStageInRange = s.stages.some(st => {
+                            if (permitted && !permitted.includes(st.name || st)) return false;
+                            return st.completed && isDateInRange(st.completed_at, dateRange, customFrom, customTo);
+                        });
+                    }
+                    return createdInRange || hasStageInRange;
                 }
-                return createdInRange || hasStageInRange;
             });
         }
 
@@ -236,12 +327,23 @@ const EarningsReport = () => {
             list = list.filter((s) => projects[s.project_id]?.client_id === selectedClient);
         }
         return list;
-    }, [subtasks, dateRange, customFrom, customTo, selectedClient, projects, selectedBrand]);
+    }, [subtasks, dateRange, customFrom, customTo, selectedClient, projects, selectedBrand, selectedStage, user]);
 
     const filteredSales = useMemo(() => {
         if (selectedBrand === "Maulshree") return [];
         
         let list = salesEntries;
+
+        // If not super-admin, restrict sales entries to permitted brands in sales_permissions
+        if (user?.role !== "super-admin") {
+            const permittedSales = user?.sales_permissions || [];
+            list = list.filter(s => {
+                if (s.brand === "Mukhwas" && permittedSales.includes("manage_mukhwas_sales")) return true;
+                if (s.brand === "Breeliq" && permittedSales.includes("manage_breeliq_sales")) return true;
+                return false;
+            });
+        }
+
         if (selectedBrand !== "all") {
             list = list.filter(s => s.brand === selectedBrand);
         }
@@ -249,12 +351,24 @@ const EarningsReport = () => {
         if (dateRange !== "all") {
             list = list.filter((s) => isDateInRange(s.date, dateRange, customFrom, customTo));
         }
+
         return list;
-    }, [salesEntries, dateRange, customFrom, customTo, selectedBrand]);
+    }, [salesEntries, dateRange, customFrom, customTo, selectedBrand, user]);
 
     const filteredTargets = useMemo(() => {
         if (selectedBrand === "Maulshree") return [];
         let list = monthlyTargets;
+
+        // If not super-admin, restrict targets to permitted brands in sales_permissions
+        if (user?.role !== "super-admin") {
+            const permittedSales = user?.sales_permissions || [];
+            list = list.filter(t => {
+                if (t.brand === "Mukhwas" && permittedSales.includes("manage_mukhwas_sales")) return true;
+                if (t.brand === "Breeliq" && permittedSales.includes("manage_breeliq_sales")) return true;
+                return false;
+            });
+        }
+
         if (selectedBrand !== "all") {
             list = list.filter(t => t.brand === selectedBrand);
         }
@@ -291,18 +405,41 @@ const EarningsReport = () => {
             });
         }
         return list;
-    }, [monthlyTargets, dateRange, customFrom, customTo, selectedBrand]);
+    }, [monthlyTargets, dateRange, customFrom, customTo, selectedBrand, user]);
 
     const summary = useMemo(() => {
         // Maulshree totals
-        const stTotalValue = filtered.reduce((s, t) => s + (t.total_price || 0), 0);
-        const stEarnedValue = filtered.reduce((s, t) => {
-            const earnedInRange = (t.stages || []).filter(st => st.completed && isDateInRange(st.completed_at, dateRange, customFrom, customTo)).reduce((sum, st) => sum + (st.price || 0), 0);
-            return s + earnedInRange;
-        }, 0);
+        let stTotalValue = 0;
+        let stEarnedValue = 0;
+        const permitted = user?.role === "super-admin" ? null : (user?.manage_stages || []);
+
+        filtered.forEach((t) => {
+            const stagesList = t.stages || [];
+            if (selectedStage !== "all") {
+                const targetStg = stagesList.find(st => (st.name || st) === selectedStage);
+                if (targetStg) {
+                    stTotalValue += targetStg.price || 0;
+                    if (targetStg.completed && isDateInRange(targetStg.completed_at, dateRange, customFrom, customTo)) {
+                        stEarnedValue += targetStg.price || 0;
+                    }
+                }
+            } else {
+                stagesList.forEach(st => {
+                    const name = st.name || st;
+                    if (permitted && !permitted.includes(name)) return;
+                    stTotalValue += st.price || 0;
+                    if (st.completed && isDateInRange(st.completed_at, dateRange, customFrom, customTo)) {
+                        stEarnedValue += st.price || 0;
+                    }
+                });
+            }
+        });
         
         // Sales totals
-        const salesEarnedValue = filteredSales.reduce((s, t) => s + (t.amount || 0), 0);
+        let salesEarnedValue = 0;
+        if (selectedStage === "all") {
+            salesEarnedValue = filteredSales.reduce((s, t) => s + (t.amount || 0), 0);
+        }
         const salesTotalValue = salesEarnedValue; // Treat direct sales as 100% completed contracts
 
         const totalValue = stTotalValue + salesTotalValue;
@@ -310,16 +447,24 @@ const EarningsReport = () => {
         
         const pendingValue = totalValue - earnedValue;
         const percent = totalValue > 0 ? Math.round((earnedValue / totalValue) * 100) : 0;
-        return { totalValue, earnedValue, pendingValue, percent, totalTasks: filtered.length + filteredSales.length };
-    }, [filtered, filteredSales, dateRange, customFrom, customTo]);
+        return { totalValue, earnedValue, pendingValue, percent, totalTasks: filtered.length + (selectedStage === "all" ? filteredSales.length : 0) };
+    }, [filtered, filteredSales, dateRange, customFrom, customTo, selectedStage, user]);
 
     const monthlyData = useMemo(() => {
         const map = {};
+        const permitted = user?.role === "super-admin" ? null : (user?.manage_stages || []);
         
         // Subtasks (Maulshree)
         filtered.forEach((s) => {
             let sEarnedInRange = 0;
-            (s.stages || []).filter((st) => st.completed && st.completed_at && isDateInRange(st.completed_at, dateRange, customFrom, customTo)).forEach((st) => {
+            const stagesList = s.stages || [];
+            
+            stagesList.filter((st) => {
+                const name = st.name || st;
+                if (permitted && !permitted.includes(name)) return false;
+                const matchesStage = selectedStage === "all" || name === selectedStage;
+                return matchesStage && st.completed && st.completed_at && isDateInRange(st.completed_at, dateRange, customFrom, customTo);
+            }).forEach((st) => {
                 const d = new Date(st.completed_at);
                 const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
                 const label = d.toLocaleString("default", { month: "short", year: "2-digit" });
@@ -327,31 +472,53 @@ const EarningsReport = () => {
                 map[key].earned += st.price || 0;
                 sEarnedInRange += st.price || 0;
             });
+            
             const d = new Date(s.assign_date || s.createdAt);
             const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
             const label = d.toLocaleString("default", { month: "short", year: "2-digit" });
             if (!map[key]) map[key] = { month: label, earned: 0, pending: 0 };
-            map[key].pending += Math.max(0, (s.total_price || 0) - sEarnedInRange);
+            
+            if (selectedStage !== "all") {
+                const targetStg = stagesList.find(st => (st.name || st) === selectedStage);
+                if (targetStg) {
+                    map[key].pending += Math.max(0, (targetStg.price || 0) - sEarnedInRange);
+                }
+            } else {
+                // If selectedStage is "all", pending should only sum up permitted stages
+                let permittedTotal = 0;
+                stagesList.forEach(st => {
+                    const name = st.name || st;
+                    if (permitted && !permitted.includes(name)) return;
+                    permittedTotal += st.price || 0;
+                });
+                map[key].pending += Math.max(0, permittedTotal - sEarnedInRange);
+            }
         });
 
         // Sales Entries (Mukhwas/Breeliq)
-        filteredSales.forEach((s) => {
-            const d = new Date(s.date);
-            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-            const label = d.toLocaleString("default", { month: "short", year: "2-digit" });
-            if (!map[key]) map[key] = { month: label, earned: 0, pending: 0 };
-            map[key].earned += s.amount || 0;
-        });
+        if (selectedStage === "all") {
+            filteredSales.forEach((s) => {
+                const d = new Date(s.date);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+                const label = d.toLocaleString("default", { month: "short", year: "2-digit" });
+                if (!map[key]) map[key] = { month: label, earned: 0, pending: 0 };
+                map[key].earned += s.amount || 0;
+            });
+        }
 
         return Object.keys(map).sort().map((k) => map[k]);
-    }, [filtered, filteredSales, dateRange, customFrom, customTo]);
+    }, [filtered, filteredSales, dateRange, customFrom, customTo, selectedStage, user]);
 
     const stageData = useMemo(() => {
         const map = {};
+        const permitted = user?.role === "super-admin" ? null : (user?.manage_stages || []);
         // Subtask stages
         filtered.forEach((s) => {
             (s.stages || []).forEach((st) => {
                 const name = st.name || st;
+                if (permitted && !permitted.includes(name)) return;
+                if (selectedStage !== "all" && name !== selectedStage) return;
+                
                 if (!map[name]) map[name] = { stage: name, total: 0, earned: 0, count: 0, completedCount: 0 };
                 
                 if (st.completed && isDateInRange(st.completed_at, dateRange, customFrom, customTo)) {
@@ -366,22 +533,30 @@ const EarningsReport = () => {
             });
         });
         // Sales entries as a stage
-        filteredSales.forEach((s) => {
-            const name = "Sales Entry";
-            if (!map[name]) map[name] = { stage: name, total: 0, earned: 0, count: 0, completedCount: 0 };
-            map[name].total += s.amount || 0;
-            map[name].earned += s.amount || 0;
-            map[name].count += 1;
-            map[name].completedCount += 1;
-        });
+        if (selectedStage === "all") {
+            filteredSales.forEach((s) => {
+                const name = "Sales Entry";
+                if (!map[name]) map[name] = { stage: name, total: 0, earned: 0, count: 0, completedCount: 0 };
+                map[name].total += s.amount || 0;
+                map[name].earned += s.amount || 0;
+                map[name].count += 1;
+                map[name].completedCount += 1;
+            });
+        }
         return Object.values(map);
-    }, [filtered, filteredSales, dateRange, customFrom, customTo]);
+    }, [filtered, filteredSales, dateRange, customFrom, customTo, selectedStage, user]);
 
     const employeeData = useMemo(() => {
         const map = {};
+        const permitted = user?.role === "super-admin" ? null : (user?.manage_stages || []);
         // Subtask earnings
         filtered.forEach((s) => {
-            (s.stages || []).filter((st) => st.completed && st.completed_by && isDateInRange(st.completed_at, dateRange, customFrom, customTo)).forEach((st) => {
+            (s.stages || []).filter((st) => {
+                const name = st.name || st;
+                if (permitted && !permitted.includes(name)) return false;
+                const matchesStage = selectedStage === "all" || name === selectedStage;
+                return matchesStage && st.completed && st.completed_by && isDateInRange(st.completed_at, dateRange, customFrom, customTo);
+            }).forEach((st) => {
                 const id = String(st.completed_by);
                 const emp = employees[id];
                 if (!map[id]) map[id] = { id, name: emp?.full_name || emp?.username || "Unknown", earned: 0, stages: 0, profile_pic: emp?.profile_pic };
@@ -390,41 +565,70 @@ const EarningsReport = () => {
             });
         });
         // Sales earnings
-        filteredSales.forEach((s) => {
-            if (!s.created_by) return;
-            const id = typeof s.created_by === 'object' ? s.created_by._id : String(s.created_by);
-            const name = typeof s.created_by === 'object' ? s.created_by.username : (employees[id]?.full_name || "Unknown");
-            if (!map[id]) map[id] = { id, name, earned: 0, stages: 0, profile_pic: employees[id]?.profile_pic };
-            map[id].earned += s.amount || 0;
-            map[id].stages += 1;
-        });
+        if (selectedStage === "all") {
+            filteredSales.forEach((s) => {
+                if (!s.created_by) return;
+                const id = typeof s.created_by === 'object' ? s.created_by._id : String(s.created_by);
+                const name = typeof s.created_by === 'object' ? s.created_by.username : (employees[id]?.full_name || "Unknown");
+                if (!map[id]) map[id] = { id, name, earned: 0, stages: 0, profile_pic: employees[id]?.profile_pic };
+                map[id].earned += s.amount || 0;
+                map[id].stages += 1;
+            });
+        }
         return Object.values(map).sort((a, b) => b.earned - a.earned);
-    }, [filtered, filteredSales, employees, dateRange, customFrom, customTo]);
+    }, [filtered, filteredSales, employees, dateRange, customFrom, customTo, selectedStage, user]);
 
     const clientData = useMemo(() => {
         const map = {};
+        const permitted = user?.role === "super-admin" ? null : (user?.manage_stages || []);
         filtered.forEach((s) => {
             const proj = projects[s.project_id];
             if (!proj?.client_id) return;
             const cid = proj.client_id;
             
-            const earnedInRange = (s.stages || []).filter(st => st.completed && isDateInRange(st.completed_at, dateRange, customFrom, customTo)).reduce((a, st) => a + (st.price || 0), 0);
+            let totalVal = 0;
+            let earnedInRange = 0;
+
+            if (selectedStage !== "all") {
+                const targetStg = (s.stages || []).find(st => (st.name || st) === selectedStage);
+                if (targetStg) {
+                    totalVal = targetStg.price || 0;
+                    if (targetStg.completed && isDateInRange(targetStg.completed_at, dateRange, customFrom, customTo)) {
+                        earnedInRange = targetStg.price || 0;
+                    }
+                }
+            } else {
+                (s.stages || []).forEach(st => {
+                    const name = st.name || st;
+                    if (permitted && !permitted.includes(name)) return;
+                    totalVal += st.price || 0;
+                    if (st.completed && isDateInRange(st.completed_at, dateRange, customFrom, customTo)) {
+                        earnedInRange += st.price || 0;
+                    }
+                });
+            }
             
             if (!map[cid]) map[cid] = { name: clients[cid]?.full_name || "Unknown", total: 0, earned: 0, pending: 0 };
-            map[cid].total += s.total_price || 0;
+            map[cid].total += totalVal;
             map[cid].earned += earnedInRange;
-            map[cid].pending += (s.total_price || 0) - earnedInRange;
+            map[cid].pending += totalVal - earnedInRange;
         });
         return Object.values(map).sort((a, b) => b.total - a.total);
-    }, [filtered, projects, clients, dateRange, customFrom, customTo]);
+    }, [filtered, projects, clients, dateRange, customFrom, customTo, selectedStage, user]);
 
     const timeline = useMemo(() => {
         const events = [];
+        const permitted = user?.role === "super-admin" ? null : (user?.manage_stages || []);
         // Subtask events
         filtered.forEach((s) => {
             const proj = projects[s.project_id];
             const client = clients[proj?.client_id];
-            (s.stages || []).filter((st) => st.completed && st.completed_at && isDateInRange(st.completed_at, dateRange, customFrom, customTo)).forEach((st) => {
+            (s.stages || []).filter((st) => {
+                const name = st.name || st;
+                if (permitted && !permitted.includes(name)) return false;
+                const matchesStage = selectedStage === "all" || name === selectedStage;
+                return matchesStage && st.completed && st.completed_at && isDateInRange(st.completed_at, dateRange, customFrom, customTo);
+            }).forEach((st) => {
                 const emp = employees[String(st.completed_by)];
                 events.push({
                     date: new Date(st.completed_at),
@@ -440,22 +644,24 @@ const EarningsReport = () => {
             });
         });
         // Sales events
-        filteredSales.forEach((s) => {
-            const emp = typeof s.created_by === 'object' ? s.created_by : employees[String(s.created_by)];
-            events.push({
-                date: new Date(s.date),
-                stageName: "Sales Entry",
-                price: s.amount || 0,
-                taskName: `Sale for ${s.brand}`,
-                projectName: s.brand,
-                clientName: "—",
-                employeeName: emp?.username || emp?.full_name || "—",
-                employeePic: emp?.profile_pic,
-                brand: s.brand
+        if (selectedStage === "all") {
+            filteredSales.forEach((s) => {
+                const emp = typeof s.created_by === 'object' ? s.created_by : employees[String(s.created_by)];
+                events.push({
+                    date: new Date(s.date),
+                    stageName: "Sales Entry",
+                    price: s.amount || 0,
+                    taskName: `Sale for ${s.brand}`,
+                    projectName: s.brand,
+                    clientName: "—",
+                    employeeName: emp?.username || emp?.full_name || "—",
+                    employeePic: emp?.profile_pic,
+                    brand: s.brand
+                });
             });
-        });
+        }
         return events.sort((a, b) => b.date - a.date);
-    }, [filtered, filteredSales, projects, clients, employees, dateRange, customFrom, customTo]);
+    }, [filtered, filteredSales, projects, clients, employees, dateRange, customFrom, customTo, selectedStage, user]);
 
     const filteredTimeline = useMemo(() => {
         if (!timelineSearch) return timeline;
@@ -575,14 +781,22 @@ const EarningsReport = () => {
                             <SearchableSelect
                                 value={{ value: selectedBrand, label: selectedBrand === "all" ? "All Brands" : selectedBrand }}
                                 onChange={(opt) => setSelectedBrand(opt ? opt.value : "all")}
-                                options={[
-                                    { value: "all", label: "All Brands" },
-                                    { value: "Maulshree", label: "Maulshree" },
-                                    ...BRANDS.map(b => ({ value: b, label: b }))
-                                ]}
+                                options={brandOptions}
                                 isClearable={false}
                             />
                         </div>
+
+                        {(selectedBrand === "all" || selectedBrand === "Maulshree") && (
+                            <div className="w-40">
+                                <SearchableSelect
+                                    value={{ value: selectedStage, label: selectedStage === "all" ? "All Stages" : selectedStage }}
+                                    onChange={(opt) => setSelectedStage(opt ? opt.value : "all")}
+                                    options={stageOptions}
+                                    isClearable={false}
+                                    placeholder="All Stages"
+                                />
+                            </div>
+                        )}
 
                         <div className="w-full sm:w-64">
                             <ClientSearchableSelect

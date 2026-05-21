@@ -24,6 +24,7 @@ export const addClient = async (req, res) => {
       linkedin,
       business_address,
       additional_notes,
+      stages,
       stage_pricing,
     } = req.body;
 
@@ -59,6 +60,7 @@ export const addClient = async (req, res) => {
       linkedin,
       business_address,
       additional_notes,
+      stages: stages || [],
       stage_pricing: stage_pricing || [],
     });
 
@@ -235,6 +237,7 @@ export const updateClient = async (req, res) => {
       phone: originalClient.phone,
       client_type: originalClient.client_type,
       company_name: originalClient.company_name,
+      stages: originalClient.stages,
       stage_pricing: originalClient.stage_pricing,
       status: originalClient.status
     };
@@ -274,6 +277,15 @@ export const updateClient = async (req, res) => {
       changedFields.push('company_name');
       changes.before.company_name = originalValues.company_name;
       changes.after.company_name = updatedClient.company_name;
+    }
+
+    // Check if stages changed
+    const originalStagesStr = JSON.stringify(originalValues.stages || []);
+    const newStagesStr = JSON.stringify(updatedClient.stages || []);
+    if (originalStagesStr !== newStagesStr) {
+      changedFields.push('stages');
+      changes.before.stages = originalValues.stages;
+      changes.after.stages = updatedClient.stages;
     }
 
     // Check if stage pricing changed
@@ -330,6 +342,7 @@ export const updateClientByUsername = async (req, res) => {
       phone: originalClient.phone,
       client_type: originalClient.client_type,
       company_name: originalClient.company_name,
+      stages: originalClient.stages,
       stage_pricing: originalClient.stage_pricing
     };
 
@@ -370,6 +383,15 @@ export const updateClientByUsername = async (req, res) => {
       changedFields.push('company_name');
       changes.before.company_name = originalValues.company_name;
       changes.after.company_name = updatedClient.company_name;
+    }
+
+    // Check if stages changed
+    const originalStagesStr = JSON.stringify(originalValues.stages || []);
+    const newStagesStr = JSON.stringify(updatedClient.stages || []);
+    if (originalStagesStr !== newStagesStr) {
+      changedFields.push('stages');
+      changes.before.stages = originalValues.stages;
+      changes.after.stages = updatedClient.stages;
     }
 
     // Check if stage pricing changed

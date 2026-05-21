@@ -57,9 +57,7 @@ const CreateEmployeeProfile = () => {
     employment_type: Yup.string().required("Employment type is required"),
     date_of_joining: Yup.string().required("Date of joining is required"),
     monthly_salary: Yup.number().typeError("Must be a number").required("Monthly salary is required"),
-    manage_stages: Yup.array().when("is_manager", {
-      is: true, then: (s) => s.min(1, "Select at least one stage"), otherwise: (s) => s.notRequired(),
-    }),
+    manage_stages: Yup.array().notRequired(),
   });
 
   useEffect(() => {
@@ -248,25 +246,26 @@ const CreateEmployeeProfile = () => {
                   <ErrorMessage name="capacity" component="div" className={errCls} />
                 </div>
 
-                {/* Manager toggle + stages */}
+                {/* Manager toggle */}
                 <div className="sm:col-span-2 flex items-center gap-2">
                   <Field type="checkbox" name="is_manager" id="is_manager" className="w-4 h-4 text-blue-600 border-gray-300 rounded" />
                   <label htmlFor="is_manager" className="text-sm text-gray-700">Is Reporting Manager</label>
                 </div>
-                {values.is_manager && (
-                  <div className="sm:col-span-2">
-                    <label className={labelCls}>Manage Stages</label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
-                      {stageOptions.map((stage, i) => (
-                        <label key={i} className="flex items-center gap-2 text-sm text-gray-700">
-                          <Field type="checkbox" name="manage_stages" value={stage} className="w-4 h-4 text-blue-600 border-gray-300 rounded" />
-                          {stage}
-                        </label>
-                      ))}
-                    </div>
-                    <ErrorMessage name="manage_stages" component="div" className={errCls} />
+
+                {/* Stage Permissions — shown for all employees */}
+                <div className="sm:col-span-2">
+                  <label className={labelCls}>Stage Permissions</label>
+                  <p className="text-xs text-gray-500 mb-2">Select the stages this employee is allowed to work on.</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
+                    {stageOptions.map((stage, i) => (
+                      <label key={i} className="flex items-center gap-2 text-sm text-gray-700">
+                        <Field type="checkbox" name="manage_stages" value={stage} className="w-4 h-4 text-blue-600 border-gray-300 rounded" />
+                        {stage}
+                      </label>
+                    ))}
                   </div>
-                )}
+                  <ErrorMessage name="manage_stages" component="div" className={errCls} />
+                </div>
               </div>
 
               {/* Actions */}
