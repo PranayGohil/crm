@@ -9,6 +9,7 @@ import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { stageOptions } from "../../../options";
 import EmployeeSearchableSelect from "../../../components/common/EmployeeSearchableSelect";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const employmentTypes = ["Full-time", "Part-time"];
 
@@ -18,6 +19,7 @@ const errCls = "text-red-600 text-xs mt-1";
 
 const CreateEmployeeProfile = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [profilePreview, setProfilePreview] = useState(null);
   const [managers, setManagers] = useState([]);
@@ -257,12 +259,17 @@ const CreateEmployeeProfile = () => {
                   <label className={labelCls}>Stage Permissions</label>
                   <p className="text-xs text-gray-500 mb-2">Select the stages this employee is allowed to work on.</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
-                    {stageOptions.map((stage, i) => (
-                      <label key={i} className="flex items-center gap-2 text-sm text-gray-700">
-                        <Field type="checkbox" name="manage_stages" value={stage} className="w-4 h-4 text-blue-600 border-gray-300 rounded" />
-                        {stage}
-                      </label>
-                    ))}
+                    {(() => {
+                      const allowedStages = user && user.role !== "super-admin"
+                        ? stageOptions.filter((s) => (user.manage_stages || []).includes(s))
+                        : stageOptions;
+                      return allowedStages.map((stage, i) => (
+                        <label key={i} className="flex items-center gap-2 text-sm text-gray-700">
+                          <Field type="checkbox" name="manage_stages" value={stage} className="w-4 h-4 text-blue-600 border-gray-300 rounded" />
+                          {stage}
+                        </label>
+                      ));
+                    })()}
                   </div>
                   <ErrorMessage name="manage_stages" component="div" className={errCls} />
                 </div>

@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import AsyncSearchableSelect from './AsyncSearchableSelect';
 import axios from 'axios';
 import debounce from 'lodash/debounce';
+import { useAuth } from '../../contexts/AuthContext';
 
 const EmployeeSearchableSelect = ({ 
   value, 
@@ -12,6 +13,7 @@ const EmployeeSearchableSelect = ({
   stages,   // optional array of stage names to filter employees by
   ...props 
 }) => {
+  const { user } = useAuth();
   const loadOptions = useCallback(
     debounce((inputValue, callback) => {
       const token = localStorage.getItem("token");
@@ -22,7 +24,15 @@ const EmployeeSearchableSelect = ({
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => {
-        const options = res.data.employees.map(e => ({
+        const filtered = res.data.employees.filter(e => {
+          if (!user) return true;
+          if (user.role === "super-admin") return true;
+          const adminStages = user.manage_stages || [];
+          const empStages = e.manage_stages || [];
+          if (empStages.length === 0) return true;
+          return empStages.some(s => adminStages.includes(s));
+        });
+        const options = filtered.map(e => ({
           value: e._id,
           label: e.manage_stages?.length
             ? `${e.full_name} (${e.manage_stages.join(", ")})`
@@ -36,7 +46,7 @@ const EmployeeSearchableSelect = ({
         callback([]);
       });
     }, 300),
-    [stages]  // recreate debounced fn when stages change
+    [stages, user]  // recreate debounced fn when stages or user change
   );
 
   return (

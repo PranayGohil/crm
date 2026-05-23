@@ -11,6 +11,7 @@ import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import ClientSearchableSelect from "../../../components/common/ClientSearchableSelect";
 import EmployeeSearchableSelect from "../../../components/common/EmployeeSearchableSelect";
 import SearchableSelect from "../../../components/common/SearchableSelect";
+import { useAuth } from "../../../contexts/AuthContext";
 
 dayjs.extend(duration);
 
@@ -139,7 +140,10 @@ const getSortedSubtasks = (subtasks, sortConfig) => {
 
 const Subtasks = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
+  const [rawClients, setRawClients] = useState([]);
+  const [rawEmployees, setRawEmployees] = useState([]);
   const [clients, setClients] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -201,12 +205,43 @@ const Subtasks = () => {
       axios.get(`${API}/api/statistics/summary`, { headers }),
     ])
       .then(([cl, em, sm]) => {
-        setClients(cl.data);
-        setEmployees(em.data);
+        setRawClients(cl.data);
+        setRawEmployees(em.data);
         setSummary(sm.data);
       })
       .catch(console.error);
   }, []);
+
+  useEffect(() => {
+    const filterAllowedClients = () => {
+      if (!rawClients || rawClients.length === 0) return;
+      const allowed = rawClients.filter(c => {
+        if (!user) return true;
+        if (user.role === "super-admin") return true;
+        const adminStages = user.manage_stages || [];
+        const clientStages = c.stages || [];
+        if (clientStages.length === 0) return true;
+        return clientStages.some(s => adminStages.includes(s));
+      });
+      setClients(allowed);
+    };
+
+    const filterAllowedEmployees = () => {
+      if (!rawEmployees || rawEmployees.length === 0) return;
+      const allowed = rawEmployees.filter(emp => {
+        if (!user) return true;
+        if (user.role === "super-admin") return true;
+        const adminStages = user.manage_stages || [];
+        const empStages = emp.manage_stages || [];
+        if (empStages.length === 0) return true;
+        return empStages.some(s => adminStages.includes(s));
+      });
+      setEmployees(allowed);
+    };
+
+    filterAllowedClients();
+    filterAllowedEmployees();
+  }, [user, rawClients, rawEmployees]);
 
   const fetchProjects = useCallback(
     async (page = 1) => {

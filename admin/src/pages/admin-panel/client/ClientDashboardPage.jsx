@@ -5,10 +5,13 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import SearchableSelect from "../../../components/common/SearchableSelect";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const ClientDashboardPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
+  const [rawClients, setRawClients] = useState([]);
   const [clients, setClients] = useState([]);
   const [statusFilter, setStatusFilter] = useState("All");
   const [loading, setLoading] = useState(false);
@@ -21,7 +24,7 @@ const ClientDashboardPage = () => {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/client/with-subtasks`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
         });
-        setClients(res.data);
+        setRawClients(res.data);
         setError(null);
       } catch (error) {
         console.error("Error fetching clients:", error);
@@ -33,6 +36,20 @@ const ClientDashboardPage = () => {
     };
     fetchClients();
   }, []);
+
+  useEffect(() => {
+    if (rawClients.length > 0) {
+      const allowed = rawClients.filter((client) => {
+        if (!user) return true;
+        if (user.role === "super-admin") return true;
+        const adminStages = user.manage_stages || [];
+        const clientStages = client.stages || [];
+        if (clientStages.length === 0) return true;
+        return clientStages.some((s) => adminStages.includes(s));
+      });
+      setClients(allowed);
+    }
+  }, [user, rawClients]);
 
   const filteredClients = clients
     .filter((client) => {

@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const Dropdown = ({ label, options, selected, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +48,9 @@ const Dropdown = ({ label, options, selected, onChange }) => {
 
 const EmployeeDashboard = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [rawEmployees, setRawEmployees] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -63,16 +66,7 @@ const EmployeeDashboard = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
         });
         const data = res.data;
-        setEmployees(data);
-        setFilteredEmployees(data);
-        setDepartments([...new Set(data.map((e) => e.department))]);
-        setDesignations([...new Set(data.map((e) => e.designation))]);
-        setStats({
-          total: data.length,
-          inActive: data.filter((e) => e.status === "Inactive").length,
-          active: data.filter((e) => e.status === "active" || e.status === "Active").length,
-          departments: new Set(data.map((e) => e.department)).size,
-        });
+        setRawEmployees(data);
       } catch (err) {
         console.error("Failed to fetch employees:", err);
         toast.error("Failed to load employee data");
@@ -82,6 +76,29 @@ const EmployeeDashboard = () => {
     };
     fetchEmployees();
   }, []);
+
+  useEffect(() => {
+    if (rawEmployees.length > 0) {
+      const allowed = rawEmployees.filter((emp) => {
+        if (!user) return true;
+        if (user.role === "super-admin") return true;
+        const adminStages = user.manage_stages || [];
+        const empStages = emp.manage_stages || [];
+        if (empStages.length === 0) return true;
+        return empStages.some((s) => adminStages.includes(s));
+      });
+      setEmployees(allowed);
+      setFilteredEmployees(allowed);
+      setDepartments([...new Set(allowed.map((e) => e.department))]);
+      setDesignations([...new Set(allowed.map((e) => e.designation))]);
+      setStats({
+        total: allowed.length,
+        inActive: allowed.filter((e) => e.status === "Inactive").length,
+        active: allowed.filter((e) => e.status === "active" || e.status === "Active").length,
+        departments: new Set(allowed.map((e) => e.department)).size,
+      });
+    }
+  }, [user, rawEmployees]);
 
   useEffect(() => {
     let filtered = [...employees];

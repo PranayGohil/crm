@@ -11,6 +11,7 @@ import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import EmployeeSearchableSelect from "../../../components/common/EmployeeSearchableSelect";
 import SearchableSelect from "../../../components/common/SearchableSelect";
 import { priorityOptions, stageOptions, statusOptions } from "../../../options";
+import { useAuth } from "../../../contexts/AuthContext";
 
 // ── Reusable confirm modal ──────────────────────────────────────────────────
 const ConfirmModal = ({ show, title, children, onConfirm, onCancel }) => {
@@ -145,10 +146,12 @@ const SubtaskCard = ({ row, employees, onDelete }) => {
 const SubtaskDashboardContainer = () => {
   const navigate = useNavigate();
   const { projectId } = useParams();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const [project, setProject] = useState(null);
   const [subtasks, setSubtasks] = useState([]);
+  const [rawEmployees, setRawEmployees] = useState([]);
   const [employees, setEmployees] = useState([]);
 
   const [globalFilter, setGlobalFilter] = useState("");
@@ -196,9 +199,23 @@ const SubtaskDashboardContainer = () => {
     axios.get(`${process.env.REACT_APP_API_URL}/api/employee/get-all`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then((r) => setEmployees(r.data))
+      .then((r) => setRawEmployees(r.data))
       .catch(console.error);
   }, [projectId]); // eslint-disable-line
+
+  useEffect(() => {
+    if (rawEmployees.length > 0) {
+      const allowed = rawEmployees.filter(emp => {
+        if (!user) return true;
+        if (user.role === "super-admin") return true;
+        const adminStages = user.manage_stages || [];
+        const empStages = emp.manage_stages || [];
+        if (empStages.length === 0) return true;
+        return empStages.some(s => adminStages.includes(s));
+      });
+      setEmployees(allowed);
+    }
+  }, [user, rawEmployees]);
 
   const naturalSort = (rowA, rowB, columnId) => {
     let a = rowA.getValue(columnId), b = rowB.getValue(columnId);

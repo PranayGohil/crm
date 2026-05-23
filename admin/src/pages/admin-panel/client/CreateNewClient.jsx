@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const STAGE_OPTIONS = ["CAD Design", "SET Design", "Render", "QC", "Delivery"];
 
@@ -23,9 +24,14 @@ const inputCls = "w-full px-4 py-2 text-sm border border-gray-300 rounded-lg foc
 
 const CreateNewClient = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const allowedStages = user && user.role !== "super-admin"
+    ? STAGE_OPTIONS.filter((s) => (user.manage_stages || []).includes(s))
+    : STAGE_OPTIONS;
 
   const formik = useFormik({
     initialValues: {
@@ -154,7 +160,7 @@ const CreateNewClient = () => {
             <h2 className="text-base sm:text-xl font-semibold text-gray-800 mb-1">Select Client Stages</h2>
             <p className="text-xs sm:text-sm text-gray-500 mb-4">Choose which stages apply to this client. Only selected stages can have pricing configured.</p>
             <div className="flex flex-wrap gap-2">
-              {STAGE_OPTIONS.map((value) => {
+              {allowedStages.map((value) => {
                 const isSelected = values.stages.includes(value);
                 return (
                   <button
@@ -184,7 +190,7 @@ const CreateNewClient = () => {
           <section className="pt-6 border-t border-gray-200">
             <h2 className="text-base sm:text-xl font-semibold text-gray-800 mb-1">Stage Pricing</h2>
             <p className="text-xs sm:text-sm text-gray-500 mb-4">Default prices per stage — auto-filled when creating subtasks.</p>
-            {values.stages.length === 0 ? (
+            {!values.stages.some((s) => allowedStages.includes(s)) ? (
               <div className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
                 ⚠️ Please select at least one stage above to configure pricing.
               </div>
@@ -192,6 +198,7 @@ const CreateNewClient = () => {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                 {values.stage_pricing.map((item, index) => {
                   if (!values.stages.includes(item.stage_name)) return null;
+                  if (!allowedStages.includes(item.stage_name)) return null;
                   return (
                     <div key={item.stage_name} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
                       <label className="block text-xs font-medium text-gray-700 mb-1.5">{item.stage_name}</label>
