@@ -590,6 +590,7 @@ export const getEmployeeDashboardData = async (req, res) => {
       endDate,
       page = 1,
       limit = 10,
+      assignedOnly = "false",
     } = req.query;
 
     const empObjId = new mongoose.Types.ObjectId(employeeId);
@@ -601,55 +602,71 @@ export const getEmployeeDashboardData = async (req, res) => {
 
     const skip = (Number(page) - 1) * Number(limit);
 
+    // Build the dynamic match conditions
+    const matchConditions = [
+      {
+        $or: [
+          { assign_to: empObjId },
+          { "stages.completed_by": empObjId },
+          { "time_logs.user_id": empObjId },
+        ],
+      },
+    ];
+
+    if (start && end) {
+      if (assignedOnly === "true") {
+        matchConditions.push({
+          $and: [
+            { assign_to: empObjId },
+            {
+              $or: [
+                { assign_date: { $gte: start, $lte: end } },
+                { "stages.assign_at": { $gte: start, $lte: end } },
+              ],
+            },
+          ],
+        });
+      } else {
+        matchConditions.push({
+          $or: [
+            {
+              $and: [
+                { assign_to: empObjId },
+                { status: { $ne: "Completed" } },
+              ],
+            },
+            {
+              stages: {
+                $elemMatch: {
+                  completed_by: empObjId,
+                  completed_at: { $gte: start, $lte: end },
+                },
+              },
+            },
+            {
+              time_logs: {
+                $elemMatch: {
+                  user_id: empObjId,
+                  start_time: { $gte: start, $lte: end },
+                },
+              },
+            },
+            {
+              $and: [
+                { assign_to: empObjId },
+                { assign_date: { $gte: start, $lte: end } },
+              ],
+            },
+          ],
+        });
+      }
+    }
+
     // ── 1. Single query replacing two separate finds + JS dedup ───────
     const allSubtasks = await SubTask.aggregate([
       {
         $match: {
-          $and: [
-            {
-              $or: [
-                { assign_to: empObjId },
-                { "stages.completed_by": empObjId },
-                { "time_logs.user_id": empObjId },
-              ],
-            },
-            ...(start && end
-              ? [
-                  {
-                    $or: [
-                      {
-                        $and: [
-                          { assign_to: empObjId },
-                          { status: { $ne: "Completed" } },
-                        ],
-                      },
-                      {
-                        stages: {
-                          $elemMatch: {
-                            completed_by: empObjId,
-                            completed_at: { $gte: start, $lte: end },
-                          },
-                        },
-                      },
-                      {
-                        time_logs: {
-                          $elemMatch: {
-                            user_id: empObjId,
-                            start_time: { $gte: start, $lte: end },
-                          },
-                        },
-                      },
-                      {
-                        $and: [
-                          { assign_to: empObjId },
-                          { assign_date: { $gte: start, $lte: end } },
-                        ]
-                      }
-                    ],
-                  },
-                ]
-              : []),
-          ],
+          $and: matchConditions,
         },
       },
       {

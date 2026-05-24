@@ -122,6 +122,7 @@ const EmployeeDashboard = () => {
   const customRangeReady = selectedFilter !== "Custom" || (!!customRange.start && !!customRange.end);
   const [statusFilter, setStatusFilter] = useState("All");
   const [priorityFilter, setPriorityFilter] = useState("All");
+  const [assignedOnly, setAssignedOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState(null);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
@@ -147,7 +148,12 @@ const EmployeeDashboard = () => {
       const fp = buildFilterDates(selectedFilter, customRange);
       const userObj = JSON.parse(localStorage.getItem("employeeUser"));
       const { data } = await axios.get(`${API}/api/employee/dashboard/${currentEmployeeId}`, {
-        params: { ...fp, page: pageOverride ?? pagination.page, limit: limitOverride ?? pagination.limit },
+        params: {
+          ...fp,
+          page: pageOverride ?? pagination.page,
+          limit: limitOverride ?? pagination.limit,
+          assignedOnly: assignedOnly.toString(),
+        },
         headers: { Authorization: `Bearer ${userObj?.token}` },
       });
       setRawSubtasks(data.subtasks ?? []);
@@ -166,9 +172,9 @@ const EmployeeDashboard = () => {
       console.error(err);
       toast.error(err.response?.data?.message ?? "Failed to fetch dashboard.");
     } finally { setLoading(false); }
-  }, [currentEmployeeId, selectedFilter, customRange, customRangeReady]); // eslint-disable-line
+  }, [currentEmployeeId, selectedFilter, customRange, customRangeReady, assignedOnly]); // eslint-disable-line
 
-  useEffect(() => { fetchDashboardData(1, pagination.limit); }, [selectedFilter, customRange]); // eslint-disable-line
+  useEffect(() => { fetchDashboardData(1, pagination.limit); }, [selectedFilter, customRange, assignedOnly]); // eslint-disable-line
 
   const fetchRef = useRef(fetchDashboardData);
   useEffect(() => { fetchRef.current = fetchDashboardData; }, [fetchDashboardData]);
@@ -326,14 +332,40 @@ const EmployeeDashboard = () => {
 
       {/* Date filters + stat cards */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 space-y-4">
-        <div className="flex flex-wrap gap-2">
-          {dateFilters.map((label) => (
-            <button key={label} onClick={() => setSelectedFilter(label)}
-              className={"px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors " +
-                (selectedFilter === label ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200")}>
-              {label}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex flex-wrap gap-2">
+            {dateFilters.map((label) => (
+              <button key={label} onClick={() => setSelectedFilter(label)}
+                className={"px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors " +
+                  (selectedFilter === label ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200")}>
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Toggle between All Pending and Period Assignment Only */}
+          <div className="flex bg-gray-100 p-1 rounded-xl w-full md:w-auto self-start md:self-center">
+            <button
+              onClick={() => setAssignedOnly(false)}
+              className={`flex-1 md:flex-initial px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 flex items-center justify-center gap-1.5 ${
+                !assignedOnly
+                  ? "bg-white text-blue-600 shadow-sm font-semibold"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+            >
+              📂 All Pending Tasks
             </button>
-          ))}
+            <button
+              onClick={() => setAssignedOnly(true)}
+              className={`flex-1 md:flex-initial px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 flex items-center justify-center gap-1.5 ${
+                assignedOnly
+                  ? "bg-white text-blue-600 shadow-sm font-semibold"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+            >
+              📅 Assigned in Period Only
+            </button>
+          </div>
         </div>
         {selectedFilter === "Custom" && (
           <div className="flex flex-col sm:flex-row gap-3">
