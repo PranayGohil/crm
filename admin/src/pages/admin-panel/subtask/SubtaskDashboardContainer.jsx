@@ -747,7 +747,7 @@ const SubtaskDashboardContainer = () => {
                 <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full mr-1">{selectedTaskIds.length}</span>
                 selected
               </span>
-              <div className="flex-1 min-w-[150px]">
+              <div className="flex-1 min-w-[150px] text-gray-800">
                 <EmployeeSearchableSelect
                   key={selectedStageNames.join(",") || "no-stages"}
                   placeholder="👤 Assign To"
@@ -757,9 +757,10 @@ const SubtaskDashboardContainer = () => {
                   value={bulkAssignTo ? { value: bulkAssignTo, label: employees.find(e => e._id === bulkAssignTo)?.full_name || "Selected Employee" } : null}
                   onChange={(opt) => setBulkAssignTo(opt ? opt.value : "")}
                   menuPlacement="top"
+                  menuPortalTarget={document.body}
                 />
               </div>
-              <div className="flex-1 min-w-[120px]">
+              <div className="flex-1 min-w-[120px] text-gray-800">
                 <SearchableSelect
                   placeholder="⚡ Priority"
                   value={bulkPriority ? { value: bulkPriority, label: bulkPriority } : null}
@@ -767,6 +768,7 @@ const SubtaskDashboardContainer = () => {
                   options={priorityOptions.map((o) => ({ value: o, label: o }))}
                   menuPosition="fixed"
                   menuPlacement="top"
+                  menuPortalTarget={document.body}
                 />
               </div>
               <button onClick={handleBulkUpdateAll} disabled={!bulkAssignTo && !bulkPriority}
