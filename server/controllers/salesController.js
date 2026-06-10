@@ -3,6 +3,17 @@ import SalesEntry from "../models/salesEntryModel.js";
 import MonthlyTarget from "../models/monthlyTargetModel.js";
 import mongoose from "mongoose";
 
+// Whether the requesting admin may manage sales for a specific brand. Checks the
+// admin's OWN permissions against the given brand — used to authorize actions on
+// an existing entry by its real brand (not a client-supplied brand value), which
+// closes the IDOR where a Mukhwas-only admin edits a Breeliq entry by id.
+const canActorManageBrand = (actor, brand) => {
+    if (!actor || !brand) return false;
+    if (actor.role === "super-admin") return true;
+    const permission = brand === "Mukhwas" ? "manage_mukhwas_sales" : "manage_breeliq_sales";
+    return (actor.sales_permissions || []).includes(permission);
+};
+
 // Add daily sales entry
 export const addSalesEntry = async (req, res) => {
     try {
@@ -66,6 +77,67 @@ export const getSalesEntries = async (req, res) => {
         });
     } catch (err) {
         console.error("Get sales entries error:", err);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+// Update a sales entry
+export const updateSalesEntry = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { amount, date, notes } = req.body || {};
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "Invalid entry id" });
+        }
+
+        const entry = await SalesEntry.findById(id);
+        if (!entry) {
+            return res.status(404).json({ success: false, message: "Sales entry not found" });
+        }
+
+        // Authorize against the entry's REAL brand, not any client-supplied brand.
+        if (!canActorManageBrand(req.admin, entry.brand)) {
+            return res.status(403).json({ success: false, message: `Access denied for ${entry.brand} sales.` });
+        }
+
+        if (amount !== undefined) entry.amount = Number(amount);
+        if (date !== undefined) entry.date = new Date(date);
+        if (notes !== undefined) entry.notes = notes;
+
+        await entry.save();
+
+        res.status(200).json({ success: true, message: "Sales entry updated successfully", entry });
+    } catch (err) {
+        console.error("Update sales entry error:", err);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};
+
+// Delete a sales entry
+export const deleteSalesEntry = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ success: false, message: "Invalid entry id" });
+        }
+
+        const entry = await SalesEntry.findById(id);
+        if (!entry) {
+            return res.status(404).json({ success: false, message: "Sales entry not found" });
+        }
+
+        // Authorize against the entry's REAL brand before deleting.
+        if (!canActorManageBrand(req.admin, entry.brand)) {
+            return res.status(403).json({ success: false, message: `Access denied for ${entry.brand} sales.` });
+        }
+
+        await entry.deleteOne();
+
+        res.status(200).json({ success: true, message: "Sales entry deleted successfully" });
+    } catch (err) {
+        console.error("Delete sales entry error:", err);
         res.status(500).json({ success: false, message: "Server error" });
     }
 };

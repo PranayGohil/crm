@@ -17,18 +17,27 @@ import {
   searchEmployees,
 } from "../controllers/employeeController.js";
 import upload from "../middlewares/upload.js";
+import { optionalAuth } from "../middlewares/auth.js";
+import { protectAdmin, requireMaulshree } from "../middlewares/adminAuth.js";
 
 const employeeRouter = express.Router();
 
-employeeRouter.get("/search", searchEmployees);
+// Public auth endpoints (no token).
 employeeRouter.post("/check-username", checkUsernameAvailability);
-employeeRouter.post("/add", upload.single("profile_pic"), addEmployee);
+employeeRouter.post("/login", loginEmployee);
+
+// Admin-only writes: hard auth + stage authorization (no portal calls these).
+employeeRouter.post("/add", protectAdmin, requireMaulshree, upload.single("profile_pic"), addEmployee);
+employeeRouter.post("/edit/:id", protectAdmin, requireMaulshree, upload.single("profile_pic"), editEmployee);
+employeeRouter.delete("/delete/:id", protectAdmin, requireMaulshree, deleteEmployee);
+
+// Shared reads: optional auth → stage-scoped when an admin token is present,
+// otherwise unscoped (preserves employee/client portal behavior).
+employeeRouter.use(optionalAuth);
+employeeRouter.get("/search", searchEmployees);
 employeeRouter.get("/get-all", getEmployees);
 employeeRouter.get("/get-multiple", getMultipleEmployees);
 employeeRouter.get("/get/:id", getEmployeeInfo);
-employeeRouter.post("/login", loginEmployee);
-employeeRouter.delete("/delete/:id", deleteEmployee);
-employeeRouter.post("/edit/:id", upload.single("profile_pic"), editEmployee);
 employeeRouter.get("/tasks/:employeeId", getEmployeeTasks);
 employeeRouter.get("/dashboard/:employeeId", getEmployeeDashboardData);
 employeeRouter.get("/managers", getManagers);

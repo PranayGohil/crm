@@ -12,6 +12,7 @@ import EmployeeSearchableSelect from "../../../components/common/EmployeeSearcha
 import SearchableSelect from "../../../components/common/SearchableSelect";
 import { priorityOptions, stageOptions, statusOptions } from "../../../options";
 import { useAuth } from "../../../contexts/AuthContext";
+import { filterStagesForUser } from "../../../constants";
 
 // ── Reusable confirm modal ──────────────────────────────────────────────────
 const ConfirmModal = ({ show, title, children, onConfirm, onCancel }) => {
@@ -322,7 +323,7 @@ const SubtaskDashboardContainer = () => {
             <SearchableSelect
               value={column.getFilterValue() ? { value: column.getFilterValue(), label: column.getFilterValue() } : null}
               onChange={(opt) => column.setFilterValue(opt ? opt.value : undefined)}
-              options={stageOptions.map((o) => ({ value: o, label: o }))}
+              options={filterStagesForUser(user, stageOptions).map((o) => ({ value: o, label: o }))}
               placeholder="All"
               menuPosition="fixed"
             />

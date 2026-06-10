@@ -13,6 +13,10 @@ import {
   FaPlus,
   FaSave,
   FaCheckCircle,
+  FaListUl,
+  FaEdit,
+  FaTrash,
+  FaTimes,
 } from "react-icons/fa";
 import SearchableSelect from "../../components/common/SearchableSelect";
 
@@ -44,7 +48,14 @@ const SalesPanel = () => {
     avgDaily: 0,
   });
   const [history, setHistory] = useState([]);
+  const [allEntries, setAllEntries] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Edit entry modal state
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [editData, setEditData] = useState({ amount: "", date: "", notes: "" });
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   // Form states
   const [saleData, setSaleData] = useState({
@@ -68,13 +79,17 @@ const SalesPanel = () => {
       const token = localStorage.getItem("token");
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [analyticsRes, historyRes] = await Promise.all([
+      const [analyticsRes, historyRes, allRes] = await Promise.all([
         axios.get(`${process.env.REACT_APP_API_URL}/api/sales/analytics`, {
           params: { brand: activeBrand, month, year },
           headers,
         }),
         axios.get(`${process.env.REACT_APP_API_URL}/api/sales/entries`, {
           params: { brand: activeBrand, month, year, limit: 5 },
+          headers,
+        }),
+        axios.get(`${process.env.REACT_APP_API_URL}/api/sales/entries`, {
+          params: { brand: activeBrand, month, year, limit: 100 },
           headers,
         }),
       ]);
@@ -85,6 +100,9 @@ const SalesPanel = () => {
       }
       if (historyRes.data.success) {
         setHistory(historyRes.data.entries);
+      }
+      if (allRes.data.success) {
+        setAllEntries(allRes.data.entries);
       }
     } catch (err) {
       console.error("Error fetching sales data:", err);
@@ -138,6 +156,67 @@ const SalesPanel = () => {
       toast.error("Error updating target");
     } finally {
       setSavingTarget(false);
+    }
+  };
+
+  const openEditModal = (entry) => {
+    setEditingEntry(entry);
+    setEditData({
+      amount: entry.amount,
+      date: new Date(entry.date).toISOString().split("T")[0],
+      notes: entry.notes || "",
+    });
+  };
+
+  const closeEditModal = () => {
+    setEditingEntry(null);
+    setEditData({ amount: "", date: "", notes: "" });
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingEntry) return;
+    setSavingEdit(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.put(
+        `${process.env.REACT_APP_API_URL}/api/sales/entry/${editingEntry._id}`,
+        { ...editData, brand: activeBrand },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (res.data.success) {
+        toast.success("Sales entry updated");
+        closeEditModal();
+        fetchData();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error updating entry");
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const handleDeleteEntry = async (entry) => {
+    if (!window.confirm("Are you sure you want to delete this sales entry?"))
+      return;
+    setDeletingId(entry._id);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.delete(
+        `${process.env.REACT_APP_API_URL}/api/sales/entry/${entry._id}`,
+        {
+          params: { brand: activeBrand },
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (res.data.success) {
+        toast.success("Sales entry deleted");
+        fetchData();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error deleting entry");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -439,6 +518,92 @@ const SalesPanel = () => {
             </div>
           </div>
 
+          {/* View & Edit Entries Section */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FaListUl className="text-gray-500" />
+                <h3 className="font-bold text-gray-800">Manage Entries</h3>
+              </div>
+              <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                {allEntries.length} {allEntries.length === 1 ? "entry" : "entries"}
+              </span>
+            </div>
+            <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50 text-gray-500 font-bold text-xs uppercase sticky top-0">
+                  <tr>
+                    <th className="px-6 py-3">Date</th>
+                    <th className="px-6 py-3">Amount</th>
+                    <th className="px-6 py-3">Created By</th>
+                    <th className="px-6 py-3">Notes</th>
+                    <th className="px-6 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {allEntries.length > 0 ? (
+                    allEntries.map((entry) => (
+                      <tr
+                        key={entry._id}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-600 font-medium">
+                          {new Date(entry.date).toLocaleDateString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap font-bold text-gray-800">
+                          {fmt(entry.amount)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                          {entry.created_by?.username || "System"}
+                        </td>
+                        <td
+                          className="px-6 py-4 text-gray-400 italic truncate max-w-[150px]"
+                          title={entry.notes}
+                        >
+                          {entry.notes || "-"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => openEditModal(entry)}
+                              title="Edit entry"
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            >
+                              <FaEdit size={14} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteEntry(entry)}
+                              disabled={deletingId === entry._id}
+                              title="Delete entry"
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                            >
+                              <FaTrash size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="px-6 py-12 text-center text-gray-400 italic"
+                      >
+                        No entries found for this month.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
           {/* Recent Entries Section */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
@@ -499,6 +664,99 @@ const SalesPanel = () => {
           </div>
         </div>
       </div>
+
+      {/* Edit Entry Modal */}
+      {editingEntry && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FaEdit className="text-white" />
+                <h3 className="text-white font-bold">Edit Sales Entry</h3>
+              </div>
+              <button
+                type="button"
+                onClick={closeEditModal}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <form onSubmit={handleEditSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Date
+                </label>
+                <div className="relative">
+                  <FaCalendarAlt className="absolute left-3 top-3 text-gray-400" />
+                  <input
+                    type="date"
+                    required
+                    value={editData.date}
+                    onChange={(e) =>
+                      setEditData({ ...editData, date: e.target.value })
+                    }
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Amount (INR)
+                </label>
+                <input
+                  type="number"
+                  required
+                  placeholder="Enter amount"
+                  min="0.01"
+                  step="0.01"
+                  value={editData.amount}
+                  onChange={(e) =>
+                    setEditData({ ...editData, amount: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Notes (Optional)
+                </label>
+                <textarea
+                  rows="3"
+                  placeholder="Add any specific details..."
+                  value={editData.notes}
+                  onChange={(e) =>
+                    setEditData({ ...editData, notes: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                ></textarea>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={closeEditModal}
+                  className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-bold hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingEdit}
+                  className="flex-1 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+                >
+                  {savingEdit ? (
+                    "Saving..."
+                  ) : (
+                    <>
+                      <FaSave /> Update
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

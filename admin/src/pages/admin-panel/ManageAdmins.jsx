@@ -4,7 +4,7 @@ import axios from "axios";
 import { useAuth } from "../../contexts/AuthContext";
 import LoadingOverlay from "../../components/admin/LoadingOverlay";
 import { FaEdit, FaTrash, FaPlus, FaUserShield, FaUser, FaEye, FaEyeSlash, FaCheckSquare, FaSquare } from "react-icons/fa";
-import { SALES_PERMISSIONS, PROJECT_STAGES } from "../../constants";
+import { BUSINESS_TYPES, MAULSHREE, PROJECT_STAGES } from "../../constants";
 
 const inputCls = "w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
 const labelCls = "block text-sm font-medium text-gray-700 mb-1";
@@ -17,11 +17,11 @@ const ManageAdmins = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [editingAdmin, setEditingAdmin] = useState(null);
     const [formData, setFormData] = useState({ 
-        username: "", 
-        email: "", 
-        password: "", 
+        username: "",
+        email: "",
+        password: "",
         phone: "",
-        sales_permissions: [],
+        business_types: [],
         manage_stages: []
     });
     const [profilePic, setProfilePic] = useState(null);
@@ -50,11 +50,11 @@ const ManageAdmins = () => {
         try {
             const token = localStorage.getItem("token");
             const fd = new FormData();
-            Object.keys(formData).forEach((k) => { 
-                if (k === "sales_permissions" || k === "manage_stages") {
+            Object.keys(formData).forEach((k) => {
+                if (k === "business_types" || k === "manage_stages") {
                     fd.append(k, JSON.stringify(formData[k]));
                 } else if (formData[k]) {
-                    fd.append(k, formData[k]); 
+                    fd.append(k, formData[k]);
                 }
             });
             if (profilePic) fd.append("profile_pic", profilePic);
@@ -70,7 +70,7 @@ const ManageAdmins = () => {
             if (res.data.success) {
                 setShowModal(false);
                 setEditingAdmin(null);
-                setFormData({ username: "", email: "", password: "", phone: "", sales_permissions: [], manage_stages: [] });
+                setFormData({ username: "", email: "", password: "", phone: "", business_types: [], manage_stages: [] });
                 setProfilePic(null);
                 fetchAdmins();
             }
@@ -97,9 +97,9 @@ const ManageAdmins = () => {
         setFormData({ 
             username: admin.username, 
             email: admin.email, 
-            phone: admin.phone || "", 
+            phone: admin.phone || "",
             password: "",
-            sales_permissions: admin.sales_permissions || [],
+            business_types: admin.business_types || [],
             manage_stages: admin.manage_stages || []
         });
         setShowModal(true);
@@ -117,7 +117,7 @@ const ManageAdmins = () => {
                         <button
                             onClick={() => {
                                 setEditingAdmin(null);
-                                setFormData({ username: "", email: "", password: "", phone: "", sales_permissions: [], manage_stages: [] });
+                                setFormData({ username: "", email: "", password: "", phone: "", business_types: [], manage_stages: [] });
                                 setProfilePic(null);
                                 setShowModal(true);
                             }}
@@ -156,7 +156,26 @@ const ManageAdmins = () => {
 
                         <p className="text-sm text-gray-500 mb-1">Phone: {admin.phone || "N/A"}</p>
                         {admin.createdBy && (
-                            <p className="text-xs text-gray-400 mb-4">Created by: {admin.createdBy.username}</p>
+                            <p className="text-xs text-gray-400 mb-2">Created by: {admin.createdBy.username}</p>
+                        )}
+
+                        {admin.role !== "super-admin" && (
+                            <div className="flex flex-wrap gap-1.5 mb-4">
+                                {(admin.business_types || []).length > 0 ? (
+                                    admin.business_types.map((type) => (
+                                        <span key={type} className="inline-flex items-center px-2 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-800">
+                                            {type}
+                                        </span>
+                                    ))
+                                ) : (
+                                    <span className="text-xs text-gray-400 italic">No business type assigned</span>
+                                )}
+                                {(admin.manage_stages || []).map((stage) => (
+                                    <span key={stage} className="inline-flex items-center px-2 py-0.5 text-xs rounded-full bg-amber-100 text-amber-800">
+                                        {stage}
+                                    </span>
+                                ))}
+                            </div>
                         )}
 
                         {user?.role === "super-admin" && admin.role !== "super-admin" && (
@@ -224,69 +243,64 @@ const ManageAdmins = () => {
                             </div>
 
                             <div>
-                                <label className={labelCls}>Sales Permissions</label>
+                                <label className={labelCls}>Business Type *</label>
+                                <p className="text-xs text-gray-400 mb-2">
+                                    Maulshree = full CRM. Mukhwas / Breeliq = sales panel only.
+                                </p>
                                 <div className="space-y-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                                    <label className="flex items-center gap-2 cursor-pointer group">
-                                        <input 
-                                            type="checkbox" 
-                                            className="hidden"
-                                            checked={formData.sales_permissions.includes(SALES_PERMISSIONS.MUKHWAS)}
-                                            onChange={(e) => {
-                                                const perms = e.target.checked 
-                                                    ? [...formData.sales_permissions, SALES_PERMISSIONS.MUKHWAS]
-                                                    : formData.sales_permissions.filter(p => p !== SALES_PERMISSIONS.MUKHWAS);
-                                                setFormData({ ...formData, sales_permissions: perms });
-                                            }}
-                                        />
-                                        {formData.sales_permissions.includes(SALES_PERMISSIONS.MUKHWAS) 
-                                            ? <FaCheckSquare className="text-blue-600" /> 
-                                            : <FaSquare className="text-gray-300" />}
-                                        <span className="text-sm text-gray-700">Mukhwas Sales</span>
-                                    </label>
-                                    <label className="flex items-center gap-2 cursor-pointer group">
-                                        <input 
-                                            type="checkbox" 
-                                            className="hidden"
-                                            checked={formData.sales_permissions.includes(SALES_PERMISSIONS.BREELIQ)}
-                                            onChange={(e) => {
-                                                const perms = e.target.checked 
-                                                    ? [...formData.sales_permissions, SALES_PERMISSIONS.BREELIQ]
-                                                    : formData.sales_permissions.filter(p => p !== SALES_PERMISSIONS.BREELIQ);
-                                                setFormData({ ...formData, sales_permissions: perms });
-                                            }}
-                                        />
-                                        {formData.sales_permissions.includes(SALES_PERMISSIONS.BREELIQ) 
-                                            ? <FaCheckSquare className="text-blue-600" /> 
-                                            : <FaSquare className="text-gray-300" />}
-                                        <span className="text-sm text-gray-700">Breeliq Sales</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className={labelCls}>Stage Permissions</label>
-                                <div className="grid grid-cols-2 gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                                    {PROJECT_STAGES.map(stage => (
-                                        <label key={stage} className="flex items-center gap-2 cursor-pointer group">
-                                            <input 
-                                                type="checkbox" 
+                                    {BUSINESS_TYPES.map(type => (
+                                        <label key={type} className="flex items-center gap-2 cursor-pointer group">
+                                            <input
+                                                type="checkbox"
                                                 className="hidden"
-                                                checked={formData.manage_stages.includes(stage)}
+                                                checked={formData.business_types.includes(type)}
                                                 onChange={(e) => {
-                                                    const stages = e.target.checked 
-                                                        ? [...formData.manage_stages, stage]
-                                                        : formData.manage_stages.filter(s => s !== stage);
-                                                    setFormData({ ...formData, manage_stages: stages });
+                                                    const types = e.target.checked
+                                                        ? [...formData.business_types, type]
+                                                        : formData.business_types.filter(t => t !== type);
+                                                    // Drop stages if Maulshree is unchecked
+                                                    const stages = types.includes(MAULSHREE) ? formData.manage_stages : [];
+                                                    setFormData({ ...formData, business_types: types, manage_stages: stages });
                                                 }}
                                             />
-                                            {formData.manage_stages.includes(stage) 
-                                                ? <FaCheckSquare className="text-blue-600" /> 
+                                            {formData.business_types.includes(type)
+                                                ? <FaCheckSquare className="text-blue-600" />
                                                 : <FaSquare className="text-gray-300" />}
-                                            <span className="text-sm text-gray-700">{stage}</span>
+                                            <span className="text-sm text-gray-700">{type}</span>
                                         </label>
                                     ))}
                                 </div>
                             </div>
+
+                            {formData.business_types.includes(MAULSHREE) && (
+                                <div>
+                                    <label className={labelCls}>Maulshree Stage Access</label>
+                                    <p className="text-xs text-gray-400 mb-2">
+                                        Leave empty for all stages, or pick specific ones.
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-2 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                                        {PROJECT_STAGES.map(stage => (
+                                            <label key={stage} className="flex items-center gap-2 cursor-pointer group">
+                                                <input
+                                                    type="checkbox"
+                                                    className="hidden"
+                                                    checked={formData.manage_stages.includes(stage)}
+                                                    onChange={(e) => {
+                                                        const stages = e.target.checked
+                                                            ? [...formData.manage_stages, stage]
+                                                            : formData.manage_stages.filter(s => s !== stage);
+                                                        setFormData({ ...formData, manage_stages: stages });
+                                                    }}
+                                                />
+                                                {formData.manage_stages.includes(stage)
+                                                    ? <FaCheckSquare className="text-blue-600" />
+                                                    : <FaSquare className="text-gray-300" />}
+                                                <span className="text-sm text-gray-700">{stage}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="flex justify-end gap-3 pt-2">
                                 <button type="button" onClick={() => setShowModal(false)}

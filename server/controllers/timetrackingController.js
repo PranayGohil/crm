@@ -12,6 +12,7 @@ import mongoose from "mongoose";
 import Project from "../models/projectModel.js";
 import SubTask from "../models/subTaskModel.js";
 import Employee from "../models/employeeModel.js";
+import { getProjectPermissionQuery } from "../utils/projectPermissions.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helper — builds the date-range filter for time_logs.start_time
@@ -101,6 +102,10 @@ export const getTimeTrackingData = async (req, res) => {
         const projectMatch = {};
         if (search) {
             projectMatch.project_name = { $regex: search, $options: "i" };
+        }
+        // Stage scope for admins (optionalAuth); unscoped otherwise.
+        if (req.admin) {
+            Object.assign(projectMatch, getProjectPermissionQuery(req.admin));
         }
 
         // ── 3. Main aggregation pipeline ─────────────────────────────────────

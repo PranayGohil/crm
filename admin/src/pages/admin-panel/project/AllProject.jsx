@@ -6,9 +6,12 @@ import LoadingOverlay from "../../../components/admin/LoadingOverlay";
 import ProjectCard from "../../../components/admin/ProjectCard";
 import ClientSearchableSelect from "../../../components/common/ClientSearchableSelect";
 import SearchableSelect from "../../../components/common/SearchableSelect";
+import { useAuth } from "../../../contexts/AuthContext";
+import { filterStagesForUser } from "../../../constants";
 
 const AllProject = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedClient, setSelectedClient] = useState({
     id: "All Client",
     name: "All Client",
@@ -209,7 +212,7 @@ const AllProject = () => {
               placeholder="All Stages"
               value={selectedStage !== "All Stages" ? { value: selectedStage, label: selectedStage } : null}
               onChange={(opt) => setSelectedStage(opt ? opt.value : "All Stages")}
-              options={[{ value: "All Stages", label: "All Stages" }, ...["CAD Design", "SET Design", "Render"].map((s) => ({ value: s, label: s }))]}
+              options={[{ value: "All Stages", label: "All Stages" }, ...filterStagesForUser(user, ["CAD Design", "SET Design", "Render"]).map((s) => ({ value: s, label: s }))]}
               isClearable={false}
             />
           </div>

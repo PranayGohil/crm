@@ -103,7 +103,9 @@ const UpcomingDueDatesPage = () => {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`${process.env.REACT_APP_API_URL}/api/statistics/upcoming-due-dates`)
+      .get(`${process.env.REACT_APP_API_URL}/api/statistics/upcoming-due-dates`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((res) => {
         const sorted = [...res.data].sort((a, b) => {
           const dA = a.project_id?.due_date ? new Date(a.project_id.due_date) : new Date(0);

@@ -10,6 +10,7 @@ const generateToken = (admin) => {
     {
       id: admin._id,
       role: admin.role,
+      business_types: admin.business_types || [],
       sales_permissions: admin.sales_permissions || [],
       manage_stages: admin.manage_stages || []
     },
@@ -75,6 +76,7 @@ export const adminLogin = async (req, res) => {
         email: admin.email,
         profile_pic: admin.profile_pic,
         role: admin.role,
+        business_types: admin.business_types || [],
         sales_permissions: admin.sales_permissions || [],
         manage_stages: admin.manage_stages || []
       },
@@ -106,7 +108,7 @@ export const getAllAdmins = async (req, res) => {
 // Create new admin (super-admin only)
 export const createAdmin = async (req, res) => {
   try {
-    const { username, email, password, phone, sales_permissions, manage_stages } = req.body;
+    const { username, email, password, phone, business_types, manage_stages } = req.body;
 
     // Check if admin already exists
     const existingAdmin = await Admin.findOne({
@@ -129,14 +131,14 @@ export const createAdmin = async (req, res) => {
       };
     }
 
-    let parsedPermissions = [];
-    if (sales_permissions) {
+    let parsedBusinessTypes = [];
+    if (business_types) {
       try {
-        parsedPermissions = typeof sales_permissions === 'string' 
-          ? JSON.parse(sales_permissions) 
-          : sales_permissions;
+        parsedBusinessTypes = typeof business_types === 'string'
+          ? JSON.parse(business_types)
+          : business_types;
       } catch (e) {
-        console.error("Parse sales_permissions error:", e);
+        console.error("Parse business_types error:", e);
       }
     }
 
@@ -157,8 +159,8 @@ export const createAdmin = async (req, res) => {
       email,
       password,
       phone,
-      sales_permissions: parsedPermissions,
-      manage_stages: parsedStages,
+      business_types: parsedBusinessTypes,
+      manage_stages: parsedStages, // cleared by hook if no Maulshree access
       role: 'admin', // Always set to admin when creating new
       createdBy: req.user.id,
       ...profilePicData
@@ -215,7 +217,7 @@ export const createAdmin = async (req, res) => {
 export const updateAdmin = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username, email, phone, isActive, sales_permissions, manage_stages, role } = req.body;
+    const { username, email, phone, isActive, business_types, manage_stages, role } = req.body;
 
     const admin = await Admin.findById(id);
     if (!admin) {
@@ -240,7 +242,7 @@ export const updateAdmin = async (req, res) => {
       phone: admin.phone,
       isActive: admin.isActive,
       profile_pic: admin.profile_pic,
-      sales_permissions: admin.sales_permissions,
+      business_types: admin.business_types,
       manage_stages: admin.manage_stages
     };
 
@@ -251,20 +253,20 @@ export const updateAdmin = async (req, res) => {
     if (role) admin.role = role;
     if (typeof isActive === 'boolean') admin.isActive = isActive;
     
-    if (sales_permissions) {
+    if (business_types) {
       try {
-        admin.sales_permissions = typeof sales_permissions === 'string' 
-          ? JSON.parse(sales_permissions) 
-          : sales_permissions;
+        admin.business_types = typeof business_types === 'string'
+          ? JSON.parse(business_types)
+          : business_types;
       } catch (e) {
-        console.error("Parse sales_permissions error:", e);
+        console.error("Parse business_types error:", e);
       }
     }
 
     if (manage_stages) {
       try {
-        admin.manage_stages = typeof manage_stages === 'string' 
-          ? JSON.parse(manage_stages) 
+        admin.manage_stages = typeof manage_stages === 'string'
+          ? JSON.parse(manage_stages)
           : manage_stages;
       } catch (e) {
         console.error("Parse manage_stages error:", e);

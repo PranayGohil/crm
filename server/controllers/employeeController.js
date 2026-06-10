@@ -3,7 +3,24 @@ import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
 import Designation from "../models/designationModel.js";
 import ActivityLogger from "../utils/activityLogger.js";
+import { canManageStages } from "../utils/projectPermissions.js";
 import jwt from "jsonwebtoken";
+
+// Per-child-admin tenant scope for employee lists:
+//   super-admin            -> all
+//   admin (child admin)    -> only employees it owns
+//   employee (manager)     -> only employees of its own tenant (same owner)
+//   unauthenticated/client -> no filter (preserves portal behavior)
+const adminEmployeeScope = (req) => {
+  if (req.admin) {
+    if (req.admin.role === "super-admin") return {};
+    return { owner: req.admin._id };
+  }
+  if (req.employee) {
+    return { owner: req.employee.owner ?? null };
+  }
+  return {};
+};
 import moment from "moment";
 import mongoose from "mongoose";
 
@@ -78,6 +95,16 @@ export const addEmployee = async (req, res) => {
       is_manager,
     } = req.body;
 
+    // A stage-scoped admin may only create employees within their own stages.
+    let requestedStages = manage_stages || [];
+    if (typeof requestedStages === "string") {
+      try { requestedStages = JSON.parse(requestedStages); } catch { requestedStages = [requestedStages]; }
+    }
+    if (!Array.isArray(requestedStages)) requestedStages = [requestedStages];
+    if (!canManageStages(req.user, requestedStages)) {
+      return res.status(403).json({ success: false, message: "You can only assign employees to your own stages." });
+    }
+
     // check if username already exists
     const existingUser = await Employee.findOne({ username });
     if (existingUser) {
@@ -109,6 +136,7 @@ export const addEmployee = async (req, res) => {
         : null,
       is_manager,
       manage_stages: manage_stages || [],
+      owner: req.admin?._id ?? null, // tenant owner (the creating child admin)
     });
 
     await newEmployee.save();
@@ -208,7 +236,7 @@ export const loginEmployee = async (req, res) => {
 export const getEmployees = async (req, res) => {
   try {
     const { stages } = req.query;
-    const query = {};
+    const query = { ...adminEmployeeScope(req) };
     if (stages) {
       const stageList = stages.split(",").map((s) => s.trim()).filter(Boolean);
       if (stageList.length) query.manage_stages = { $all: stageList };
@@ -229,20 +257,26 @@ export const searchEmployees = async (req, res) => {
     const { q, stages, page = 1, limit = 20 } = req.query;
     const skip = (page - 1) * limit;
 
-    const query = {};
+    // Combine admin stage-scope + text search + explicit stage filter via $and
+    // so their conditions don't clobber each other (each may use $or).
+    const and = [];
+    const scope = adminEmployeeScope(req);
+    if (Object.keys(scope).length) and.push(scope);
     if (q) {
-      query.$or = [
-        { full_name: { $regex: q, $options: "i" } },
-        { email: { $regex: q, $options: "i" } },
-        { department: { $regex: q, $options: "i" } },
-        { username: { $regex: q, $options: "i" } },
-      ];
+      and.push({
+        $or: [
+          { full_name: { $regex: q, $options: "i" } },
+          { email: { $regex: q, $options: "i" } },
+          { department: { $regex: q, $options: "i" } },
+          { username: { $regex: q, $options: "i" } },
+        ],
+      });
     }
-    // If stages param is provided, only return employees who can work on ALL of those stages
     if (stages) {
       const stageList = stages.split(",").map((s) => s.trim()).filter(Boolean);
-      if (stageList.length) query.manage_stages = { $all: stageList };
+      if (stageList.length) and.push({ manage_stages: { $all: stageList } });
     }
+    const query = and.length ? { $and: and } : {};
 
     const employees = await Employee.find(
       query,
@@ -273,7 +307,7 @@ export const getMultipleEmployees = async (req, res) => {
   try {
     const ids = req.query.ids?.split(",");
     if (!ids || ids.length === 0) return res.json([]);
-    const employees = await Employee.find({ _id: { $in: ids } });
+    const employees = await Employee.find({ _id: { $in: ids }, ...adminEmployeeScope(req) });
     res.json(employees);
   } catch (error) {
     console.error(error);
@@ -327,6 +361,19 @@ export const editEmployee = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Employee not found" });
+    }
+
+    // A child admin may only edit employees it owns.
+    if (req.admin.role !== "super-admin" && employee.owner?.toString() !== req.admin._id.toString()) {
+      return res.status(403).json({ success: false, message: "Access denied. This employee belongs to another admin." });
+    }
+    let requestedStages = manage_stages;
+    if (typeof requestedStages === "string") {
+      try { requestedStages = JSON.parse(requestedStages); } catch { requestedStages = [requestedStages]; }
+    }
+    if (requestedStages !== undefined && !Array.isArray(requestedStages)) requestedStages = [requestedStages];
+    if (requestedStages !== undefined && !canManageStages(req.user, requestedStages)) {
+      return res.status(403).json({ success: false, message: "You can only assign employees to your own stages." });
     }
 
     // Store original values for logging
@@ -479,6 +526,10 @@ export const deleteEmployee = async (req, res) => {
     const employee = await Employee.findById(id);
     if (!employee) {
       return res.status(404).json({ success: false, message: "Employee not found" });
+    }
+
+    if (req.admin.role !== "super-admin" && employee.owner?.toString() !== req.admin._id.toString()) {
+      return res.status(403).json({ success: false, message: "Access denied. This employee belongs to another admin." });
     }
 
     // Check if employee has active tasks
@@ -828,7 +879,7 @@ export const getEmployeeDashboardData = async (req, res) => {
 export const getManagers = async (req, res) => {
   try {
     const managers = await Employee.find(
-      { is_manager: true },
+      { is_manager: true, ...adminEmployeeScope(req) },
       "full_name email"
     );
     res.json({ success: true, data: managers });

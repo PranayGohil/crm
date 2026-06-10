@@ -2,8 +2,12 @@ import Client from "../models/clientModel.js";
 import SubTask from "../models/subTaskModel.js";
 import Project from "../models/projectModel.js";
 import ActivityLogger from "../utils/activityLogger.js";
+import { getClientStageQuery, canAdminAccessClient, canManageStages } from "../utils/projectPermissions.js";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+
+// Stage filter applied only when an admin token is present (optionalAuth).
+const adminClientScope = (req) => (req.admin ? getClientStageQuery(req.admin) : {});
 
 // clientController.js - update addClient to accept stage_pricing
 export const addClient = async (req, res) => {
@@ -27,6 +31,11 @@ export const addClient = async (req, res) => {
       stages,
       stage_pricing,
     } = req.body;
+
+    // A stage-scoped admin may only create clients within their own stages.
+    if (!canManageStages(req.user, Array.isArray(stages) ? stages : (stages ? [stages] : []))) {
+      return res.status(403).json({ success: false, message: "You can only create clients within your assigned stages." });
+    }
 
     const existingUsername = await Client.findOne({ username });
     if (existingUsername) {
@@ -153,7 +162,7 @@ export const loginClient = async (req, res) => {
 
 export const getClients = async (req, res) => {
   try {
-    const clients = await Client.find();
+    const clients = await Client.find(adminClientScope(req));
     res.status(200).json(clients);
   } catch (error) {
     console.error("Error in getClients:", error);
@@ -166,15 +175,20 @@ export const searchClients = async (req, res) => {
     const { q, page = 1, limit = 20 } = req.query;
     const skip = (page - 1) * limit;
 
-    const query = {};
+    const and = [];
+    const scope = adminClientScope(req);
+    if (Object.keys(scope).length) and.push(scope);
     if (q) {
-      query.$or = [
-        { full_name: { $regex: q, $options: "i" } },
-        { company_name: { $regex: q, $options: "i" } },
-        { email: { $regex: q, $options: "i" } },
-        { username: { $regex: q, $options: "i" } },
-      ];
+      and.push({
+        $or: [
+          { full_name: { $regex: q, $options: "i" } },
+          { company_name: { $regex: q, $options: "i" } },
+          { email: { $regex: q, $options: "i" } },
+          { username: { $regex: q, $options: "i" } },
+        ],
+      });
     }
+    const query = and.length ? { $and: and } : {};
 
     const clients = await Client.find(query)
       .sort({ full_name: 1 })
@@ -228,6 +242,13 @@ export const updateClient = async (req, res) => {
     const originalClient = await Client.findById(id);
     if (!originalClient) {
       return res.status(404).json({ error: "Client not found" });
+    }
+
+    if (!canAdminAccessClient(req.user, originalClient)) {
+      return res.status(403).json({ success: false, message: "Access denied for this client's stage." });
+    }
+    if (req.body.stages !== undefined && !canManageStages(req.user, Array.isArray(req.body.stages) ? req.body.stages : [req.body.stages])) {
+      return res.status(403).json({ success: false, message: "You can only assign clients to your own stages." });
     }
 
     // Store original values for logging
@@ -335,6 +356,13 @@ export const updateClientByUsername = async (req, res) => {
       return res.status(404).json({ error: "Client not found" });
     }
 
+    if (!canAdminAccessClient(req.user, originalClient)) {
+      return res.status(403).json({ success: false, message: "Access denied for this client's stage." });
+    }
+    if (req.body.stages !== undefined && !canManageStages(req.user, Array.isArray(req.body.stages) ? req.body.stages : [req.body.stages])) {
+      return res.status(403).json({ success: false, message: "You can only assign clients to your own stages." });
+    }
+
     // Store original values for logging
     const originalValues = {
       full_name: originalClient.full_name,
@@ -438,6 +466,10 @@ export const toggleClientStatus = async (req, res) => {
       return res.status(404).json({ message: "Client not found" });
     }
 
+    if (!canAdminAccessClient(req.user, client)) {
+      return res.status(403).json({ success: false, message: "Access denied for this client's stage." });
+    }
+
     client.status = client.status === "active" ? "inactive" : "active";
     await client.save();
 
@@ -456,6 +488,10 @@ export const deleteClient = async (req, res) => {
     const client = await Client.findById(id);
     if (!client) {
       return res.status(404).json({ error: "Client not found" });
+    }
+
+    if (!canAdminAccessClient(req.user, client)) {
+      return res.status(403).json({ success: false, message: "Access denied for this client's stage." });
     }
 
     // Find all projects of that client
@@ -553,7 +589,7 @@ export const getClientProjectsWithUsername = async (req, res) => {
 export const getClientsWithSubtasks = async (req, res) => {
   try {
     console.log("getClientsWithSubtasks called");
-    const clients = await Client.find().lean();
+    const clients = await Client.find(adminClientScope(req)).lean();
 
     const clientData = await Promise.all(
       clients.map(async (client) => {

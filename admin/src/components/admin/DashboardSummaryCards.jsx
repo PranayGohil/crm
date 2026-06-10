@@ -12,14 +12,15 @@ const DashboardSummaryCards = () => {
 
   useEffect(() => {
     setLoading(true);
+    const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
     axios
-      .get(`${process.env.REACT_APP_API_URL}/api/statistics/summary`)
+      .get(`${process.env.REACT_APP_API_URL}/api/statistics/summary`, { headers })
       .then((res) => setSummary(res.data))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
 
     axios
-      .get(`${process.env.REACT_APP_API_URL}/api/statistics/department-capacities`)
+      .get(`${process.env.REACT_APP_API_URL}/api/statistics/department-capacities`, { headers })
       .then((res) => setDepartmentCapacities(res.data))
       .catch((err) => console.error(err));
   }, []);
