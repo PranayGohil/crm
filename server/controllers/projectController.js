@@ -4,7 +4,7 @@ import Employee from "../models/employeeModel.js";
 import Client from "../models/clientModel.js";
 import ActivityLogger from "../utils/activityLogger.js";
 import mongoose from "mongoose";
-import { getProjectPermissionQuery, canAdminAccessProject } from "../utils/projectPermissions.js";
+import { getProjectPermissionQuery, canAdminAccessProject, canManageStages } from "../utils/projectPermissions.js";
 
 // Helper function to get related info for logging
 const getRelatedInfo = async (clientId, employeeIds = []) => {
@@ -46,6 +46,14 @@ export const addProject = async (req, res) => {
       status,
       content,
     } = JSON.parse(req.body.data);
+
+    // A stage-scoped admin may only create projects within their own stages.
+    if (!canManageStages(req.user, stages || [])) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only create projects within your assigned stages.",
+      });
+    }
 
     let newUploadedFiles = [];
     if (req.files && req.files.length > 0) {
@@ -757,6 +765,16 @@ export const getProjectsForReportingManager = async (req, res) => {
 
     const manager = await Employee.findById(managerId).lean();
     if (!manager) return res.status(404).json({ success: false, message: "Manager not found" });
+
+    // Access control: only the manager themselves, the admin that owns the
+    // manager, or a super-admin may view this manager's team/projects.
+    const actor = req.user;
+    const actorRole = actor?.role;
+    const isSelf = actor?._id?.toString() === managerId.toString();
+    const isOwningAdmin = actorRole === "admin" && manager.owner?.toString() === actor?._id?.toString();
+    if (actorRole !== "super-admin" && !isSelf && !isOwningAdmin) {
+      return res.status(403).json({ success: false, message: "Access denied. You can only view your own team." });
+    }
 
     const manageStages = manager.manage_stages ?? [];
 

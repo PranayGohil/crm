@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { SALES_PERMISSIONS } from "../../constants";
+import { hasMaulshreeAccess, hasSalesAccess } from "../../constants";
 
 const DashboardMenu = ({ onClose }) => {
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+
+  const canMaulshree = hasMaulshreeAccess(user);
+  const canSales = hasSalesAccess(user);
 
   const toggleMenu = () => setCollapsed(!collapsed);
 
@@ -28,6 +31,7 @@ const DashboardMenu = ({ onClose }) => {
       to: "/dashboard",
       label: "Dashboard",
       path: "/dashboard",
+      condition: canMaulshree,
       icon: (
         <path
           strokeLinecap="round"
@@ -41,6 +45,7 @@ const DashboardMenu = ({ onClose }) => {
       to: "/project/dashboard",
       label: "Projects",
       path: "/project",
+      condition: canMaulshree,
       icon: (
         <path
           strokeLinecap="round"
@@ -54,6 +59,7 @@ const DashboardMenu = ({ onClose }) => {
       to: "/subtasks",
       label: "Task Management",
       path: "/subtasks",
+      condition: canMaulshree,
       icon: (
         <path
           strokeLinecap="round"
@@ -67,6 +73,7 @@ const DashboardMenu = ({ onClose }) => {
       to: "/earnings-report",
       label: "Earnings Report",
       path: "/earnings-report",
+      condition: canMaulshree,
       icon: (
         <path
           strokeLinecap="round"
@@ -80,6 +87,7 @@ const DashboardMenu = ({ onClose }) => {
       to: "/time-tracking",
       label: "Team Time Tracking",
       path: "/time-tracking",
+      condition: canMaulshree,
       icon: (
         <path
           strokeLinecap="round"
@@ -93,6 +101,7 @@ const DashboardMenu = ({ onClose }) => {
       to: "/client/dashboard",
       label: "Clients",
       path: "/client",
+      condition: canMaulshree,
       icon: (
         <path
           strokeLinecap="round"
@@ -106,6 +115,7 @@ const DashboardMenu = ({ onClose }) => {
       to: "/employee/dashboard",
       label: "Employees",
       path: "/employee",
+      condition: canMaulshree,
       icon: (
         <path
           strokeLinecap="round"
@@ -119,6 +129,7 @@ const DashboardMenu = ({ onClose }) => {
       to: "/designation",
       label: "Designation",
       path: "/designation",
+      condition: canMaulshree,
       icon: (
         <path
           strokeLinecap="round"
@@ -132,6 +143,7 @@ const DashboardMenu = ({ onClose }) => {
       to: "/department",
       label: "Department",
       path: "/department",
+      condition: canMaulshree,
       icon: (
         <path
           strokeLinecap="round"
@@ -145,6 +157,7 @@ const DashboardMenu = ({ onClose }) => {
       to: "/archived-projects",
       label: "Archived Projects",
       path: "/archived-projects",
+      condition: canMaulshree,
       icon: (
         <path
           strokeLinecap="round"
@@ -158,18 +171,27 @@ const DashboardMenu = ({ onClose }) => {
       to: "/sales-panel",
       label: "Sales Panel",
       path: "/sales-panel",
-      condition:
-        user?.role === "super-admin" ||
-        user?.sales_permissions?.some(
-          (p) =>
-            p === SALES_PERMISSIONS.MUKHWAS || p === SALES_PERMISSIONS.BREELIQ,
-        ),
+      condition: canSales,
       icon: (
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={2}
           d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      ),
+    },
+    {
+      to: "/sales-earnings",
+      label: "Sales Earnings",
+      path: "/sales-earnings",
+      condition: canSales,
+      icon: (
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 3v18h18M7 14l4-4 4 4 5-5"
         />
       ),
     },

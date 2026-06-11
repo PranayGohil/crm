@@ -20,7 +20,9 @@ const CreateProfileSection = ({ form, onChange, setProfilePic, errors }) => {
 
   useEffect(() => {
     axios
-      .get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`)
+      .get(`${process.env.REACT_APP_API_URL}/api/designation/get-all`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
       .then((res) => {
         if (res.data.success) {
           console.log("get all designations", res.data.designations);

@@ -1,9 +1,13 @@
 import Department from "../models/departmentModel.js";
 import ActivityLogger from "../utils/activityLogger.js";
 
+// Super-admin sees all; a Child Admin sees only the departments it owns.
+const ownerFilter = (req) =>
+  req.admin?.role === "super-admin" ? {} : { owner: req.admin?._id };
+
 export const getDepartments = async (req, res) => {
   try {
-    const departments = await Department.find().sort({ createdAt: -1 });
+    const departments = await Department.find(ownerFilter(req)).sort({ createdAt: -1 });
     res.json({ success: true, departments });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch departments" });
@@ -17,11 +21,11 @@ export const addDepartment = async (req, res) => {
     if (!name?.trim())
       return res.status(400).json({ message: "Name is required" });
 
-    const existing = await Department.findOne({ name: name.trim() });
+    const existing = await Department.findOne({ name: name.trim(), owner: req.admin._id });
     if (existing)
       return res.status(409).json({ message: "Department already exists" });
 
-    const department = await Department.create({ name: name.trim() });
+    const department = await Department.create({ name: name.trim(), owner: req.admin._id });
 
     // 📝 LOG ACTIVITY - Admin created a new department
     const logger = new ActivityLogger(req);
@@ -59,6 +63,11 @@ export const deleteDepartment = async (req, res) => {
     const department = await Department.findById(id);
     if (!department) {
       return res.status(404).json({ message: "Department not found" });
+    }
+
+    // A Child Admin can only delete its own departments.
+    if (req.admin.role !== "super-admin" && department.owner?.toString() !== req.admin._id.toString()) {
+      return res.status(403).json({ message: "Access denied. You can only delete your own departments." });
     }
 
     // Check if department is being used by any employees

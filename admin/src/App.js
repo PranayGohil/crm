@@ -44,6 +44,7 @@ import LoginPage from "./pages/admin-panel/LoginPage";
 import ViewSubtask from "./pages/admin-panel/subtask/ViewSubtask";
 
 import ProtectedRoute from "./components/admin/ProtectedRoute";
+import RequireMaulshree from "./components/admin/RequireMaulshree";
 
 import Designation from "./pages/admin-panel/Designation";
 import Department from "./pages/admin-panel/Department";
@@ -61,6 +62,7 @@ import NotificationSettings from "./NotificationSettings";
 
 import ActivityLogs from "./pages/admin-panel/ActivityLogs";
 import SalesPanel from "./pages/admin-panel/SalesPanel";
+import SalesEarnings from "./pages/admin-panel/SalesEarnings";
 
 function App() {
   return (
@@ -73,93 +75,97 @@ function App() {
           </ProtectedRoute>
         }
       >
-        {/* Protected routes */}
-        <Route path="/" element={<DashboardOverview />} />
-        <Route index element={<DashboardOverview />} />
-        <Route path="/dashboard" element={<DashboardOverview />} />
+        {/* Routes available to every authenticated admin (incl. sales-only) */}
         <Route path="/admin/profile" element={<AdminProfile />} />
-
-        {/* client */}
-        <Route path="/client/dashboard" element={<ClientDashboardPage />} />
-        <Route path="/client/create" element={<CreateNewClient />} />
-        <Route path="/client/details/:id" element={<ClientDetailsPage />} />
-        <Route path="/client/edit/:id" element={<EditClient />} />
-
-        <Route
-          path="/client/projects/:username"
-          element={<ClientProjectDetails />}
-        />
-
-        <Route
-          path="/project/details/:projectId"
-          element={<ProjectDetails />}
-        />
-        <Route path="/project/dashboard" element={<AllProject />} />
-        <Route path="/project/add" element={<AddNewProject />} />
-        <Route
-          path="/project/subtask/add/:projectId"
-          element={<AddSubtask />}
-        />
-        <Route
-          path="/project/subtask-dashboard/:projectId"
-          element={<SubtaskDashboardContainer />}
-        />
-
-        <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
-        <Route
-          path="/subtask/upcoming-due-dates"
-          element={<UpcomingDueDatesPage />}
-        />
-        <Route
-          path="/project/gallery/:projectId"
-          element={<ProjectMediaGallery />}
-        />
-        <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
-        <Route
-          path="/employee/edit/:employeeId"
-          element={<EmployeeProfileEdit />}
-        />
-        <Route path="/employee/profile/:id" element={<TeamMemberProfile />} />
-        <Route
-          path="/employee/activity-history/:id"
-          element={<EmployeeActivityDashboard />}
-        />
-        <Route
-          path="/employee/timetracking/:id"
-          element={<EmployeeTimeTracking />}
-        />
-        <Route path="/subtasks" element={<Subtasks />} />
-        <Route path="/time-tracking" element={<TimeTrackingDashboard />} />
         <Route path="/notifications" element={<NotificationAdmin />} />
-
-        {/* edit page */}
-
-        <Route path="/project/edit/:projectId" element={<EditProject />} />
-
         <Route
-          path="/project/subtask/edit/:subtaskId"
-          element={<EditSubtask />}
-        />
-        <Route
-          path="/employee/create-profile"
-          element={<CreateEmployeeProfile />}
-        />
-        <Route path="/designation" element={<Designation />} />
-        <Route path="/department" element={<Department />} />
-
-        <Route path="/archived-projects" element={<ArchivedProjects />} />
-
-        <Route path="/subtask/logs/:subtaskId" element={<SubtaskLogs />} />
-
-        <Route path="/earnings-report" element={<EarningsReport />} />
-
-        <Route path="/manage-admins" element={<ManageAdmins />} />
-
-        <Route path="/notification-settings"
+          path="/notification-settings"
           element={<NotificationSettings />}
         />
-        <Route path="/activity-logs" element={<ActivityLogs />} />
         <Route path="/sales-panel" element={<SalesPanel />} />
+        <Route path="/sales-earnings" element={<SalesEarnings />} />
+
+        {/* Maulshree (main CRM) routes — sales-only admins are redirected away */}
+        <Route element={<RequireMaulshree />}>
+          <Route path="/" element={<DashboardOverview />} />
+          <Route index element={<DashboardOverview />} />
+          <Route path="/dashboard" element={<DashboardOverview />} />
+
+          {/* client */}
+          <Route path="/client/dashboard" element={<ClientDashboardPage />} />
+          <Route path="/client/create" element={<CreateNewClient />} />
+          <Route path="/client/details/:id" element={<ClientDetailsPage />} />
+          <Route path="/client/edit/:id" element={<EditClient />} />
+
+          <Route
+            path="/client/projects/:username"
+            element={<ClientProjectDetails />}
+          />
+
+          <Route
+            path="/project/details/:projectId"
+            element={<ProjectDetails />}
+          />
+          <Route path="/project/dashboard" element={<AllProject />} />
+          <Route path="/project/add" element={<AddNewProject />} />
+          <Route
+            path="/project/subtask/add/:projectId"
+            element={<AddSubtask />}
+          />
+          <Route
+            path="/project/subtask-dashboard/:projectId"
+            element={<SubtaskDashboardContainer />}
+          />
+
+          <Route path="/subtask/view/:subtaskId" element={<ViewSubtask />} />
+          <Route
+            path="/subtask/upcoming-due-dates"
+            element={<UpcomingDueDatesPage />}
+          />
+          <Route
+            path="/project/gallery/:projectId"
+            element={<ProjectMediaGallery />}
+          />
+          <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
+          <Route
+            path="/employee/edit/:employeeId"
+            element={<EmployeeProfileEdit />}
+          />
+          <Route path="/employee/profile/:id" element={<TeamMemberProfile />} />
+          <Route
+            path="/employee/activity-history/:id"
+            element={<EmployeeActivityDashboard />}
+          />
+          <Route
+            path="/employee/timetracking/:id"
+            element={<EmployeeTimeTracking />}
+          />
+          <Route path="/subtasks" element={<Subtasks />} />
+          <Route path="/time-tracking" element={<TimeTrackingDashboard />} />
+
+          {/* edit page */}
+          <Route path="/project/edit/:projectId" element={<EditProject />} />
+          <Route
+            path="/project/subtask/edit/:subtaskId"
+            element={<EditSubtask />}
+          />
+          <Route
+            path="/employee/create-profile"
+            element={<CreateEmployeeProfile />}
+          />
+          <Route path="/designation" element={<Designation />} />
+          <Route path="/department" element={<Department />} />
+
+          <Route path="/archived-projects" element={<ArchivedProjects />} />
+
+          <Route path="/subtask/logs/:subtaskId" element={<SubtaskLogs />} />
+
+          <Route path="/earnings-report" element={<EarningsReport />} />
+
+          <Route path="/manage-admins" element={<ManageAdmins />} />
+
+          <Route path="/activity-logs" element={<ActivityLogs />} />
+        </Route>
       </Route>
 
       <Route path="/" element={<Plain_layout />}>

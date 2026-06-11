@@ -8,7 +8,12 @@ import ActivityLogger from "../utils/activityLogger.js";
 
 import mongoose from "mongoose";
 import cloudinary from "../config/cloudinary.js";
-import { getProjectPermissionQuery, canAdminAccessProject } from "../utils/projectPermissions.js";
+import { getProjectPermissionQuery, canAdminAccessProject, canAdminAccessByStages } from "../utils/projectPermissions.js";
+
+// Admin-only stage guard for an already-loaded subtask. Returns true when the
+// actor may act on it; super-admin/employee/client pass through unchanged.
+const subtaskStageAllowed = (user, subtask) =>
+  canAdminAccessByStages(user, (subtask?.stages || []).map((s) => s.name));
 
 const FIXED_STAGE_ORDER = [
   "CAD Design",
@@ -334,6 +339,29 @@ export const addBulkSubTasks = async (req, res) => {
 // Get all subtasks
 export const getSubTasks = async (req, res) => {
   try {
+    // ── Build the permission match per actor ──
+    const role = req.user.role;
+    const myStages = req.user.manage_stages || [];
+    let permissionMatch = null;
+
+    if (role === "client") {
+      permissionMatch = { "project.client_id": req.user._id.toString() };
+    } else if (role === "admin") {
+      // Admin: empty manage_stages = ALL; otherwise overlap + no-stage records.
+      if (myStages.length > 0) {
+        permissionMatch = {
+          $or: [
+            { "project.stages": { $in: myStages } },
+            { "project.stages": { $size: 0 } },
+            { "project.stages": { $exists: false } },
+          ],
+        };
+      }
+    } else if (role !== "super-admin") {
+      // Employee: preserve existing overlap-by-project-stage behavior.
+      permissionMatch = { "project.stages": { $in: myStages } };
+    }
+
     const subTasks = await SubTask.aggregate([
       {
         $lookup: {
@@ -345,19 +373,7 @@ export const getSubTasks = async (req, res) => {
       },
       { $unwind: { path: "$project", preserveNullAndEmptyArrays: true } },
       // ── PERMISSION FILTER ──
-      ...(req.user.role === "client" ? [
-        {
-          $match: {
-            "project.client_id": req.user._id.toString()
-          }
-        }
-      ] : req.user.role !== "super-admin" ? [
-        {
-          $match: {
-            "project.stages": { $in: req.user.manage_stages || [] }
-          }
-        }
-      ] : []),
+      ...(permissionMatch ? [{ $match: permissionMatch }] : []),
       {
         $lookup: {
           from: "clients",
@@ -667,6 +683,10 @@ export const completeStage = async (req, res) => {
     const subtask = await SubTask.findById(id);
     if (!subtask) return res.status(404).json({ message: "Subtask not found" });
 
+    if (!subtaskStageAllowed(req.user, subtask)) {
+      return res.status(403).json({ success: false, message: "Access denied for this stage." });
+    }
+
     const stageIndex = subtask.current_stage_index;
     if (stageIndex >= subtask.stages.length)
       return res.status(400).json({ message: "All stages already completed" });
@@ -780,6 +800,10 @@ export const changeSubTaskStatus = async (req, res) => {
 
     const subtask = await SubTask.findById(id);
     if (!subtask) return res.status(404).json({ message: "Subtask not found" });
+
+    if (!subtaskStageAllowed(req.user, subtask)) {
+      return res.status(403).json({ success: false, message: "Access denied for this stage." });
+    }
 
     const oldStatus = subtask.status;
 
@@ -922,14 +946,19 @@ export const changeSubTaskPriority = async (req, res) => {
     const { id } = req.params;
     const { priority } = req.body;
 
+    const existing = await SubTask.findById(id);
+    if (!existing) {
+      return res.status(404).json({ message: "Subtask not found" });
+    }
+    if (!subtaskStageAllowed(req.user, existing)) {
+      return res.status(403).json({ success: false, message: "Access denied for this stage." });
+    }
+
     const updated = await SubTask.findByIdAndUpdate(
       id,
       { priority },
       { new: true }
     );
-    if (!updated) {
-      return res.status(404).json({ message: "Subtask not found" });
-    }
 
     // 📝 LOG ACTIVITY
     const logger = new ActivityLogger(req);
@@ -961,12 +990,38 @@ export const bulkUpdateSubtasks = async (req, res) => {
     const { ids, update } = req.body;
     console.log("Bulk updating subtasks:", ids, update);
 
-    // 1️⃣ Get subtasks before update
-    const updatedTasks = await SubTask.find({ _id: { $in: ids } });
-    console.log("Found subtasks to update:", updatedTasks);
+    // Enforce assignment hierarchy when (re)assigning a subtask:
+    //   - employee/manager caller -> assignee must report to them
+    //   - child admin caller      -> assignee must belong to them (same owner)
+    //   - super-admin             -> no restriction
+    if (update?.assign_to) {
+      const assignee = await Employee.findById(update.assign_to).select("reporting_manager owner");
+      const actor = req.user;
+      const role = actor?.role;
+      if (!assignee) {
+        return res.status(400).json({ success: false, message: "Assignee not found" });
+      }
+      if (role === "employee") {
+        if (assignee.reporting_manager?.toString() !== actor._id?.toString()) {
+          return res.status(403).json({ success: false, message: "You can only assign tasks to employees who report to you." });
+        }
+      } else if (role === "admin") {
+        if (assignee.owner?.toString() !== actor._id?.toString()) {
+          return res.status(403).json({ success: false, message: "You can only assign tasks to your own employees." });
+        }
+      }
+    }
+
+    // 1️⃣ Get subtasks before update — restrict to stages this admin can manage
+    const updatedTasks = (await SubTask.find({ _id: { $in: ids } }))
+      .filter((t) => subtaskStageAllowed(req.user, t));
+    if (!updatedTasks.length) {
+      return res.status(403).json({ success: false, message: "Access denied for the selected stage(s)." });
+    }
+    const allowedIds = updatedTasks.map((t) => t._id);
 
     // 2️⃣ Update them
-    await SubTask.updateMany({ _id: { $in: ids } }, { $set: update });
+    await SubTask.updateMany({ _id: { $in: allowedIds } }, { $set: update });
 
     // 🔥 NEW LOGIC: Handle assign_at for bulk assignment
     if (update.assign_to) {
@@ -1071,11 +1126,12 @@ export const bulkDeleteSubtasks = async (req, res) => {
   try {
     const { ids } = req.body;
 
-    // Find subtasks first
-    const subtasks = await SubTask.find({ _id: { $in: ids } });
+    // Find subtasks first — restrict to stages this admin can manage
+    const subtasks = (await SubTask.find({ _id: { $in: ids } }))
+      .filter((t) => subtaskStageAllowed(req.user, t));
 
     if (!subtasks || subtasks.length === 0) {
-      return res.status(404).json({ message: "No subtasks found" });
+      return res.status(403).json({ message: "Access denied for the selected stage(s)." });
     }
 
     // Check if any subtask is in progress
@@ -1088,8 +1144,9 @@ export const bulkDeleteSubtasks = async (req, res) => {
       });
     }
 
-    // If all are safe, delete them
-    const result = await SubTask.deleteMany({ _id: { $in: ids } });
+    // If all are safe, delete them (only the ones in scope)
+    const allowedIds = subtasks.map((t) => t._id);
+    const result = await SubTask.deleteMany({ _id: { $in: allowedIds } });
 
     // 📝 LOG ACTIVITY
     const logger = new ActivityLogger(req);
@@ -1142,6 +1199,14 @@ export const addComment = async (req, res) => {
   }
 
   try {
+    const target = await SubTask.findById(subtaskId).select("stages");
+    if (!target) {
+      return res.status(404).json({ success: false, message: "Subtask not found" });
+    }
+    if (!subtaskStageAllowed(req.user, target)) {
+      return res.status(403).json({ success: false, message: "Access denied for this stage." });
+    }
+
     // build comment object dynamically
     const comment = {
       user_type,
@@ -1222,6 +1287,9 @@ export const addMedia = async (req, res) => {
     if (!subtask) {
       return res.status(404).json({ message: "Subtask not found" });
     }
+    if (!subtaskStageAllowed(req.user, subtask)) {
+      return res.status(403).json({ success: false, message: "Access denied for this stage." });
+    }
 
     const Assignee = await Employee.findById(subtask.assign_to);
 
@@ -1283,6 +1351,9 @@ export const removeMedia = async (req, res) => {
     const subtask = await SubTask.findById(subtaskId);
     if (!subtask) {
       return res.status(404).json({ message: "Subtask not found" });
+    }
+    if (!subtaskStageAllowed(req.user, subtask)) {
+      return res.status(403).json({ success: false, message: "Access denied for this stage." });
     }
 
     // Remove from Cloudinary
@@ -1353,6 +1424,10 @@ export const startTimer = async (req, res) => {
   const { subtaskId } = req.params;
   try {
     const subtask = await SubTask.findById(subtaskId);
+    if (!subtask) return res.status(404).json({ message: "Subtask not found" });
+    if (!subtaskStageAllowed(req.user, subtask)) {
+      return res.status(403).json({ success: false, message: "Access denied for this stage." });
+    }
     subtask.time_logs.push({ start_time: new Date(), end_time: null });
     await subtask.save();
     res.json({ message: "Timer started", subtask });
@@ -1367,6 +1442,10 @@ export const stopTimer = async (req, res) => {
   const { subtaskId } = req.params;
   try {
     const subtask = await SubTask.findById(subtaskId);
+    if (!subtask) return res.status(404).json({ message: "Subtask not found" });
+    if (!subtaskStageAllowed(req.user, subtask)) {
+      return res.status(403).json({ success: false, message: "Access denied for this stage." });
+    }
     const lastLog = subtask.time_logs.find((log) => log.end_time === null);
     if (lastLog) {
       lastLog.end_time = new Date();

@@ -27,6 +27,38 @@ export const verifyToken = (req, res, next) => {
     }
 };
 
+// Non-blocking auth for endpoints that are shared with the employee/client
+// portals (which may not always send a token). If a valid ADMIN token is
+// present, it loads the admin into req.admin/req.user so controllers can apply
+// stage scoping; otherwise the request proceeds unauthenticated (unscoped),
+// preserving existing portal behavior.
+export const optionalAuth = async (req, res, next) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) return next();
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const admin = await Admin.findById(decoded.id);
+        if (admin) {
+            req.user = admin;
+            req.admin = admin;
+            req.isAdmin = true;
+        } else {
+            // Resolve an employee token too, so managers get tenant scoping.
+            const employee = await Employee.findById(decoded.id);
+            if (employee) {
+                employee.role = "employee";
+                req.user = employee;
+                req.employee = employee;
+                req.isAdmin = false;
+            }
+        }
+    } catch (err) {
+        // Invalid/expired token -> treat as unauthenticated, don't block.
+    }
+    next();
+};
+
 export const protectAny = async (req, res, next) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];

@@ -55,6 +55,14 @@ const employeeSchema = mongoose.Schema({
   },
   is_manager: { type: Boolean, default: false },
   manage_stages: [{ type: String }],
+  // The Child Admin (super-admin or stage admin) that owns this employee.
+  // Drives per-child-admin isolation: an admin/manager only sees employees of
+  // its own tenant; super-admin sees all. Null = legacy (super-admin only).
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Admin",
+    default: null,
+  },
   created_at: {
     type: Date,
     default: Date.now,

@@ -1,9 +1,13 @@
 import Designation from "../models/designationModel.js";
 import ActivityLogger from "../utils/activityLogger.js";
 
+// Super-admin sees all; a Child Admin sees only the designations it owns.
+const ownerFilter = (req) =>
+  req.admin?.role === "super-admin" ? {} : { owner: req.admin?._id };
+
 export const getDesignations = async (req, res) => {
   try {
-    const designations = await Designation.find().sort({ createdAt: -1 });
+    const designations = await Designation.find(ownerFilter(req)).sort({ createdAt: -1 });
     res.json({ success: true, designations });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch designations" });
@@ -17,11 +21,11 @@ export const addDesignation = async (req, res) => {
     if (!name?.trim())
       return res.status(400).json({ message: "Name is required" });
 
-    const existing = await Designation.findOne({ name: name.trim() });
+    const existing = await Designation.findOne({ name: name.trim(), owner: req.admin._id });
     if (existing)
       return res.status(409).json({ message: "Designation already exists" });
 
-    const designation = await Designation.create({ name: name.trim() });
+    const designation = await Designation.create({ name: name.trim(), owner: req.admin._id });
 
     // 📝 LOG ACTIVITY - Admin created a new designation
     const logger = new ActivityLogger(req);
@@ -59,6 +63,11 @@ export const deleteDesignation = async (req, res) => {
     const designation = await Designation.findById(id);
     if (!designation) {
       return res.status(404).json({ message: "Designation not found" });
+    }
+
+    // A Child Admin can only delete its own designations.
+    if (req.admin.role !== "super-admin" && designation.owner?.toString() !== req.admin._id.toString()) {
+      return res.status(403).json({ message: "Access denied. You can only delete your own designations." });
     }
 
     // Check if designation is being used by any employees

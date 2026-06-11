@@ -96,35 +96,40 @@ export const SocketProvider = ({ children }) => {
       });
   };
 
-  useEffect(async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-      }
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/admin/profile`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.data.admin) {
-        console.error("Failed to fetch admin profile:", response.data);
-        navigate("/login");
-        return;
-      }
-      const user = response.data.admin;
-      // console.log("Fetched admin profile:", user);
+  useEffect(() => {
+    let socketInstance = null;
 
-      const s = io(process.env.REACT_APP_API_URL, {
-        transports: ["polling", "websocket"],
-        reconnection: true,
-        reconnectionAttempts: Infinity,
-        reconnectionDelay: 2000,
-      });
-      setSocket(s);
+    const initSocket = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/admin/profile`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (!response.data.admin) {
+          console.error("Failed to fetch admin profile:", response.data);
+          navigate("/login");
+          return;
+        }
+        const user = response.data.admin;
+        // console.log("Fetched admin profile:", user);
+
+        const s = io(process.env.REACT_APP_API_URL, {
+          transports: ["polling", "websocket"],
+          reconnection: true,
+          reconnectionAttempts: Infinity,
+          reconnectionDelay: 2000,
+        });
+        socketInstance = s;
+        setSocket(s);
 
       if (user) {
         s.emit("register", user._id);
@@ -196,13 +201,19 @@ export const SocketProvider = ({ children }) => {
         showNotification(notification, "success");
       });
 
-      return () => {
-        s.disconnect();
-      };
-    } catch (error) {
-      console.error("Error fetching admin profile:", error);
-      navigate("/login");
-    }
+      } catch (error) {
+        console.error("Error fetching admin profile:", error);
+        navigate("/login");
+      }
+    };
+
+    initSocket();
+
+    return () => {
+      if (socketInstance) {
+        socketInstance.disconnect();
+      }
+    };
   }, [notificationPermission]);
 
   // Function to manually request permission

@@ -12,6 +12,7 @@ import ClientSearchableSelect from "../../../components/common/ClientSearchableS
 import EmployeeSearchableSelect from "../../../components/common/EmployeeSearchableSelect";
 import SearchableSelect from "../../../components/common/SearchableSelect";
 import { useAuth } from "../../../contexts/AuthContext";
+import { filterStagesForUser } from "../../../constants";
 
 dayjs.extend(duration);
 
@@ -553,7 +554,7 @@ const Subtasks = () => {
               onChange={(opt) =>
                 setFilters((p) => ({ ...p, stage: opt ? opt.value : "" }))
               }
-              options={stageOptions.map((o) => ({ value: o, label: o }))}
+              options={filterStagesForUser(user, stageOptions).map((o) => ({ value: o, label: o }))}
             />
             <SearchableSelect
               placeholder="Subtask Status"
